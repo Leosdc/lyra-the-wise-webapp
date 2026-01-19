@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyra the Wise - RPG WebApp</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="medieval-theme">
+    <div id="app-overlay"></div>
+
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="assets/Lyra_logo.png" alt="Lyra the Wise" class="header-logo">
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-view="dashboard"><i class="fas fa-scroll"></i> Início</button>
+                <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i> Personagens</button>
+                <button class="nav-btn" data-view="monstros"><i class="fas fa-dragon"></i> Bestiário</button>
+                <button class="nav-btn" data-view="sessoes"><i class="fas fa-feather-pointed"></i> Diários</button>
+                <button class="nav-btn" data-view="chat"><i class="fas fa-scroll-old"></i> Taverna (IA)</button>
+            </nav>
+            <div class="user-controls">
+                <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- Dashboard View -->
+        <section id="dashboard" class="view">
+            <div class="hero-section">
+                <div class="hero-artwork">
+                    <img src="assets/Lyra_the_wise.png" alt="Lyra" class="hero-lyra">
+                </div>
+                <h2>Saudações, Historiador</h2>
+                <p>O que desejas consultar nos anais de Lyra hoje?</p>
+                <div class="quick-actions">
+                    <button class="action-card" data-view="fichas">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Personagens</span>
+                    </button>
+                    <button class="action-card" data-view="monstros">
+                        <i class="fas fa-dragon"></i>
+                        <span>Bestiário</span>
+                    </button>
+                    <button class="action-card" data-view="sessoes">
+                        <i class="fas fa-feather-pointed"></i>
+                        <span>Diários</span>
+                    </button>
+                    <button class="action-card" data-view="chat">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>AI Master</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat View -->
+        <section id="chat" class="view hidden">
+            <div class="chat-container parchment">
+                <div class="chat-header">
+                    <h2><i class="fas fa-scroll"></i> Pergunte à Lyra</h2>
+                </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Sua mensagem, viajante...">
+                    <button id="send-msg-btn" class="medieval-btn small">Enviar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fichas View -->
+        <section id="fichas" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-user-shield"></i> Seus Personagens</h2>
+                <button id="show-wizard-btn" class="medieval-btn small"><i class="fas fa-plus"></i>
+                    Novo</button>
+            </div>
+            <div id="fichas-list" class="items-grid"></div>
+        </section>
+
+        <!-- Monstros View -->
+        <section id="monstros" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
+                <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i>
+                    Invocar</button>
+            </div>
+            <div id="monsters-list" class="items-grid"></div>
+        </section>
+
+        <!-- Sessoes View -->
+        <section id="sessoes" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-feather-pointed"></i> Diários de Sessão</h2>
+                <button id="show-session-btn" class="medieval-btn small"><i class="fas fa-pen-nib"></i>
+                    Escrever</button>
+            </div>
+            <div id="sessions-list" class="items-grid"></div>
+        </section>
+    </main>
+
+    <!-- Modals & Wizards -->
+    <div id="modal-wrapper" class="hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content parchment">
+            <button class="close-modal">&times;</button>
+            <div id="modal-body">
+                <!-- Wizard Steps (Characters) -->
+                <div id="creation-wizard" class="wizard-container hidden">
+                    <div class="wizard-progress">
+                        <div class="step-indicator active" data-step="1">1</div>
+                        <div class="step-indicator" data-step="2">2</div>
+                        <div class="step-indicator" data-step="3">3</div>
+                        <div class="step-indicator" data-step="4">4</div>
+                    </div>
+                    <!-- Steps content... same as before -->
+                    <div class="wizard-step" data-step="1">
+                        <h3>Origens</h3>
+                        <div class="form-group"><label>Nome</label><input type="text" id="wiz-name"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"></div>
+                            <div class="form-group"><label>Classe</label><input type="text" id="wiz-class"></div>
+                        </div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="2">
+                        <h3>Atributos</h3>
+                        <div class="attributes-grid">
+                            <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10"></div>
+                            <div class="attr-input"><span>DEX</span><input type="number" id="wiz-dex" value="10"></div>
+                            <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10"></div>
+                            <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10"></div>
+                            <div class="attr-input"><span>WIS</span><input type="number" id="wiz-wis" value="10"></div>
+                            <div class="attr-input"><span>CHA</span><input type="number" id="wiz-cha" value="10"></div>
+                        </div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="3">
+                        <h3>Perícias</h3>
+                        <div class="skills-selection">
+                            <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
+                            <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
+                            <label><input type="checkbox" value="Atletismo"> Atletismo</label>
+                            <label><input type="checkbox" value="Percepção"> Percepção</label>
+                        </div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="4">
+                        <h3>Consagração</h3>
+                        <p>Lyra irá tecer a trama final do seu herói.</p>
+                    </div>
+                    <div class="wizard-nav">
+                        <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                        <button id="wiz-next" class="medieval-btn small">Próximo</button>
+                        <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
+                    </div>
+                </div>
+
+                <!-- Monster Wizard -->
+                <div id="monster-wizard" class="wizard-container hidden">
+                    <h3><i class="fas fa-dragon"></i> Invocação</h3>
+                    <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
+                        <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
+                    </div>
+                    <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
+                            class="medieval-textarea"></textarea></div>
+                    <div class="wizard-nav">
+                        <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
+                    </div>
+                </div>
+
+                <!-- Character Sheet -->
+                <div id="character-sheet" class="sheet-container hidden">
+                    <div class="sheet-tabs">
+                        <button class="sheet-tab active" data-tab="geral">Geral</button>
+                        <button class="sheet-tab" data-tab="atributos">Atributos</button>
+                        <button class="sheet-tab" data-tab="pericias">Perícias</button>
+                        <button class="sheet-tab" data-tab="recursos">Recursos</button>
+                        <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    </div>
+                    <div class="sheet-content">
+                        <div id="sheet-geral" class="sheet-section">
+                            <h2 id="sheet-char-name"></h2>
+                            <p id="sheet-char-info"></p>
+                            <div class="vital-stats">
+                                <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
+                                <div class="vital-box"><span>HP</span><strong id="sheet-hp"></strong></div>
+                                <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                            </div>
+                        </div>
+                        <div id="sheet-atributos" class="sheet-section hidden">
+                            <div class="scores-grid" id="sheet-scores"></div>
+                        </div>
+                        <div id="sheet-pericias" class="sheet-section hidden">
+                            <div class="skills-list" id="sheet-skills"></div>
+                        </div>
+                        <div id="sheet-recursos" class="sheet-section hidden">
+                            <div id="sheet-features" class="text-block"></div>
+                        </div>
+                        <div id="sheet-historia" class="sheet-section hidden">
+                            <div id="sheet-backstory" class="text-block"></div>
+                            <div class="traits-grid">
+                                <div><strong>Traços</strong>
+                                    <p id="sheet-traits"></p>
+                                </div>
+                                <div><strong>Ideais</strong>
+                                    <p id="sheet-ideals"></p>
+                                </div>
+                                <div><strong>Vínculos</strong>
+                                    <p id="sheet-bonds"></p>
+                                </div>
+                                <div><strong>Defeitos</strong>
+                                    <p id="sheet-flaws"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+
+</html>

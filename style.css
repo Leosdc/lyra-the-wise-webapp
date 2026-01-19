@@ -1,0 +1,700 @@
+/* Lyra the Wise - Medieval Design System */
+
+:root {
+    --gold: #d4af37;
+    --gold-bright: #ffdf00;
+    --dark-charcoal: #121212;
+    --dark-panel: rgba(20, 20, 20, 0.85);
+    --parchment: #f4e4bc;
+    --ink: #2c1e16;
+    --crimson: #8b0000;
+    --glass: rgba(255, 255, 255, 0.05);
+    --border-medieval: 2px solid var(--gold);
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: #e0e0e0;
+    line-height: 1.6;
+    background: var(--dark-charcoal);
+    overflow-x: hidden;
+}
+
+.medieval-theme {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)),
+        url('assets/Background.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+.logo-text,
+.medieval-btn {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1.5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.header-logo {
+    height: 60px;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+    transition: 0.3s;
+}
+
+.header-logo:hover {
+    filter: drop-shadow(0 0 10px var(--gold));
+    transform: scale(1.05);
+}
+
+/* Header & Nav */
+.app-header {
+    background: var(--dark-panel);
+    border-bottom: 2px solid var(--gold);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: #bbb;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Parchment Containers */
+.parchment {
+    background: url('https://www.transparenttextures.com/patterns/pizzelle.png'), var(--parchment);
+    color: var(--ink);
+    padding: 2rem;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d3c29a;
+}
+
+/* Buttons */
+.medieval-btn {
+    background: linear-gradient(145deg, #2c1e16, #120b08);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.medieval-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.medieval-btn.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+}
+
+/* Dashboard & View Headers */
+.hero-section {
+    text-align: center;
+    padding: 2rem 2rem 6rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.hero-artwork {
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+}
+
+.hero-lyra {
+    max-width: 400px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    transition: 0.5s ease-in-out;
+}
+
+.hero-lyra:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 60px rgba(212, 175, 55, 0.3);
+}
+
+.hero-section h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--gold);
+}
+
+.hero-section p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 3rem;
+}
+
+.quick-actions {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.action-card {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    color: var(--gold);
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.action-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    border-color: var(--gold);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.action-card:hover::before {
+    opacity: 1;
+}
+
+.action-card i {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+    transition: 0.3s;
+}
+
+.action-card:hover i {
+    transform: scale(1.1);
+    color: var(--gold-bright);
+}
+
+.action-card span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.view-header h2 {
+    color: var(--gold);
+    font-size: 2.2rem;
+}
+
+/* Grid & Cards */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto 4rem auto;
+    padding: 0 2rem;
+}
+
+.medieval-card {
+    background: var(--dark-panel);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.medieval-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-8px);
+}
+
+.card-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.25rem;
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+    padding-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #666;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+/* Chat UI */
+.chat-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    border: 3px double var(--gold);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.msg {
+    max-width: 85%;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+}
+
+.msg.bot {
+    align-self: flex-start;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 3px solid var(--gold);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    flex-shrink: 0;
+}
+
+.msg-content {
+    line-height: 1.5;
+}
+
+.msg.user {
+    align-self: flex-end;
+    background: rgba(44, 30, 22, 0.05);
+    text-align: right;
+}
+
+.chat-input-area {
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 1rem;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Modal & Wizard */
+#modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#modal-wrapper.active {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1001;
+    position: relative;
+    padding: 3rem 2rem 2rem 2rem;
+}
+
+.wizard-progress {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.step-indicator {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.3;
+}
+
+.step-indicator.active {
+    opacity: 1;
+    background: var(--ink);
+    color: var(--parchment);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #8b4513;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.attr-input {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 1rem;
+}
+
+.attr-input input {
+    width: 60px;
+    text-align: center;
+    font-size: 1.2rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--gold);
+}
+
+.skills-selection {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+}
+
+.skills-selection label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.wizard-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Character Sheet (Libram) */
+.sheet-container {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+}
+
+.sheet-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.sheet-tab {
+    background: transparent;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--ink);
+    opacity: 0.5;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.sheet-tab.active {
+    opacity: 1;
+    background: var(--ink);
+    color: var(--parchment);
+    border-radius: 4px;
+}
+
+.sheet-section {
+    padding-bottom: 2rem;
+}
+
+.sheet-section h2 {
+    margin-bottom: 0.5rem;
+    color: #2c1e16;
+}
+
+.sheet-section p {
+    color: #5a4a3a;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+
+.vital-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.vital-box {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1.5rem;
+    border: 2px solid #8b4513;
+    border-radius: 4px;
+}
+
+.vital-box span {
+    display: block;
+    font-size: 0.7rem;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.vital-box strong {
+    font-size: 1.8rem;
+    color: #8b0000;
+}
+
+.scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1.5rem;
+}
+
+.score-box {
+    text-align: center;
+    border: 1px solid #d3c29a;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.score-box .label {
+    font-family: 'Cinzel', serif;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.score-box .mod {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--ink);
+}
+
+.score-box .val {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.text-block {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1.5rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    line-height: 1.8;
+}
+
+.traits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.traits-grid strong {
+    display: block;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.traits-grid p {
+    font-size: 0.85rem;
+    font-style: normal !important;
+}
+
+.sheet-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.medieval-textarea {
+    width: 100%;
+    height: 120px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #8b4513;
+    padding: 0.8rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+}
+
+/* Helpers */
+.hidden {
+    display: none !important;
+}
+
+.error-text {
+    color: var(--crimson);
+    text-align: center;
+    padding: 1rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem;
+    opacity: 0.6;
+}
