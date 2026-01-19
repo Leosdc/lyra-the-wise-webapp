@@ -21,6 +21,7 @@ const app = {
 
         // Menu Toggle
         document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
+        document.getElementById('home-btn')?.addEventListener('click', () => this.switchView('dashboard'));
         document.querySelector('.close-menu')?.addEventListener('click', () => this.toggleMenu(false));
         document.querySelector('.menu-overlay')?.addEventListener('click', () => this.toggleMenu(false));
 

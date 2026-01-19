@@ -20,6 +20,8 @@
                 <div class="logo-container">
                     <img src="assets/Lyra_logo.png" alt="Lyra the Wise" class="header-logo">
                 </div>
+                <button id="home-btn" class="medieval-btn small icon-only" title="Início"><i
+                        class="fas fa-home"></i></button>
                 <div class="header-menu-container">
                     <button id="menu-btn" class="medieval-btn small"><i class="fas fa-bars"></i> Menu</button>
                     <div class="header-dropdown-content parchment">
@@ -142,13 +144,17 @@
         <!-- Dashboard View -->
         <section id="dashboard" class="view">
             <div class="hero-section">
-                <div class="hero-artwork">
-                    <img src="assets/Lyra_the_wise.png" alt="Lyra" class="hero-lyra">
-                </div>
-                <div class="lyra-story">
-                    <h2>Lyra, the Wise</h2>
-                    <p>Guardiã dos segredos arcanos e mestre das crônicas. Lyra não apenas observa, ela tece o destino
-                        de heróis e monstros em uma trama infinita de magia e perigo. O que desejas consultar hoje?</p>
+                <div class="hero-content-wrapper">
+                    <div class="hero-artwork">
+                        <img src="assets/Lyra_the_wise.png" alt="Lyra" class="hero-lyra">
+                    </div>
+                    <div class="lyra-story">
+                        <h2>Lyra, the Wise</h2>
+                        <p>Guardiã dos segredos arcanos e mestre das crônicas. Lyra não apenas observa, ela tece o
+                            destino
+                            de heróis e monstros em uma trama infinita de magia e perigo. O que desejas consultar hoje?
+                        </p>
+                    </div>
                 </div>
                 <div class="quick-actions">
                     <!-- Criação Arcaica -->
@@ -257,15 +263,17 @@
         </section>
 
         <!-- Monstros View -->
-        <div class="view-header">
-            <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
-            <div class="header-actions">
-                <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i> Invocar</button>
-                <button id="show-trap-btn" class="medieval-btn small"><i class="fas fa-skull-crossbones"></i>
-                    Armadilha</button>
+        <section id="monstros" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
+                <div class="header-actions">
+                    <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i>
+                        Invocar</button>
+                    <button id="show-trap-btn" class="medieval-btn small"><i class="fas fa-skull-crossbones"></i>
+                        Armadilha</button>
+                </div>
             </div>
-        </div>
-        <div id="monsters-list" class="items-grid"></div>
+            <div id="monsters-list" class="items-grid"></div>
         </section>
 
         <!-- Sessoes View -->
