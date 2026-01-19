@@ -1,14 +1,16 @@
 
-const AI_PROXY_URL = "http://localhost:8000/chat"; // Update with EC2 IP for production
+const AI_PROXY_URL = "https://script.google.com/macros/s/AKfycbxargXcnX6vxelFHruR0l1uZEVqP3etr-6kENsB5TB55luDv0uet_JJbOvE6-65WUyH5w/exec";
 
-export const sendMessageToLyra = async (message, history = []) => {
+export const sendMessageToLyra = async (message, idToken, history = []) => {
     try {
         const response = await fetch(AI_PROXY_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message, history })
+            body: JSON.stringify({
+                action: 'callGemini',
+                idToken,
+                message,
+                history
+            })
         });
 
         if (!response.ok) {
@@ -16,6 +18,7 @@ export const sendMessageToLyra = async (message, history = []) => {
         }
 
         const data = await response.json();
+        if (data.error) throw new Error(data.error);
         return data.response;
     } catch (error) {
         console.error("Erro ao falar com a IA:", error);

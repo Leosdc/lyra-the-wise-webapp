@@ -325,14 +325,31 @@ h4,
 
 /* Chat UI */
 .chat-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 2rem auto;
-    height: 70vh;
+    height: 75vh;
     display: flex;
     flex-direction: column;
-    padding: 0;
+    padding: 0 !important;
+    /* Keep internal padding 0, move it to sub-elements */
     overflow: hidden;
     border: 3px double var(--gold);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.chat-header {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1.5rem 2.5rem;
+    border-bottom: 2px solid rgba(44, 30, 22, 0.1);
+}
+
+.chat-header h2 {
+    font-size: 1.6rem;
+    color: var(--ink);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
 }
 
 .chat-messages {

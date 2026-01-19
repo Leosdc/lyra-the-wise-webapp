@@ -219,7 +219,8 @@ const app = {
         input.value = '';
         this.isWaitingForAI = true;
         try {
-            const response = await sendMessageToLyra(message, this.chatHistory);
+            const idToken = await this.user.getIdToken();
+            const response = await sendMessageToLyra(message, idToken, this.chatHistory);
             this.addMessageToUI('bot', response);
             this.chatHistory.push({ role: 'user', content: message }, { role: 'bot', content: response });
         } catch (error) {
