@@ -13,10 +13,18 @@
 }
 
 .user-avatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 1px solid var(--gold);
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 * {

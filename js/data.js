@@ -60,8 +60,20 @@ export const getMonsters = async (userId) => {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const saveMonster = async (userId, monsterData) => {
+    const data = { ...monsterData, userId, updatedAt: new Date().toISOString() };
+    const docRef = await addDoc(collection(db, COLLECTIONS.MONSTERS), data);
+    return docRef.id;
+};
+
 export const getSessions = async (userId) => {
-    const q = query(collection(db, COLLECTIONS.SESSIONS), where("userId", "==", userId));
+    const q = query(collection(db, COLLECTIONS.SESSIONS), where("userId", "==", userId), orderBy("updatedAt", "desc"));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const saveSession = async (userId, sessionData) => {
+    const data = { ...sessionData, userId, updatedAt: new Date().toISOString() };
+    const docRef = await addDoc(collection(db, COLLECTIONS.SESSIONS), data);
+    return docRef.id;
 };

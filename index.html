@@ -87,13 +87,15 @@
         </section>
 
         <!-- Monstros View -->
-        <section id="monstros" class="view hidden">
-            <div class="view-header">
-                <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
-                <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i>
-                    Invocar</button>
+        <div class="view-header">
+            <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
+            <div class="header-actions">
+                <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i> Invocar</button>
+                <button id="show-trap-btn" class="medieval-btn small"><i class="fas fa-skull-crossbones"></i>
+                    Armadilha</button>
             </div>
-            <div id="monsters-list" class="items-grid"></div>
+        </div>
+        <div id="monsters-list" class="items-grid"></div>
         </section>
 
         <!-- Sessoes View -->
@@ -163,16 +165,30 @@
 
                 <!-- Monster Wizard -->
                 <div id="monster-wizard" class="wizard-container hidden">
-                    <h3><i class="fas fa-dragon"></i> Invocação</h3>
+                    <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
                     <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
                     <div class="form-row">
                         <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
                         <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
                     </div>
                     <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
-                            class="medieval-textarea"></textarea></div>
+                            class="medieval-textarea"
+                            placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
                     <div class="wizard-nav">
                         <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
+                    </div>
+                </div>
+
+                <!-- Session Wizard -->
+                <div id="session-wizard" class="wizard-container hidden">
+                    <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
+                    <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title"></div>
+                    <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
+                            class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea></div>
+                    <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
+                            class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea></div>
+                    <div class="wizard-nav">
+                        <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
                     </div>
                 </div>
 

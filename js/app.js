@@ -1,7 +1,7 @@
 
 import { login, logout, initAuth } from "./auth.js";
-import { getCharacters, getCharacter, saveCharacter, getMonsters, getSessions } from "./data.js";
-import { sendMessageToLyra } from "./ai.js";
+import { getCharacters, getCharacter, saveCharacter, getMonsters, saveMonster, getSessions, saveSession } from "./data.js";
+import { sendMessageToLyra, createMonsterWithLyra } from "./ai.js";
 
 const app = {
     user: null,
@@ -17,6 +17,8 @@ const app = {
     },
 
     bindEvents() {
+        console.log("🔗 Binding events...");
+
         // Nav Buttons
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.switchView(e.currentTarget.getAttribute('data-view')));
@@ -55,6 +57,7 @@ const app = {
         // Wizards & Modals Show
         document.getElementById('show-wizard-btn')?.addEventListener('click', () => this.showCreationWizard());
         document.getElementById('show-monster-btn')?.addEventListener('click', () => this.showMonsterCreator());
+        document.getElementById('show-trap-btn')?.addEventListener('click', () => this.showTrapCreator());
         document.getElementById('show-session-btn')?.addEventListener('click', () => this.showSessionEditor());
 
         // Close Modals (Backdrop & Button)
@@ -67,6 +70,7 @@ const app = {
         document.getElementById('wiz-prev')?.addEventListener('click', () => this.updateWizardStep(-1));
         document.getElementById('wiz-finish')?.addEventListener('click', () => this.handleWizardFinish());
         document.getElementById('mon-finish-btn')?.addEventListener('click', () => this.handleMonsterFinish());
+        document.getElementById('sess-finish-btn')?.addEventListener('click', () => this.handleSessionFinish());
 
         document.querySelectorAll('.sheet-tab').forEach(tab => {
             tab.addEventListener('click', (e) => this.switchSheetTab(e.currentTarget.dataset.tab));
@@ -77,9 +81,16 @@ const app = {
         this.user = user;
         const loginBtn = document.getElementById('login-btn');
         if (user) {
-            if (loginBtn) loginBtn.innerHTML = `<img src="${user.photoURL}" class="user-avatar"> Sair`;
+            console.log("👤 Usuário logado:", user.email);
+            if (loginBtn) {
+                loginBtn.innerHTML = `
+                    <img src="${user.photoURL}" class="user-avatar" alt="Avatar">
+                    <span>Sair</span>
+                `;
+            }
             this.loadViewData(this.currentView);
         } else {
+            console.log("👤 Usuário deslogado");
             if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
             this.clearAllViews();
             this.switchView('dashboard');
@@ -87,6 +98,7 @@ const app = {
     },
 
     switchView(viewId) {
+        console.log("🖼️ Alternando para vista:", viewId);
         this.currentView = viewId;
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-view') === viewId));
         document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
@@ -97,31 +109,48 @@ const app = {
 
     async loadViewData(viewId) {
         if (!this.user) return;
-        if (viewId === 'fichas') await this.loadCharacters();
-        if (viewId === 'monstros') await this.loadMonsters();
-        if (viewId === 'sessoes') await this.loadSessions();
-        if (viewId === 'chat') this.focusChat();
+        try {
+            if (viewId === 'fichas') await this.loadCharacters();
+            if (viewId === 'monstros') await this.loadMonsters();
+            if (viewId === 'sessoes') await this.loadSessions();
+            if (viewId === 'chat') this.focusChat();
+        } catch (err) {
+            console.error("❌ Erro ao carregar dados da vista:", err);
+        }
     },
 
     // --- Wizards ---
     showCreationWizard() {
+        console.log("✨ Abrindo Criador de Personagem");
         this.openModal('creation-wizard');
         this.wizardStep = 1;
         this.updateWizardUI();
     },
 
     showMonsterCreator() {
+        console.log("🐉 Abrindo Invocador de Monstros");
+        document.getElementById('mon-cr').parentElement.classList.remove('hidden');
+        document.getElementById('monster-wizard').querySelector('h3').innerText = "Invocação de Criatura";
+        this.openModal('monster-wizard');
+    },
+
+    showTrapCreator() {
+        console.log("💀 Abrindo Invocador de Armadilhas");
+        document.getElementById('mon-cr').parentElement.classList.add('hidden');
+        document.getElementById('monster-wizard').querySelector('h3').innerText = "Criação de Armadilha";
         this.openModal('monster-wizard');
     },
 
     showSessionEditor() {
-        alert("O escriba ainda está preparando os anais para esta função...");
+        console.log("📝 Abrindo Diário de Sessão");
+        this.openModal('session-wizard');
     },
 
     openModal(wizardId) {
         document.getElementById('modal-wrapper').classList.add('active');
-        document.querySelectorAll('.wizard-container, .sheet-container').forEach(c => c.classList.add('hidden'));
-        document.getElementById(wizardId).classList.remove('hidden');
+        document.querySelectorAll('.wizard-container, .sheet-container, .modal-content > div:not(.close-modal):not(#modal-body)').forEach(c => c.classList.add('hidden'));
+        const target = document.getElementById(wizardId);
+        if (target) target.classList.remove('hidden');
     },
 
     closeModal() {
@@ -154,8 +183,59 @@ const app = {
     },
 
     async handleMonsterFinish() {
-        alert("Invocando criatura... (Integrando com AI Proxy)");
-        this.closeModal();
+        const btn = document.getElementById('mon-finish-btn');
+        btn.disabled = true;
+        btn.innerText = "Invocando...";
+
+        try {
+            const isTrap = document.getElementById('monster-wizard').querySelector('h3').innerText.includes("Armadilha");
+            const monsterData = {
+                name: document.getElementById('mon-name').value,
+                cr: isTrap ? "Trap" : document.getElementById('mon-cr').value,
+                type: document.getElementById('mon-type').value,
+                prompt: document.getElementById('mon-prompt').value
+            };
+
+            const idToken = await this.user.getIdToken();
+            const result = await createMonsterWithLyra(monsterData, idToken);
+
+            await saveMonster(this.user.uid, result);
+
+            console.log("👹 Conteúdo Invocado:", result);
+            alert(`Sucesso! ${result.name} foi conjurado.`);
+            this.closeModal();
+            this.loadMonsters();
+        } catch (error) {
+            alert("Falha na invocação mística: " + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Invocar";
+        }
+    },
+
+    async handleSessionFinish() {
+        const btn = document.getElementById('sess-finish-btn');
+        btn.disabled = true;
+        btn.innerText = "Registrando...";
+
+        try {
+            const sessionData = {
+                title: document.getElementById('sess-title').value,
+                summary: document.getElementById('sess-summary').value,
+                notes: document.getElementById('sess-notes').value
+            };
+
+            await saveSession(this.user.uid, sessionData);
+
+            alert("Crônica registrada nos anais!");
+            this.closeModal();
+            this.loadSessions();
+        } catch (error) {
+            alert("Erro ao registrar: " + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Registrar";
+        }
     },
 
     // --- Data Rendering ---
@@ -180,8 +260,8 @@ const app = {
     renderCard(item, type) {
         const b = item.secoes?.basico || {};
         return `<div class="medieval-card" data-type="${type}" data-id="${item.id}">
-            <div class="card-title">${item.name || b.Nome || 'Sem Nome'}</div>
-            <div class="card-subtitle">${b.Raça || ''} ${b.Classe || ''}</div>
+            <div class="card-title">${item.name || b.Nome || item.title || 'Sem Nome'}</div>
+            <div class="card-subtitle">${b.Raça || item.type || ''} ${b.Classe || item.cr || ''}</div>
         </div>`;
     },
 
@@ -201,7 +281,6 @@ const app = {
         const b = char.secoes?.basico || {};
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
         document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'}`;
-        // ... (populate other fields as implemented before)
     },
 
     switchSheetTab(tabId) {

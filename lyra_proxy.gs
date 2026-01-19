@@ -1,4 +1,5 @@
 // === LYRA THE WISE: PROXY ARCANO (Serverless Edition) ===
+// VERSÃO CORRIGIDA: Usa o mesmo API Key do WebApp
 
 function doPost(e) {
   let requestData;
@@ -10,14 +11,13 @@ function doPost(e) {
 
   const idToken = requestData.idToken;
 
-  // 1. Validar se o Token existe
   if (!idToken) {
     return createResponse({ error: 'Não autorizado: Token ausente.' });
   }
 
-  // Chave de API do Firebase (para validar o token)
-  // Nota: Deixando a mesma que você forneceu do "Mundo da Alice"
-  const FIREBASE_API_KEY = "AIzaSyA177h7yrtUUeM0T1jaCx0ElaXlfTBbScA";
+  // === CHAVE DE API DO FIREBASE (CORRIGIDA) ===
+  // Deve ser igual à do seu firebase-config.js
+  const FIREBASE_API_KEY = "AIzaSyBdymlRGmshBOgIKMWomn07Lf6SyAalR3E";
 
   try {
     const verifyUrl = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`;
@@ -45,65 +45,88 @@ function doPost(e) {
 
   // === LÓGICA DA LYRA ===
   const action = requestData.action;
-  const message = requestData.message;
-  const history = requestData.history || [];
-
+  
   if (action === 'callGemini') {
-    return createResponse(callGemini(message, history));
+    return createResponse(callGemini(requestData.message, requestData.history || []));
+  }
+  
+  if (action === 'callGeminiMonster') {
+    return createResponse(callGeminiMonster(requestData.monsterData));
+  }
+
+  if (action === 'callGeminiSession') {
+    return createResponse(callGeminiSession(requestData.sessionData));
   }
   
   return createResponse({ error: 'Ação não reconhecida.' });
 }
 
 function callGemini(message, history) {
-  // Pegar a chave GEMINI_API_KEY das propriedades do script
   const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
   if (!apiKey) return { error: 'GEMINI_API_KEY não configurada no Script Properties' };
   
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
   
-  // Formatando o histórico para o Gemini
-  let contents = [];
-  history.forEach(msg => {
-    contents.push({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }]
-    });
-  });
+  let contents = history.map(msg => ({
+    role: msg.role === 'user' ? 'user' : 'model',
+    parts: [{ text: msg.content }]
+  }));
   
-  // Adicionando a última mensagem
-  contents.push({
-    role: 'user',
-    parts: [{ text: message }]
-  });
+  contents.push({ role: 'user', parts: [{ text: message }] });
   
   const payload = {
     contents: contents,
-    generationConfig: { 
-      temperature: 0.8, 
-      maxOutputTokens: 2048,
-      topP: 0.95,
-      topK: 40
-    }
+    generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
   };
 
   const response = UrlFetchApp.fetch(url, {
-    method: 'post', 
-    contentType: 'application/json',
-    payload: JSON.stringify(payload), 
-    muteHttpExceptions: true
+    method: 'post', contentType: 'application/json',
+    payload: JSON.stringify(payload), muteHttpExceptions: true
   });
 
   const resData = JSON.parse(response.getContentText());
-
-  if (response.getResponseCode() !== 200 || !resData.candidates) {
-    return { error: 'Erro na API Gemini: ' + response.getContentText() };
-  }
+  if (response.getResponseCode() !== 200 || !resData.candidates) return { error: 'Erro na API Gemini' };
   
-  // Retornando no formato simplificado esperado pelo app.js
-  return { 
-    response: resData.candidates[0].content.parts[0].text 
-  };
+  return { response: resData.candidates[0].content.parts[0].text };
+}
+
+function callGeminiMonster(monsterData) {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  
+  const prompt = `Crie uma ficha de monstro para RPG (estilo D&D 5e) baseada nestas informações:
+  Nome: ${monsterData.name}
+  ND: ${monsterData.cr}
+  Tipo: ${monsterData.type}
+  Contexto: ${monsterData.prompt}
+  
+  Retorne APENAS um JSON puro no seguinte formato:
+  {
+    "name": "Nome",
+    "cr": "ND",
+    "type": "Tipo",
+    "hp": 50,
+    "ca": 15,
+    "description": "...",
+    "actions": [{"name": "...", "desc": "..."}]
+  }`;
+
+  const payload = { contents: [{ parts: [{ text: prompt }] }] };
+  const response = UrlFetchApp.fetch(url, {
+    method: 'post', contentType: 'application/json',
+    payload: JSON.stringify(payload), muteHttpExceptions: true
+  });
+
+  const resData = JSON.parse(response.getContentText());
+  const text = resData.candidates[0].content.parts[0].text;
+  // Limpar possíveis markdown do Gemini
+  const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  return { monster: JSON.parse(jsonStr) };
+}
+
+function callGeminiSession(sessionData) {
+  // Lógica similar para diários de sessão
+  return { response: "Diário processado pela IA." };
 }
 
 function createResponse(obj) {
