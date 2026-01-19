@@ -8,8 +8,31 @@ Bem-vindo à versão Web do Sanctum de **Lyra the Wise**. Esta aplicação é a 
 
 - **AI Tavern (Mestre Lyra)**: Chat direto com a Lyra utilizando o modelo **Gemini 2.0 Flash** para narrações e dúvidas.
 - **Character Libram**: Gestão completa de fichas de RPG com criação guiada e visualização imersiva.
-- **World Building Tools**: Invocador de monstros e diários de sessão (em expansão).
+- **GM Command Center**: Novo Painel do Mestre e gestão de sessões para controle total da narrativa.
 - **Segurança Ninja**: Autenticação via Google (Firebase) com validação de tokens em servidor seguro.
+
+## ⚔️ Guia de Ferramentas Arcanas
+
+| Ferramenta | Descrição |
+| :--- | :--- |
+| **Painel do Mestre** | Central de controle para o mestre com resumo da sessão e NPCs ativos. |
+| **Campanhas** | Gestão de múltiplos grupos, cronogramas e histórico de aventuras. |
+| **Fale com Lyra** | Assistente de IA para suporte em tempo real durante a sessão. |
+| **Personagens** | Gerenciamento de fichas de personagens (PCs). |
+| **Bestiário** | Catálogo de monstros com estatísticas e habilidades. |
+| **Encontros** | Cria cenas de combate ou desafios sociais de forma randômica. |
+| **Armadilhas** | Biblioteca de perigos mecânicos e mágicos para masmorras. |
+| **Descritor de Cenas** | Ajuda a criar descrições sensoriais e imersivas de ambientes. |
+| **Itens Mágicos** | Gerador de itens lendários, armas e artefatos mágicos. |
+| **Tesouros** | Cálculo de loot e recompensas para os jogadores. |
+| **Puzzles** | Enigmas e desafios de lógica para testar o grupo. |
+| **Vilões** | Criação de antagonistas profundos com planos e fraquezas. |
+| **NPCs** | Cria personagens secundários com nomes e traços únicos. |
+| **Nomes** | Base de dados de nomes temáticos por raça ou região. |
+| **Motivações** | Define o que move cada personagem ou vilão na história. |
+| **Tramas** | Gera ganchos de aventura e reviravoltas na narrativa. |
+| **Regras** | Consulta rápida às mecânicas core do sistema de RPG. |
+| **Sessões** | Registro histórico e notas das sessões de jogo. |
 
 ## 🛠️ Tecnologias e Artefatos
 

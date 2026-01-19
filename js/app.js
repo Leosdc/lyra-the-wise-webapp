@@ -19,14 +19,30 @@ const app = {
     bindEvents() {
         console.log("🔗 Binding events...");
 
-        // Nav Buttons
+        // Menu Toggle
+        document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
+        document.querySelector('.close-menu')?.addEventListener('click', () => this.toggleMenu(false));
+        document.querySelector('.menu-overlay')?.addEventListener('click', () => this.toggleMenu(false));
+
+        // Nav Buttons (within menu)
         document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchView(e.currentTarget.getAttribute('data-view')));
+            btn.addEventListener('click', (e) => {
+                const view = e.currentTarget.getAttribute('data-view');
+                const action = e.currentTarget.getAttribute('data-action');
+                if (view) this.switchView(view);
+                else if (action) this.handleQuickAction(action);
+                this.toggleMenu(false);
+            });
         });
 
         // Dashboard Action Cards
         document.querySelectorAll('.action-card').forEach(card => {
-            card.addEventListener('click', (e) => this.switchView(e.currentTarget.getAttribute('data-view')));
+            card.addEventListener('click', (e) => {
+                const view = e.currentTarget.getAttribute('data-view');
+                const action = e.currentTarget.getAttribute('data-action');
+                if (view) this.switchView(view);
+                else if (action) this.handleQuickAction(action);
+            });
         });
 
         // Global delegate for medieval-cards (dynamic content)
@@ -80,6 +96,8 @@ const app = {
     handleAuthStateChange(user) {
         this.user = user;
         const loginBtn = document.getElementById('login-btn');
+        const tracker = document.getElementById('header-char-tracker');
+
         if (user) {
             console.log("👤 Usuário logado:", user.email);
             if (loginBtn) {
@@ -89,9 +107,12 @@ const app = {
                 `;
             }
             this.loadViewData(this.currentView);
+            // Show tracker if a character is selected
+            if (this.currentCharacter) this.updateHeaderTracker(this.currentCharacter);
         } else {
             console.log("👤 Usuário deslogado");
             if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
+            tracker?.classList.add('hidden');
             this.clearAllViews();
             this.switchView('dashboard');
         }
@@ -100,11 +121,57 @@ const app = {
     switchView(viewId) {
         console.log("🖼️ Alternando para vista:", viewId);
         this.currentView = viewId;
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-view') === viewId));
+
+        // Navigation active state
+        document.querySelectorAll('.nav-btn').forEach(btn =>
+            btn.classList.toggle('active', btn.getAttribute('data-view') === viewId)
+        );
+
+        // View visibility
         document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
         const targetView = document.getElementById(viewId);
         if (targetView) targetView.classList.remove('hidden');
+
+        // Scroll lock logic: only allow scroll on views other than dashboard
+        document.body.style.overflow = (viewId === 'dashboard') ? 'hidden' : 'auto';
+
         if (this.user) this.loadViewData(viewId);
+    },
+
+    toggleMenu(show) {
+        const menu = document.getElementById('side-menu');
+        if (menu) menu.classList.toggle('hidden', !show);
+    },
+
+    openMenuAtSection(sectionId) {
+        this.toggleMenu(true);
+        document.querySelectorAll('.menu-section').forEach(sec => {
+            sec.style.display = (sec.dataset.section === sectionId || sectionId === 'all') ? 'block' : 'none';
+        });
+    },
+
+    handleQuickAction(action) {
+        console.log("⚡ Action Triggered:", action);
+        this.toggleMenu(false); // Close menu on action
+        if (action === 'monster-gen') this.showMonsterCreator();
+        else if (action === 'trap-gen') this.showTrapCreator();
+        else {
+            alert(`Invocando magia para: ${action}. (Funcionalidade em desenvolvimento)`);
+        }
+    },
+
+    updateHeaderTracker(character) {
+        const tracker = document.getElementById('header-char-tracker');
+        if (!character || !this.user) {
+            tracker?.classList.add('hidden');
+            return;
+        }
+
+        tracker?.classList.remove('hidden');
+        const b = character.secoes?.basico || {};
+        document.getElementById('header-char-name').innerText = character.name || b.Nome || "Herói";
+        document.getElementById('header-char-level').innerText = `Nível ${b.Nível || 1}`;
+        document.getElementById('header-char-stats').innerText = `PV: ${b.PV_Atual || 10}/${b.PV_Total || 10} | CA: ${b.CA || 10}`;
     },
 
     async loadViewData(viewId) {
@@ -273,7 +340,9 @@ const app = {
     async viewCharacter(id) {
         this.openModal('character-sheet');
         const char = await getCharacter(id);
+        this.currentCharacter = char; // Store globally
         this.populateSheet(char);
+        this.updateHeaderTracker(char); // Update header
         this.switchSheetTab('geral');
     },
 
