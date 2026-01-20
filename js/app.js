@@ -10,6 +10,7 @@ const app = {
     currentSystem: localStorage.getItem('lyra_current_system') || 'dnd5e',
     chatHistory: [],
     wizardStep: 1,
+    creationMode: 'ai', // 'ai' or 'manual'
     currentCharacter: null,
     rpgTrivia: [
         "Dungeons & Dragons foi criado por Gary Gygax e Dave Arneson em 1974.",
@@ -174,6 +175,30 @@ const app = {
 
         // System Selector
         document.getElementById('system-selector')?.addEventListener('change', (e) => this.handleSystemChange(e.target.value));
+
+        // Choice Cards
+        document.querySelectorAll('.choice-card').forEach(card => {
+            card.addEventListener('click', (e) => this.handleChoiceClick(e.currentTarget));
+        });
+    },
+
+    handleChoiceClick(card) {
+        const mode = card.dataset.mode;
+        this.creationMode = mode;
+        const wizardId = card.closest('.wizard-container').id;
+
+        if (wizardId === 'creation-wizard') {
+            this.wizardStep = 1;
+            document.getElementById('char-choice-step').classList.add('hidden');
+            document.querySelector('.wizard-progress').classList.remove('hidden');
+            this.updateWizardUI();
+        } else if (wizardId === 'monster-wizard') {
+            document.getElementById('mon-choice-step').classList.add('hidden');
+            document.getElementById('mon-form').classList.remove('hidden');
+        } else if (wizardId === 'session-wizard') {
+            document.getElementById('sess-choice-step').classList.add('hidden');
+            document.getElementById('sess-form').classList.remove('hidden');
+        }
     },
 
     handleSystemChange(systemId) {
@@ -360,9 +385,27 @@ const app = {
             wrapper.classList.add('active');
             wrapper.classList.remove('hidden');
         }
-        document.querySelectorAll('.wizard-container, .sheet-container, .modal-content > div:not(.close-modal):not(#modal-body)').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
         const target = document.getElementById(wizardId);
-        if (target) target.classList.remove('hidden');
+        if (target) {
+            target.classList.remove('hidden');
+            // Back to choice step
+            if (wizardId === 'creation-wizard') {
+                document.getElementById('char-choice-step').classList.remove('hidden');
+                document.querySelector('.wizard-progress').classList.add('hidden');
+            } else if (wizardId === 'monster-wizard') {
+                document.getElementById('mon-choice-step').classList.remove('hidden');
+                document.getElementById('mon-form').classList.add('hidden');
+            } else if (wizardId === 'session-wizard') {
+                document.getElementById('sess-choice-step').classList.remove('hidden');
+                document.getElementById('sess-form').classList.add('hidden');
+            }
+        }
+    },
+
+    toggleLoading(show) {
+        const loading = document.getElementById('mystic-loading');
+        if (loading) loading.classList.toggle('hidden', !show);
     },
 
     closeModal() {
@@ -406,42 +449,56 @@ const app = {
 
     // --- Actions ---
     async handleWizardFinish() {
-        const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
-        const name = document.getElementById('wiz-name').value;
-        const race = document.getElementById('wiz-race').value;
-        const className = document.getElementById('wiz-class').value;
-        const background = document.getElementById('wiz-background').value;
+        this.toggleLoading(true);
+        try {
+            const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
+            const name = document.getElementById('wiz-name').value;
+            const race = document.getElementById('wiz-race').value;
+            const className = document.getElementById('wiz-class').value;
+            const background = document.getElementById('wiz-background').value;
 
-        const data = {
-            name: name,
-            secoes: {
-                basico: {
-                    Nome: name,
-                    Raça: race,
-                    Classe: className,
-                    Antecedente: background,
-                    Nível: 1,
-                    Velocidade: "9m"
-                },
-                atributos: {
-                    Força: document.getElementById('wiz-str').value,
-                    Destreza: document.getElementById('wiz-dex').value,
-                    Constituição: document.getElementById('wiz-con').value,
-                    Inteligência: document.getElementById('wiz-int').value,
-                    Sabedoria: document.getElementById('wiz-wis').value,
-                    Carisma: document.getElementById('wiz-cha').value
-                },
-                pericias: skills.reduce((acc, skill) => ({ ...acc, [skill]: "Proficiente" }), {}),
-                combate: {
-                    HP: 10,
-                    CA: 10 + this.calculateModifier(document.getElementById('wiz-dex').value),
-                    Iniciativa: this.calculateModifier(document.getElementById('wiz-dex').value)
+            const basicData = {
+                name: name,
+                secoes: {
+                    basico: {
+                        Nome: name,
+                        Raça: race,
+                        Classe: className,
+                        Antecedente: background,
+                        Nível: 1,
+                        Velocidade: "9m"
+                    },
+                    atributos: {
+                        Força: document.getElementById('wiz-str').value,
+                        Destreza: document.getElementById('wiz-dex').value,
+                        Constituição: document.getElementById('wiz-con').value,
+                        Inteligência: document.getElementById('wiz-int').value,
+                        Sabedoria: document.getElementById('wiz-wis').value,
+                        Carisma: document.getElementById('wiz-cha').value
+                    },
+                    pericias: skills.reduce((acc, skill) => ({ ...acc, [skill]: "Proficiente" }), {}),
+                    combate: {
+                        HP: 10,
+                        CA: 10 + this.calculateModifier(document.getElementById('wiz-dex').value),
+                        Iniciativa: this.calculateModifier(document.getElementById('wiz-dex').value)
+                    }
                 }
+            };
+
+            let finalData = basicData;
+            if (this.creationMode === 'ai') {
+                // Future: Integrate Lyra to generate backstory/traits based on these inputs
+                // For now, let's at least simulate it or keep it simple
             }
-        };
-        await saveCharacter(this.user.uid, this.currentSystem, data);
-        this.closeModal();
-        this.loadCharacters();
+
+            await saveCharacter(this.user.uid, this.currentSystem, finalData);
+            this.closeModal();
+            this.loadCharacters();
+        } catch (error) {
+            this.showAlert("Erro ao consagrar herói: " + error.message, "Karma Ruim");
+        } finally {
+            this.toggleLoading(false);
+        }
     },
 
     calculateModifier(val) {
@@ -456,10 +513,7 @@ const app = {
     },
 
     async handleMonsterFinish() {
-        const btn = document.getElementById('mon-finish-btn');
-        btn.disabled = true;
-        btn.innerText = "Invocando...";
-
+        this.toggleLoading(true);
         try {
             const isTrap = document.getElementById('monster-wizard').querySelector('h3').innerText.includes("Armadilha");
             const monsterData = {
@@ -469,28 +523,29 @@ const app = {
                 prompt: document.getElementById('mon-prompt').value
             };
 
-            const idToken = await this.user.getIdToken();
-            const result = await createMonsterWithLyra(monsterData, idToken);
+            let result;
+            if (this.creationMode === 'ai') {
+                const idToken = await this.user.getIdToken();
+                result = await createMonsterWithLyra(monsterData, idToken);
+            } else {
+                result = {
+                    ...monsterData,
+                    stats: "Estatísticas manuais (em desenvolvimento)"
+                };
+            }
 
             await saveMonster(this.user.uid, this.currentSystem, result);
-
-            console.log("👹 Conteúdo Invocado:", result);
-            this.showAlert(`Sucesso! ${result.name} foi conjurado.`, "Convocação Concluída");
             this.closeModal();
             this.loadMonsters();
         } catch (error) {
-            alert("Falha na invocação mística: " + error.message);
+            this.showAlert("Falha na invocação mística: " + error.message, "Contra-feitiço");
         } finally {
-            btn.disabled = false;
-            btn.innerText = "Invocar";
+            this.toggleLoading(false);
         }
     },
 
     async handleSessionFinish() {
-        const btn = document.getElementById('sess-finish-btn');
-        btn.disabled = true;
-        btn.innerText = "Registrando...";
-
+        this.toggleLoading(true);
         try {
             const sessionData = {
                 title: document.getElementById('sess-title').value,
@@ -499,15 +554,12 @@ const app = {
             };
 
             await saveSession(this.user.uid, this.currentSystem, sessionData);
-
-            this.showAlert("Crônica registrada nos anais!", "Escriba Real");
             this.closeModal();
             this.loadSessions();
         } catch (error) {
-            alert("Erro ao registrar: " + error.message);
+            this.showAlert("Erro ao registrar: " + error.message, "Escriba Interrompido");
         } finally {
-            btn.disabled = false;
-            btn.innerText = "Registrar";
+            this.toggleLoading(false);
         }
     },
 

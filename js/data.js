@@ -23,11 +23,12 @@ export const getCharacters = async (userId, systemId) => {
     const q = query(
         collection(db, COLLECTIONS.CHARACTERS),
         where("userId", "==", userId),
-        where("systemId", "==", systemId),
-        orderBy("updatedAt", "desc")
+        where("systemId", "==", systemId)
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 };
 
 export const getCharacter = async (id) => {
@@ -63,7 +64,9 @@ export const getMonsters = async (userId, systemId) => {
         where("systemId", "==", systemId)
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 };
 
 export const saveMonster = async (userId, systemId, monsterData) => {
@@ -76,11 +79,12 @@ export const getSessions = async (userId, systemId) => {
     const q = query(
         collection(db, COLLECTIONS.SESSIONS),
         where("userId", "==", userId),
-        where("systemId", "==", systemId),
-        orderBy("updatedAt", "desc")
+        where("systemId", "==", systemId)
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 };
 
 export const saveSession = async (userId, systemId, sessionData) => {

@@ -300,11 +300,26 @@
     <div id="modal-wrapper" class="hidden">
         <div class="modal-backdrop"></div>
         <div class="modal-content parchment">
-            <button class="close-modal">&times;</button>
+            <button class="close-modal"><i class="fas fa-xmark"></i></button>
             <div id="modal-body">
                 <!-- Wizard Steps (Characters) -->
                 <div id="creation-wizard" class="wizard-container hidden">
-                    <div class="wizard-progress">
+                    <div id="char-choice-step" class="wizard-step">
+                        <h3>Como deseja criar, viajante?</h3>
+                        <div class="mode-choices">
+                            <div class="choice-card" data-mode="ai">
+                                <i class="fas fa-wand-magic-sparkles"></i>
+                                <h4>Com Lyra</h4>
+                                <p>A IA tecerá os detalhes arcanos para você.</p>
+                            </div>
+                            <div class="choice-card" data-mode="manual">
+                                <i class="fas fa-feather-pointed"></i>
+                                <h4>Manualmente</h4>
+                                <p>Você mesmo escreve cada detalhe da sua história.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wizard-progress hidden">
                         <div class="step-indicator active" data-step="1">1</div>
                         <div class="step-indicator" data-step="2">2</div>
                         <div class="step-indicator" data-step="3">3</div>
@@ -367,116 +382,162 @@
 
                 <!-- Monster Wizard -->
                 <div id="monster-wizard" class="wizard-container hidden">
-                    <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
-                    <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
-                        <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
-                    </div>
-                    <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
-                            class="medieval-textarea"
-                            placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
-                    <div class="wizard-nav">
-                        <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
-                    </div>
-                </div>
-
-                <!-- Session Wizard -->
-                <div id="session-wizard" class="wizard-container hidden">
-                    <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
-                    <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title"></div>
-                    <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
-                            class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea></div>
-                    <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
-                            class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea></div>
-                    <div class="wizard-nav">
-                        <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
-                    </div>
-                </div>
-
-                <!-- Character Sheet -->
-                <div id="character-sheet" class="sheet-container hidden">
-                    <div class="sheet-tabs">
-                        <button class="sheet-tab active" data-tab="geral">Geral</button>
-                        <button class="sheet-tab" data-tab="atributos">Atributos</button>
-                        <button class="sheet-tab" data-tab="pericias">Perícias</button>
-                        <button class="sheet-tab" data-tab="recursos">Recursos</button>
-                        <button class="sheet-tab" data-tab="historia">Crônicas</button>
-                    </div>
-                    <div class="sheet-content">
-                        <div id="sheet-geral" class="sheet-section">
-                            <h2 id="sheet-char-name"></h2>
-                            <p id="sheet-char-info"></p>
-                            <div class="vital-stats">
-                                <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
-                                <div class="vital-box"><span>HP</span><span class="hp-values"><strong
-                                            id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
-                                </div>
-                                <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
-                                <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                    <div id="mon-choice-step" class="wizard-step">
+                        <h3>Origem da Criatura</h3>
+                        <div class="mode-choices">
+                            <div class="choice-card" data-mode="ai">
+                                <i class="fas fa-dragon"></i>
+                                <h4>Invocar com Lyra</h4>
+                                <p>A IA gerará as estatísticas e a descrição.</p>
                             </div>
-                            <div class="extra-info">
-                                <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
-                                <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
+                            <div class="choice-card" data-mode="manual">
+                                <i class="fas fa-hammer"></i>
+                                <h4>Forjar Manualmente</h4>
+                                <p>Preencha os detalhes da criatura você mesmo.</p>
                             </div>
                         </div>
-                        <div id="sheet-atributos" class="sheet-section hidden">
-                            <div class="scores-grid" id="sheet-scores"></div>
+                    </div>
+                    <div id="mon-form" class="hidden">
+                        <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
+                        <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
+                            <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
                         </div>
-                        <div id="sheet-pericias" class="sheet-section hidden">
-                            <div class="skills-list" id="sheet-skills"></div>
+                        <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
+                                class="medieval-textarea"
+                                placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
+                        <div class="wizard-nav">
+                            <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
                         </div>
-                        <div id="sheet-recursos" class="sheet-section hidden">
-                            <div id="sheet-features" class="text-block"></div>
+                    </div>
+
+                    <!-- Session Wizard -->
+                    <div id="session-wizard" class="wizard-container hidden">
+                        <div id="sess-choice-step" class="wizard-step">
+                            <h3>Registro da Crônica</h3>
+                            <div class="mode-choices">
+                                <div class="choice-card" data-mode="ai">
+                                    <i class="fas fa-scroll"></i>
+                                    <h4>Escriba Lyra</h4>
+                                    <p>A IA organizará seus pensamentos em um diário.</p>
+                                </div>
+                                <div class="choice-card" data-mode="manual">
+                                    <i class="fas fa-pen-nib"></i>
+                                    <h4>Própria Pena</h4>
+                                    <p>Escreva sua própria crônica de aventura.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div id="sheet-historia" class="sheet-section hidden">
-                            <div id="sheet-backstory" class="text-block"></div>
-                            <div class="traits-grid">
-                                <div><strong>Traços</strong>
-                                    <p id="sheet-traits"></p>
+                        <div id="sess-form" class="hidden">
+                            <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
+                            <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title">
+                            </div>
+                            <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
+                                    class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea>
+                            </div>
+                            <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
+                                    class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea>
+                            </div>
+                            <div class="wizard-nav">
+                                <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
+                            </div>
+                        </div>
+
+                        <!-- Character Sheet -->
+                        <div id="character-sheet" class="sheet-container hidden">
+                            <div class="sheet-tabs">
+                                <button class="sheet-tab active" data-tab="geral">Geral</button>
+                                <button class="sheet-tab" data-tab="atributos">Atributos</button>
+                                <button class="sheet-tab" data-tab="pericias">Perícias</button>
+                                <button class="sheet-tab" data-tab="recursos">Recursos</button>
+                                <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                            </div>
+                            <div class="sheet-content">
+                                <div id="sheet-geral" class="sheet-section">
+                                    <h2 id="sheet-char-name"></h2>
+                                    <p id="sheet-char-info"></p>
+                                    <div class="vital-stats">
+                                        <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
+                                        <div class="vital-box"><span>HP</span><span class="hp-values"><strong
+                                                    id="sheet-hp-curr"></strong>/<strong
+                                                    id="sheet-hp-max"></strong></span>
+                                        </div>
+                                        <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
+                                        <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                                    </div>
+                                    <div class="extra-info">
+                                        <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
+                                        <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
+                                    </div>
                                 </div>
-                                <div><strong>Ideais</strong>
-                                    <p id="sheet-ideals"></p>
+                                <div id="sheet-atributos" class="sheet-section hidden">
+                                    <div class="scores-grid" id="sheet-scores"></div>
                                 </div>
-                                <div><strong>Vínculos</strong>
-                                    <p id="sheet-bonds"></p>
+                                <div id="sheet-pericias" class="sheet-section hidden">
+                                    <div class="skills-list" id="sheet-skills"></div>
                                 </div>
-                                <div><strong>Defeitos</strong>
-                                    <p id="sheet-flaws"></p>
+                                <div id="sheet-recursos" class="sheet-section hidden">
+                                    <div id="sheet-features" class="text-block"></div>
+                                </div>
+                                <div id="sheet-historia" class="sheet-section hidden">
+                                    <div id="sheet-backstory" class="text-block"></div>
+                                    <div class="traits-grid">
+                                        <div><strong>Traços</strong>
+                                            <p id="sheet-traits"></p>
+                                        </div>
+                                        <div><strong>Ideais</strong>
+                                            <p id="sheet-ideals"></p>
+                                        </div>
+                                        <div><strong>Vínculos</strong>
+                                            <p id="sheet-bonds"></p>
+                                        </div>
+                                        <div><strong>Defeitos</strong>
+                                            <p id="sheet-flaws"></p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Custom Alert Modal -->
-    <div id="alert-modal" class="modal-overlay hidden">
-        <div class="medieval-modal alert-content">
-            <div class="lyra-corner top-left"></div>
-            <div class="lyra-corner top-right"></div>
-            <div class="alert-body">
-                <i class="fa-solid fa-scroll alert-icon"></i>
-                <h3 id="alert-title">Decreto Real</h3>
-                <p id="alert-message"></p>
+            <!-- Custom Alert Modal -->
+            <div id="alert-modal" class="modal-overlay hidden">
+                <div class="medieval-modal alert-content">
+                    <div class="lyra-corner top-left"></div>
+                    <div class="lyra-corner top-right"></div>
+                    <div class="alert-body">
+                        <i class="fa-solid fa-scroll alert-icon"></i>
+                        <h3 id="alert-title">Decreto Real</h3>
+                        <p id="alert-message"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+
+            <!-- Scroll Indicators -->
+            <div id="scroll-up" class="scroll-indicator hidden">
+                <i class="fa-solid fa-chevron-up"></i>
             </div>
-        </div>
-    </div>
+            <div id="scroll-down" class="scroll-indicator">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
 
-    <!-- Scroll Indicators -->
-    <div id="scroll-up" class="scroll-indicator hidden">
-        <i class="fa-solid fa-chevron-up"></i>
-    </div>
-    <div id="scroll-down" class="scroll-indicator">
-        <i class="fa-solid fa-chevron-down"></i>
-    </div>
+            <script src="js/app.js" type="module"></script>
 
-    <script src="js/app.js" type="module"></script>
+            <!-- Mystical Loading Overlay -->
+            <div id="mystic-loading" class="hidden">
+                <div class="mystic-spinner">
+                    <div class="rune-layer outer"></div>
+                    <div class="rune-layer"></div>
+                    <div class="rune-layer inner"></div>
+                </div>
+                <div class="loading-text">Tecendo a Trama...</div>
+            </div>
 </body>
 
 </html>
