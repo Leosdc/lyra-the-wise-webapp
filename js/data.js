@@ -1,5 +1,5 @@
 
-import { db } from "./auth.js";
+import { db, storage } from "./auth.js";
 import {
     collection,
     addDoc,
@@ -12,11 +12,20 @@ import {
     updateDoc,
     deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const COLLECTIONS = {
     CHARACTERS: "fichas",
     MONSTERS: "monstros",
     SESSIONS: "sessoes"
+};
+
+// Upload character token image
+export const uploadCharacterToken = async (userId, characterId, file) => {
+    const storageRef = ref(storage, `tokens/${userId}/${characterId}.jpg`);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
 };
 
 export const getCharacters = async (userId, systemId) => {

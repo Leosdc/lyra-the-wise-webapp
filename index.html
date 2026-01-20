@@ -514,8 +514,17 @@
                 <div id="character-sheet" class="sheet-container hidden">
                     <div class="sheet-header">
                         <div class="header-main-info">
-                            <h2 id="sheet-char-name"></h2>
-                            <div id="sheet-char-info" class="char-subtitle"></div>
+                            <div class="char-token-wrapper">
+                                <img id="sheet-token" src="assets/Lyra_Token.png" alt="Token" class="char-token">
+                                <input type="file" id="token-upload" accept="image/*" class="hidden">
+                                <label for="token-upload" id="token-upload-btn" class="token-upload-overlay hidden">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                            </div>
+                            <div class="char-name-info">
+                                <h2 id="sheet-char-name"></h2>
+                                <div id="sheet-char-info" class="char-subtitle"></div>
+                            </div>
                         </div>
                         <div class="sheet-actions">
                             <button id="edit-sheet-btn" class="medieval-btn small"><i
@@ -596,7 +605,7 @@
                                     <!-- Populated by JS -->
                                 </tbody>
                             </table>
-                            <button id="add-attack-btn" class="medieval-btn small" style="margin-top: 1rem;">
+                            <button id="add-attack-btn" class="medieval-btn small hidden" style="margin-top: 1rem;">
                                 <i class="fas fa-plus"></i> Adicionar Ataque
                             </button>
                         </div>

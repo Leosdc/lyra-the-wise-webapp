@@ -976,6 +976,34 @@ h4,
     margin-bottom: 1rem;
 }
 
+/* Card with Token */
+.medieval-card.has-token {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-token {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.card-info {
+    flex: 1;
+}
+
+.card-info h3 {
+    margin: 0 0 0.3rem;
+}
+
+.card-info .card-subtitle {
+    margin: 0;
+}
+
 .card-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1218,7 +1246,56 @@ h4,
     padding-bottom: 1rem;
 }
 
-.header-main-info h2 {
+.header-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.char-token-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.char-token {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    object-fit: cover;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.token-upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.token-upload-overlay i {
+    color: var(--gold);
+    font-size: 1.5rem;
+}
+
+.token-upload-overlay:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.edit-mode .token-upload-overlay {
+    display: flex !important;
+}
+
+.char-name-info h2 {
     font-size: 2rem;
     margin: 0;
 }
@@ -1304,6 +1381,79 @@ h4,
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     margin: 1.5rem 0 0.5rem;
     padding-bottom: 0.2rem;
+}
+
+/* Saves List */
+.saves-list {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.save-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid rgba(44, 30, 22, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.save-item.proficient {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--gold);
+}
+
+.save-total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--ink);
+}
+
+.save-item span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+/* Skills List */
+.skills-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+}
+
+.skill-item.proficient {
+    background: rgba(212, 175, 55, 0.15);
+}
+
+.skill-total {
+    font-weight: bold;
+    min-width: 2rem;
+    text-align: right;
+}
+
+.skill-item i {
+    font-size: 0.7rem;
+    color: var(--gold);
+}
+
+.skill-item span {
+    font-size: 0.85rem;
+}
+
+.skill-item small {
+    opacity: 0.6;
 }
 
 /* Edit Mode Styles */

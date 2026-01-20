@@ -1,6 +1,6 @@
 
 import { login, logout, initAuth } from "./auth.js";
-import { getCharacters, getCharacter, saveCharacter, getMonsters, saveMonster, getSessions, saveSession } from "./data.js";
+import { getCharacters, getCharacter, saveCharacter, getMonsters, saveMonster, getSessions, saveSession, uploadCharacterToken } from "./data.js";
 import { sendMessageToLyra, createMonsterWithLyra, createCharacterWithLyra, processSessionWithLyra } from "./ai.js";
 import { SUPPORTED_SYSTEMS } from "./constants.js";
 
@@ -193,6 +193,26 @@ const app = {
         document.getElementById('edit-sheet-btn')?.addEventListener('click', () => this.toggleSheetEdit(true));
         document.getElementById('cancel-sheet-btn')?.addEventListener('click', () => this.cancelSheetEdit());
         document.getElementById('save-sheet-btn')?.addEventListener('click', () => this.saveSheetChanges());
+
+        // Token Upload
+        document.getElementById('token-upload')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !this.currentCharacter) return;
+
+            try {
+                this.toggleLoading(true);
+                const url = await uploadCharacterToken(this.user.uid, this.currentCharacter.id, file);
+                this.currentCharacter.tokenUrl = url;
+                await saveCharacter(this.user.uid, this.currentSystem, this.currentCharacter);
+                document.getElementById('sheet-token').src = url;
+                this.showAlert("Token atualizado com sucesso!", "Imagem");
+            } catch (error) {
+                console.error("Erro no upload:", error);
+                this.showAlert("Erro ao enviar imagem: " + error.message, "Erro");
+            } finally {
+                this.toggleLoading(false);
+            }
+        });
     },
 
     handleChoiceClick(card) {
@@ -715,16 +735,26 @@ const app = {
 
     renderCard(item, type) {
         let subtitle = "";
-        if (type === 'character') subtitle = `${item.secoes?.basico?.Raça || ''} ${item.secoes?.basico?.Classe || ''} (Nív ${item.secoes?.basico?.Nível || 1})`;
+        let tokenHtml = "";
+
+        if (type === 'character') {
+            subtitle = `${item.secoes?.basico?.Raça || ''} ${item.secoes?.basico?.Classe || ''} (Nív ${item.secoes?.basico?.Nível || 1})`;
+            if (item.tokenUrl) {
+                tokenHtml = `<img src="${item.tokenUrl}" class="card-token" alt="Token">`;
+            }
+        }
         if (type === 'monster') subtitle = `${item.secoes?.Tipo || ''} (ND ${item.secoes?.ND || '?'})`;
         if (type === 'trap') subtitle = `Perigo: ${item.secoes?.Dificuldade || 'Média'}`;
         if (type === 'session') subtitle = item.date ? new Date(item.date).toLocaleDateString() : 'Data desconhecida';
 
         return `
-            <div class="medieval-card" data-id="${item.id}" data-type="${type}">
+            <div class="medieval-card ${tokenHtml ? 'has-token' : ''}" data-id="${item.id}" data-type="${type}">
                 <div class="card-glow"></div>
-                <h3>${item.name || item.title || 'Sem Nome'}</h3>
-                <span class="card-subtitle">${subtitle}</span>
+                ${tokenHtml}
+                <div class="card-info">
+                    <h3>${item.name || item.title || 'Sem Nome'}</h3>
+                    <span class="card-subtitle">${subtitle}</span>
+                </div>
             </div>
         `;
     },
@@ -829,6 +859,7 @@ const app = {
         // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
         document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} (Nível ${b.Nível || 1})`;
+        document.getElementById('sheet-token').src = char.tokenUrl || 'assets/Lyra_Token.png';
         document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
         document.getElementById('sheet-hp-max').innerText = comb.HP_Max || comb.HP || 10;
         document.getElementById('sheet-ca').innerText = comb.CA || 10;
@@ -873,6 +904,35 @@ const app = {
                     <span class="score-mod">${this.formatModifier(a.v)}</span>
                 </div>
             `).join('');
+        }
+
+        // Saving Throws (Testes de Resistência)
+        const savesList = document.getElementById('sheet-saves');
+        if (savesList) {
+            const saves = s.saves || {};
+            const saveMap = [
+                { id: 'Força', abbr: 'FOR', attr: 'Força' },
+                { id: 'Destreza', abbr: 'DEX', attr: 'Destreza' },
+                { id: 'Constituição', abbr: 'CON', attr: 'Constituição' },
+                { id: 'Inteligência', abbr: 'INT', attr: 'Inteligência' },
+                { id: 'Sabedoria', abbr: 'SAB', attr: 'Sabedoria' },
+                { id: 'Carisma', abbr: 'CAR', attr: 'Carisma' }
+            ];
+
+            savesList.innerHTML = saveMap.map(save => {
+                const attrVal = attr[save.attr] || 10;
+                const mod = this.calculateModifier(attrVal);
+                const isProf = !!saves[save.id];
+                const total = mod + (isProf ? profBonus : 0);
+
+                return `
+                    <div class="save-item ${isProf ? 'proficient' : ''}" data-save="${save.id}">
+                        <div class="save-total">${total >= 0 ? `+${total}` : total}</div>
+                        <i class="fa-circle ${isProf ? 'fas' : 'far'} editable-toggle" data-field="saves.${save.id}"></i>
+                        <span>${save.abbr}</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Perícias (with calculation)
@@ -948,6 +1008,7 @@ const app = {
         document.getElementById('edit-sheet-btn').classList.toggle('hidden', enable);
         document.getElementById('cancel-sheet-btn')?.classList.toggle('hidden', !enable);
         document.getElementById('save-sheet-btn').classList.toggle('hidden', !enable);
+        document.getElementById('add-attack-btn')?.classList.toggle('hidden', !enable);
 
         if (enable) {
             // Backup current character for cancel
