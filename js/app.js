@@ -440,11 +440,22 @@ const app = {
 
     updateWizardUI() {
         document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-        document.querySelector(`.wizard-step[data-step="${this.wizardStep}"]`).classList.remove('hidden');
+        const activeStep = document.querySelector(`#creation-wizard .wizard-step[data-step="${this.wizardStep}"]`);
+        if (activeStep) activeStep.classList.remove('hidden');
+
         document.querySelectorAll('.step-indicator').forEach(i => i.classList.toggle('active', parseInt(i.dataset.step) === this.wizardStep));
+
+        // Final message update
+        const finalMsg = document.getElementById('wiz-final-msg');
+        if (finalMsg) {
+            finalMsg.innerText = this.creationMode === 'ai'
+                ? "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente."
+                : "Seu herói está pronto para ser consagrado nos anais da história.";
+        }
+
         document.getElementById('wiz-prev').classList.toggle('hidden', this.wizardStep === 1);
-        document.getElementById('wiz-next').classList.toggle('hidden', this.wizardStep === 4);
-        document.getElementById('wiz-finish').classList.toggle('hidden', this.wizardStep !== 4);
+        document.getElementById('wiz-next').classList.toggle('hidden', this.wizardStep === 5);
+        document.getElementById('wiz-finish').classList.toggle('hidden', this.wizardStep !== 5);
     },
 
     // --- Actions ---
@@ -456,6 +467,8 @@ const app = {
             const race = document.getElementById('wiz-race').value;
             const className = document.getElementById('wiz-class').value;
             const background = document.getElementById('wiz-background').value;
+            const alignment = document.getElementById('wiz-alignment').value;
+            const speed = document.getElementById('wiz-speed').value;
 
             const basicData = {
                 name: name,
@@ -465,8 +478,9 @@ const app = {
                         Raça: race,
                         Classe: className,
                         Antecedente: background,
+                        Alinhamento: alignment,
                         Nível: 1,
-                        Velocidade: "9m"
+                        Velocidade: speed
                     },
                     atributos: {
                         Força: document.getElementById('wiz-str').value,
@@ -478,17 +492,34 @@ const app = {
                     },
                     pericias: skills.reduce((acc, skill) => ({ ...acc, [skill]: "Proficiente" }), {}),
                     combate: {
-                        HP: 10,
+                        HP: 10 + this.calculateModifier(document.getElementById('wiz-con').value),
                         CA: 10 + this.calculateModifier(document.getElementById('wiz-dex').value),
                         Iniciativa: this.calculateModifier(document.getElementById('wiz-dex').value)
+                    },
+                    historia: {
+                        Personalidade: document.getElementById('wiz-traits').value,
+                        Ideais: document.getElementById('wiz-ideals').value,
+                        Vínculos: document.getElementById('wiz-bonds').value,
+                        Defeitos: document.getElementById('wiz-flaws').value,
+                        História: document.getElementById('wiz-backstory').value
                     }
                 }
             };
 
             let finalData = basicData;
             if (this.creationMode === 'ai') {
-                // Future: Integrate Lyra to generate backstory/traits based on these inputs
-                // For now, let's at least simulate it or keep it simple
+                const idToken = await this.user.getIdToken();
+                // We send the 'crunch' to get the 'fluff'
+                const aiResult = await createCharacterWithLyra(basicData, idToken);
+                if (aiResult) {
+                    finalData.secoes.historia = {
+                        Personalidade: aiResult.traits || aiResult.Personalidade || finalData.secoes.historia.Personalidade,
+                        Ideais: aiResult.ideals || aiResult.Ideais || finalData.secoes.historia.Ideais,
+                        Vínculos: aiResult.bonds || aiResult.Vínculos || finalData.secoes.historia.Vínculos,
+                        Defeitos: aiResult.flaws || aiResult.Defeitos || finalData.secoes.historia.Defeitos,
+                        História: aiResult.backstory || aiResult.História || finalData.secoes.historia.História
+                    };
+                }
             }
 
             await saveCharacter(this.user.uid, this.currentSystem, finalData);
@@ -622,6 +653,7 @@ const app = {
         document.getElementById('sheet-prof').innerText = "+2";
         document.getElementById('sheet-background').innerText = b.Antecedente || "Nenhum";
         document.getElementById('sheet-alignment').innerText = b.Alinhamento || "Neutro";
+        document.getElementById('sheet-speed').innerText = b.Velocidade || "9m";
 
         // Atributos
         const scoresGrid = document.getElementById('sheet-scores');

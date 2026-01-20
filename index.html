@@ -324,16 +324,39 @@
                         <div class="step-indicator" data-step="2">2</div>
                         <div class="step-indicator" data-step="3">3</div>
                         <div class="step-indicator" data-step="4">4</div>
+                        <div class="step-indicator" data-step="5">5</div>
                     </div>
                     <!-- Steps content... same as before -->
                     <div class="wizard-step" data-step="1">
                         <h3>Origens</h3>
-                        <div class="form-group"><label>Nome</label><input type="text" id="wiz-name"></div>
+                        <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
+                                placeholder="Ex: Valerius"></div>
                         <div class="form-row">
-                            <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"></div>
-                            <div class="form-group"><label>Classe</label><input type="text" id="wiz-class"></div>
+                            <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"
+                                    placeholder="Ex: Humano"></div>
+                            <div class="form-group"><label>Classe</label><input type="text" id="wiz-class"
+                                    placeholder="Ex: Guerreiro"></div>
                         </div>
-                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Alinhamento</label>
+                                <select id="wiz-alignment" class="medieval-select">
+                                    <option value="Leal e Bom">Leal e Bom</option>
+                                    <option value="Neutro e Bom">Neutro e Bom</option>
+                                    <option value="Caótico e Bom">Caótico e Bom</option>
+                                    <option value="Leal e Neutro">Leal e Neutro</option>
+                                    <option value="Neutro">Neutro</option>
+                                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                                    <option value="Leal e Mau">Leal e Mau</option>
+                                    <option value="Neutro e Mau">Neutro e Mau</option>
+                                    <option value="Caótico e Mau">Caótico e Mau</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
+                                    value="9m"></div>
+                        </div>
+                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"
+                                placeholder="Ex: Acólito"></div>
                     </div>
                     <div class="wizard-step hidden" data-step="2">
                         <h3>Atributos</h3>
@@ -370,9 +393,34 @@
                         </div>
                     </div>
                     <div class="wizard-step hidden" data-step="4">
-                        <h3>Consagração</h3>
-                        <p>Lyra irá tecer a trama final do seu herói.</p>
+                        <h3>Crônicas e Personalidade</h3>
+                        <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
+                                class="medieval-textarea"
+                                placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                            </div>
+                            <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
+                        </div>
+                        <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
+                                class="medieval-textarea"
+                                placeholder="Ex: Eu não consigo resistir a uma aposta alta."></textarea></div>
+                        <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
+                                class="medieval-textarea"
+                                placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)"></textarea>
+                        </div>
                     </div>
+
+                    <div class="wizard-step hidden" data-step="5">
+                        <h3>Consagração</h3>
+                        <p id="wiz-final-msg">Lyra irá tecer a trama final do seu herói.</p>
+                    </div>
+
                     <div class="wizard-nav">
                         <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
                         <button id="wiz-next" class="medieval-btn small">Próximo</button>
@@ -443,58 +491,58 @@
                                 <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Character Sheet -->
-                        <div id="character-sheet" class="sheet-container hidden">
-                            <div class="sheet-tabs">
-                                <button class="sheet-tab active" data-tab="geral">Geral</button>
-                                <button class="sheet-tab" data-tab="atributos">Atributos</button>
-                                <button class="sheet-tab" data-tab="pericias">Perícias</button>
-                                <button class="sheet-tab" data-tab="recursos">Recursos</button>
-                                <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    <!-- Character Sheet -->
+                    <div id="character-sheet" class="sheet-container hidden">
+                        <div class="sheet-tabs">
+                            <button class="sheet-tab active" data-tab="geral">Geral</button>
+                            <button class="sheet-tab" data-tab="atributos">Atributos</button>
+                            <button class="sheet-tab" data-tab="pericias">Perícias</button>
+                            <button class="sheet-tab" data-tab="recursos">Recursos</button>
+                            <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                        </div>
+                        <div class="sheet-content">
+                            <div id="sheet-geral" class="sheet-section">
+                                <h2 id="sheet-char-name"></h2>
+                                <p id="sheet-char-info"></p>
+                                <div class="vital-stats">
+                                    <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
+                                    <div class="vital-box"><span>HP</span><span class="hp-values"><strong
+                                                id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
+                                    </div>
+                                    <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
+                                    <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                                </div>
+                                <div class="extra-info">
+                                    <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
+                                    <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
+                                    <p><strong>Velocidade:</strong> <span id="sheet-speed"></span></p>
+                                </div>
                             </div>
-                            <div class="sheet-content">
-                                <div id="sheet-geral" class="sheet-section">
-                                    <h2 id="sheet-char-name"></h2>
-                                    <p id="sheet-char-info"></p>
-                                    <div class="vital-stats">
-                                        <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
-                                        <div class="vital-box"><span>HP</span><span class="hp-values"><strong
-                                                    id="sheet-hp-curr"></strong>/<strong
-                                                    id="sheet-hp-max"></strong></span>
-                                        </div>
-                                        <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
-                                        <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                            <div id="sheet-atributos" class="sheet-section hidden">
+                                <div class="scores-grid" id="sheet-scores"></div>
+                            </div>
+                            <div id="sheet-pericias" class="sheet-section hidden">
+                                <div class="skills-list" id="sheet-skills"></div>
+                            </div>
+                            <div id="sheet-recursos" class="sheet-section hidden">
+                                <div id="sheet-features" class="text-block"></div>
+                            </div>
+                            <div id="sheet-historia" class="sheet-section hidden">
+                                <div id="sheet-backstory" class="text-block"></div>
+                                <div class="traits-grid">
+                                    <div><strong>Traços</strong>
+                                        <p id="sheet-traits"></p>
                                     </div>
-                                    <div class="extra-info">
-                                        <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
-                                        <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
+                                    <div><strong>Ideais</strong>
+                                        <p id="sheet-ideals"></p>
                                     </div>
-                                </div>
-                                <div id="sheet-atributos" class="sheet-section hidden">
-                                    <div class="scores-grid" id="sheet-scores"></div>
-                                </div>
-                                <div id="sheet-pericias" class="sheet-section hidden">
-                                    <div class="skills-list" id="sheet-skills"></div>
-                                </div>
-                                <div id="sheet-recursos" class="sheet-section hidden">
-                                    <div id="sheet-features" class="text-block"></div>
-                                </div>
-                                <div id="sheet-historia" class="sheet-section hidden">
-                                    <div id="sheet-backstory" class="text-block"></div>
-                                    <div class="traits-grid">
-                                        <div><strong>Traços</strong>
-                                            <p id="sheet-traits"></p>
-                                        </div>
-                                        <div><strong>Ideais</strong>
-                                            <p id="sheet-ideals"></p>
-                                        </div>
-                                        <div><strong>Vínculos</strong>
-                                            <p id="sheet-bonds"></p>
-                                        </div>
-                                        <div><strong>Defeitos</strong>
-                                            <p id="sheet-flaws"></p>
-                                        </div>
+                                    <div><strong>Vínculos</strong>
+                                        <p id="sheet-bonds"></p>
+                                    </div>
+                                    <div><strong>Defeitos</strong>
+                                        <p id="sheet-flaws"></p>
                                     </div>
                                 </div>
                             </div>
@@ -502,42 +550,43 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Custom Alert Modal -->
-            <div id="alert-modal" class="modal-overlay hidden">
-                <div class="medieval-modal alert-content">
-                    <div class="lyra-corner top-left"></div>
-                    <div class="lyra-corner top-right"></div>
-                    <div class="alert-body">
-                        <i class="fa-solid fa-scroll alert-icon"></i>
-                        <h3 id="alert-title">Decreto Real</h3>
-                        <p id="alert-message"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
-                    </div>
+        <!-- Custom Alert Modal -->
+        <div id="alert-modal" class="modal-overlay hidden">
+            <div class="medieval-modal alert-content">
+                <div class="lyra-corner top-left"></div>
+                <div class="lyra-corner top-right"></div>
+                <div class="alert-body">
+                    <i class="fa-solid fa-scroll alert-icon"></i>
+                    <h3 id="alert-title">Decreto Real</h3>
+                    <p id="alert-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Scroll Indicators -->
-            <div id="scroll-up" class="scroll-indicator hidden">
-                <i class="fa-solid fa-chevron-up"></i>
-            </div>
-            <div id="scroll-down" class="scroll-indicator">
-                <i class="fa-solid fa-chevron-down"></i>
-            </div>
+        <!-- Scroll Indicators -->
+        <div id="scroll-up" class="scroll-indicator hidden">
+            <i class="fa-solid fa-chevron-up"></i>
+        </div>
+        <div id="scroll-down" class="scroll-indicator">
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
 
-            <script src="js/app.js" type="module"></script>
+        <script src="js/app.js" type="module"></script>
 
-            <!-- Mystical Loading Overlay -->
-            <div id="mystic-loading" class="hidden">
-                <div class="mystic-spinner">
-                    <div class="rune-layer outer"></div>
-                    <div class="rune-layer"></div>
-                    <div class="rune-layer inner"></div>
-                </div>
-                <div class="loading-text">Tecendo a Trama...</div>
+        <!-- Mystical Loading Overlay -->
+        <div id="mystic-loading" class="hidden">
+            <div class="mystic-spinner">
+                <div class="rune-layer outer"></div>
+                <div class="rune-layer"></div>
+                <div class="rune-layer inner"></div>
             </div>
+            <div class="loading-text">Tecendo a Trama...</div>
+        </div>
 </body>
 
 </html>

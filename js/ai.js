@@ -62,6 +62,11 @@ export const createMonsterWithLyra = async (monsterData, idToken) => {
     return data.monster;
 };
 
+export const createCharacterWithLyra = async (charData, idToken) => {
+    const data = await callProxy({ action: 'callGeminiCharacter', idToken, charData });
+    return data.character;
+};
+
 export const processSessionWithLyra = async (sessionData, idToken) => {
     const data = await callProxy({ action: 'callGeminiSession', idToken, sessionData });
     return data.response;
