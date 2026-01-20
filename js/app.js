@@ -676,18 +676,24 @@ const app = {
     },
 
     async loadMonsters() {
-        if (!this.user) return;
-        const monsters = await getMonsters(this.user.uid, this.currentSystem);
         const list = document.getElementById('monsters-list');
+        if (!this.user) {
+            if (list) list.innerHTML = '<p class="empty-state">Faça login para ver seu bestiário.</p>';
+            return;
+        }
+        const monsters = await getMonsters(this.user.uid, this.currentSystem);
         if (list) {
             list.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monster')).join('') : '<p class="empty-state">Nenhuma criatura invocada.</p>';
         }
     },
 
     async loadTraps() {
-        if (!this.user) return;
-        const traps = await getTraps(this.user.uid, this.currentSystem);
         const list = document.getElementById('traps-list');
+        if (!this.user) {
+            if (list) list.innerHTML = '<p class="empty-state">Faça login para ver suas armadilhas.</p>';
+            return;
+        }
+        const traps = await getTraps(this.user.uid, this.currentSystem);
         if (list) {
             list.innerHTML = traps.length ? traps.map(t => this.renderCard(t, 'trap')).join('') : '<p class="empty-state">Nenhuma armadilha armada.</p>';
         }

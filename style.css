@@ -118,6 +118,18 @@ textarea {
     padding: 10px;
 }
 
+/* Medieval select inside parchment/wizard (dark dropdown on light bg) */
+.parchment .medieval-select,
+.wizard-container .medieval-select {
+    background-color: rgba(44, 30, 22, 0.9);
+    border: 1px solid var(--gold) !important;
+    border-radius: 4px;
+    padding: 8px 30px 8px 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23f1c40f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -1040,11 +1052,11 @@ h4,
 
 .sheet-tabs {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
     border-bottom: 2px solid rgba(44, 30, 22, 0.1);
     padding-bottom: 0.5rem;
-    overflow-x: auto;
 }
 
 .sheet-tab {
@@ -1505,7 +1517,12 @@ h4,
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem;
-    opacity: 0.6;
+    opacity: 0.9;
+    font-size: 1.2rem;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin: 2rem;
 }
 
 /* Mobile Responsiveness */
