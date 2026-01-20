@@ -11,11 +11,37 @@ const app = {
     chatHistory: [],
     wizardStep: 1,
     currentCharacter: null,
+    rpgTrivia: [
+        "Dungeons & Dragons foi criado por Gary Gygax e Dave Arneson em 1974.",
+        "O primeiro RPG comercializado foi o D&D original, vindo de um jogo de guerra chamado 'Chainmail'.",
+        "Dados de 20 lados (d20) existem desde a Roma Antiga, mas não eram usados para RPGs.",
+        "O nome 'Vecna' é um anagrama de Jack Vance, escritor que inspirou o sistema de magia do D&D.",
+        "Tasha, do feitiço Riso Incontrolável, era o nome da filha de uma das jogadoras de Gygax.",
+        "O cenário de 'Forgotten Realms' foi criado por Ed Greenwood quando ele tinha apenas 8 anos.",
+        "Os Beholders e Mind Flayers são propriedade intelectual exclusiva da Wizards of the Coast.",
+        "O d6 é o dado mais antigo do mundo, com exemplares datados de 5.000 anos atrás.",
+        "Gary Gygax trabalhava como sapateiro enquanto escrevia as regras de D&D.",
+        "A classe Bardo foi originalmente uma 'classe de prestígio' que exigia níveis em Lutador e Ladrão.",
+        "O dragão Bahamut é inspirado na mitologia árabe, onde é um peixe gigante que sustenta a Terra.",
+        "A primeira edição de D&D vinha em uma modesta caixa de madeira com três livretes.",
+        "A 'Gygaxian Naturalism' é o termo para mundos de RPG que funcionam como ecossistemas reais.",
+        "O 'Gamer Gate' original era o nome de uma taverna lendária em uma das primeiras campanhas de Gary.",
+        "O primeiro personagem de Gary Gygax foi um mago chamado Mordenkainen.",
+        "A TSR (empresa do D&D) quase faliu em 1982 devido a uma linha de agulhas de crochê tematizadas.",
+        "Stephen King quase escreveu um suplemento oficial para o sistema GURPS nos anos 80.",
+        "O RPG 'Cyberpunk 2020' previu corretamente o uso de videochamadas e interfaces neurais.",
+        "Em 'Vampiro: A Máscara', o termo 'Kindred' foi escolhido para soar mais elegante que 'vampiro'.",
+        "O sistema 'Pathfinder' surgiu de uma edição de D&D (3.5) que os fãs se recusaram a abandonar.",
+        "A revista 'Dragon Magazine' publicou mais de 400 edições de conteúdo oficial de D&D.",
+        "O termo 'Critical Hit' foi introduzido pela primeira vez em um jogo chamado 'Empire of the Petal Throne'."
+    ],
+    triviaIndex: 0,
 
     init() {
         console.log("⚔️ Lyra WebApp Initializing...");
         this.populateSystems();
         this.bindEvents();
+        this.showRandomTrivia();
         initAuth((user) => this.handleAuthStateChange(user));
     },
 
@@ -26,12 +52,51 @@ const app = {
         }
     },
 
+    showRandomTrivia() {
+        const triviaEl = document.getElementById('rpg-trivia');
+        if (!triviaEl) return;
+
+        // Shuffle once at start to avoid starting with the same one
+        this.rpgTrivia = this.rpgTrivia.sort(() => Math.random() - 0.5);
+        this.triviaIndex = 0;
+
+        const updateText = () => {
+            triviaEl.classList.add('fade-out');
+
+            setTimeout(() => {
+                this.triviaIndex = (this.triviaIndex + 1) % this.rpgTrivia.length;
+                triviaEl.innerText = this.rpgTrivia[this.triviaIndex];
+                triviaEl.classList.remove('fade-out');
+            }, 800);
+        };
+
+        // Initial set
+        triviaEl.innerText = this.rpgTrivia[this.triviaIndex];
+
+        // Start interval - change every 12 seconds for better reading
+        setInterval(updateText, 12000);
+    },
+
     bindEvents() {
         console.log("🔗 Binding events...");
 
         // Dynamic Scroll Indicators hiding/showing
         window.addEventListener('scroll', () => this.updateScrollIndicators());
         window.addEventListener('resize', () => this.updateScrollIndicators());
+
+        // Scroll indicators click logic
+        document.getElementById('scroll-up')?.addEventListener('click', () => {
+            window.scrollBy({
+                top: -window.innerHeight * 0.7,
+                behavior: 'smooth'
+            });
+        });
+        document.getElementById('scroll-down')?.addEventListener('click', () => {
+            window.scrollBy({
+                top: window.innerHeight * 0.7,
+                behavior: 'smooth'
+            });
+        });
 
         // Menu Toggle
         document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
@@ -158,8 +223,16 @@ const app = {
 
         document.querySelectorAll('.view').forEach(view => {
             view.classList.add('hidden');
+            view.classList.remove('view-enter');
         });
-        document.getElementById(viewId)?.classList.remove('hidden');
+
+        const nextView = document.getElementById(viewId);
+        if (nextView) {
+            nextView.classList.remove('hidden');
+            // Trigger reflow for animation
+            void nextView.offsetWidth;
+            nextView.classList.add('view-enter');
+        }
 
         // Update active nav state
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -178,23 +251,18 @@ const app = {
     updateScrollIndicators() {
         const up = document.getElementById('scroll-up');
         const down = document.getElementById('scroll-down');
-        const isDashboard = this.currentView === 'dashboard';
 
-        if (!isDashboard) {
-            up?.classList.add('hidden');
-            down?.classList.add('hidden');
-            return;
-        }
-
+        // Check window scroll for the main view
         const scrollPos = window.scrollY;
         const windowHeight = window.innerHeight;
         const totalHeight = document.documentElement.scrollHeight;
+        const threshold = 30;
 
-        // Threshold for showing/hiding
-        const threshold = 50;
+        const canScrollUp = scrollPos > threshold;
+        const canScrollDown = scrollPos + windowHeight < totalHeight - threshold;
 
-        if (up) up.classList.toggle('hidden', scrollPos < threshold);
-        if (down) down.classList.toggle('hidden', scrollPos + windowHeight > totalHeight - threshold);
+        if (up) up.classList.toggle('hidden', !canScrollUp);
+        if (down) down.classList.toggle('hidden', !canScrollDown || totalHeight <= windowHeight);
     },
 
     toggleMenu(show) {
@@ -287,14 +355,22 @@ const app = {
     },
 
     openModal(wizardId) {
-        document.getElementById('modal-wrapper').classList.add('active');
+        const wrapper = document.getElementById('modal-wrapper');
+        if (wrapper) {
+            wrapper.classList.add('active');
+            wrapper.classList.remove('hidden');
+        }
         document.querySelectorAll('.wizard-container, .sheet-container, .modal-content > div:not(.close-modal):not(#modal-body)').forEach(c => c.classList.add('hidden'));
         const target = document.getElementById(wizardId);
         if (target) target.classList.remove('hidden');
     },
 
     closeModal() {
-        document.getElementById('modal-wrapper').classList.remove('active');
+        const wrapper = document.getElementById('modal-wrapper');
+        if (wrapper) {
+            wrapper.classList.remove('active');
+            wrapper.classList.add('hidden');
+        }
         document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
     },
 
