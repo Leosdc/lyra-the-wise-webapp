@@ -252,23 +252,23 @@ const app = {
         }
     },
 
-    switchView(viewId) {
-        console.log("🎨 Switching view to:", viewId);
+    async switchView(viewId) {
         this.currentView = viewId;
         localStorage.setItem('lyra_current_view', viewId);
 
-        document.querySelectorAll('.view').forEach(view => {
-            view.classList.add('hidden');
-            view.classList.remove('view-enter');
-        });
-
-        const nextView = document.getElementById(viewId);
-        if (nextView) {
-            nextView.classList.remove('hidden');
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        const targetView = document.getElementById(viewId);
+        if (targetView) {
+            targetView.classList.remove('hidden');
             // Trigger reflow for animation
-            void nextView.offsetWidth;
-            nextView.classList.add('view-enter');
+            void targetView.offsetWidth;
+            targetView.classList.add('view-enter');
         }
+
+        if (viewId === 'fichas') await this.loadCharacters();
+        if (viewId === 'monstros') await this.loadMonsters();
+        if (viewId === 'armadilhas') await this.loadTraps();
+        if (viewId === 'sessoes') await this.loadSessions();
 
         // Update active nav state
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -278,10 +278,17 @@ const app = {
         // Scroll lock logic: allow scrolling on all views
         document.body.style.overflow = 'auto';
 
-        if (this.user) this.loadViewData(viewId);
-
         // Dynamic Indicators visibility
         this.updateScrollIndicators();
+    },
+
+    calculateModifier(score) {
+        return Math.floor((score - 10) / 2);
+    },
+
+    formatModifier(val) {
+        const mod = this.calculateModifier(val);
+        return mod >= 0 ? `+${mod}` : mod;
     },
 
     updateScrollIndicators() {
@@ -390,11 +397,23 @@ const app = {
         this.openModal('monster-wizard');
     },
 
+    showMonsterCreator() {
+        if (!this.checkAuth()) return;
+        console.log("🐉 Abrindo Invocador de Criaturas");
+        const monCr = document.getElementById('mon-cr');
+        if (monCr) monCr.parentElement.classList.remove('hidden');
+        const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
+        if (monTitle) monTitle.innerText = "Origem da Criatura";
+        this.openModal('monster-wizard');
+    },
+
     showTrapCreator() {
         if (!this.checkAuth()) return;
         console.log("💀 Abrindo Invocador de Armadilhas");
-        document.getElementById('mon-cr').parentElement.classList.add('hidden');
-        document.getElementById('monster-wizard').querySelector('h3').innerText = "Criação de Armadilha";
+        const monCr = document.getElementById('mon-cr');
+        if (monCr) monCr.parentElement.classList.add('hidden');
+        const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
+        if (monTitle) monTitle.innerText = "Criação de Armadilha";
         this.openModal('monster-wizard');
     },
 
@@ -421,7 +440,7 @@ const app = {
             }
         }
 
-        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step, #detail-container').forEach(c => c.classList.add('hidden'));
         const target = document.getElementById(wizardId);
         if (target) {
             target.classList.remove('hidden');
@@ -476,23 +495,30 @@ const app = {
     },
 
     updateWizardUI() {
-        document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('.wizard-step').forEach(s => {
+            const stepNum = parseInt(s.dataset.step);
+            s.classList.toggle('hidden', stepNum !== this.wizardStep);
+        });
 
-        // Handle choice step vs numbered steps
-        const choiceStep = document.getElementById('char-choice-step');
         const progress = document.querySelector('.wizard-progress');
-        const activeStep = document.querySelector(`#creation-wizard .wizard-step[data-step="${this.wizardStep}"]`);
+        const nav = document.querySelector('.wizard-nav');
 
         if (this.wizardStep === 0) {
-            if (choiceStep) choiceStep.classList.remove('hidden');
-            if (progress) progress.classList.add('hidden');
+            progress?.classList.add('hidden');
+            nav?.classList.add('hidden'); // Hide nav buttons on choice step
         } else {
-            if (choiceStep) choiceStep.classList.add('hidden');
-            if (progress) progress.classList.remove('hidden');
-            if (activeStep) activeStep.classList.remove('hidden');
-        }
+            progress?.classList.remove('hidden');
+            nav?.classList.remove('hidden');
+            document.querySelectorAll('.step-indicator').forEach(ind => {
+                const indStep = parseInt(ind.dataset.step);
+                ind.classList.toggle('active', indStep === this.wizardStep);
+                ind.classList.toggle('completed', indStep < this.wizardStep);
+            });
 
-        document.querySelectorAll('.step-indicator').forEach(i => i.classList.toggle('active', parseInt(i.dataset.step) === this.wizardStep));
+            document.getElementById('wiz-prev').classList.toggle('hidden', this.wizardStep === 1);
+            document.getElementById('wiz-next').classList.toggle('hidden', this.wizardStep === 5);
+            document.getElementById('wiz-finish').classList.toggle('hidden', this.wizardStep !== 5);
+        }
 
         // Final message update
         const finalMsg = document.getElementById('wiz-final-msg');
@@ -501,10 +527,6 @@ const app = {
                 ? "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente."
                 : "Seu herói está pronto para ser consagrado nos anais da história.";
         }
-
-        document.getElementById('wiz-prev').classList.toggle('hidden', this.wizardStep === 1);
-        document.getElementById('wiz-next').classList.toggle('hidden', this.wizardStep === 5);
-        document.getElementById('wiz-finish').classList.toggle('hidden', this.wizardStep !== 5);
     },
 
     // --- Actions ---
@@ -581,17 +603,6 @@ const app = {
         }
     },
 
-    calculateModifier(val) {
-        const v = parseInt(val) || 10;
-        const mod = Math.floor((v - 10) / 2);
-        return mod;
-    },
-
-    formatModifier(val) {
-        const mod = this.calculateModifier(val);
-        return mod >= 0 ? `+${mod}` : mod;
-    },
-
     async handleMonsterFinish() {
         this.toggleLoading(true);
         try {
@@ -614,9 +625,14 @@ const app = {
                 };
             }
 
-            await saveMonster(this.user.uid, this.currentSystem, result);
+            if (isTrap) {
+                await saveTrap(this.user.uid, this.currentSystem, result);
+                this.loadTraps();
+            } else {
+                await saveMonster(this.user.uid, this.currentSystem, result);
+                this.loadMonsters();
+            }
             this.closeModal();
-            this.loadMonsters();
         } catch (error) {
             this.showAlert("Falha na invocação mística: " + error.message, "Contra-feitiço");
         } finally {
@@ -654,33 +670,116 @@ const app = {
     // --- Data Rendering ---
     async loadCharacters() {
         const container = document.getElementById('fichas-list');
+        if (!this.user) return;
         const chars = await getCharacters(this.user.uid, this.currentSystem);
-        container.innerHTML = chars.length ? chars.map(c => this.renderCard(c, 'fichas')).join('') : '<p class="empty-state">Sem personagens.</p>';
+        container.innerHTML = chars.length ? chars.map(c => this.renderCard(c, 'character')).join('') : '<p class="empty-state">Sem personagens.</p>';
     },
 
     async loadMonsters() {
-        const container = document.getElementById('monsters-list');
+        if (!this.user) return;
         const monsters = await getMonsters(this.user.uid, this.currentSystem);
-        container.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monstros')).join('') : '<p class="empty-state">O bestiário está vazio.</p>';
+        const list = document.getElementById('monsters-list');
+        if (list) {
+            list.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monster')).join('') : '<p class="empty-msg">Nenhuma criatura invocada.</p>';
+        }
+    },
+
+    async loadTraps() {
+        if (!this.user) return;
+        const traps = await getTraps(this.user.uid, this.currentSystem);
+        const list = document.getElementById('traps-list');
+        if (list) {
+            list.innerHTML = traps.length ? traps.map(t => this.renderCard(t, 'trap')).join('') : '<p class="empty-msg">Nenhuma armadilha armada.</p>';
+        }
     },
 
     async loadSessions() {
         const container = document.getElementById('sessions-list');
+        if (!this.user) return;
         const sessions = await getSessions(this.user.uid, this.currentSystem);
-        container.innerHTML = sessions.length ? sessions.map(s => this.renderCard(s, 'sessoes')).join('') : '<p class="empty-state">Nenhuma aventura narrada.</p>';
+        container.innerHTML = sessions.length ? sessions.map(s => this.renderCard(s, 'session')).join('') : '<p class="empty-state">Nenhuma aventura narrada.</p>';
     },
 
     renderCard(item, type) {
-        const b = item.secoes?.basico || {};
-        return `<div class="medieval-card" data-type="${type}" data-id="${item.id}">
-            <div class="card-title">${item.name || b.Nome || item.title || 'Sem Nome'}</div>
-            <div class="card-subtitle">${b.Raça || item.type || ''} ${b.Classe || item.cr || ''}</div>
-        </div>`;
+        let subtitle = "";
+        if (type === 'character') subtitle = `${item.secoes?.basico?.Raça || ''} ${item.secoes?.basico?.Classe || ''} (Nív ${item.secoes?.basico?.Nível || 1})`;
+        if (type === 'monster') subtitle = `${item.secoes?.Tipo || ''} (ND ${item.secoes?.ND || '?'})`;
+        if (type === 'trap') subtitle = `Perigo: ${item.secoes?.Dificuldade || 'Média'}`;
+        if (type === 'session') subtitle = item.date ? new Date(item.date).toLocaleDateString() : 'Data desconhecida';
+
+        return `
+            <div class="medieval-card" data-id="${item.id}" data-type="${type}">
+                <div class="card-glow"></div>
+                <h3>${item.name || item.title || 'Sem Nome'}</h3>
+                <span class="card-subtitle">${subtitle}</span>
+            </div>
+        `;
     },
 
     async viewItem(type, id) {
-        if (type === 'fichas') await this.viewCharacter(id);
+        if (type === 'character') await this.viewCharacter(id);
+        else if (type === 'monster') await this.viewMonster(id);
+        else if (type === 'trap') await this.viewTrap(id);
+        else if (type === 'session') await this.viewSession(id);
         else alert(`Visualizando ${type}: ${id}`);
+    },
+
+    async viewMonster(id) {
+        this.openModal('detail-container');
+        const monster = await getMonster(id);
+        const container = document.getElementById('detail-container');
+        if (container && monster) {
+            container.classList.remove('hidden');
+            const s = monster.secoes || {};
+            container.innerHTML = `
+                <div class="details-container">
+                    <h2><i class="fas fa-dragon"></i> ${monster.name}</h2>
+                    <p><strong>Tipo:</strong> ${s.Tipo || '?'}</p>
+                    <p><strong>ND (Nível de Desafio):</strong> ${s.ND || '?'}</p>
+                    <div class="vital-stats">
+                        <div class="vital-box"><span>CA</span><strong>${s.Status?.CA || 10}</strong></div>
+                        <div class="vital-box"><span>PV</span><strong>${s.Status?.PV || 10}</strong></div>
+                    </div>
+                    <div class="text-block">${s.Descricao || s.Habilidades || 'Sem descrição.'}</div>
+                </div>
+            `;
+        }
+    },
+
+    async viewTrap(id) {
+        this.openModal('detail-container');
+        const trap = await getTrap(id);
+        const container = document.getElementById('detail-container');
+        if (container && trap) {
+            container.classList.remove('hidden');
+            const s = trap.secoes || {};
+            container.innerHTML = `
+                <div class="details-container">
+                    <h2><i class="fas fa-skull-crossbones"></i> ${trap.name}</h2>
+                    <p><strong>Dificuldade:</strong> ${s.Dificuldade || 'Média'}</p>
+                    <p><strong>Dano Estimado:</strong> ${s.Dano || '1d6'}</p>
+                    <div class="text-block">${s.Descricao || 'Sem descrição.'}</div>
+                    <div class="text-block"><strong>Mecanismo:</strong> ${s.Mecanismo || 'Não especificado.'}</div>
+                </div>
+            `;
+        }
+    },
+
+    async viewSession(id) {
+        this.openModal('detail-container');
+        const session = await getSession(id);
+        const container = document.getElementById('detail-container');
+        if (container && session) {
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="details-container">
+                    <h2><i class="fas fa-book-open"></i> ${session.title}</h2>
+                    <p><strong>Data:</strong> ${session.date ? new Date(session.date).toLocaleDateString() : 'Desconhecida'}</p>
+                    <div class="text-block"><strong>Resumo:</strong> ${session.summary || 'Sem resumo.'}</div>
+                    <div class="text-block"><strong>Notas:</strong> ${session.notes || 'Sem notas.'}</div>
+                </div>
+            `;
+        }
     },
 
     async viewCharacter(id) {
@@ -701,18 +800,41 @@ const app = {
         const per = s.pericias || {};
         const rec = s.recursos || {};
 
+        // D&D 5e Auto-Calculations
+        const profBonus = parseInt(b.Bonus_Proficiencia) || 2;
+        const dexMod = this.calculateModifier(attr.Destreza || 10);
+        const wisMod = this.calculateModifier(attr.Sabedoria || 10);
+
+        // Initiative (DEX based)
+        const iniBase = parseInt(comb.Iniciativa);
+        const initiative = isNaN(iniBase) ? dexMod : iniBase;
+
+        // Passive Perception (10 + WIS + Prof if shared)
+        const percProf = per["Percepção"] ? profBonus : 0;
+        const passivePerc = 10 + wisMod + percProf;
+
         // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
         document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} (Nível ${b.Nível || 1})`;
         document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
         document.getElementById('sheet-hp-max').innerText = comb.HP_Max || comb.HP || 10;
         document.getElementById('sheet-ca').innerText = comb.CA || 10;
-        document.getElementById('sheet-inic').innerText = comb.Iniciativa !== undefined ? (comb.Iniciativa >= 0 ? `+${comb.Iniciativa}` : comb.Iniciativa) : "+0";
-        document.getElementById('sheet-prof').innerText = b.Bonus_Proficiencia || "+2";
+        document.getElementById('sheet-inic').innerText = initiative >= 0 ? `+${initiative}` : initiative;
+        document.getElementById('sheet-prof').innerText = profBonus >= 0 ? `+${profBonus}` : profBonus;
         document.getElementById('sheet-background').innerText = b.Antecedente || "Nenhum";
         document.getElementById('sheet-alignment').innerText = b.Alinhamento || "Neutro";
         document.getElementById('sheet-speed').innerText = b.Velocidade || "9m";
         document.getElementById('sheet-xp').innerText = b.XP || "0";
+
+        // Passive Perception display
+        const speedPanel = document.getElementById('sheet-speed').parentElement.parentElement;
+        if (!document.getElementById('sheet-passive-perc')) {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>Percepção Passiva:</strong> <span id="sheet-passive-perc" class="editable" data-field="calculado.Percepcao_Passiva">${passivePerc}</span>`;
+            speedPanel.appendChild(p);
+        } else {
+            document.getElementById('sheet-passive-perc').innerText = passivePerc;
+        }
 
         const insp = document.getElementById('sheet-insp');
         if (insp) {
@@ -740,21 +862,33 @@ const app = {
             `).join('');
         }
 
-        // Perícias
+        // Perícias (with calculation)
         const skillsList = document.getElementById('sheet-skills');
         if (skillsList) {
-            const allSkills = [
-                "Acrobacia", "Adestramento de Animais", "Arcanismo", "Atletismo", "Atuação",
-                "Blefar", "Furtividade", "História", "Intimidação", "Intuição",
-                "Investigação", "Medicina", "Natureza", "Percepção", "Persuasão",
-                "Prestidigitação", "Religião", "Sobrevivência"
-            ];
-            skillsList.innerHTML = allSkills.map(skill => `
-                <div class="skill-item ${per[skill] ? 'proficient' : ''}" data-skill="${skill}">
-                    <i class="fa-circle ${per[skill] ? 'fas' : 'far'} editable-toggle" data-field="pericias.${skill}"></i>
-                    <span>${skill}</span>
-                </div>
-            `).join('');
+            const skillMap = {
+                "Acrobacia": "Destreza", "Adestramento de Animais": "Sabedoria", "Arcanismo": "Inteligência",
+                "Atletismo": "Força", "Atuação": "Carisma", "Blefar": "Carisma", "Furtividade": "Destreza",
+                "História": "Inteligência", "Intimidação": "Carisma", "Intuição": "Sabedoria",
+                "Investigação": "Inteligência", "Medicina": "Sabedoria", "Natureza": "Inteligência",
+                "Percepção": "Sabedoria", "Persuasão": "Carisma", "Prestidigitação": "Destreza",
+                "Religião": "Inteligência", "Sobrevivência": "Sabedoria"
+            };
+
+            skillsList.innerHTML = Object.keys(skillMap).map(skillName => {
+                const attrName = skillMap[skillName];
+                const attrVal = attr[attrName] || 10;
+                const mod = this.calculateModifier(attrVal);
+                const isProf = !!per[skillName];
+                const total = mod + (isProf ? profBonus : 0);
+
+                return `
+                    <div class="skill-item ${isProf ? 'proficient' : ''}" data-skill="${skillName}">
+                        <div class="skill-total">${total >= 0 ? `+${total}` : total}</div>
+                        <i class="fa-circle ${isProf ? 'fas' : 'far'} editable-toggle" data-field="pericias.${skillName}"></i>
+                        <span>${skillName} <small>(${attrName.substring(0, 3)})</small></span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Combate (Saves e Hit Dice)

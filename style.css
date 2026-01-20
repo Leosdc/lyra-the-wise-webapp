@@ -135,13 +135,14 @@ body {
 
 .medieval-theme {
     position: relative;
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
         url('assets/Animação.gif');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     min-height: 100vh;
     animation: bgSubtleMovement 60s infinite alternate;
+    overflow-x: hidden;
 }
 
 .medieval-theme::before {
@@ -151,10 +152,23 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
+    background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
     pointer-events: none;
     z-index: 1;
-    animation: vignettePulse 8s infinite alternate ease-in-out;
+    animation: vignettePulse 10s infinite alternate ease-in-out;
+}
+
+.medieval-theme::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(244, 228, 188, 0.05), transparent);
+    pointer-events: none;
+    z-index: 2;
+    animation: mysticalShimmer 15s infinite linear;
 }
 
 @keyframes bgSubtleMovement {
@@ -167,13 +181,25 @@ body {
     }
 }
 
-@keyframes vignettePulse {
+@keyframes mysticalShimmer {
     0% {
-        opacity: 0.5;
+        transform: translateX(-100%) translateY(-100%);
     }
 
     100% {
-        opacity: 1;
+        transform: translateX(100%) translateY(100%);
+    }
+}
+
+@keyframes vignettePulse {
+    0% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0.9;
+        transform: scale(1.1);
     }
 }
 
@@ -1183,6 +1209,23 @@ h4,
     font-size: 1.5rem;
     color: var(--crimson);
     font-family: 'Cinzel', serif;
+}
+
+/* Monster/Trap details */
+.details-container {
+    padding: 1rem;
+}
+
+.details-container h2 {
+    font-family: 'Cinzel', serif;
+    color: var(--crimson);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.details-container .vital-stats {
+    margin: 1rem 0;
 }
 
 .extra-info.grid-2 {

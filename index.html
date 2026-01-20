@@ -109,6 +109,8 @@
                 <div class="menu-grid">
                     <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i> Personagens</button>
                     <button class="nav-btn" data-view="monstros"><i class="fas fa-dragon"></i> Bestiário</button>
+                    <button class="nav-btn" data-view="armadilhas"><i class="fas fa-skull-crossbones"></i>
+                        Armadilhas</button>
                     <button class="nav-btn" data-action="item-gen"><i class="fas fa-ring"></i> Itens Mágicos</button>
                     <button class="nav-btn" data-action="villain-gen"><i class="fas fa-mask"></i> Vilões</button>
                     <button class="nav-btn" data-action="npc-gen"><i class="fas fa-users-gear"></i> NPCs</button>
@@ -174,6 +176,10 @@
                     <button class="action-card" data-view="monstros">
                         <i class="fas fa-dragon"></i>
                         <span>Bestiário</span>
+                    </button>
+                    <button class="action-card" data-view="armadilhas">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>Armadilhas</span>
                     </button>
                     <button class="action-card" data-action="villain-gen">
                         <i class="fas fa-mask"></i>
@@ -278,11 +284,20 @@
                 <div class="header-actions">
                     <button id="show-monster-btn" class="medieval-btn small"><i class="fas fa-magic"></i>
                         Invocar</button>
-                    <button id="show-trap-btn" class="medieval-btn small"><i class="fas fa-skull-crossbones"></i>
-                        Armadilha</button>
                 </div>
             </div>
             <div id="monsters-list" class="items-grid"></div>
+        </section>
+
+        <!-- Armadilhas View -->
+        <section id="armadilhas" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-skull-crossbones"></i> Armadilhas & Perigos</h2>
+                <div class="header-actions">
+                    <button id="show-trap-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Nova</button>
+                </div>
+            </div>
+            <div id="traps-list" class="items-grid"></div>
         </section>
 
         <!-- Sessoes View -->
@@ -301,6 +316,7 @@
         <div class="modal-backdrop"></div>
         <div class="modal-content parchment">
             <button class="close-modal"><i class="fas fa-xmark"></i></button>
+            <div id="detail-container" class="hidden"></div> <!-- Added detail container -->
             <div id="modal-body">
                 <!-- Wizard Steps (Characters) -->
                 <div id="creation-wizard" class="wizard-container hidden">
