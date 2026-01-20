@@ -2,22 +2,36 @@
 import { login, logout, initAuth } from "./auth.js";
 import { getCharacters, getCharacter, saveCharacter, getMonsters, saveMonster, getSessions, saveSession } from "./data.js";
 import { sendMessageToLyra, createMonsterWithLyra } from "./ai.js";
+import { SUPPORTED_SYSTEMS } from "./constants.js";
 
 const app = {
     user: null,
-    currentView: 'dashboard',
+    currentView: localStorage.getItem('lyra_current_view') || 'dashboard',
+    currentSystem: localStorage.getItem('lyra_current_system') || 'dnd5e',
     chatHistory: [],
     wizardStep: 1,
     currentCharacter: null,
 
     init() {
         console.log("⚔️ Lyra WebApp Initializing...");
+        this.populateSystems();
         this.bindEvents();
         initAuth((user) => this.handleAuthStateChange(user));
     },
 
+    populateSystems() {
+        const selector = document.getElementById('system-selector');
+        if (selector) {
+            selector.innerHTML = SUPPORTED_SYSTEMS.map(s => `<option value="${s.id}" ${s.id === this.currentSystem ? 'selected' : ''}>${s.name}</option>`).join('');
+        }
+    },
+
     bindEvents() {
         console.log("🔗 Binding events...");
+
+        // Dynamic Scroll Indicators hiding/showing
+        window.addEventListener('scroll', () => this.updateScrollIndicators());
+        window.addEventListener('resize', () => this.updateScrollIndicators());
 
         // Menu Toggle
         document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
@@ -59,7 +73,7 @@ const app = {
         if (loginBtn) {
             loginBtn.addEventListener('click', () => {
                 if (this.user) logout();
-                else login().catch(err => alert("Erro ao entrar: " + err.message));
+                else login().catch(err => this.showAlert("Erro ao entrar: " + err.message, "Portal de Login"));
             });
         }
 
@@ -92,51 +106,95 @@ const app = {
         document.querySelectorAll('.sheet-tab').forEach(tab => {
             tab.addEventListener('click', (e) => this.switchSheetTab(e.currentTarget.dataset.tab));
         });
+
+        // System Selector
+        document.getElementById('system-selector')?.addEventListener('change', (e) => this.handleSystemChange(e.target.value));
+    },
+
+    handleSystemChange(systemId) {
+        console.log("🎲 Alternando sistema para:", systemId);
+        this.currentSystem = systemId;
+        localStorage.setItem('lyra_current_system', systemId);
+        if (this.user) {
+            this.loadViewData(this.currentView);
+        }
     },
 
     handleAuthStateChange(user) {
         this.user = user;
+        this.updateAuthUI(user);
+        if (user) {
+            console.log("👤 Usuário Logado:", user.uid);
+            this.switchView(this.currentView); // Restore persisted view
+        } else {
+            this.switchView('dashboard');
+        }
+    },
+
+    updateAuthUI(user) {
         const loginBtn = document.getElementById('login-btn');
         const tracker = document.getElementById('header-char-tracker');
 
         if (user) {
-            console.log("👤 Usuário logado:", user.email);
             if (loginBtn) {
                 loginBtn.innerHTML = `
                     <img src="${user.photoURL}" class="user-avatar" alt="Avatar">
                     <span>Sair</span>
                 `;
             }
-            this.loadViewData(this.currentView);
             // Show tracker if a character is selected
             if (this.currentCharacter) this.updateHeaderTracker(this.currentCharacter);
         } else {
-            console.log("👤 Usuário deslogado");
             if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
             tracker?.classList.add('hidden');
             this.clearAllViews();
-            this.switchView('dashboard');
         }
     },
 
     switchView(viewId) {
-        console.log("🖼️ Alternando para vista:", viewId);
+        console.log("🎨 Switching view to:", viewId);
         this.currentView = viewId;
+        localStorage.setItem('lyra_current_view', viewId);
 
-        // Navigation active state
-        document.querySelectorAll('.nav-btn').forEach(btn =>
-            btn.classList.toggle('active', btn.getAttribute('data-view') === viewId)
-        );
+        document.querySelectorAll('.view').forEach(view => {
+            view.classList.add('hidden');
+        });
+        document.getElementById(viewId)?.classList.remove('hidden');
 
-        // View visibility
-        document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
-        const targetView = document.getElementById(viewId);
-        if (targetView) targetView.classList.remove('hidden');
+        // Update active nav state
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === viewId);
+        });
 
-        // Scroll lock logic: only allow scroll on views other than dashboard
-        document.body.style.overflow = (viewId === 'dashboard') ? 'hidden' : 'auto';
+        // Scroll lock logic: allow scrolling on all views
+        document.body.style.overflow = 'auto';
 
         if (this.user) this.loadViewData(viewId);
+
+        // Dynamic Indicators visibility
+        this.updateScrollIndicators();
+    },
+
+    updateScrollIndicators() {
+        const up = document.getElementById('scroll-up');
+        const down = document.getElementById('scroll-down');
+        const isDashboard = this.currentView === 'dashboard';
+
+        if (!isDashboard) {
+            up?.classList.add('hidden');
+            down?.classList.add('hidden');
+            return;
+        }
+
+        const scrollPos = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const totalHeight = document.documentElement.scrollHeight;
+
+        // Threshold for showing/hiding
+        const threshold = 50;
+
+        if (up) up.classList.toggle('hidden', scrollPos < threshold);
+        if (down) down.classList.toggle('hidden', scrollPos + windowHeight > totalHeight - threshold);
     },
 
     toggleMenu(show) {
@@ -156,9 +214,19 @@ const app = {
         this.toggleMenu(false); // Close menu on action
         if (action === 'monster-gen') this.showMonsterCreator();
         else if (action === 'trap-gen') this.showTrapCreator();
+        else if (action === 'fichas') this.switchView('fichas');
         else {
-            alert(`Invocando magia para: ${action}. (Funcionalidade em desenvolvimento)`);
+            this.showAlert(`Invocando magia para: ${action}. (Funcionalidade em desenvolvimento)`, "Magia em Preparo");
         }
+    },
+
+    checkAuth() {
+        if (!this.user) {
+            this.showAlert("Viajante, você precisa se identificar (Entrar) para que Lyra possa registrar seu progresso nos anais da história.", "Portal Fechado");
+            login().catch(err => console.error("Login failed:", err));
+            return false;
+        }
+        return true;
     },
 
     updateHeaderTracker(character) {
@@ -189,6 +257,7 @@ const app = {
 
     // --- Wizards ---
     showCreationWizard() {
+        if (!this.checkAuth()) return;
         console.log("✨ Abrindo Criador de Personagem");
         this.openModal('creation-wizard');
         this.wizardStep = 1;
@@ -196,6 +265,7 @@ const app = {
     },
 
     showMonsterCreator() {
+        if (!this.checkAuth()) return;
         console.log("🐉 Abrindo Invocador de Monstros");
         document.getElementById('mon-cr').parentElement.classList.remove('hidden');
         document.getElementById('monster-wizard').querySelector('h3').innerText = "Invocação de Criatura";
@@ -203,6 +273,7 @@ const app = {
     },
 
     showTrapCreator() {
+        if (!this.checkAuth()) return;
         console.log("💀 Abrindo Invocador de Armadilhas");
         document.getElementById('mon-cr').parentElement.classList.add('hidden');
         document.getElementById('monster-wizard').querySelector('h3').innerText = "Criação de Armadilha";
@@ -210,6 +281,7 @@ const app = {
     },
 
     showSessionEditor() {
+        if (!this.checkAuth()) return;
         console.log("📝 Abrindo Diário de Sessão");
         this.openModal('session-wizard');
     },
@@ -223,8 +295,25 @@ const app = {
 
     closeModal() {
         document.getElementById('modal-wrapper').classList.remove('active');
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
     },
 
+    showAlert(message, title = "Decreto Real") {
+        const modal = document.getElementById('alert-modal');
+        const titleEl = document.getElementById('alert-title');
+        const messageEl = document.getElementById('alert-message');
+        if (modal && titleEl && messageEl) {
+            titleEl.innerText = title;
+            messageEl.innerText = message;
+            modal.classList.remove('hidden');
+        } else {
+            alert(message);
+        }
+    },
+
+    closeAlert() {
+        document.getElementById('alert-modal')?.classList.add('hidden');
+    },
     updateWizardStep(dir) {
         this.wizardStep += dir;
         this.updateWizardUI();
@@ -241,13 +330,53 @@ const app = {
 
     // --- Actions ---
     async handleWizardFinish() {
+        const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
+        const name = document.getElementById('wiz-name').value;
+        const race = document.getElementById('wiz-race').value;
+        const className = document.getElementById('wiz-class').value;
+        const background = document.getElementById('wiz-background').value;
+
         const data = {
-            name: document.getElementById('wiz-name').value,
-            secoes: { basico: { Nome: document.getElementById('wiz-name').value, Raça: document.getElementById('wiz-race').value, Classe: document.getElementById('wiz-class').value } }
+            name: name,
+            secoes: {
+                basico: {
+                    Nome: name,
+                    Raça: race,
+                    Classe: className,
+                    Antecedente: background,
+                    Nível: 1,
+                    Velocidade: "9m"
+                },
+                atributos: {
+                    Força: document.getElementById('wiz-str').value,
+                    Destreza: document.getElementById('wiz-dex').value,
+                    Constituição: document.getElementById('wiz-con').value,
+                    Inteligência: document.getElementById('wiz-int').value,
+                    Sabedoria: document.getElementById('wiz-wis').value,
+                    Carisma: document.getElementById('wiz-cha').value
+                },
+                pericias: skills.reduce((acc, skill) => ({ ...acc, [skill]: "Proficiente" }), {}),
+                combate: {
+                    HP: 10,
+                    CA: 10 + this.calculateModifier(document.getElementById('wiz-dex').value),
+                    Iniciativa: this.calculateModifier(document.getElementById('wiz-dex').value)
+                }
+            }
         };
-        await saveCharacter(this.user.uid, data);
+        await saveCharacter(this.user.uid, this.currentSystem, data);
         this.closeModal();
         this.loadCharacters();
+    },
+
+    calculateModifier(val) {
+        const v = parseInt(val) || 10;
+        const mod = Math.floor((v - 10) / 2);
+        return mod;
+    },
+
+    formatModifier(val) {
+        const mod = this.calculateModifier(val);
+        return mod >= 0 ? `+${mod}` : mod;
     },
 
     async handleMonsterFinish() {
@@ -267,10 +396,10 @@ const app = {
             const idToken = await this.user.getIdToken();
             const result = await createMonsterWithLyra(monsterData, idToken);
 
-            await saveMonster(this.user.uid, result);
+            await saveMonster(this.user.uid, this.currentSystem, result);
 
             console.log("👹 Conteúdo Invocado:", result);
-            alert(`Sucesso! ${result.name} foi conjurado.`);
+            this.showAlert(`Sucesso! ${result.name} foi conjurado.`, "Convocação Concluída");
             this.closeModal();
             this.loadMonsters();
         } catch (error) {
@@ -293,9 +422,9 @@ const app = {
                 notes: document.getElementById('sess-notes').value
             };
 
-            await saveSession(this.user.uid, sessionData);
+            await saveSession(this.user.uid, this.currentSystem, sessionData);
 
-            alert("Crônica registrada nos anais!");
+            this.showAlert("Crônica registrada nos anais!", "Escriba Real");
             this.closeModal();
             this.loadSessions();
         } catch (error) {
@@ -309,19 +438,19 @@ const app = {
     // --- Data Rendering ---
     async loadCharacters() {
         const container = document.getElementById('fichas-list');
-        const chars = await getCharacters(this.user.uid);
+        const chars = await getCharacters(this.user.uid, this.currentSystem);
         container.innerHTML = chars.length ? chars.map(c => this.renderCard(c, 'fichas')).join('') : '<p class="empty-state">Sem personagens.</p>';
     },
 
     async loadMonsters() {
         const container = document.getElementById('monsters-list');
-        const monsters = await getMonsters(this.user.uid);
+        const monsters = await getMonsters(this.user.uid, this.currentSystem);
         container.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monstros')).join('') : '<p class="empty-state">O bestiário está vazio.</p>';
     },
 
     async loadSessions() {
         const container = document.getElementById('sessions-list');
-        const sessions = await getSessions(this.user.uid);
+        const sessions = await getSessions(this.user.uid, this.currentSystem);
         container.innerHTML = sessions.length ? sessions.map(s => this.renderCard(s, 'sessoes')).join('') : '<p class="empty-state">Nenhuma aventura narrada.</p>';
     },
 
@@ -348,9 +477,76 @@ const app = {
     },
 
     populateSheet(char) {
-        const b = char.secoes?.basico || {};
+        if (!char) return;
+        const s = char.secoes || {};
+        const b = s.basico || {};
+        const attr = s.atributos || {};
+        const comb = s.combate || {};
+        const per = s.pericias || {};
+
+        // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
-        document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'}`;
+        document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} (Nível ${b.Nível || 1})`;
+        document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
+        document.getElementById('sheet-hp-max').innerText = comb.HP || 10;
+        document.getElementById('sheet-ca').innerText = comb.CA || 10;
+        document.getElementById('sheet-inic').innerText = comb.Iniciativa !== undefined ? (comb.Iniciativa >= 0 ? `+${comb.Iniciativa}` : comb.Iniciativa) : "+0";
+        document.getElementById('sheet-prof').innerText = "+2";
+        document.getElementById('sheet-background').innerText = b.Antecedente || "Nenhum";
+        document.getElementById('sheet-alignment').innerText = b.Alinhamento || "Neutro";
+
+        // Atributos
+        const scoresGrid = document.getElementById('sheet-scores');
+        if (scoresGrid) {
+            const attrs = [
+                { l: 'FOR', v: attr.Força || 10 },
+                { l: 'DEX', v: attr.Destreza || 10 },
+                { l: 'CON', v: attr.Constituição || 10 },
+                { l: 'INT', v: attr.Inteligência || 10 },
+                { l: 'WIS', v: attr.Sabedoria || 10 },
+                { l: 'CHA', v: attr.Carisma || 10 }
+            ];
+            scoresGrid.innerHTML = attrs.map(a => `
+                <div class="score-box">
+                    <span class="score-label">${a.l}</span>
+                    <strong class="score-value">${a.v}</strong>
+                    <span class="score-mod">${this.formatModifier(a.v)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Perícias
+        const skillsList = document.getElementById('sheet-skills');
+        if (skillsList) {
+            const allSkills = [
+                "Acrobacia", "Adestramento de Animais", "Arcanismo", "Atletismo", "Atuação",
+                "Blefar", "Furtividade", "História", "Intimidação", "Intuição",
+                "Investigação", "Medicina", "Natureza", "Percepção", "Persuasão",
+                "Prestidigitação", "Religião", "Sobrevivência"
+            ];
+            skillsList.innerHTML = allSkills.map(skill => `
+                <div class="skill-item ${per[skill] ? 'proficient' : ''}">
+                    <i class="fa-circle ${per[skill] ? 'fas' : 'far'}"></i>
+                    <span>${skill}</span>
+                </div>
+            `).join('');
+        }
+
+        // Recursos (Habilidades e Traços)
+        const featuresBlock = document.getElementById('sheet-features');
+        if (featuresBlock) {
+            featuresBlock.innerText = s.historia?.Habilidades || "Nenhuma habilidade registrada.";
+        }
+
+        // História
+        const backstoryBlock = document.getElementById('sheet-backstory');
+        if (backstoryBlock) {
+            backstoryBlock.innerText = s.historia?.História || "Sua história ainda está por ser escrita.";
+        }
+        document.getElementById('sheet-traits').innerText = s.historia?.Personalidade || "-";
+        document.getElementById('sheet-ideals').innerText = s.historia?.Ideais || "-";
+        document.getElementById('sheet-bonds').innerText = s.historia?.Vínculos || "-";
+        document.getElementById('sheet-flaws').innerText = s.historia?.Defeitos || "-";
     },
 
     switchSheetTab(tabId) {

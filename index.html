@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyra the Wise - RPG WebApp</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/Lyra_Token.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -43,7 +44,8 @@
                                 <h3><i class="fas fa-chess-board"></i> Mestre de Masmorras</h3>
                                 <button class="nav-btn" data-action="gm-screen"><i class="fas fa-desktop"></i> Painel do
                                     Mestre</button>
-                                <button class="nav-btn" data-action="campaign-mgnt"><i class="fas fa-fort-awesome"></i>
+                                <button class="nav-btn" data-action="campaign-mgnt"><i
+                                        class="fas fa-map-location-dot"></i>
                                     Campanhas</button>
                                 <button class="nav-btn" data-action="encounter-gen"><i class="fas fa-shield"></i>
                                     Encontros</button>
@@ -86,6 +88,11 @@
             </div>
 
             <div class="user-controls">
+                <div class="system-selector-container">
+                    <select id="system-selector" class="medieval-select">
+                        <option value="dnd5e">D&D 5ª Edição</option>
+                    </select>
+                </div>
                 <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
             </div>
         </div>
@@ -112,7 +119,7 @@
                 <div class="menu-grid">
                     <button class="nav-btn" data-action="gm-screen"><i class="fas fa-desktop"></i> Painel do
                         Mestre</button>
-                    <button class="nav-btn" data-action="campaign-mgnt"><i class="fas fa-fort-awesome"></i>
+                    <button class="nav-btn" data-action="campaign-mgnt"><i class="fas fa-map-location-dot"></i>
                         Campanhas</button>
                     <button class="nav-btn" data-action="encounter-gen"><i class="fas fa-shield"></i> Encontros</button>
                     <button class="nav-btn" data-action="trap-gen"><i class="fas fa-skull-crossbones"></i>
@@ -185,7 +192,7 @@
                         <span>Painel do Mestre</span>
                     </button>
                     <button class="action-card" data-action="campaign-mgnt">
-                        <i class="fas fa-fort-awesome"></i>
+                        <i class="fas fa-map-location-dot"></i>
                         <span>Campanhas</span>
                     </button>
                     <button class="action-card" data-action="encounter-gen">
@@ -309,6 +316,7 @@
                             <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"></div>
                             <div class="form-group"><label>Classe</label><input type="text" id="wiz-class"></div>
                         </div>
+                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"></div>
                     </div>
                     <div class="wizard-step hidden" data-step="2">
                         <h3>Atributos</h3>
@@ -325,9 +333,23 @@
                         <h3>Perícias</h3>
                         <div class="skills-selection">
                             <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
+                            <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
                             <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
                             <label><input type="checkbox" value="Atletismo"> Atletismo</label>
+                            <label><input type="checkbox" value="Atuação"> Atuação</label>
+                            <label><input type="checkbox" value="Blefar"> Blefar</label>
+                            <label><input type="checkbox" value="Furtividade"> Furtividade</label>
+                            <label><input type="checkbox" value="História"> História</label>
+                            <label><input type="checkbox" value="Intimidação"> Intimidação</label>
+                            <label><input type="checkbox" value="Intuição"> Intuição</label>
+                            <label><input type="checkbox" value="Investigação"> Investigação</label>
+                            <label><input type="checkbox" value="Medicina"> Medicina</label>
+                            <label><input type="checkbox" value="Natureza"> Natureza</label>
                             <label><input type="checkbox" value="Percepção"> Percepção</label>
+                            <label><input type="checkbox" value="Persuasão"> Persuasão</label>
+                            <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
+                            <label><input type="checkbox" value="Religião"> Religião</label>
+                            <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
                         </div>
                     </div>
                     <div class="wizard-step hidden" data-step="4">
@@ -385,8 +407,15 @@
                             <p id="sheet-char-info"></p>
                             <div class="vital-stats">
                                 <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
-                                <div class="vital-box"><span>HP</span><strong id="sheet-hp"></strong></div>
+                                <div class="vital-box"><span>HP</span><span class="hp-values"><strong
+                                            id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
+                                </div>
+                                <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
                                 <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                            </div>
+                            <div class="extra-info">
+                                <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
+                                <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
                             </div>
                         </div>
                         <div id="sheet-atributos" class="sheet-section hidden">
@@ -419,6 +448,30 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="medieval-modal alert-content">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-scroll alert-icon"></i>
+                <h3 id="alert-title">Decreto Real</h3>
+                <p id="alert-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicators -->
+    <div id="scroll-up" class="scroll-indicator hidden">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+    <div id="scroll-down" class="scroll-indicator">
+        <i class="fa-solid fa-chevron-down"></i>
     </div>
 
     <script src="js/app.js" type="module"></script>

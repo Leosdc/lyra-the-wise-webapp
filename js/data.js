@@ -19,10 +19,11 @@ const COLLECTIONS = {
     SESSIONS: "sessoes"
 };
 
-export const getCharacters = async (userId) => {
+export const getCharacters = async (userId, systemId) => {
     const q = query(
         collection(db, COLLECTIONS.CHARACTERS),
         where("userId", "==", userId),
+        where("systemId", "==", systemId),
         orderBy("updatedAt", "desc")
     );
     const querySnapshot = await getDocs(q);
@@ -36,10 +37,11 @@ export const getCharacter = async (id) => {
     return null;
 };
 
-export const saveCharacter = async (userId, charData) => {
+export const saveCharacter = async (userId, systemId, charData) => {
     const data = {
         ...charData,
         userId,
+        systemId,
         updatedAt: new Date().toISOString()
     };
 
@@ -54,26 +56,35 @@ export const saveCharacter = async (userId, charData) => {
     }
 };
 
-export const getMonsters = async (userId) => {
-    const q = query(collection(db, COLLECTIONS.MONSTERS), where("userId", "==", userId));
+export const getMonsters = async (userId, systemId) => {
+    const q = query(
+        collection(db, COLLECTIONS.MONSTERS),
+        where("userId", "==", userId),
+        where("systemId", "==", systemId)
+    );
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-export const saveMonster = async (userId, monsterData) => {
-    const data = { ...monsterData, userId, updatedAt: new Date().toISOString() };
+export const saveMonster = async (userId, systemId, monsterData) => {
+    const data = { ...monsterData, userId, systemId, updatedAt: new Date().toISOString() };
     const docRef = await addDoc(collection(db, COLLECTIONS.MONSTERS), data);
     return docRef.id;
 };
 
-export const getSessions = async (userId) => {
-    const q = query(collection(db, COLLECTIONS.SESSIONS), where("userId", "==", userId), orderBy("updatedAt", "desc"));
+export const getSessions = async (userId, systemId) => {
+    const q = query(
+        collection(db, COLLECTIONS.SESSIONS),
+        where("userId", "==", userId),
+        where("systemId", "==", systemId),
+        orderBy("updatedAt", "desc")
+    );
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-export const saveSession = async (userId, sessionData) => {
-    const data = { ...sessionData, userId, updatedAt: new Date().toISOString() };
+export const saveSession = async (userId, systemId, sessionData) => {
+    const data = { ...sessionData, userId, systemId, updatedAt: new Date().toISOString() };
     const docRef = await addDoc(collection(db, COLLECTIONS.SESSIONS), data);
     return docRef.id;
 };
