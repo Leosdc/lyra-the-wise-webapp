@@ -1113,31 +1113,175 @@ h4,
     margin-bottom: 3rem;
 }
 
+/* Character Sheet Expanded */
+.sheet-container {
+    padding: 1.5rem;
+    color: var(--ink);
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 1rem;
+}
+
+.header-main-info h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.char-subtitle {
+    font-size: 1rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.sheet-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.vital-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
 .vital-box {
     text-align: center;
-    background: rgba(244, 228, 188, 0.5);
-    padding: 1.2rem;
-    border: 2px solid var(--gold);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: rgba(244, 228, 188, 0.4);
+    padding: 1rem;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .vital-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .vital-box span {
     display: block;
     font-size: 0.7rem;
     font-family: 'Cinzel', serif;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+    opacity: 0.8;
 }
 
 .vital-box strong {
-    font-size: 1.8rem;
-    color: #8b0000;
+    font-size: 1.5rem;
+    color: var(--crimson);
+    font-family: 'Cinzel', serif;
+}
+
+.extra-info.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1.5rem;
+}
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    color: var(--crimson);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 1.5rem 0 0.5rem;
+    padding-bottom: 0.2rem;
+}
+
+/* Edit Mode Styles */
+.sheet-container.edit-mode .editable,
+.sheet-container.edit-mode .editable-area {
+    background: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px dashed var(--gold);
+    min-height: 1.2rem;
+    cursor: text;
+}
+
+.sheet-container.edit-mode input[type="text"],
+.sheet-container.edit-mode input[type="number"],
+.sheet-container.edit-mode textarea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--gold);
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--ink);
+    padding: 2px 5px;
+}
+
+.sheet-container.edit-mode .editable-toggle {
+    cursor: pointer;
+    color: var(--gold);
+}
+
+/* Combat & Attacks */
+.combat-top-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.death-saves,
+.hit-dice-box {
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.death-row {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.attacks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.attack-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    padding: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Saves & Skills */
+.saves-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.save-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+}
+
+.save-item.proficient {
+    color: var(--crimson);
+    font-weight: 600;
 }
 
 .scores-grid {

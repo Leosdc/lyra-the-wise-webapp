@@ -187,6 +187,10 @@ const app = {
         document.getElementById('switch-char-btn')?.addEventListener('click', () => {
             this.switchView('fichas');
         });
+
+        // Sheet Actions
+        document.getElementById('edit-sheet-btn')?.addEventListener('click', () => this.toggleSheetEdit(true));
+        document.getElementById('save-sheet-btn')?.addEventListener('click', () => this.saveSheetChanges());
     },
 
     handleChoiceClick(card) {
@@ -695,34 +699,42 @@ const app = {
         const attr = s.atributos || {};
         const comb = s.combate || {};
         const per = s.pericias || {};
+        const rec = s.recursos || {};
 
         // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
         document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} (Nível ${b.Nível || 1})`;
         document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
-        document.getElementById('sheet-hp-max').innerText = comb.HP || 10;
+        document.getElementById('sheet-hp-max').innerText = comb.HP_Max || comb.HP || 10;
         document.getElementById('sheet-ca').innerText = comb.CA || 10;
         document.getElementById('sheet-inic').innerText = comb.Iniciativa !== undefined ? (comb.Iniciativa >= 0 ? `+${comb.Iniciativa}` : comb.Iniciativa) : "+0";
-        document.getElementById('sheet-prof').innerText = "+2";
+        document.getElementById('sheet-prof').innerText = b.Bonus_Proficiencia || "+2";
         document.getElementById('sheet-background').innerText = b.Antecedente || "Nenhum";
         document.getElementById('sheet-alignment').innerText = b.Alinhamento || "Neutro";
         document.getElementById('sheet-speed').innerText = b.Velocidade || "9m";
+        document.getElementById('sheet-xp').innerText = b.XP || "0";
+
+        const insp = document.getElementById('sheet-insp');
+        if (insp) {
+            insp.classList.toggle('fas', !!b.Inspiracao);
+            insp.classList.toggle('far', !b.Inspiracao);
+        }
 
         // Atributos
         const scoresGrid = document.getElementById('sheet-scores');
         if (scoresGrid) {
             const attrs = [
-                { l: 'FOR', v: attr.Força || 10 },
-                { l: 'DEX', v: attr.Destreza || 10 },
-                { l: 'CON', v: attr.Constituição || 10 },
-                { l: 'INT', v: attr.Inteligência || 10 },
-                { l: 'WIS', v: attr.Sabedoria || 10 },
-                { l: 'CHA', v: attr.Carisma || 10 }
+                { id: 'Força', l: 'FOR', v: attr.Força || 10 },
+                { id: 'Destreza', l: 'DEX', v: attr.Destreza || 10 },
+                { id: 'Constituição', l: 'CON', v: attr.Constituição || 10 },
+                { id: 'Inteligência', l: 'INT', v: attr.Inteligência || 10 },
+                { id: 'Sabedoria', l: 'WIS', v: attr.Sabedoria || 10 },
+                { id: 'Carisma', l: 'CHA', v: attr.Carisma || 10 }
             ];
             scoresGrid.innerHTML = attrs.map(a => `
                 <div class="score-box">
                     <span class="score-label">${a.l}</span>
-                    <strong class="score-value">${a.v}</strong>
+                    <strong class="score-value editable" data-field="atributos.${a.id}">${a.v}</strong>
                     <span class="score-mod">${this.formatModifier(a.v)}</span>
                 </div>
             `).join('');
@@ -738,28 +750,122 @@ const app = {
                 "Prestidigitação", "Religião", "Sobrevivência"
             ];
             skillsList.innerHTML = allSkills.map(skill => `
-                <div class="skill-item ${per[skill] ? 'proficient' : ''}">
-                    <i class="fa-circle ${per[skill] ? 'fas' : 'far'}"></i>
+                <div class="skill-item ${per[skill] ? 'proficient' : ''}" data-skill="${skill}">
+                    <i class="fa-circle ${per[skill] ? 'fas' : 'far'} editable-toggle" data-field="pericias.${skill}"></i>
                     <span>${skill}</span>
                 </div>
             `).join('');
         }
 
-        // Recursos (Habilidades e Traços)
-        const featuresBlock = document.getElementById('sheet-features');
-        if (featuresBlock) {
-            featuresBlock.innerText = s.historia?.Habilidades || "Nenhuma habilidade registrada.";
-        }
+        // Combate (Saves e Hit Dice)
+        document.getElementById('sheet-hit-dice').innerText = comb.Dados_Vida || "1d8";
+        // Death saves reset
+        document.querySelectorAll('.death-row input').forEach(i => i.checked = false);
+
+        // Recursos & Inventário
+        document.getElementById('sheet-features').innerText = rec.Habilidades || "Nenhuma habilidade registrada.";
+        document.getElementById('sheet-inventory').innerText = rec.Inventario || "Vazio.";
 
         // História
-        const backstoryBlock = document.getElementById('sheet-backstory');
-        if (backstoryBlock) {
-            backstoryBlock.innerText = s.historia?.História || "Sua história ainda está por ser escrita.";
-        }
+        document.getElementById('sheet-backstory').innerText = s.historia?.História || "Sem história.";
         document.getElementById('sheet-traits').innerText = s.historia?.Personalidade || "-";
         document.getElementById('sheet-ideals').innerText = s.historia?.Ideais || "-";
         document.getElementById('sheet-bonds').innerText = s.historia?.Vínculos || "-";
         document.getElementById('sheet-flaws').innerText = s.historia?.Defeitos || "-";
+    },
+
+    toggleSheetEdit(enable) {
+        const sheet = document.getElementById('character-sheet');
+        sheet.classList.toggle('edit-mode', enable);
+        document.getElementById('edit-sheet-btn').classList.toggle('hidden', enable);
+        document.getElementById('save-sheet-btn').classList.toggle('hidden', !enable);
+
+        if (enable) {
+            // Transform text into inputs
+            sheet.querySelectorAll('.editable').forEach(el => {
+                const val = el.innerText;
+                const field = el.dataset.field;
+                const isNum = !isNaN(val) || field.includes('HP') || field.includes('CA') || field.includes('XP');
+                el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
+
+                // Real-time modifier update for attributes
+                if (field.includes('atributos')) {
+                    const input = el.querySelector('input');
+                    input.addEventListener('input', (e) => {
+                        const scoreMod = el.parentElement.querySelector('.score-mod');
+                        if (scoreMod) scoreMod.innerText = this.formatModifier(e.target.value);
+                    });
+                }
+            });
+            sheet.querySelectorAll('.editable-area').forEach(el => {
+                const val = el.innerText;
+                el.innerHTML = `<textarea data-field="${el.dataset.field}">${val}</textarea>`;
+            });
+            // Toggles (Inspiration/Skills) in edit mode are just clickable icons
+            sheet.querySelectorAll('.editable-toggle').forEach(el => {
+                el.onclick = () => {
+                    el.classList.toggle('fas');
+                    el.classList.toggle('far');
+                };
+            });
+        } else {
+            // Remove click handlers if disabling edit mode
+            sheet.querySelectorAll('.editable-toggle').forEach(el => el.onclick = null);
+        }
+    },
+
+    async saveSheetChanges() {
+        if (!this.currentCharacter) return;
+        this.toggleLoading(true);
+        const sheet = document.getElementById('character-sheet');
+
+        try {
+            const updated = JSON.parse(JSON.stringify(this.currentCharacter)); // Deep clone
+            if (!updated.secoes) updated.secoes = {};
+
+            // Collect inputs
+            sheet.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field; // e.g. "basico.Nome"
+                let val;
+
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    val = el.value;
+                    if (el.type === 'number') val = parseInt(val) || 0;
+                } else if (el.classList.contains('editable-toggle')) {
+                    val = el.classList.contains('fas'); // Boolean for toggles
+                } else {
+                    // Fallback for elements that already have inputs inside
+                    const input = el.querySelector('input, textarea');
+                    if (input) {
+                        val = input.value;
+                        if (input.type === 'number') val = parseInt(val) || 0;
+                    }
+                }
+
+                if (val !== undefined) this.setNestedValue(updated.secoes, field, val);
+            });
+
+            await saveCharacter(this.user.uid, this.currentSystem, updated);
+            this.currentCharacter = updated;
+            this.toggleSheetEdit(false);
+            this.populateSheet(updated);
+            this.updateHeaderTracker(updated);
+            this.showAlert("Ficha consagrada nos anais com sucesso!", "Êxito");
+        } catch (err) {
+            this.showAlert("Erro ao salvar: " + err.message, "Karma Ruim");
+        } finally {
+            this.toggleLoading(false);
+        }
+    },
+
+    setNestedValue(obj, path, value) {
+        const parts = path.split('.');
+        let current = obj;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (!current[parts[i]]) current[parts[i]] = {};
+            current = current[parts[i]];
+        }
+        current[parts[parts.length - 1]] = value;
     },
 
     switchSheetTab(tabId) {

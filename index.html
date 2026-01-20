@@ -496,39 +496,84 @@
 
                 <!-- Character Sheet -->
                 <div id="character-sheet" class="sheet-container hidden">
+                    <div class="sheet-header">
+                        <div class="header-main-info">
+                            <h2 id="sheet-char-name"></h2>
+                            <div id="sheet-char-info" class="char-subtitle"></div>
+                        </div>
+                        <div class="sheet-actions">
+                            <button id="edit-sheet-btn" class="medieval-btn small"><i
+                                    class="fas fa-feather-pointed"></i> Editar</button>
+                            <button id="save-sheet-btn" class="medieval-btn small hidden"><i class="fas fa-save"></i>
+                                Salvar</button>
+                        </div>
+                    </div>
                     <div class="sheet-tabs">
                         <button class="sheet-tab active" data-tab="geral">Geral</button>
                         <button class="sheet-tab" data-tab="atributos">Atributos</button>
                         <button class="sheet-tab" data-tab="pericias">Perícias</button>
+                        <button class="sheet-tab" data-tab="combate">Combate</button>
                         <button class="sheet-tab" data-tab="recursos">Recursos</button>
                         <button class="sheet-tab" data-tab="historia">Crônicas</button>
                     </div>
                     <div class="sheet-content">
                         <div id="sheet-geral" class="sheet-section">
-                            <h2 id="sheet-char-name"></h2>
-                            <p id="sheet-char-info"></p>
                             <div class="vital-stats">
-                                <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
-                                <div class="vital-box"><span>HP</span><span class="hp-values"><strong
-                                            id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
-                                </div>
-                                <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
-                                <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                                <div class="vital-box"><span>CA</span><strong id="sheet-ca" class="editable"
+                                        data-field="combate.CA"></strong></div>
+                                <div class="vital-box"><span>PV</span><span class="hp-values"><strong id="sheet-hp-curr"
+                                            class="editable" data-field="combate.HP"></strong>/<strong id="sheet-hp-max"
+                                            class="editable" data-field="combate.HP_Max"></strong></span></div>
+                                <div class="vital-box"><span>Inic.</span><strong id="sheet-inic" class="editable"
+                                        data-field="combate.Iniciativa"></strong></div>
+                                <div class="vital-box"><span>Prof.</span><strong id="sheet-prof" class="editable"
+                                        data-field="basico.Bonus_Proficiencia"></strong></div>
+                                <div class="vital-box"><span>Insp.</span><i id="sheet-insp"
+                                        class="far fa-star editable-toggle" data-field="basico.Inspiracao"></i></div>
                             </div>
-                            <div class="extra-info">
-                                <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
-                                <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
-                                <p><strong>Velocidade:</strong> <span id="sheet-speed"></span></p>
+                            <div class="extra-info grid-2">
+                                <p><strong>Antecedente:</strong> <span id="sheet-background" class="editable"
+                                        data-field="basico.Antecedente"></span></p>
+                                <p><strong>Alinhamento:</strong> <span id="sheet-alignment" class="editable"
+                                        data-field="basico.Alinhamento"></span></p>
+                                <p><strong>Velocidade:</strong> <span id="sheet-speed" class="editable"
+                                        data-field="basico.Velocidade"></span></p>
+                                <p><strong>XP:</strong> <span id="sheet-xp" class="editable"
+                                        data-field="basico.XP"></span></p>
                             </div>
                         </div>
                         <div id="sheet-atributos" class="sheet-section hidden">
                             <div class="scores-grid" id="sheet-scores"></div>
+                            <h4 class="section-title">Testes de Resistência</h4>
+                            <div class="saves-list" id="sheet-saves"></div>
                         </div>
                         <div id="sheet-pericias" class="sheet-section hidden">
                             <div class="skills-list" id="sheet-skills"></div>
                         </div>
+                        <div id="sheet-combate" class="sheet-section hidden">
+                            <div class="combat-top-row">
+                                <div class="death-saves">
+                                    <span>Salva-Vidas contra Morte</span>
+                                    <div class="death-row">Sucessos <input type="checkbox" id="death-s1"> <input
+                                            type="checkbox" id="death-s2"> <input type="checkbox" id="death-s3"></div>
+                                    <div class="death-row">Fracassos <input type="checkbox" id="death-f1"> <input
+                                            type="checkbox" id="death-f2"> <input type="checkbox" id="death-f3"></div>
+                                </div>
+                                <div class="hit-dice-box">
+                                    <span>Dados de Vida</span>
+                                    <div id="sheet-hit-dice" class="editable" data-field="combate.Dados_Vida"></div>
+                                </div>
+                            </div>
+                            <h4 class="section-title">Ataques e Magias</h4>
+                            <div id="sheet-attacks" class="attacks-list"></div>
+                        </div>
                         <div id="sheet-recursos" class="sheet-section hidden">
-                            <div id="sheet-features" class="text-block"></div>
+                            <h4 class="section-title">Habilidades e Talentos</h4>
+                            <div id="sheet-features" class="text-block editable-area" data-field="recursos.Habilidades">
+                            </div>
+                            <h4 class="section-title">Inventário</h4>
+                            <div id="sheet-inventory" class="text-block editable-area" data-field="recursos.Inventario">
+                            </div>
                         </div>
                         <div id="sheet-historia" class="sheet-section hidden">
                             <div id="sheet-backstory" class="text-block"></div>
