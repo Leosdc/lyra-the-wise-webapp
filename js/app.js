@@ -225,7 +225,7 @@ const app = {
         this.user = user;
         this.updateAuthUI(user);
         if (user) {
-            console.log("👤 Usuário Logado:", user.uid);
+            // console.log("👤 Usuário Logado:", user.uid);
             this.switchView(this.currentView); // Restore persisted view
         } else {
             this.switchView('dashboard');
@@ -680,7 +680,7 @@ const app = {
         const monsters = await getMonsters(this.user.uid, this.currentSystem);
         const list = document.getElementById('monsters-list');
         if (list) {
-            list.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monster')).join('') : '<p class="empty-msg">Nenhuma criatura invocada.</p>';
+            list.innerHTML = monsters.length ? monsters.map(m => this.renderCard(m, 'monster')).join('') : '<p class="empty-state">Nenhuma criatura invocada.</p>';
         }
     },
 
@@ -689,7 +689,7 @@ const app = {
         const traps = await getTraps(this.user.uid, this.currentSystem);
         const list = document.getElementById('traps-list');
         if (list) {
-            list.innerHTML = traps.length ? traps.map(t => this.renderCard(t, 'trap')).join('') : '<p class="empty-msg">Nenhuma armadilha armada.</p>';
+            list.innerHTML = traps.length ? traps.map(t => this.renderCard(t, 'trap')).join('') : '<p class="empty-state">Nenhuma armadilha armada.</p>';
         }
     },
 
@@ -1047,12 +1047,11 @@ const app = {
 
     focusChat() { setTimeout(() => document.getElementById('chat-input')?.focus(), 100); },
 
-    clearAllViews() {
-        ['fichas-list', 'monsters-list', 'sessions-list', 'chat-messages'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = '';
-        });
-    },
+    ['fichas-list', 'monsters-list', 'traps-list', 'sessions-list', 'chat-messages'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+    });
+},
 
     // PDF Export
     async exportPDF() { alert("Abrindo portal de exportação no EC2..."); }

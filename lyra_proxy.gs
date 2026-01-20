@@ -57,6 +57,10 @@ function doPost(e) {
   if (action === 'callGeminiSession') {
     return createResponse(callGeminiSession(requestData.sessionData));
   }
+
+  if (action === 'callGeminiCharacter') {
+    return createResponse(callGeminiCharacter(requestData.charData));
+  }
   
   return createResponse({ error: 'Ação não reconhecida.' });
 }
@@ -122,6 +126,41 @@ function callGeminiMonster(monsterData) {
   // Limpar possíveis markdown do Gemini
   const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
   return { monster: JSON.parse(jsonStr) };
+}
+
+function callGeminiCharacter(charData) {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const prompt = `Você é Lyra the Wise. Com base nestas estatísticas técnicas de um personagem de D&D 5e:
+  ${JSON.stringify(charData, null, 2)}
+  
+  Crie a "trama" narrativa dele:
+  1. Personalidade (Traços)
+  2. Ideais
+  3. Vínculos
+  4. Defeitos
+  5. Uma História (Backstory) envolvente baseada nestes dados.
+  
+  Retorne APENAS um JSON puro no seguinte formato:
+  {
+    "traits": "...",
+    "ideals": "...",
+    "bonds": "...",
+    "flaws": "...",
+    "backstory": "..."
+  }`;
+
+  const payload = { contents: [{ parts: [{ text: prompt }] }] };
+  const response = UrlFetchApp.fetch(url, {
+    method: 'post', contentType: 'application/json',
+    payload: JSON.stringify(payload), muteHttpExceptions: true
+  });
+
+  const resData = JSON.parse(response.getContentText());
+  const text = resData.candidates[0].content.parts[0].text;
+  const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  return { character: JSON.parse(jsonStr) };
 }
 
 function callGeminiSession(sessionData) {

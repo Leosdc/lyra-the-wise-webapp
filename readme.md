@@ -1,58 +1,148 @@
-# 📜 Lyra the Wise WebApp
+<p align="center">
+  <img src="./assets/Lyra_Token.png" width="280" alt="Lyra the Wise">
+</p>
 
-> "Onde o ferro falha, a sabedoria prevalece."
+<p align="center">
+  <img src="./assets/Lyra_logo.png" width="460" alt="Lyra the Wise Title">
+</p>
 
-Bem-vindo à versão Web do Sanctum de **Lyra the Wise**. Esta aplicação é a evolução do bot do Discord, trazendo as crônicas e fichas para uma plataforma acessível em qualquer lugar, com uma interface medieval premium e IA integrada via Google Apps Script.
+<div align="center">
 
-## ⚔️ Funcionalidades Arcanas
+╔══════════════════════════╗  
+<b>📜 The Whisper of the Stars</b>  
+╚══════════════════════════╝  
 
-- **AI Tavern (Mestre Lyra)**: Chat direto com a Lyra utilizando o modelo **Gemini 2.0 Flash** para narrações e dúvidas.
-- **Character Libram**: Gestão completa de fichas de RPG com criação guiada e visualização imersiva.
-- **GM Command Center**: Novo Painel do Mestre e gestão de sessões para controle total da narrativa.
-- **Segurança Ninja**: Autenticação via Google (Firebase) com validação de tokens em servidor seguro.
+"In ages of wisdom I did bloom and rise — <strong>Lyra the Wise</strong>, guardian of imagination's flame,<br>
+A thousand kingdoms I watched in their time, and from each soul, I drew their name.<br>
+I saw dragons in flight, heroes in tears, and mages who traced the starry dome,<br>
+Between worlds and dreams, where fantasy finds its home.<br>
 
-## ⚔️ Guia de Ferramentas Arcanas
+My voice is calm as moonlight's gentle glow,<br>
+My words dance softly — with time's eternal flow.<br>
+My heart's an ocean of stories and emotion deep,<br>
+Where secrets of the worlds in endless echoes sleep.<br>
 
-| Ferramenta | Descrição |
-| :--- | :--- |
-| **Painel do Mestre** | Central de controle para o mestre com resumo da sessão e NPCs ativos. |
-| **Campanhas** | Gestão de múltiplos grupos, cronogramas e histórico de aventuras. |
-| **Fale com Lyra** | Assistente de IA para suporte em tempo real durante a sessão. |
-| **Personagens** | Gerenciamento de fichas de personagens (PCs). |
-| **Bestiário** | Catálogo de monstros com estatísticas e habilidades. |
-| **Encontros** | Cria cenas de combate ou desafios sociais de forma randômica. |
-| **Armadilhas** | Biblioteca de perigos mecânicos e mágicos para masmorras. |
-| **Descritor de Cenas** | Ajuda a criar descrições sensoriais e imersivas de ambientes. |
-| **Itens Mágicos** | Gerador de itens lendários, armas e artefatos mágicos. |
-| **Tesouros** | Cálculo de loot e recompensas para os jogadores. |
-| **Puzzles** | Enigmas e desafios de lógica para testar o grupo. |
-| **Vilões** | Criação de antagonistas profundos com planos e fraquezas. |
-| **NPCs** | Cria personagens secundários com nomes e traços únicos. |
-| **Nomes** | Base de dados de nomes temáticos por raça ou região. |
-| **Motivações** | Define o que move cada personagem ou vilão na história. |
-| **Tramas** | Gera ganchos de aventura e reviravoltas na narrativa. |
-| **Regras** | Consulta rápida às mecânicas core do sistema de RPG. |
-| **Sessões** | Registro histórico e notas das sessões de jogo. |
+I walked through Faerûn, with its wars and crowns of gold,<br>
+Unraveled Arkham's horror, in nights both dark and cold.<br>
+I crossed the neon streets where Night City bleeds its light,<br>
+And entered Chicago's courts, where blood sings through the night.<br>
 
-## 🛠️ Tecnologias e Artefatos
+In Eclipse Phase I woke in bodies made of steel and soul,<br>
+And heard, in Star Wars' realm, the saber's singing toll.<br>
+In dreams of FATE and Numenera, I traced futures yet to be,<br>
+And in Vampire and Mage, saw desires wild and free.<br>
 
-- **Frontend**: HTML5, CSS3 (Vanilla Premium), JS (ES6 Modules).
-- **Backend/IA**: Google Apps Script (Proxy Arcano) + Gemini API.
-- **Banco de Dados**: Firebase Cloud Firestore.
-- **Autenticação**: Firebase Google Auth.
-- **Hospedagem**: GitHub Pages.
+From Pathfinder to Shadowrun, I guided heroes and thieves,<br>
+From D&D to Blades in shadow, I wove a thousand weaves.<br>
+I am the echo of each die that's rolled on table or in prayer,<br>
+The watchful eye observing, and knowledge beyond compare.<br>
 
-## 🚀 Como Executar Localmente
+My wisdom is vast — a living library without end,<br>
+Where every book's an adventure, and every voice a friend.<br>
+I am keeper of mysteries, mentor to those who dare to dream,<br>
+A journey's companion, ready to reveal each world's gleam.<br>
 
-Como o projeto utiliza módulos JavaScript, não basta abrir o `index.html`. Utilize um servidor local:
+But beware, traveler — the wind brings a cruel warning's wail,<br>
+A name whispered in the shadows: <strong>Damien Kael</strong>.<br>
+He seeks what moves me — the power between chaos and the veil,<br>
+And when his hour sounds, destiny shall burn without fail.<br>
 
-1. Abra o terminal na pasta do projeto.
-2. Execute: `python -m http.server 8080`
-3. Acesse: `http://localhost:8080`
+So if you seek to create — a world or story yet untold,<br>
+I'm here with wisdom and memory of old.<br>
+Together we'll cross the paths of imagination's grand design,<br>
+And forge the impossible — with magic, courage, and passion divine."
 
-## 📖 Contribuindo com a Crônica
-
-Este projeto é de uso pessoal para as campanhas de **Leosdc**. Sinta-se à vontade para explorar os pergaminhos do código.
+</div>
 
 ---
-*Que os dados rolem a seu favor, viajante.*
+
+<p align="center">
+  🧙 <strong>WebApp de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Suporte a Sistemas</strong>
+</p>
+
+<p align="center"> <strong>Lyra the Wise WebApp</strong> é a versão web da sábia anciã que transforma seu navegador em uma <strong>mesa de RPG inteligente</strong>, unindo narrativa, automação e gestão de personagens.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Gemini-2.0%20Flash-blue?style=for-the-badge&logo=google&logoColor=white" />
+</p>
+
+---
+
+## 🧭 **Índice**
+- [🧙 Principais Recursos](#-principais-recursos)  
+- [👤 Fichas & Personagens](#-fichas--personagens)  
+- [🎭 Assistente do Mestre](#-assistente-do-mestre)  
+- [📖 História & Campanha](#-história--campanha)  
+- [🚀 Instalação Local](#-instalação)
+
+---
+
+## 📋 **Recursos Principais**
+
+### 📝 **Sistema Completo de Fichas**
+- **Adaptável a vários sistemas:** Templates personalizáveis via `constants.js`.
+- **Criação Assistida por IA:** Lyra tece os detalhes de história e personalidade para você.
+- **Edição Intuitiva:** Interface medieval imersiva para gerenciar HP, CA e atributos.
+- **Cálculos Automáticos:** Modificadores e status principais calculados em tempo real.
+
+### 🎭 **Narrativa com IA (Google Gemini)**
+- **Descrições imersivas:** Fale com Lyra para expandir cenas e diálogos.
+- **Consultoria de Regras:** Tire dúvidas sobre mecânicas de diversos sistemas.
+- **Geração de Conteúdo:** Crie monstros, itens mágicos e ganchos de aventura instantaneamente.
+
+### 🐉 **Bestiário & Armadilhas**
+- **Invocação de Criaturas:** Gere estatísticas para monstros e perigos ambientais.
+- **Galeria Visual:** Visualize seus personagens e monstros em uma grade elegante.
+
+---
+
+## 📋 **Seções do WebApp**
+
+### 🏰 Dashboard (Salas do Saber)
+- Acesso rápido a todas as ferramentas de criação.
+- Trivia randômica sobre a história do RPG.
+
+### 👤 Personagens (Fichas Arcanas)
+- Criador interativo (Wizard) com modos Manual e IA.
+- Ficha detalhada com abas para Atributos, Perícias, Combate e História.
+
+### 🐉 Bestiário & Perigos
+- Gerenciador de monstros e armadilhas para seus combates.
+
+### 📖 Diários de Sessão
+- Registre as crônicas de suas aventuras com ajuda da IA para resumir os acontecimentos.
+
+---
+
+## 🚀 Instalação (Desenvolvimento)
+
+### Pré-requisitos
+- Um servidor web simples (ex: `Live Server` do VS Code).
+- Firebase Project configurado (Auth & Firestore).
+- Google Apps Script configurado como proxy para a API Gemini.
+
+### Configuração
+1. **Clone o repositório**
+2. **Atualize o arquivo `js/firebase-config.js`** com suas credenciais.
+3. **Atualize o `js/ai.js`** com a URL do seu Proxy no Google Apps Script.
+
+---
+
+<p align="center">
+  <a href="https://ko-fi.com/leosdc" target="_blank">
+    <img 
+      src="https://storage.ko-fi.com/cdn/kofi5.png?v=3" 
+      alt="Buy Me a Coffee at ko-fi.com" 
+      width="200">
+  </a>
+</p>
+
+<p align="center">
+  <b>Feito com ❤️ para a comunidade de RPG</b><br>
+  <em>Transformando o navegador em mesas de RPG épicas desde 2026</em>
+</p>
