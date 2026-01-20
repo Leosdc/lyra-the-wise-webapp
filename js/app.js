@@ -430,8 +430,9 @@ const app = {
                     <span>Sair</span>
                 `;
             }
-            // Show tracker if a character is selected
-            if (this.currentCharacter) this.updateHeaderTracker(this.currentCharacter);
+            // Show tracker wrapper always when logged in
+            tracker?.classList.remove('hidden');
+            this.selectCharacter(this.currentCharacter);
         } else {
             if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
             tracker?.classList.add('hidden');
@@ -562,17 +563,8 @@ const app = {
     },
 
     updateHeaderTracker(character) {
-        const tracker = document.getElementById('header-char-tracker');
-        if (!character || !this.user) {
-            tracker?.classList.add('hidden');
-            return;
-        }
-
-        tracker?.classList.remove('hidden');
-        const b = character.secoes?.basico || {};
-        document.getElementById('header-char-name').innerText = character.name || b.Nome || "Herói";
-        document.getElementById('header-char-level').innerText = `Nível ${b.Nível || 1}`;
-        document.getElementById('header-char-stats').innerText = `PV: ${b.PV_Atual || 10}/${b.PV_Total || 10} | CA: ${b.CA || 10}`;
+        // Consolidating with selectCharacter for simplicity
+        this.selectCharacter(character);
     },
 
     async loadViewData(viewId) {
@@ -589,20 +581,20 @@ const app = {
 
     selectCharacter(char) {
         this.currentCharacter = char;
+        const info = document.getElementById('header-char-info');
+
+        if (!char) {
+            info?.classList.add('hidden');
+            return;
+        }
 
         // Persist selection for this system
         if (char && char.id) {
             localStorage.setItem(`lyra_char_${this.currentSystem}`, char.id);
         }
 
-        // Update header tracker
-        const tracker = document.getElementById('char-tracker');
-        if (!char) {
-            tracker?.classList.add('hidden');
-            return;
-        }
-
-        tracker?.classList.remove('hidden');
+        // Show info part
+        info?.classList.remove('hidden');
         const b = char.secoes?.basico || {};
         const comb = char.secoes?.combate || {};
 
@@ -610,8 +602,10 @@ const app = {
         document.getElementById('header-char-level').textContent = `Nível ${b.Nível || 1}`;
         document.getElementById('header-char-stats').textContent = `PV: ${comb.HP || 10}/${comb.HP_Max || comb.HP || 10} | CA: ${comb.CA || 10}`;
 
-        // Update token if available
-        const tokenImg = tracker?.querySelector('.header-char-token');
+        // Update token if available index.html uses header-char-token? No, I should check.
+        // Actually, looking at index.html, there is no token in the header tracker yet.
+        // But selectCharacter previously tried to update it. I'll leave it but wrap with check.
+        const tokenImg = document.querySelector('.header-char-token');
         if (tokenImg) {
             tokenImg.src = char.tokenUrl || 'assets/Lyra_Token.png';
         }
@@ -1288,36 +1282,45 @@ const app = {
         document.getElementById('add-attack-btn')?.classList.toggle('hidden', !enable);
 
         if (enable) {
-            // Backup current character for cancel
             this.characterBackup = JSON.parse(JSON.stringify(this.currentCharacter));
 
-            // Transform text into inputs
+            // Editable fields
             sheet.querySelectorAll('.editable').forEach(el => {
                 let val = el.innerText;
                 const field = el.dataset.field;
-                const isNum = !isNaN(parseFloat(val.replace('+', ''))) || field.includes('HP') || field.includes('CA') || field.includes('XP');
+                const isStrictNum = /^[+-]?\d+$/.test(val.trim());
+                const isNum = isStrictNum || field.includes('HP') || field.includes('CA') || field.includes('XP');
 
-                // Remove + sign for number inputs (browsers don't accept "+0" format)
-                if (isNum && val.startsWith('+')) {
-                    val = val.substring(1);
-                }
-
+                if (isNum && val.startsWith('+')) val = val.substring(1);
                 el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
 
-                // Real-time modifier update for attributes
                 if (field.includes('atributos')) {
-                    const input = el.querySelector('input');
-                    input.addEventListener('input', (e) => {
+                    el.querySelector('input').addEventListener('input', (e) => {
                         const scoreMod = el.parentElement.querySelector('.score-mod');
                         if (scoreMod) scoreMod.innerText = this.formatModifier(e.target.value);
                     });
                 }
             });
+
+            // Editable areas
             sheet.querySelectorAll('.editable-area').forEach(el => {
                 const val = el.innerText;
                 el.innerHTML = `<textarea data-field="${el.dataset.field}">${val}</textarea>`;
             });
-            // Toggles (Inspiration/Skills) in edit mode are just clickable icons
+
+            // Editable Table Attacks
+            sheet.querySelectorAll('.editable-attack').forEach(el => {
+                const val = el.innerText === '-' ? '' : el.innerText;
+                el.innerHTML = `<input type="text" value="${val}" data-field="${el.dataset.field}">`;
+            });
+
+            // Add Attack Logic
+            const addAtkBtn = document.getElementById('add-attack-btn');
+            if (addAtkBtn) {
+                addAtkBtn.onclick = () => this.addAttackRow();
+            }
+
+            // Toggles
             sheet.querySelectorAll('.editable-toggle').forEach(el => {
                 el.onclick = () => {
                     el.classList.toggle('fas');
@@ -1325,9 +1328,25 @@ const app = {
                 };
             });
         } else {
-            // Remove click handlers if disabling edit mode
             sheet.querySelectorAll('.editable-toggle').forEach(el => el.onclick = null);
+            const addAtkBtn = document.getElementById('add-attack-btn');
+            if (addAtkBtn) addAtkBtn.onclick = null;
         }
+    },
+
+    addAttackRow() {
+        const tbody = document.getElementById('attacks-body');
+        if (!tbody) return;
+        const index = tbody.querySelectorAll('.attack-row').length;
+        const row = document.createElement('tr');
+        row.className = 'attack-row';
+        row.dataset.index = index;
+        row.innerHTML = `
+            <td class="editable-attack"><input type="text" value="" data-field="nome"></td>
+            <td class="editable-attack"><input type="text" value="" data-field="bonus"></td>
+            <td class="editable-attack"><input type="text" value="" data-field="dano"></td>
+        `;
+        tbody.appendChild(row);
     },
 
     cancelSheetEdit() {
@@ -1370,11 +1389,26 @@ const app = {
                 if (val !== undefined) this.setNestedValue(updated.secoes, field, val);
             });
 
+            // Collect attacks separately as they are an array
+            const attackRows = sheet.querySelectorAll('.attack-row');
+            const attacks = [];
+            attackRows.forEach(row => {
+                const atk = {};
+                row.querySelectorAll('[data-field]').forEach(inputEl => {
+                    const f = inputEl.dataset.field;
+                    const val = inputEl.tagName === 'INPUT' ? inputEl.value : inputEl.innerText;
+                    if (f) atk[f] = val;
+                });
+                if (atk.nome) attacks.push(atk);
+            });
+            if (!updated.secoes.combate) updated.secoes.combate = {};
+            updated.secoes.combate.Ataques = attacks;
+
             await saveCharacter(this.user.uid, this.currentSystem, updated);
             this.currentCharacter = updated;
             this.toggleSheetEdit(false);
             this.populateSheet(updated);
-            this.updateHeaderTracker(updated);
+            this.selectCharacter(updated);
             this.showAlert("Ficha consagrada nos anais com sucesso!", "Êxito");
         } catch (err) {
             this.showAlert("Erro ao salvar: " + err.message, "Karma Ruim");
