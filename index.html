@@ -91,8 +91,12 @@
                         <div class="dropdown-header">
                             <strong>Trocar Personagem</strong>
                         </div>
-                        <div id="char-switcher-list" class="char-switcher-list">
-                            <!-- Populated by JS -->
+                        <div class="dropdown-scroll-wrapper">
+                            <i class="fas fa-chevron-up dropdown-scroll-arrow up hidden"></i>
+                            <div id="char-switcher-list" class="char-switcher-list">
+                                <!-- Populated by JS -->
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-scroll-arrow down hidden"></i>
                         </div>
                     </div>
                 </div>
@@ -104,8 +108,12 @@
                         <span id="system-selector-text">D&D 5ª Edição</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="custom-select-options hidden" id="system-selector-options">
-                        <!-- Options populated by JS -->
+                    <div class="custom-select-options-wrapper hidden" id="system-selector-options-wrapper">
+                        <i class="fas fa-chevron-up dropdown-scroll-arrow up hidden"></i>
+                        <div class="custom-select-options" id="system-selector-options">
+                            <!-- Options populated by JS -->
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-scroll-arrow down hidden"></i>
                     </div>
                     <input type="hidden" id="system-selector" value="dnd5e">
                 </div>

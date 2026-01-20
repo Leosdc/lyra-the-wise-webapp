@@ -82,12 +82,16 @@ const app = {
 
                     // Close dropdown
                     document.getElementById('system-selector-container').classList.remove('open');
-                    optionsContainer.classList.add('hidden');
+                    document.getElementById('system-selector-options-wrapper').classList.add('hidden');
 
                     // Trigger system change
                     this.handleSystemChange(value);
                 });
             });
+
+            // Bind scroll indicators
+            optionsContainer.addEventListener('scroll', () => this.updateDropdownScroll(optionsContainer));
+            this.updateDropdownScroll(optionsContainer);
         }
     },
 
@@ -147,25 +151,27 @@ const app = {
         document.getElementById('system-selector-trigger')?.addEventListener('click', (e) => {
             e.stopPropagation();
             const container = document.getElementById('system-selector-container');
+            const wrapper = document.getElementById('system-selector-options-wrapper');
             const options = document.getElementById('system-selector-options');
             const isOpen = container.classList.contains('open');
 
             if (isOpen) {
                 container.classList.remove('open');
-                options.classList.add('hidden');
+                wrapper.classList.add('hidden');
             } else {
                 container.classList.add('open');
-                options.classList.remove('hidden');
+                wrapper.classList.remove('hidden');
+                this.updateDropdownScroll(options);
             }
         });
 
         // Close system selector when clicking outside
         document.addEventListener('click', (e) => {
             const container = document.getElementById('system-selector-container');
-            const options = document.getElementById('system-selector-options');
+            const wrapper = document.getElementById('system-selector-options-wrapper');
             if (container && !container.contains(e.target)) {
                 container.classList.remove('open');
-                options?.classList.add('hidden');
+                wrapper?.classList.add('hidden');
             }
         });
         document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
@@ -503,6 +509,26 @@ const app = {
         down.style.zIndex = z;
     },
 
+    updateDropdownScroll(container) {
+        if (!container) return;
+        const wrapper = container.parentElement;
+        const up = wrapper.querySelector('.dropdown-scroll-arrow.up');
+        const down = wrapper.querySelector('.dropdown-scroll-arrow.down');
+
+        if (!up || !down) return;
+
+        const scrollPos = container.scrollTop;
+        const containerHeight = container.clientHeight;
+        const totalHeight = container.scrollHeight;
+        const threshold = 5;
+
+        const canScrollUp = scrollPos > threshold;
+        const canScrollDown = scrollPos + containerHeight < totalHeight - threshold;
+
+        up.classList.toggle('hidden', !canScrollUp);
+        down.classList.toggle('hidden', !canScrollDown || totalHeight <= containerHeight);
+    },
+
     toggleMenu(show) {
         const menu = document.getElementById('side-menu');
         if (menu) menu.classList.toggle('hidden', !show);
@@ -558,6 +584,36 @@ const app = {
             if (viewId === 'chat') this.focusChat();
         } catch (err) {
             console.error("❌ Erro ao carregar dados da vista:", err);
+        }
+    },
+
+    selectCharacter(char) {
+        this.currentCharacter = char;
+
+        // Persist selection for this system
+        if (char && char.id) {
+            localStorage.setItem(`lyra_char_${this.currentSystem}`, char.id);
+        }
+
+        // Update header tracker
+        const tracker = document.getElementById('char-tracker');
+        if (!char) {
+            tracker?.classList.add('hidden');
+            return;
+        }
+
+        tracker?.classList.remove('hidden');
+        const b = char.secoes?.basico || {};
+        const comb = char.secoes?.combate || {};
+
+        document.getElementById('header-char-name').textContent = char.name || b.Nome || 'Sem Nome';
+        document.getElementById('header-char-level').textContent = `Nível ${b.Nível || 1}`;
+        document.getElementById('header-char-stats').textContent = `PV: ${comb.HP || 10}/${comb.HP_Max || comb.HP || 10} | CA: ${comb.CA || 10}`;
+
+        // Update token if available
+        const tokenImg = tracker?.querySelector('.header-char-token');
+        if (tokenImg) {
+            tokenImg.src = char.tokenUrl || 'assets/Lyra_Token.png';
         }
     },
 
@@ -944,6 +1000,10 @@ const app = {
                     }
                 });
             });
+
+            // Bind scroll indicators
+            list.addEventListener('scroll', () => this.updateDropdownScroll(list));
+            this.updateDropdownScroll(list);
         } catch (error) {
             console.error("Erro ao carregar personagens:", error);
             list.innerHTML = '<p class="empty-state">Erro ao carregar personagens.</p>';
@@ -1233,9 +1293,15 @@ const app = {
 
             // Transform text into inputs
             sheet.querySelectorAll('.editable').forEach(el => {
-                const val = el.innerText;
+                let val = el.innerText;
                 const field = el.dataset.field;
-                const isNum = !isNaN(val) || field.includes('HP') || field.includes('CA') || field.includes('XP');
+                const isNum = !isNaN(parseFloat(val.replace('+', ''))) || field.includes('HP') || field.includes('CA') || field.includes('XP');
+
+                // Remove + sign for number inputs (browsers don't accept "+0" format)
+                if (isNum && val.startsWith('+')) {
+                    val = val.substring(1);
+                }
+
                 el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
 
                 // Real-time modifier update for attributes

@@ -178,18 +178,21 @@ textarea {
     transform: rotate(180deg);
 }
 
-.custom-select-options {
+.custom-select-options-wrapper {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     margin-top: 0.25rem;
+    z-index: 5000;
+}
+
+.custom-select-options {
     background: rgba(20, 15, 10, 0.98);
     border: 2px solid var(--gold);
     border-radius: 6px;
-    max-height: 300px;
+    max-height: 250px;
     overflow-y: auto;
-    z-index: 5000;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     animation: slideDown 0.2s ease;
 }
@@ -429,8 +432,6 @@ h4,
     right: 0;
     margin-top: 0.5rem;
     width: 300px;
-    max-height: 400px;
-    overflow-y: auto;
     background: rgba(20, 15, 10, 0.98);
     border: 2px solid var(--gold);
     border-radius: 8px;
@@ -439,17 +440,76 @@ h4,
     animation: slideDown 0.2s ease;
 }
 
-.char-switcher-dropdown .dropdown-header {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-    color: var(--gold);
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+.dropdown-scroll-wrapper {
+    position: relative;
+    overflow: hidden;
 }
 
 .char-switcher-list {
     padding: 0.5rem;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* Scroll Arrows for Dropdowns */
+.dropdown-scroll-arrow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background: linear-gradient(rgba(20, 15, 10, 0.9), transparent);
+    color: var(--gold);
+    padding: 5px 0;
+    font-size: 0.8rem;
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    animation: pulseArrow 1.5s infinite;
+}
+
+.dropdown-scroll-arrow.up {
+    top: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.dropdown-scroll-arrow.down {
+    bottom: 0;
+    background: linear-gradient(transparent, rgba(20, 15, 10, 0.9));
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+@keyframes pulseArrow {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(2px);
+    }
+}
+
+.dropdown-scroll-arrow.up {
+    animation-name: pulseArrowUp;
+}
+
+@keyframes pulseArrowUp {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
 }
 
 .char-switcher-item {
