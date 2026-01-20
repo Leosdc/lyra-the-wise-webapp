@@ -1,7 +1,7 @@
 
 import { login, logout, initAuth } from "./auth.js";
 import { getCharacters, getCharacter, saveCharacter, getMonsters, saveMonster, getSessions, saveSession } from "./data.js";
-import { sendMessageToLyra, createMonsterWithLyra } from "./ai.js";
+import { sendMessageToLyra, createMonsterWithLyra, createCharacterWithLyra, processSessionWithLyra } from "./ai.js";
 import { SUPPORTED_SYSTEMS } from "./constants.js";
 
 const app = {
@@ -40,6 +40,8 @@ const app = {
 
     init() {
         console.log("⚔️ Lyra WebApp Initializing...");
+        // Applying initial view immediately to prevent flicker
+        this.switchView(this.currentView);
         this.populateSystems();
         this.bindEvents();
         this.showRandomTrivia();
@@ -180,6 +182,11 @@ const app = {
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', (e) => this.handleChoiceClick(e.currentTarget));
         });
+
+        // Switch Character Button
+        document.getElementById('switch-char-btn')?.addEventListener('click', () => {
+            this.switchView('fichas');
+        });
     },
 
     handleChoiceClick(card) {
@@ -189,8 +196,6 @@ const app = {
 
         if (wizardId === 'creation-wizard') {
             this.wizardStep = 1;
-            document.getElementById('char-choice-step').classList.add('hidden');
-            document.querySelector('.wizard-progress').classList.remove('hidden');
             this.updateWizardUI();
         } else if (wizardId === 'monster-wizard') {
             document.getElementById('mon-choice-step').classList.add('hidden');
@@ -199,6 +204,8 @@ const app = {
             document.getElementById('sess-choice-step').classList.add('hidden');
             document.getElementById('sess-form').classList.remove('hidden');
         }
+        // Update indicators after state change
+        this.updateScrollIndicators();
     },
 
     handleSystemChange(systemId) {
@@ -276,18 +283,32 @@ const app = {
     updateScrollIndicators() {
         const up = document.getElementById('scroll-up');
         const down = document.getElementById('scroll-down');
+        if (!up || !down) return;
 
-        // Check window scroll for the main view
-        const scrollPos = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const totalHeight = document.documentElement.scrollHeight;
-        const threshold = 30;
+        let scrollPos, windowHeight, totalHeight;
+        const modal = document.querySelector('#modal-wrapper.active');
+        const parchment = modal ? modal.querySelector('.parchment') : null;
 
+        if (modal && parchment) {
+            scrollPos = parchment.scrollTop;
+            windowHeight = parchment.clientHeight;
+            totalHeight = parchment.scrollHeight;
+        } else {
+            scrollPos = window.scrollY;
+            windowHeight = window.innerHeight;
+            totalHeight = document.documentElement.scrollHeight;
+        }
+
+        const threshold = 15;
         const canScrollUp = scrollPos > threshold;
         const canScrollDown = scrollPos + windowHeight < totalHeight - threshold;
 
-        if (up) up.classList.toggle('hidden', !canScrollUp);
-        if (down) down.classList.toggle('hidden', !canScrollDown || totalHeight <= windowHeight);
+        up.classList.toggle('hidden', !canScrollUp);
+        down.classList.toggle('hidden', !canScrollDown || totalHeight <= windowHeight);
+
+        const z = modal ? "10001" : "9000";
+        up.style.zIndex = z;
+        down.style.zIndex = z;
     },
 
     toggleMenu(show) {
@@ -353,7 +374,7 @@ const app = {
         if (!this.checkAuth()) return;
         console.log("✨ Abrindo Criador de Personagem");
         this.openModal('creation-wizard');
-        this.wizardStep = 1;
+        this.wizardStep = 0; // Start at Choice Step
         this.updateWizardUI();
     },
 
@@ -381,18 +402,29 @@ const app = {
 
     openModal(wizardId) {
         const wrapper = document.getElementById('modal-wrapper');
+        const content = wrapper?.querySelector('.parchment');
+
         if (wrapper) {
             wrapper.classList.add('active');
             wrapper.classList.remove('hidden');
+
+            // Listen for internal scrolling to update indicators
+            if (content) {
+                content.removeEventListener('scroll', () => this.updateScrollIndicators());
+                content.addEventListener('scroll', () => this.updateScrollIndicators());
+                // Scroll to top when opening
+                content.scrollTop = 0;
+            }
         }
+
         document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
         const target = document.getElementById(wizardId);
         if (target) {
             target.classList.remove('hidden');
             // Back to choice step
             if (wizardId === 'creation-wizard') {
-                document.getElementById('char-choice-step').classList.remove('hidden');
-                document.querySelector('.wizard-progress').classList.add('hidden');
+                this.wizardStep = 0;
+                this.updateWizardUI();
             } else if (wizardId === 'monster-wizard') {
                 document.getElementById('mon-choice-step').classList.remove('hidden');
                 document.getElementById('mon-form').classList.add('hidden');
@@ -401,6 +433,7 @@ const app = {
                 document.getElementById('sess-form').classList.add('hidden');
             }
         }
+        this.updateScrollIndicators();
     },
 
     toggleLoading(show) {
@@ -440,8 +473,20 @@ const app = {
 
     updateWizardUI() {
         document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+
+        // Handle choice step vs numbered steps
+        const choiceStep = document.getElementById('char-choice-step');
+        const progress = document.querySelector('.wizard-progress');
         const activeStep = document.querySelector(`#creation-wizard .wizard-step[data-step="${this.wizardStep}"]`);
-        if (activeStep) activeStep.classList.remove('hidden');
+
+        if (this.wizardStep === 0) {
+            if (choiceStep) choiceStep.classList.remove('hidden');
+            if (progress) progress.classList.add('hidden');
+        } else {
+            if (choiceStep) choiceStep.classList.add('hidden');
+            if (progress) progress.classList.remove('hidden');
+            if (activeStep) activeStep.classList.remove('hidden');
+        }
 
         document.querySelectorAll('.step-indicator').forEach(i => i.classList.toggle('active', parseInt(i.dataset.step) === this.wizardStep));
 
@@ -578,11 +623,19 @@ const app = {
     async handleSessionFinish() {
         this.toggleLoading(true);
         try {
-            const sessionData = {
+            let sessionData = {
                 title: document.getElementById('sess-title').value,
                 summary: document.getElementById('sess-summary').value,
                 notes: document.getElementById('sess-notes').value
             };
+
+            if (this.creationMode === 'ai' && this.user) {
+                const idToken = await this.user.getIdToken();
+                const aiResponse = await processSessionWithLyra(sessionData, idToken);
+                if (aiResponse) {
+                    sessionData.summary = aiResponse;
+                }
+            }
 
             await saveSession(this.user.uid, this.currentSystem, sessionData);
             this.closeModal();
@@ -713,6 +766,7 @@ const app = {
         document.querySelectorAll('.sheet-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
         document.querySelectorAll('.sheet-section').forEach(s => s.classList.add('hidden'));
         document.getElementById(`sheet-${tabId}`).classList.remove('hidden');
+        this.updateScrollIndicators();
     },
 
     // --- Chat Logic ---

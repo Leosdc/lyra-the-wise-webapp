@@ -150,7 +150,7 @@
 
     <main id="main-content">
         <!-- Dashboard View -->
-        <section id="dashboard" class="view">
+        <section id="dashboard" class="view hidden">
             <div class="hero-section">
                 <div class="hero-content-wrapper">
                     <div class="hero-artwork">
@@ -304,7 +304,7 @@
             <div id="modal-body">
                 <!-- Wizard Steps (Characters) -->
                 <div id="creation-wizard" class="wizard-container hidden">
-                    <div id="char-choice-step" class="wizard-step">
+                    <div id="char-choice-step" class="wizard-step" data-step="0">
                         <h3>Como deseja criar, viajante?</h3>
                         <div class="mode-choices">
                             <div class="choice-card" data-mode="ai">
@@ -340,7 +340,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Alinhamento</label>
-                                <select id="wiz-alignment" class="medieval-select">
+                                <select id="wiz-alignment" class="wizard-select">
                                     <option value="Leal e Bom">Leal e Bom</option>
                                     <option value="Neutro e Bom">Neutro e Bom</option>
                                     <option value="Caótico e Bom">Caótico e Bom</option>
@@ -459,91 +459,91 @@
                             <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Session Wizard -->
-                    <div id="session-wizard" class="wizard-container hidden">
-                        <div id="sess-choice-step" class="wizard-step">
-                            <h3>Registro da Crônica</h3>
-                            <div class="mode-choices">
-                                <div class="choice-card" data-mode="ai">
-                                    <i class="fas fa-scroll"></i>
-                                    <h4>Escriba Lyra</h4>
-                                    <p>A IA organizará seus pensamentos em um diário.</p>
-                                </div>
-                                <div class="choice-card" data-mode="manual">
-                                    <i class="fas fa-pen-nib"></i>
-                                    <h4>Própria Pena</h4>
-                                    <p>Escreva sua própria crônica de aventura.</p>
-                                </div>
+                <!-- Session Wizard -->
+                <div id="session-wizard" class="wizard-container hidden">
+                    <div id="sess-choice-step" class="wizard-step">
+                        <h3>Registro da Crônica</h3>
+                        <div class="mode-choices">
+                            <div class="choice-card" data-mode="ai">
+                                <i class="fas fa-scroll"></i>
+                                <h4>Escriba Lyra</h4>
+                                <p>A IA organizará seus pensamentos em um diário.</p>
                             </div>
-                        </div>
-                        <div id="sess-form" class="hidden">
-                            <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
-                            <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title">
-                            </div>
-                            <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
-                                    class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea>
-                            </div>
-                            <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
-                                    class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea>
-                            </div>
-                            <div class="wizard-nav">
-                                <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
+                            <div class="choice-card" data-mode="manual">
+                                <i class="fas fa-pen-nib"></i>
+                                <h4>Própria Pena</h4>
+                                <p>Escreva sua própria crônica de aventura.</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Character Sheet -->
-                    <div id="character-sheet" class="sheet-container hidden">
-                        <div class="sheet-tabs">
-                            <button class="sheet-tab active" data-tab="geral">Geral</button>
-                            <button class="sheet-tab" data-tab="atributos">Atributos</button>
-                            <button class="sheet-tab" data-tab="pericias">Perícias</button>
-                            <button class="sheet-tab" data-tab="recursos">Recursos</button>
-                            <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    <div id="sess-form" class="hidden">
+                        <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
+                        <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title">
                         </div>
-                        <div class="sheet-content">
-                            <div id="sheet-geral" class="sheet-section">
-                                <h2 id="sheet-char-name"></h2>
-                                <p id="sheet-char-info"></p>
-                                <div class="vital-stats">
-                                    <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
-                                    <div class="vital-box"><span>HP</span><span class="hp-values"><strong
-                                                id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
-                                    </div>
-                                    <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
-                                    <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                        <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
+                                class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea>
+                        </div>
+                        <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
+                                class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea>
+                        </div>
+                        <div class="wizard-nav">
+                            <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Character Sheet -->
+                <div id="character-sheet" class="sheet-container hidden">
+                    <div class="sheet-tabs">
+                        <button class="sheet-tab active" data-tab="geral">Geral</button>
+                        <button class="sheet-tab" data-tab="atributos">Atributos</button>
+                        <button class="sheet-tab" data-tab="pericias">Perícias</button>
+                        <button class="sheet-tab" data-tab="recursos">Recursos</button>
+                        <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    </div>
+                    <div class="sheet-content">
+                        <div id="sheet-geral" class="sheet-section">
+                            <h2 id="sheet-char-name"></h2>
+                            <p id="sheet-char-info"></p>
+                            <div class="vital-stats">
+                                <div class="vital-box"><span>CA</span><strong id="sheet-ca"></strong></div>
+                                <div class="vital-box"><span>HP</span><span class="hp-values"><strong
+                                            id="sheet-hp-curr"></strong>/<strong id="sheet-hp-max"></strong></span>
                                 </div>
-                                <div class="extra-info">
-                                    <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
-                                    <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
-                                    <p><strong>Velocidade:</strong> <span id="sheet-speed"></span></p>
+                                <div class="vital-box"><span>Inic.</span><strong id="sheet-inic"></strong></div>
+                                <div class="vital-box"><span>Prof.</span><strong id="sheet-prof"></strong></div>
+                            </div>
+                            <div class="extra-info">
+                                <p><strong>Antecedente:</strong> <span id="sheet-background"></span></p>
+                                <p><strong>Alinhamento:</strong> <span id="sheet-alignment"></span></p>
+                                <p><strong>Velocidade:</strong> <span id="sheet-speed"></span></p>
+                            </div>
+                        </div>
+                        <div id="sheet-atributos" class="sheet-section hidden">
+                            <div class="scores-grid" id="sheet-scores"></div>
+                        </div>
+                        <div id="sheet-pericias" class="sheet-section hidden">
+                            <div class="skills-list" id="sheet-skills"></div>
+                        </div>
+                        <div id="sheet-recursos" class="sheet-section hidden">
+                            <div id="sheet-features" class="text-block"></div>
+                        </div>
+                        <div id="sheet-historia" class="sheet-section hidden">
+                            <div id="sheet-backstory" class="text-block"></div>
+                            <div class="traits-grid">
+                                <div><strong>Traços</strong>
+                                    <p id="sheet-traits"></p>
                                 </div>
-                            </div>
-                            <div id="sheet-atributos" class="sheet-section hidden">
-                                <div class="scores-grid" id="sheet-scores"></div>
-                            </div>
-                            <div id="sheet-pericias" class="sheet-section hidden">
-                                <div class="skills-list" id="sheet-skills"></div>
-                            </div>
-                            <div id="sheet-recursos" class="sheet-section hidden">
-                                <div id="sheet-features" class="text-block"></div>
-                            </div>
-                            <div id="sheet-historia" class="sheet-section hidden">
-                                <div id="sheet-backstory" class="text-block"></div>
-                                <div class="traits-grid">
-                                    <div><strong>Traços</strong>
-                                        <p id="sheet-traits"></p>
-                                    </div>
-                                    <div><strong>Ideais</strong>
-                                        <p id="sheet-ideals"></p>
-                                    </div>
-                                    <div><strong>Vínculos</strong>
-                                        <p id="sheet-bonds"></p>
-                                    </div>
-                                    <div><strong>Defeitos</strong>
-                                        <p id="sheet-flaws"></p>
-                                    </div>
+                                <div><strong>Ideais</strong>
+                                    <p id="sheet-ideals"></p>
+                                </div>
+                                <div><strong>Vínculos</strong>
+                                    <p id="sheet-bonds"></p>
+                                </div>
+                                <div><strong>Defeitos</strong>
+                                    <p id="sheet-flaws"></p>
                                 </div>
                             </div>
                         </div>
@@ -551,42 +551,43 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Custom Alert Modal -->
-        <div id="alert-modal" class="modal-overlay hidden">
-            <div class="medieval-modal alert-content">
-                <div class="lyra-corner top-left"></div>
-                <div class="lyra-corner top-right"></div>
-                <div class="alert-body">
-                    <i class="fa-solid fa-scroll alert-icon"></i>
-                    <h3 id="alert-title">Decreto Real</h3>
-                    <p id="alert-message"></p>
-                </div>
-                <div class="modal-footer">
-                    <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
-                </div>
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="medieval-modal alert-content">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-scroll alert-icon"></i>
+                <h3 id="alert-title">Decreto Real</h3>
+                <p id="alert-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
             </div>
         </div>
+    </div>
 
-        <!-- Scroll Indicators -->
-        <div id="scroll-up" class="scroll-indicator hidden">
-            <i class="fa-solid fa-chevron-up"></i>
-        </div>
-        <div id="scroll-down" class="scroll-indicator">
-            <i class="fa-solid fa-chevron-down"></i>
-        </div>
+    <!-- Scroll Indicators -->
+    <div id="scroll-up" class="scroll-indicator hidden">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+    <div id="scroll-down" class="scroll-indicator">
+        <i class="fa-solid fa-chevron-down"></i>
+    </div>
 
-        <script src="js/app.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
 
-        <!-- Mystical Loading Overlay -->
-        <div id="mystic-loading" class="hidden">
-            <div class="mystic-spinner">
-                <div class="rune-layer outer"></div>
-                <div class="rune-layer"></div>
-                <div class="rune-layer inner"></div>
-            </div>
-            <div class="loading-text">Tecendo a Trama...</div>
+    <!-- Mystical Loading Overlay -->
+    <div id="mystic-loading" class="hidden">
+        <div class="mystic-spinner">
+            <div class="rune-layer outer"></div>
+            <div class="rune-layer"></div>
+            <div class="rune-layer inner"></div>
         </div>
+        <div class="loading-text">Tecendo a Trama...</div>
+    </div>
 </body>
 
 </html>

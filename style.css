@@ -134,12 +134,47 @@ body {
 }
 
 .medieval-theme {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+    position: relative;
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
         url('assets/Animação.gif');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
     min-height: 100vh;
+    animation: bgSubtleMovement 60s infinite alternate;
+}
+
+.medieval-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+    z-index: 1;
+    animation: vignettePulse 8s infinite alternate ease-in-out;
+}
+
+@keyframes bgSubtleMovement {
+    0% {
+        background-position: 50% 50%;
+    }
+
+    100% {
+        background-position: 52% 52%;
+    }
+}
+
+@keyframes vignettePulse {
+    0% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Typography */
@@ -1349,13 +1384,13 @@ h4,
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: var(--gold);
     animation: bounceMedieval 2s infinite;
-    z-index: 1000;
+    z-index: 20000;
+    /* Above everything including modals */
     pointer-events: auto;
-    /* Enable clicking */
-    text-shadow: 0 0 10px rgba(0, 0, 0, 1);
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.8), 0 0 5px var(--gold);
     transition: 0.3s opacity;
     cursor: pointer !important;
 }
@@ -1663,7 +1698,7 @@ h4,
 }
 
 .attr-input input {
-    width: 60px;
+    width: 80px;
     text-align: center;
     font-size: 1.5rem;
     background: transparent;
@@ -1710,7 +1745,7 @@ h4,
     cursor: pointer;
 }
 
-.medieval-select {
+.wizard-select {
     width: 100%;
     padding: 0.8rem;
     background: rgba(255, 255, 255, 0.4);
