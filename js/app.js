@@ -1047,11 +1047,12 @@ const app = {
 
     focusChat() { setTimeout(() => document.getElementById('chat-input')?.focus(), 100); },
 
-    ['fichas-list', 'monsters-list', 'traps-list', 'sessions-list', 'chat-messages'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '';
-    });
-},
+    clearAllViews() {
+        ['fichas-list', 'monsters-list', 'traps-list', 'sessions-list', 'chat-messages'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '';
+        });
+    },
 
     // PDF Export
     async exportPDF() { alert("Abrindo portal de exportação no EC2..."); }
