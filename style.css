@@ -598,6 +598,51 @@ h4,
     border: 1px solid #d3c29a;
 }
 
+/* Modal System */
+#modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-wrapper .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+#modal-wrapper .modal-content {
+    position: relative;
+    max-width: 1100px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 5001;
+}
+
+/* Secondary Button Style */
+.medieval-btn.secondary {
+    background: transparent;
+    border-color: #888;
+    color: #888;
+}
+
+.medieval-btn.secondary:hover {
+    background: #888;
+    color: #fff;
+    box-shadow: none;
+}
+
 
 /* Buttons */
 .medieval-btn {
@@ -1110,6 +1155,45 @@ h4,
     font-style: italic;
     font-size: 1.1rem;
     margin-bottom: 2rem;
+}
+
+/* Attacks Table */
+.attacks-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.attacks-table th,
+.attacks-table td {
+    border: 1px solid rgba(44, 30, 22, 0.3);
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.attacks-table th {
+    background: rgba(44, 30, 22, 0.1);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ink);
+}
+
+.attacks-table td {
+    color: #664d3b;
+}
+
+.attacks-table .attack-row:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.edit-mode .attacks-table td input {
+    width: 100%;
+    border: 1px solid var(--gold);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.3rem;
+    font-family: inherit;
 }
 
 .vital-stats {

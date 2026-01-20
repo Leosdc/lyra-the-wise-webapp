@@ -185,11 +185,13 @@ const app = {
 
         // Switch Character Button
         document.getElementById('switch-char-btn')?.addEventListener('click', () => {
+            this.closeModal();
             this.switchView('fichas');
         });
 
         // Sheet Actions
         document.getElementById('edit-sheet-btn')?.addEventListener('click', () => this.toggleSheetEdit(true));
+        document.getElementById('cancel-sheet-btn')?.addEventListener('click', () => this.cancelSheetEdit());
         document.getElementById('save-sheet-btn')?.addEventListener('click', () => this.saveSheetChanges());
     },
 
@@ -216,6 +218,11 @@ const app = {
         console.log("🎲 Alternando sistema para:", systemId);
         this.currentSystem = systemId;
         localStorage.setItem('lyra_current_system', systemId);
+
+        // Clear current character selection when switching systems
+        this.currentCharacter = null;
+        this.updateHeaderTracker(null);
+
         if (this.user) {
             this.loadViewData(this.currentView);
         }
@@ -912,15 +919,40 @@ const app = {
         document.getElementById('sheet-ideals').innerText = s.historia?.Ideais || "-";
         document.getElementById('sheet-bonds').innerText = s.historia?.Vínculos || "-";
         document.getElementById('sheet-flaws').innerText = s.historia?.Defeitos || "-";
+
+        // Attacks Table
+        const attacksBody = document.getElementById('attacks-body');
+        if (attacksBody) {
+            const attacks = comb.Ataques || [];
+            if (attacks.length === 0) {
+                attacksBody.innerHTML = `
+                    <tr class="attack-row">
+                        <td class="editable-attack" data-field="nome">-</td>
+                        <td class="editable-attack" data-field="bonus">-</td>
+                        <td class="editable-attack" data-field="dano">-</td>
+                    </tr>`;
+            } else {
+                attacksBody.innerHTML = attacks.map((atk, i) => `
+                    <tr class="attack-row" data-index="${i}">
+                        <td class="editable-attack" data-field="nome">${atk.nome || '-'}</td>
+                        <td class="editable-attack" data-field="bonus">${atk.bonus || '-'}</td>
+                        <td class="editable-attack" data-field="dano">${atk.dano || '-'}</td>
+                    </tr>`).join('');
+            }
+        }
     },
 
     toggleSheetEdit(enable) {
         const sheet = document.getElementById('character-sheet');
         sheet.classList.toggle('edit-mode', enable);
         document.getElementById('edit-sheet-btn').classList.toggle('hidden', enable);
+        document.getElementById('cancel-sheet-btn')?.classList.toggle('hidden', !enable);
         document.getElementById('save-sheet-btn').classList.toggle('hidden', !enable);
 
         if (enable) {
+            // Backup current character for cancel
+            this.characterBackup = JSON.parse(JSON.stringify(this.currentCharacter));
+
             // Transform text into inputs
             sheet.querySelectorAll('.editable').forEach(el => {
                 const val = el.innerText;
@@ -952,6 +984,15 @@ const app = {
             // Remove click handlers if disabling edit mode
             sheet.querySelectorAll('.editable-toggle').forEach(el => el.onclick = null);
         }
+    },
+
+    cancelSheetEdit() {
+        // Restore from backup
+        if (this.characterBackup) {
+            this.currentCharacter = this.characterBackup;
+            this.populateSheet(this.currentCharacter);
+        }
+        this.toggleSheetEdit(false);
     },
 
     async saveSheetChanges() {
@@ -1020,6 +1061,13 @@ const app = {
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
         if (!message || this.isWaitingForAI) return;
+
+        // Check if user is logged in
+        if (!this.user) {
+            this.addMessageToUI('bot', "⚠️ Você precisa fazer login para conversar com Lyra. Clique em 'Entrar' no canto superior direito.");
+            return;
+        }
+
         this.addMessageToUI('user', message);
         input.value = '';
         this.isWaitingForAI = true;

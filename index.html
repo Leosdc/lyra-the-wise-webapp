@@ -520,6 +520,9 @@
                         <div class="sheet-actions">
                             <button id="edit-sheet-btn" class="medieval-btn small"><i
                                     class="fas fa-feather-pointed"></i> Editar</button>
+                            <button id="cancel-sheet-btn" class="medieval-btn small secondary hidden"><i
+                                    class="fas fa-times"></i>
+                                Cancelar</button>
                             <button id="save-sheet-btn" class="medieval-btn small hidden"><i class="fas fa-save"></i>
                                 Salvar</button>
                         </div>
@@ -581,7 +584,21 @@
                                 </div>
                             </div>
                             <h4 class="section-title">Ataques e Magias</h4>
-                            <div id="sheet-attacks" class="attacks-list"></div>
+                            <table class="attacks-table" id="sheet-attacks">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Bônus de Ataque</th>
+                                        <th>Dano/Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attacks-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                            <button id="add-attack-btn" class="medieval-btn small" style="margin-top: 1rem;">
+                                <i class="fas fa-plus"></i> Adicionar Ataque
+                            </button>
                         </div>
                         <div id="sheet-recursos" class="sheet-section hidden">
                             <h4 class="section-title">Habilidades e Talentos</h4>
