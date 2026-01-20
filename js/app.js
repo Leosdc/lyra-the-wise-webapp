@@ -49,9 +49,45 @@ const app = {
     },
 
     populateSystems() {
-        const selector = document.getElementById('system-selector');
-        if (selector) {
-            selector.innerHTML = SUPPORTED_SYSTEMS.map(s => `<option value="${s.id}" ${s.id === this.currentSystem ? 'selected' : ''}>${s.name}</option>`).join('');
+        const optionsContainer = document.getElementById('system-selector-options');
+        const textDisplay = document.getElementById('system-selector-text');
+        const hiddenInput = document.getElementById('system-selector');
+
+        if (optionsContainer) {
+            optionsContainer.innerHTML = SUPPORTED_SYSTEMS.map(s => `
+                <div class="custom-select-option ${s.id === this.currentSystem ? 'selected' : ''}" data-value="${s.id}">
+                    ${s.name}
+                </div>
+            `).join('');
+
+            // Update display text
+            const currentSystem = SUPPORTED_SYSTEMS.find(s => s.id === this.currentSystem);
+            if (textDisplay && currentSystem) {
+                textDisplay.textContent = currentSystem.name;
+            }
+
+            // Add click handlers to options
+            optionsContainer.querySelectorAll('.custom-select-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value;
+                    const text = option.textContent.trim();
+
+                    // Update selection
+                    optionsContainer.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+
+                    // Update display and hidden input
+                    textDisplay.textContent = text;
+                    hiddenInput.value = value;
+
+                    // Close dropdown
+                    document.getElementById('system-selector-container').classList.remove('open');
+                    optionsContainer.classList.add('hidden');
+
+                    // Trigger system change
+                    this.handleSystemChange(value);
+                });
+            });
         }
     },
 
@@ -102,6 +138,36 @@ const app = {
         });
 
         // Menu Toggle
+        document.getElementById('menu-btn')?.addEventListener('click', () => this.toggleMenu(true));
+        document.querySelectorAll('.close-menu, .menu-overlay').forEach(el => {
+            el.addEventListener('click', () => this.toggleMenu(false));
+        });
+
+        // Custom System Selector Toggle
+        document.getElementById('system-selector-trigger')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const container = document.getElementById('system-selector-container');
+            const options = document.getElementById('system-selector-options');
+            const isOpen = container.classList.contains('open');
+
+            if (isOpen) {
+                container.classList.remove('open');
+                options.classList.add('hidden');
+            } else {
+                container.classList.add('open');
+                options.classList.remove('hidden');
+            }
+        });
+
+        // Close system selector when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.getElementById('system-selector-container');
+            const options = document.getElementById('system-selector-options');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+                options?.classList.add('hidden');
+            }
+        });
         document.getElementById('menu-btn')?.addEventListener('click', () => this.openMenuAtSection('all'));
         document.getElementById('home-btn')?.addEventListener('click', () => this.switchView('dashboard'));
         document.querySelector('.close-menu')?.addEventListener('click', () => this.toggleMenu(false));
@@ -183,10 +249,28 @@ const app = {
             card.addEventListener('click', (e) => this.handleChoiceClick(e.currentTarget));
         });
 
-        // Switch Character Button
-        document.getElementById('switch-char-btn')?.addEventListener('click', () => {
-            this.closeModal();
-            this.switchView('fichas');
+        // Switch Character Button - Open Dropdown
+        document.getElementById('switch-char-btn')?.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('char-switcher-dropdown');
+            const isOpen = !dropdown.classList.contains('hidden');
+
+            if (isOpen) {
+                dropdown.classList.add('hidden');
+            } else {
+                // Populate and show dropdown
+                await this.populateCharSwitcher();
+                dropdown.classList.remove('hidden');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('char-switcher-dropdown');
+            const container = document.querySelector('.char-switcher-container');
+            if (dropdown && !container?.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
         });
 
         // Sheet Actions
@@ -199,9 +283,26 @@ const app = {
             const file = e.target.files[0];
             if (!file || !this.currentCharacter) return;
 
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                this.showAlert("Por favor, selecione uma imagem válida.", "Erro");
+                return;
+            }
+
+            // Validate file size (max 5MB before compression)
+            const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+            if (file.size > MAX_SIZE) {
+                this.showAlert("Imagem muito grande! Máximo permitido: 5MB.", "Erro");
+                return;
+            }
+
             try {
                 this.toggleLoading(true);
-                const url = await uploadCharacterToken(this.user.uid, this.currentCharacter.id, file);
+
+                // Resize image to 400x400 before upload
+                const resizedBlob = await this.resizeImage(file, 400, 400);
+
+                const url = await uploadCharacterToken(this.user.uid, this.currentCharacter.id, resizedBlob);
                 this.currentCharacter.tokenUrl = url;
                 await saveCharacter(this.user.uid, this.currentSystem, this.currentCharacter);
                 document.getElementById('sheet-token').src = url;
@@ -211,7 +312,38 @@ const app = {
                 this.showAlert("Erro ao enviar imagem: " + error.message, "Erro");
             } finally {
                 this.toggleLoading(false);
+                e.target.value = ''; // Reset input
             }
+        });
+    },
+
+    // Resize image using canvas
+    async resizeImage(file, maxWidth, maxHeight) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            img.onload = () => {
+                // Calculate new dimensions (square crop)
+                const size = Math.min(img.width, img.height);
+                const sx = (img.width - size) / 2;
+                const sy = (img.height - size) / 2;
+
+                canvas.width = maxWidth;
+                canvas.height = maxHeight;
+
+                // Draw cropped and resized image
+                ctx.drawImage(img, sx, sy, size, size, 0, 0, maxWidth, maxHeight);
+
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject(new Error('Falha ao processar imagem'));
+                }, 'image/jpeg', 0.85);
+            };
+
+            img.onerror = () => reject(new Error('Falha ao carregar imagem'));
+            img.src = URL.createObjectURL(file);
         });
     },
 
@@ -234,14 +366,36 @@ const app = {
         this.updateScrollIndicators();
     },
 
-    handleSystemChange(systemId) {
+    async handleSystemChange(systemId) {
         console.log("🎲 Alternando sistema para:", systemId);
+
+        // Save current character for current system before switching
+        if (this.currentCharacter && this.currentSystem) {
+            localStorage.setItem(`lyra_char_${this.currentSystem}`, this.currentCharacter.id);
+        }
+
         this.currentSystem = systemId;
         localStorage.setItem('lyra_current_system', systemId);
 
-        // Clear current character selection when switching systems
-        this.currentCharacter = null;
-        this.updateHeaderTracker(null);
+        // Try to restore last character for this system
+        const savedCharId = localStorage.getItem(`lyra_char_${systemId}`);
+        if (savedCharId && this.user) {
+            try {
+                const char = await getCharacter(savedCharId);
+                if (char) {
+                    this.selectCharacter(char);
+                } else {
+                    this.currentCharacter = null;
+                    this.updateHeaderTracker(null);
+                }
+            } catch {
+                this.currentCharacter = null;
+                this.updateHeaderTracker(null);
+            }
+        } else {
+            this.currentCharacter = null;
+            this.updateHeaderTracker(null);
+        }
 
         if (this.user) {
             this.loadViewData(this.currentView);
@@ -558,12 +712,27 @@ const app = {
 
     // --- Actions ---
     async handleWizardFinish() {
+        const name = document.getElementById('wiz-name').value.trim();
+        const race = document.getElementById('wiz-race').value.trim();
+        const className = document.getElementById('wiz-class').value;
+
+        // Validate required fields
+        if (!name) {
+            this.showAlert("O nome do herói é obrigatório!", "Campo Obrigatório");
+            return;
+        }
+        if (!race) {
+            this.showAlert("A raça é obrigatória!", "Campo Obrigatório");
+            return;
+        }
+        if (!className) {
+            this.showAlert("Selecione uma classe!", "Campo Obrigatório");
+            return;
+        }
+
         this.toggleLoading(true);
         try {
             const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
-            const name = document.getElementById('wiz-name').value;
-            const race = document.getElementById('wiz-race').value;
-            const className = document.getElementById('wiz-class').value;
             const background = document.getElementById('wiz-background').value;
             const alignment = document.getElementById('wiz-alignment').value;
             const speed = document.getElementById('wiz-speed').value;
@@ -731,6 +900,54 @@ const app = {
         if (!this.user) return;
         const sessions = await getSessions(this.user.uid, this.currentSystem);
         container.innerHTML = sessions.length ? sessions.map(s => this.renderCard(s, 'session')).join('') : '<p class="empty-state">Nenhuma aventura narrada.</p>';
+    },
+
+    async populateCharSwitcher() {
+        const list = document.getElementById('char-switcher-list');
+        if (!this.user || !list) {
+            if (list) list.innerHTML = '<p class="empty-state">Faça login para ver personagens.</p>';
+            return;
+        }
+
+        list.innerHTML = '<p class="loading-text">Carregando...</p>';
+
+        try {
+            const characters = await getCharacters(this.user.uid, this.currentSystem);
+
+            if (characters.length === 0) {
+                list.innerHTML = '<p class="empty-state">Nenhum personagem neste sistema.</p>';
+                return;
+            }
+
+            list.innerHTML = characters.map(char => {
+                const b = char.secoes?.basico || {};
+                const isCurrent = this.currentCharacter?.id === char.id;
+                return `
+                    <div class="char-switcher-item ${isCurrent ? 'active' : ''}" data-char-id="${char.id}">
+                        <img src="${char.tokenUrl || 'assets/Lyra_Token.png'}" class="switcher-token" alt="">
+                        <div class="switcher-info">
+                            <strong>${char.name || b.Nome || 'Sem Nome'}</strong>
+                            <span>${b.Raça || '?'} ${b.Classe || '?'} (Nív ${b.Nível || 1})</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Add click handlers
+            list.querySelectorAll('.char-switcher-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    const charId = item.dataset.charId;
+                    const char = characters.find(c => c.id === charId);
+                    if (char) {
+                        this.selectCharacter(char);
+                        document.getElementById('char-switcher-dropdown').classList.add('hidden');
+                    }
+                });
+            });
+        } catch (error) {
+            console.error("Erro ao carregar personagens:", error);
+            list.innerHTML = '<p class="empty-state">Erro ao carregar personagens.</p>';
+        }
     },
 
     renderCard(item, type) {

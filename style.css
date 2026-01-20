@@ -118,6 +118,19 @@ textarea {
     padding: 10px;
 }
 
+.medieval-select option:hover,
+.medieval-select option:focus,
+.medieval-select option:checked {
+    background: rgba(212, 175, 55, 0.3) !important;
+    background-color: rgba(212, 175, 55, 0.3) !important;
+    color: var(--gold);
+}
+
+.medieval-select:focus {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
 /* Medieval select inside parchment/wizard (dark dropdown on light bg) */
 .parchment .medieval-select,
 .wizard-container .medieval-select {
@@ -128,6 +141,93 @@ textarea {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23f1c40f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
+}
+
+/* Custom Select Dropdown */
+.custom-select-container {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.custom-select-trigger:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-trigger i {
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+}
+
+.custom-select-container.open .custom-select-trigger i {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    background: rgba(20, 15, 10, 0.98);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 5000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    animation: slideDown 0.2s ease;
+}
+
+.custom-select-option {
+    padding: 0.75rem 1rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.15s;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-option:last-child {
+    border-bottom: none;
+}
+
+.custom-select-option:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--gold);
+}
+
+.custom-select-option.selected {
+    background: rgba(212, 175, 55, 0.3);
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.custom-select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 3px;
 }
 
 * {
@@ -316,6 +416,90 @@ h4,
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Character Switcher Dropdown */
+.char-switcher-container {
+    position: relative;
+}
+
+.char-switcher-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: rgba(20, 15, 10, 0.98);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 5000;
+    animation: slideDown 0.2s ease;
+}
+
+.char-switcher-dropdown .dropdown-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--gold);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.char-switcher-list {
+    padding: 0.5rem;
+}
+
+.char-switcher-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.char-switcher-item:hover {
+    background: rgba(212, 175, 55, 0.15);
+}
+
+.char-switcher-item.active {
+    background: rgba(212, 175, 55, 0.25);
+    border-left: 3px solid var(--gold);
+}
+
+.switcher-token {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+}
+
+.switcher-info {
+    flex: 1;
+}
+
+.switcher-info strong {
+    display: block;
+    color: var(--gold);
+    font-size: 1rem;
+}
+
+.switcher-info span {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.char-switcher-list .empty-state,
+.char-switcher-list .loading-text {
+    text-align: center;
+    padding: 1rem;
+    color: #888;
+    font-size: 0.9rem;
 }
 
 /* Centered Modal Overlay */
