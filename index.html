@@ -600,6 +600,15 @@
                         <button id="wiz-next" class="medieval-btn small">Próximo</button>
                         <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
                     </div>
+
+                    <!-- Lyra's Guidance (Inside Wizard) -->
+                    <div id="lyra-guidance" class="lyra-guidance-container hidden">
+                        <img src="assets/Lyra_the_wise.png" alt="Lyra guidance" class="guidance-portrait">
+                        <div class="guidance-bubble parchment">
+                            <p id="guidance-text">Em que posso ajudá-lo, viajante?</p>
+                            <div class="bubble-tail"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Monster Wizard -->
@@ -888,7 +897,6 @@
     <!-- Custom Alert Modal -->
     <div id="alert-modal" class="modal-overlay hidden">
         <div class="medieval-modal alert-content">
-            <button class="close-btn close-btn-medieval" data-modal="alert-modal"><i class="fas fa-times"></i></button>
             <div class="lyra-corner top-left"></div>
             <div class="lyra-corner top-right"></div>
             <div class="alert-body">
@@ -898,6 +906,23 @@
             </div>
             <div class="modal-footer">
                 <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="medieval-modal confirm-box">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                <h3 id="confirm-title">Confirmar Exclusão</h3>
+                <p id="confirm-message" class="confirm-text"></p>
+            </div>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
+                <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
             </div>
         </div>
     </div>

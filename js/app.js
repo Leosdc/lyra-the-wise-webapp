@@ -21,7 +21,7 @@ const app = {
     user: null,
     currentCharacter: null,
     currentSystem: localStorage.getItem('lyra_current_system') || 'dnd5e',
-    currentView: 'dashboard',
+    currentView: localStorage.getItem('lyra_current_view') || 'dashboard',
     isDamien: false,
     isDeleteMode: false,
     chatHistory: [],
@@ -45,6 +45,7 @@ const app = {
         this.showRandomTrivia();
         this.bindEvents();
         this.initMusicPlayer();
+        WizardModule.initGuidanceListeners();
 
         // Start Trivia Rotation
         setInterval(() => this.showRandomTrivia(), 15000);
@@ -163,7 +164,11 @@ const app = {
             NavigationModule.updateDropdownScroll(list);
         } catch (error) {
             console.error("Erro ao povoar switcher:", error);
-            list.innerHTML = '<p class="empty-state">Erro ao carredar personagens.</p>';
+            if (error.message.includes("permissions")) {
+                list.innerHTML = '<p class="empty-state">Erro de Permissão: Verifique se as Security Rules no Firebase batem com os nomes das coleções (ex: "fichas").</p>';
+            } else {
+                list.innerHTML = '<p class="empty-state">Erro ao carregar personagens. Verifique a conexão astral.</p>';
+            }
         }
     },
 
@@ -264,6 +269,7 @@ const app = {
         }
 
         this.currentView = viewId;
+        localStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
     },
 
@@ -408,6 +414,35 @@ const app = {
             messageEl.innerText = message;
             modal.classList.remove('hidden');
         } else alert(message);
+    },
+
+    showConfirm(message, title = "Confirmação Mística") {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirm-modal');
+            const titleEl = document.getElementById('confirm-title');
+            const messageEl = document.getElementById('confirm-message');
+            const okBtn = document.getElementById('confirm-ok-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+            if (!modal || !okBtn || !cancelBtn) {
+                resolve(confirm(message));
+                return;
+            }
+
+            titleEl.innerText = title;
+            messageEl.innerText = message;
+            modal.classList.remove('hidden');
+
+            const cleanup = (result) => {
+                modal.classList.add('hidden');
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            };
+
+            okBtn.onclick = () => cleanup(true);
+            cancelBtn.onclick = () => cleanup(false);
+        });
     },
 
     toggleLoading(show) {
@@ -591,6 +626,113 @@ const app = {
                 return;
             }
 
+            if (this.isDeleteMode && card) {
+                e.stopImmediatePropagation();
+                card.classList.toggle('is-selected');
+                return;
+            }
+
+            if (card) {
+                const type = card.dataset.type;
+                const id = card.dataset.id;
+
+                if (type === 'character') {
+                    this.openModal('character-sheet');
+                    getCharacter(id).then(c => {
+                        if (c) {
+                            this.selectCharacter(c);
+                            SheetModule.populateSheet(c, this.getSheetContext());
+                            SheetModule.switchSheetTab('geral', this.getSheetContext());
+                        }
+                    });
+                } else {
+                    NavigationModule.viewItem(type, id, this.getSheetContext());
+                }
+            }
+        });
+    },
+
+    toggleDeleteMode(type) {
+        this.isDeleteMode = !this.isDeleteMode;
+        const btn = document.getElementById('bulk-delete-fichas-btn');
+        const container = document.getElementById('fichas-list');
+
+        if (this.isDeleteMode) {
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Concluir';
+                btn.classList.add('active');
+            }
+            container?.classList.add('delete-mode-active');
+            document.querySelectorAll('.medieval-card').forEach(c => c.classList.add('is-delete-mode'));
+            this.showAlert("Selecione as fichas que deseja apagar e clique em 'Concluir' no botão.", "Modo Exclusão");
+        } else {
+            const selected = document.querySelectorAll('.medieval-card.is-selected');
+            if (selected.length > 0) {
+                this.handleBulkDelete(selected, type);
+            } else {
+                this.exitDeleteMode();
+            }
+        }
+    },
+
+    exitDeleteMode() {
+        this.isDeleteMode = false;
+        const btn = document.getElementById('bulk-delete-fichas-btn');
+        const container = document.getElementById('fichas-list');
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-trash-can"></i> Excluir';
+            btn.classList.remove('active');
+        }
+        container?.classList.remove('delete-mode-active');
+        document.querySelectorAll('.medieval-card').forEach(c => {
+            c.classList.remove('is-delete-mode');
+            c.classList.remove('is-selected');
+        });
+    },
+
+    async handleBulkDelete(selectedCards, type) {
+        const count = selectedCards.length;
+        const confirmed = await this.showConfirm(`Deseja realmente apagar ${count} itens permanentemente?`, "Limpeza Profunda");
+
+        if (confirmed) {
+            this.toggleLoading(true);
+            try {
+                for (const card of selectedCards) {
+                    const id = card.dataset.id;
+                    if (type === 'character') await deleteCharacter(id);
+                }
+                this.showAlert(`${count} itens removidos do multiverso.`, "Sucesso");
+                this.loadCharacters();
+            } catch (err) {
+                this.showAlert("A remoção falhou: " + err.message);
+            } finally {
+                this.toggleLoading(false);
+            }
+        }
+        this.exitDeleteMode();
+    },
+
+    // --- Event Binding (The Glue) ---
+    bindEvents() {
+        console.log("🔗 Connecting Runes (Binding Events)...");
+
+        // GLOBAL CLICK DELEGATE (Cards)
+        document.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.card-delete-btn');
+            const card = e.target.closest('.medieval-card');
+
+            if (deleteBtn && card) {
+                e.stopImmediatePropagation();
+                NavigationModule.deleteItem(card.dataset.id, card.dataset.type, this.getNavigationLoaders());
+                return;
+            }
+
+            if (this.isDeleteMode && card) {
+                e.stopImmediatePropagation();
+                card.classList.toggle('is-selected');
+                return;
+            }
+
             if (card) {
                 const type = card.dataset.type;
                 const id = card.dataset.id;
@@ -658,6 +800,10 @@ const app = {
         document.getElementById('send-msg-btn')?.addEventListener('click', () => this.handleSendMessage());
         document.getElementById('chat-input')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
 
+        // Bulk Delete Actions
+        document.getElementById('bulk-delete-fichas-btn')?.addEventListener('click', () => this.toggleDeleteMode('character'));
+        document.getElementById('confirm-bulk-delete')?.addEventListener('click', () => this.handleBulkDelete());
+
         // Settings
         document.getElementById('settings-btn')?.addEventListener('click', () => {
             if (this.checkAuth()) this.openModal('settings-modal');
@@ -692,7 +838,7 @@ const app = {
         // Dynamic Lists
         document.getElementById('add-attack-btn')?.addEventListener('click', () => ListModule.addItem(this.currentCharacter, 'combat.attacks', { name: '', bonus: '', damage: '' }) && SheetModule.populateSheet(this.currentCharacter, this.getSheetContext()));
         document.getElementById('add-spell-btn')?.addEventListener('click', () => ListModule.addItem(this.currentCharacter, 'spells.list', { name: '', level: '', range: '' }) && SheetModule.populateSheet(this.currentCharacter, this.getSheetContext()));
-        document.getElementById('add-item-btn')?.addEventListener('click', () => ListModule.addItem(this.currentCharacter, 'inventory.items', { name: '', quantity: 1, weight: 0 }) && SheetModule.populateSheet(this.currentCharacter, this.getSheetContext()));
+        document.getElementById('add-item-btn')?.addEventListener('click', () => ListModule.addItem(this.currentCharacter, 'inventory.items', { name: '', quantity: 1, weight: 0, description: '' }) && SheetModule.populateSheet(this.currentCharacter, this.getSheetContext()));
 
         // Global Action: Delete List Item & Prof Toggle
         document.getElementById('character-sheet')?.addEventListener('click', (e) => {
@@ -704,10 +850,15 @@ const app = {
                 SheetModule.populateSheet(this.currentCharacter, this.getSheetContext());
                 return;
             }
-            const profBtn = e.target.closest('.prof-toggle');
+            // Allow clicking the entire proficiency row (skill or save)
+            const profBtn = e.target.closest('.prof-toggle') || e.target.closest('.skill-item') || e.target.closest('.save-item');
             if (profBtn && document.getElementById('character-sheet').classList.contains('edit-mode')) {
-                ListModule.toggleProficiency(this.currentCharacter, profBtn.dataset.type, profBtn.dataset.field);
-                SheetModule.populateSheet(this.currentCharacter, this.getSheetContext());
+                // If we clicked the row, find the actual toggle button or its data
+                const target = profBtn.classList.contains('prof-toggle') ? profBtn : profBtn.querySelector('.prof-toggle');
+                if (target) {
+                    ListModule.toggleProficiency(this.currentCharacter, target.dataset.type, target.dataset.field);
+                    SheetModule.populateSheet(this.currentCharacter, this.getSheetContext());
+                }
             }
         });
 
@@ -787,8 +938,5 @@ const app = {
     }
 };
 
-window.app = app;
-
-// Initialize the application
 window.app = app;
 document.addEventListener('DOMContentLoaded', () => app.init());

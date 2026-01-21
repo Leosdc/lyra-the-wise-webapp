@@ -231,11 +231,14 @@ export const SheetModule = {
         const inventoryBody = document.getElementById('inventory-body');
         if (inventoryBody) {
             inventoryBody.innerHTML = (char.inventory?.items || []).map((it, i) => `
-                <div class="list-item-v2" data-index="${i}">
-                    <input type="text" value="${it.name || ''}" placeholder="Item" data-list="inventory.items" data-field="name" readonly>
-                    <input type="number" value="${it.quantity || 1}" placeholder="Qtd" data-list="inventory.items" data-field="quantity" readonly>
-                    <input type="text" value="${it.weight || 0}" placeholder="Peso" data-list="inventory.items" data-field="weight" readonly>
-                    <button class="icon-btn delete-list-item" data-list="inventory.items" data-index="${i}"><i class="fas fa-trash"></i></button>
+                <div class="list-item-v2 inventory-row" data-index="${i}">
+                    <div class="item-main-row">
+                        <input type="text" value="${it.name || ''}" placeholder="Item" data-list="inventory.items" data-field="name" readonly>
+                        <input type="number" value="${it.quantity || 1}" placeholder="Qtd" data-list="inventory.items" data-field="quantity" readonly>
+                        <input type="text" value="${it.weight || 0}" placeholder="Peso" data-list="inventory.items" data-field="weight" readonly>
+                        <button class="icon-btn delete-list-item" data-list="inventory.items" data-index="${i}"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <textarea class="item-desc-input" placeholder="Descrição do item..." data-list="inventory.items" data-field="description" readonly>${it.description || ''}</textarea>
                 </div>
             `).join('');
         }
@@ -275,7 +278,7 @@ export const SheetModule = {
             sheet.querySelectorAll('textarea[data-field]').forEach(txt => txt.readOnly = false);
 
             // Inputs Diretos (Combate/Mochila)
-            sheet.querySelectorAll('input[data-field]').forEach(input => {
+            sheet.querySelectorAll('input[data-field], textarea[data-field]').forEach(input => {
                 input.readOnly = false;
                 input.disabled = false;
             });

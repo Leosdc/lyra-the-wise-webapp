@@ -2659,6 +2659,148 @@ h4,
     }
 }
 
+/* Inventory Refinements */
+.inventory-row {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    padding: 1rem !important;
+}
+
+.item-main-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    align-items: center;
+}
+
+.item-desc-input {
+    width: 100%;
+    min-height: 60px;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px dashed var(--gold);
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--ink);
+    resize: vertical;
+    font-style: italic;
+}
+
+body.damien-theme .item-desc-input {
+    background: rgba(147, 51, 234, 0.05) !important;
+    color: #e2e8f0;
+}
+
+/* Lyra's Guidance System (Wizard) */
+.lyra-guidance-container {
+    position: absolute;
+    bottom: -20px;
+    right: -40px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    z-index: 100;
+    pointer-events: none;
+    animation: guidanceReveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes guidanceReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.guidance-portrait {
+    width: 80px;
+    height: 110px;
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    background: #000;
+    object-fit: cover;
+}
+
+.guidance-bubble {
+    width: 280px;
+    padding: 1rem !important;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    position: relative;
+    border: 3px double var(--gold) !important;
+}
+
+.guidance-bubble p {
+    margin: 0;
+    font-style: italic;
+    color: var(--ink);
+}
+
+.bubble-tail {
+    position: absolute;
+    left: -10px;
+    bottom: 20px;
+    width: 20px;
+    height: 20px;
+    background: inherit;
+    border-left: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+    transform: rotate(45deg);
+}
+
+/* Deletion State Visual Cues */
+.medieval-card.is-delete-mode {
+    border: 2px solid var(--crimson) !important;
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0% {
+        box-shadow: 0 0 5px rgba(192, 57, 43, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(192, 57, 43, 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(192, 57, 43, 0.3);
+    }
+}
+
+.medieval-card.is-selected {
+    border-color: var(--gold-bright) !important;
+    box-shadow: 0 0 25px var(--gold-bright) !important;
+    transform: scale(1.02);
+}
+
+.medieval-card.is-selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--gold);
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
 @keyframes pulseGlow {
 
     0%,

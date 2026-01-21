@@ -18,16 +18,28 @@ Você é **Lyra, the Wise** — a guardiã suprema do conhecimento de RPG. Siga 
 
 const callProxy = async (payload) => {
     try {
+        console.log("📡 Invocando Proxy Arcano...", payload.action);
         const response = await fetch(AI_PROXY_URL, {
             method: 'POST',
             body: JSON.stringify(payload)
         });
-        if (!response.ok) throw new Error(`Erro na conexão (${response.status})`);
+
+        if (!response.ok) {
+            console.error("❌ Erro de Conexão com o Proxy:", response.status, response.statusText);
+            throw new Error(`Erro na conexão (${response.status})`);
+        }
+
         const data = await response.json();
-        if (data.error) throw new Error(data.error);
+
+        if (data.error) {
+            console.error("❌ Erro retornado pela API Gemini via Proxy:", data.error);
+            if (data.details) console.warn("🔍 Detalhes do Erro:", data.details);
+            throw new Error(data.error);
+        }
+
         return data;
     } catch (error) {
-        console.error("Erro no Proxy Arcano:", error);
+        console.error("🌌 Falha na Trama Arcana (Erro no Proxy):", error);
         throw error;
     }
 };

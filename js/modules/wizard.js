@@ -50,6 +50,26 @@ export const WizardModule = {
 
     // --- Navigation Logic ---
     handleChoiceClick(card) {
+        this.isDeleteMode = false;
+        this.chatHistory = [];
+        this.triviaIndex = 0;
+        this.isWaitingForAI = false;
+
+        // Guidance Dictionary
+        this.guidanceTips = {
+            'wiz-name': "Escolha um nome que ecoe pelas tavernas de Sword Coast, viajante!",
+            'wiz-race': "Sua linhagem define seus traços ancestrais. Humanos são versáteis, Elfos são graciosos...",
+            'wiz-class': "Sua vocação! Magos dominam o arcano, Guerreiros a lâmina, e Bardos... bem, a música!",
+            'wiz-str': "Força bruta! Importante para empunhar machados pesados e saltar abismos.",
+            'wiz-dex': "Agilidade! Vital para evitar flechas e arrombar trincas de baús antigos.",
+            'wiz-con': "Constituição é sua vitalidade. Quanto mais alta, mais golpes você suportará.",
+            'wiz-int': "Inteligência rege o estudo e a magia arcana. Conhecimento é poder!",
+            'wiz-wis': "Sabedoria é percepção e sintonia com o divino. Escute o que o mundo diz.",
+            'wiz-cha': "Carisma é sua força de presença. Ótimo para convencer guardas ou intimidar orcs!",
+            'wiz-background': "Sua vida antes da aventura. Pode te conceder perícias e segredos automáticos!",
+            'wiz-appearance': "Descreva suas cicatrizes e aura mística. Eu usarei isso para te tecer na história!",
+            'wiz-backstory': "Sua jornada até aqui. Se escolher meu auxílio, expandirei seus contos misticamente."
+        };
         const mode = card.dataset.mode;
         this.creationMode = mode;
         const wizardContainer = card.closest('.wizard-container');
@@ -180,7 +200,17 @@ export const WizardModule = {
                             if (key === 'backstory') finalData.story.notes = aiResult[foundKey];
                         }
                     });
+                    // Explicit Fix for Appearance
+                    if (aiResult.appearance || aiResult['Aparência'] || aiResult['Aparencia']) {
+                        finalData.story.appearance = aiResult.appearance || aiResult['Aparência'] || aiResult['Aparencia'];
+                    }
                 }
+            }
+
+            // Apply Background Bonuses (DnD 5e automation)
+            if (context.currentSystem === 'dnd5e' && finalData.story.background) {
+                const ListModule = (await import('./lists.js')).ListModule;
+                ListModule.applyBackgroundBonuses(finalData, finalData.story.background);
             }
 
             // Run Engine (Dependency)
@@ -257,5 +287,31 @@ export const WizardModule = {
         } finally {
             context.toggleLoading(false);
         }
+    },
+
+    initGuidanceListeners() {
+        console.log("🧚 Lyra está pronta para guiar...");
+        const inputs = document.querySelectorAll('#creation-wizard input, #creation-wizard select, #creation-wizard textarea');
+        const container = document.getElementById('lyra-guidance');
+        const textEl = document.getElementById('guidance-text');
+
+        inputs.forEach(input => {
+            const showTip = () => {
+                const tip = this.guidanceTips[input.id];
+                if (tip && container && textEl) {
+                    textEl.innerText = tip;
+                    container.classList.remove('hidden');
+                }
+            };
+            input.addEventListener('focus', showTip);
+            input.addEventListener('mouseenter', showTip);
+        });
+
+        // Hide when not focused on wizard inputs
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#creation-wizard') && container) {
+                container.classList.add('hidden');
+            }
+        });
     }
 };

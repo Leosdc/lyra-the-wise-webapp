@@ -62,5 +62,28 @@ export const ListModule = {
 
         character.proficiencies_choice[type] = list;
         return true;
+    },
+
+    /**
+     * DnD 5e Background Automation
+     */
+    applyBackgroundBonuses(character, backgroundName) {
+        if (!character || !backgroundName) return;
+        const bg = backgroundName.toLowerCase().trim();
+
+        // Basic 5e Automation
+        if (bg.includes("acólito") || bg.includes("acolyte")) {
+            this.toggleProficiency(character, 'skills', 'Insight');
+            this.toggleProficiency(character, 'skills', 'Religião');
+        } else if (bg.includes("soldado") || bg.includes("soldier")) {
+            this.toggleProficiency(character, 'skills', 'Atletismo');
+            this.toggleProficiency(character, 'skills', 'Intimidação');
+        } else if (bg.includes("criminoso") || bg.includes("criminal")) {
+            this.toggleProficiency(character, 'skills', 'Enganação');
+            this.toggleProficiency(character, 'skills', 'Furtividade');
+        } else if (bg.includes("herói do povo") || bg.includes("folk hero")) {
+            this.toggleProficiency(character, 'skills', 'Adestramento de Animais');
+            this.toggleProficiency(character, 'skills', 'Sobrevivência');
+        }
     }
 };
