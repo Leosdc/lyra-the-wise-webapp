@@ -81,10 +81,24 @@
             </div>
 
             <div id="header-char-tracker" class="header-center hidden">
-                <div id="header-char-info" class="tracker-info hidden">
-                    <span id="header-char-name">Nome do Herói</span>
-                    <span id="header-char-level">Lvl 1</span>
-                    <span id="header-char-stats">PV: 10/10 | CA: 15</span>
+                <div class="header-token-wrapper">
+                    <img id="header-token" src="assets/Lyra_Token.png" alt="Token">
+                </div>
+                <div id="header-char-info" class="tracker-info">
+                    <div class="header-name-row">
+                        <span id="header-name">Nome do Herói</span>
+                        <span id="header-info" class="header-sub">Raça Classe (Nív 1)</span>
+                    </div>
+                    <div class="header-stats-row">
+                        <div class="header-hp-container">
+                            <div id="header-hp-bar" class="header-hp-fill"></div>
+                            <span id="header-hp-text">10/10</span>
+                        </div>
+                        <div class="header-ac-badge">
+                            <i class="fas fa-shield-halved"></i>
+                            <span id="header-ac-val">10</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="char-switcher-container">
                     <button id="switch-char-btn" class="medieval-btn small"><i class="fas fa-exchange-alt"></i></button>
@@ -118,7 +132,11 @@
                     </div>
                     <input type="hidden" id="system-selector" value="dnd5e">
                 </div>
-                <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
+                <div id="user-profile-actions" class="user-profile-actions hidden">
+                    <button id="settings-btn" class="medieval-btn small icon-only" title="Configurações"><i
+                            class="fas fa-cog"></i></button>
+                    <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
+                </div>
             </div>
         </div>
     </header>
@@ -484,7 +502,17 @@
                         </div>
                         <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
                                 class="medieval-textarea"
-                                placeholder="Ex: Eu não consigo resistir a uma aposta alta."></textarea></div>
+                                placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                            </div>
+                            <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                            </div>
+                        </div>
                         <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
                                 class="medieval-textarea"
                                 placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)"></textarea>
@@ -742,10 +770,10 @@
                                     </div>
                                 </div>
                                 <div class="encumbrance-tracker">
-                                    <h4>Carga & Peso</h4>
+                                    <h4 class="section-title">Carga</h4>
                                     <div class="weight-bar">
-                                        <div id="weight-progress" class="bar"></div>
-                                        <span id="weight-text">0 / 150 lbs</span>
+                                        <div id="weight-progress" class="bar"></div><span id="weight-text">0 / 0
+                                            lbs</span>
                                     </div>
                                 </div>
                             </div>
@@ -778,6 +806,97 @@
                                 <textarea data-field="story.notes" class="medieval-textarea large"
                                     placeholder="Suas crônicas escritas nas estrelas..."></textarea>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div id="settings-modal" class="modal-wrapper hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="parchment settings-pane">
+                <button class="close-modal">&times;</button>
+                <div class="scroll-paper">
+                    <h2 class="scroll-title">Ajustes do Perfil</h2>
+                    <div class="settings-content">
+                        <div class="form-group">
+                            <label>Apelido Arcano</label>
+                            <input type="text" id="setting-nickname" class="medieval-input"
+                                placeholder="Seu nome de aventureiro">
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp (Opcional)</label>
+                            <input type="text" id="setting-whatsapp" class="medieval-input"
+                                placeholder="Para contato entre guildas">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição do Aventureiro</label>
+                            <textarea id="setting-bio" class="medieval-textarea"
+                                placeholder="Conte sua lenda..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Arsenal de Cursores</label>
+                            <div class="cursor-grid" id="cursor-selector">
+                                <!-- Swords -->
+                                <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_gold_1768971092688.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_silver_1768971106313.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_crimson_1768971119712.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_shadow_1768971133849.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_emerald_1768971146995.png">
+                                </div>
+                                <!-- Staffs -->
+                                <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_crystal_1768971160123.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_sunlight_1768971174166.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_lunar_1768971187426.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_shadow_1768971460663.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_emerald_nature_1768971473975.png">
+                                </div>
+                                <!-- Potions -->
+                                <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_potion_red_1768971199083.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana">
+                                    <img
+                                        src="C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_potion_blue_1768971212299.png">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
                         </div>
                     </div>
                 </div>

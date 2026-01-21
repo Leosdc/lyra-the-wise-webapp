@@ -89,6 +89,7 @@ const app = {
         this.populateSystems();
         this.showRandomTrivia();
         this.bindEvents();
+        this.loadUserPreferences();
 
         if (this.isDamien) this.applyDamienAssets();
     },
@@ -254,6 +255,18 @@ const app = {
 
         document.getElementById('bulk-delete-fichas-btn')?.addEventListener('click', () => this.toggleDeleteMode());
 
+        // Settings & Perfil
+        document.getElementById('settings-btn')?.addEventListener('click', () => this.openSettings());
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => this.saveSettings());
+
+        document.getElementById('cursor-selector')?.addEventListener('click', (e) => {
+            const option = e.target.closest('.cursor-option');
+            if (option) {
+                document.querySelectorAll('.cursor-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+            }
+        });
+
         // Global delegate for medieval-cards (dynamic content)
         document.addEventListener('click', (e) => {
             const deleteBtn = e.target.closest('.card-delete-btn');
@@ -344,10 +357,32 @@ const app = {
             }
         });
 
-        // Sheet Actions
         document.getElementById('edit-sheet-btn')?.addEventListener('click', () => this.toggleSheetEdit(true));
         document.getElementById('cancel-sheet-btn')?.addEventListener('click', () => this.cancelSheetEdit());
         document.getElementById('save-sheet-btn')?.addEventListener('click', () => this.saveSheetChanges());
+
+        // Dynamic Lists: Add Buttons
+        document.getElementById('add-attack-btn')?.addEventListener('click', () => this.addListItem('combat.attacks', { name: '', bonus: '', damage: '' }));
+        document.getElementById('add-spell-btn')?.addEventListener('click', () => this.addListItem('spells.list', { name: '', level: '', range: '' }));
+        document.getElementById('add-item-btn')?.addEventListener('click', () => this.addListItem('inventory.items', { name: '', quantity: 1, weight: 0 }));
+
+        // Global delegate for delete list items & proficiency toggles
+        document.getElementById('character-sheet')?.addEventListener('click', (e) => {
+            const delBtn = e.target.closest('.delete-list-item');
+            if (delBtn) {
+                const listPath = delBtn.dataset.list;
+                const index = parseInt(delBtn.dataset.index);
+                this.removeListItem(listPath, index);
+                return;
+            }
+
+            const profBtn = e.target.closest('.prof-toggle');
+            if (profBtn && document.getElementById('character-sheet').classList.contains('edit-mode')) {
+                const field = profBtn.dataset.field;
+                const type = profBtn.dataset.type; // 'skills' or 'saves'
+                this.toggleProficiency(type, field);
+            }
+        });
 
         // Token Upload
         document.getElementById('token-upload')?.addEventListener('change', async (e) => {
@@ -487,22 +522,89 @@ const app = {
     updateAuthUI(user) {
         const loginBtn = document.getElementById('login-btn');
         const tracker = document.getElementById('header-char-tracker');
+        const userActions = document.getElementById('user-profile-actions');
 
         if (user) {
+            userActions?.classList.remove('hidden');
             if (loginBtn) {
                 loginBtn.innerHTML = `
-                    <img src="${user.photoURL}" class="user-avatar" alt="Avatar">
+                    <img src="${user.photoURL || 'assets/Lyra_Token.png'}" class="user-avatar" alt="Avatar">
                     <span>Sair</span>
                 `;
+                loginBtn.onclick = () => logout();
             }
-            // Show tracker wrapper always when logged in
             tracker?.classList.remove('hidden');
             this.selectCharacter(this.currentCharacter);
+            this.loadUserPreferences();
         } else {
-            if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
+            userActions?.classList.add('hidden');
+            if (loginBtn) {
+                loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
+                loginBtn.onclick = () => login();
+            }
             tracker?.classList.add('hidden');
             this.clearAllViews();
         }
+    },
+
+    async loadUserPreferences() {
+        if (!this.user) return;
+        // In a real app, we'd fetch from Firestore collection 'users'
+        // For now, let's use localStorage as a fallback/cache
+        const prefs = JSON.parse(localStorage.getItem(`lyra_prefs_${this.user.uid}`) || '{}');
+        this.applyPreferences(prefs);
+    },
+
+    applyPreferences(prefs) {
+        if (!prefs) return;
+
+        // Apply cursor
+        document.body.className = document.body.className.replace(/cursor-\S+/g, '');
+        if (prefs.cursor) {
+            document.body.classList.add(`cursor-${prefs.cursor}`);
+        }
+
+        // Fill settings fields if modal is open (or just keep in data)
+        const nick = document.getElementById('setting-nickname');
+        const wa = document.getElementById('setting-whatsapp');
+        const bio = document.getElementById('setting-bio');
+
+        if (nick) nick.value = prefs.nickname || '';
+        if (wa) wa.value = prefs.whatsapp || '';
+        if (bio) bio.value = prefs.bio || '';
+
+        if (prefs.cursor) {
+            const opt = document.querySelector(`.cursor-option[data-cursor="${prefs.cursor}"]`);
+            if (opt) {
+                document.querySelectorAll('.cursor-option').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+            }
+        }
+    },
+
+    openSettings() {
+        this.openModal('settings-modal');
+    },
+
+    async saveSettings() {
+        if (!this.user) return;
+
+        const nickname = document.getElementById('setting-nickname').value;
+        const whatsapp = document.getElementById('setting-whatsapp').value;
+        const bio = document.getElementById('setting-bio').value;
+        const selectedCursor = document.querySelector('.cursor-option.active')?.dataset.cursor;
+
+        const prefs = {
+            nickname,
+            whatsapp,
+            bio,
+            cursor: selectedCursor
+        };
+
+        localStorage.setItem(`lyra_prefs_${this.user.uid}`, JSON.stringify(prefs));
+        this.applyPreferences(prefs);
+        this.closeModal('settings-modal');
+        this.showAlert("Preferências consagradas com sucesso!", "Selo Real");
     },
 
     async switchView(viewId) {
@@ -866,6 +968,8 @@ const app = {
             template.story.ideals = document.getElementById('wiz-ideals').value;
             template.story.bonds = document.getElementById('wiz-bonds').value;
             template.story.flaws = document.getElementById('wiz-flaws').value;
+            template.story.mannerisms = document.getElementById('wiz-mannerisms').value;
+            template.story.talents = document.getElementById('wiz-talents').value;
             template.story.notes = document.getElementById('wiz-backstory').value;
 
             let finalData = { name: name, ...template };
@@ -1024,12 +1128,18 @@ const app = {
             list.innerHTML = characters.map(char => {
                 const b = char.secoes?.basico || {};
                 const isCurrent = this.currentCharacter?.id === char.id;
+                const race = char.bio?.race || char.secoes?.basico?.Raça || 'Raça?';
+                const clazz = char.bio?.class || char.secoes?.basico?.Classe || 'Classe?';
+                const level = char.bio?.level || char.secoes?.basico?.Nível || 1;
+
                 return `
                     <div class="char-switcher-item ${isCurrent ? 'active' : ''}" data-char-id="${char.id}">
-                        <img src="${char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png')}" class="switcher-token" alt="">
-                        <div class="switcher-info">
-                            <strong>${char.name || b.Nome || 'Sem Nome'}</strong>
-                            <span>${b.Raça || '?'} ${b.Classe || '?'} (Nív ${b.Nível || 1})</span>
+                        <div class="switcher-item-content">
+                            <img src="${char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png')}" alt="Token">
+                            <div class="switcher-text">
+                                <strong>${char.name || char.bio?.name || 'Sem Nome'}</strong>
+                                <span>${race} ${clazz} (Nív ${level})</span>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1123,8 +1233,8 @@ const app = {
         }[type] || 'este item';
 
         const confirmed = await this.showConfirm(
-            `Tem certeza que deseja apagar ${itemTypeLabel}? Esta ação é permanente e não poderá ser desfeita nos anais do tempo.`,
-            "Sentença de Apagamento"
+            `Tem certeza que deseja apagar ${itemTypeLabel}? Esta ação não poderá ser desfeita.`,
+            "Confirmar Exclusão"
         );
 
         if (!confirmed) return;
@@ -1231,8 +1341,8 @@ const app = {
 
         // Use new structure or fallback
         const level = char.bio?.level || char.secoes?.basico?.Nível || 1;
-        const race = char.bio?.race || char.secoes?.basico?.Raça || '?';
-        const clazz = char.bio?.class || char.secoes?.basico?.Classe || '?';
+        const race = char.bio?.race || char.secoes?.basico?.Raça || 'Raça?';
+        const clazz = char.bio?.class || char.secoes?.basico?.Classe || 'Classe?';
 
         document.getElementById('header-info').innerText = `${race} ${clazz} (Nív ${level})`;
 
@@ -1288,12 +1398,16 @@ const app = {
             };
         }
 
-        // Magic
-        if (char.spells) {
-            const attrMap = { int: intMod, wis: wisMod, cha: chaMod };
-            const castMod = attrMap[char.spells.ability] || 0;
-            char.spells.save_dc = 8 + castMod + profBonus;
-            char.spells.attack_bonus = castMod + profBonus;
+        // Initial HP Calculation if zero or not set
+        if (!char.stats.hp_max || char.stats.hp_max === 0) {
+            const hitDie = char.bio.hitDie ? parseInt(char.bio.hitDie.replace('d', '')) : 8;
+            char.stats.hp_max = hitDie + conMod + ((level - 1) * (Math.floor(hitDie / 2) + 1 + conMod));
+            char.stats.hp_current = char.stats.hp_max;
+        }
+
+        // AC Calculation (Basic: 10 + Dex)
+        if (!char.stats.ac || char.stats.ac === 10) {
+            char.stats.ac = 10 + dexMod;
         }
 
         return { strMod, dexMod, conMod, intMod, wisMod, chaMod, profBonus };
@@ -1332,35 +1446,63 @@ const app = {
                 { id: 'cha', l: 'CHA', v: char.attributes.cha, m: mods.chaMod }
             ];
             scoresGrid.innerHTML = attrMap.map(a => `
-                <div class="score-box">
-                    <span class="score-label">${a.l}</span>
-                    <strong class="score-value editable" data-field="attributes.${a.id}">${a.v}</strong>
                     <span class="score-mod">${a.m >= 0 ? `+${a.m}` : a.m}</span>
                 </div>
             `).join('');
         }
 
         // Saves & Skills
+        const savesContainer = document.getElementById('sheet-saves');
+        if (savesContainer) {
+            const saves = [
+                { id: 'str', l: 'Força' }, { id: 'dex', l: 'Destreza' }, { id: 'con', l: 'Constituição' },
+                { id: 'int', l: 'Inteligência' }, { id: 'wis', l: 'Sabedoria' }, { id: 'cha', l: 'Carisma' }
+            ];
+            savesContainer.innerHTML = saves.map(s => {
+                const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
+                const val = mods[`${s.id}Mod`] + (isProf ? mods.profBonus : 0);
+                return `
+                    <div class="prof-item">
+                        <span class="prof-indicator prof-toggle ${isProf ? 'active' : ''}" data-type="saves" data-field="${s.id}"></span>
+                        <span class="prof-label">${s.l}</span>
+                        <span class="prof-val">${val >= 0 ? `+${val}` : val}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
         const skillsContainer = document.getElementById('sheet-skills');
         if (skillsContainer) {
-            const dndSkills = [
-                { id: 'atletismo', n: 'Atletismo', a: 'str' },
-                { id: 'acrobacia', n: 'Acrobacia', a: 'dex' },
-                { id: 'furtividade', n: 'Furtividade', a: 'dex' },
-                { id: 'percepcao', n: 'Percepção', a: 'wis' }
+            const skills = [
+                { id: 'acrobacia', l: 'Acrobacia (Des)' }, { id: 'adestrar_animais', l: 'Adestrar Animais (Sab)' },
+                { id: 'arcanismo', l: 'Arcanismo (Int)' }, { id: 'atletismo', l: 'Atletismo (For)' },
+                { id: 'atuacao', l: 'Atuação (Car)' }, { id: 'enganacao', l: 'Enganação (Car)' },
+                { id: 'furtividade', l: 'Furtividade (Des)' }, { id: 'historia', l: 'História (Int)' },
+                { id: 'intimidacao', l: 'Intimidação (Car)' }, { id: 'intuicao', l: 'Intuição (Sab)' },
+                { id: 'investigacao', l: 'Investigação (Int)' }, { id: 'medicina', l: 'Medicina (Sab)' },
+                { id: 'natureza', l: 'Natureza (Int)' }, { id: 'percepcao', l: 'Percepção (Sab)' },
+                { id: 'persuasao', l: 'Persuasão (Car)' }, { id: 'prestidigitacao', l: 'Prestidigitação (Des)' },
+                { id: 'religiao', l: 'Religião (Int)' }, { id: 'sobrevivencia', l: 'Sobrevivência (Sab)' }
             ];
-            skillsContainer.innerHTML = dndSkills.map(s => {
-                const attrMod = mods[`${s.a}Mod`];
-                const isProf = (char.proficiencies_choice?.skills || []).includes(s.id);
-                const total = attrMod + (isProf ? mods.profBonus : 0);
-                return `<div class="skill-item"><span>${s.n}</span><strong>${total >= 0 ? `+${total}` : total}</strong></div>`;
+            skillsContainer.innerHTML = skills.map(sk => {
+                const isProf = (char.proficiencies_choice?.skills || []).includes(sk.id);
+                const isExpert = (char.proficiencies_choice?.expertise || []).includes(sk.id);
+                const attr = sk.l.match(/\((.*?)\)/)[1].toLowerCase().replace('sab', 'wis').replace('des', 'dex').replace('for', 'str').replace('car', 'cha');
+                const val = mods[`${attr}Mod`] + (isProf ? mods.profBonus : 0) + (isExpert ? mods.profBonus : 0);
+                return `
+                    <div class="prof-item">
+                        <span class="prof-indicator prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" data-type="skills" data-field="${sk.id}"></span>
+                        <span class="prof-label">${sk.l}</span>
+                        <span class="prof-val">${val >= 0 ? `+${val}` : val}</span>
+                    </div>
+                `;
             }).join('');
         }
 
         // --- ABA COMBATE ---
         const s = char.stats || {};
         document.getElementById('sheet-ca').innerText = s.ac;
-        document.getElementById('sheet-inic').innerText = s.initiative >= 0 ? `+${s.initiative}` : s.initiative;
+        document.getElementById('sheet-inic').innerText = s.initiative >= 0 ? `+ ${s.initiative} ` : s.initiative;
         document.getElementById('sheet-speed').innerText = s.speed;
 
         document.getElementById('sheet-hp-curr').value = s.hp_current;
@@ -1396,12 +1538,54 @@ const app = {
             weightText.innerText = `${inv.encumbrance.current} / ${inv.encumbrance.limit} lbs`;
         }
 
+        // --- ABA COMBATE: ATAQUES ---
+        const attacksBody = document.getElementById('attacks-body');
+        if (attacksBody) {
+            attacksBody.innerHTML = (char.combat?.attacks || []).map((atk, i) => `
+                <div class="list-item-v2" data-index="${i}">
+                    <input type="text" value="${atk.name || ''}" placeholder="Nome" data-list="combat.attacks" data-field="name" readonly>
+                    <input type="text" value="${atk.bonus || ''}" placeholder="Bônus" data-list="combat.attacks" data-field="bonus" readonly>
+                    <input type="text" value="${atk.damage || ''}" placeholder="Dano" data-list="combat.attacks" data-field="damage" readonly>
+                    <button class="icon-btn delete-list-item" data-list="combat.attacks" data-index="${i}"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // --- ABA MAGIA: LISTA ---
+        const spellsBody = document.getElementById('spells-body');
+        if (spellsBody) {
+            spellsBody.innerHTML = (char.spells?.list || []).map((sp, i) => `
+                <div class="list-item-v2" data-index="${i}">
+                    <input type="text" value="${sp.name || ''}" placeholder="Magia" data-list="spells.list" data-field="name" readonly>
+                    <input type="text" value="${sp.level || ''}" placeholder="Nív" data-list="spells.list" data-field="level" readonly>
+                    <input type="text" value="${sp.range || ''}" placeholder="Alcance" data-list="spells.list" data-field="range" readonly>
+                    <button class="icon-btn delete-list-item" data-list="spells.list" data-index="${i}"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // --- ABA MOCHILA: ITENS ---
+        const inventoryBody = document.getElementById('inventory-body');
+        if (inventoryBody) {
+            inventoryBody.innerHTML = (char.inventory?.items || []).map((it, i) => `
+                <div class="list-item-v2" data-index="${i}">
+                    <input type="text" value="${it.name || ''}" placeholder="Item" data-list="inventory.items" data-field="name" readonly>
+                    <input type="number" value="${it.quantity || 1}" placeholder="Qtd" data-list="inventory.items" data-field="quantity" readonly>
+                    <input type="text" value="${it.weight || 0}" placeholder="Peso" data-list="inventory.items" data-field="weight" readonly>
+                    <button class="icon-btn delete-list-item" data-list="inventory.items" data-index="${i}"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
         // --- ABA CRÔNICAS ---
         const story = char.story || {};
-        document.querySelectorAll('#sheet-historia textarea').forEach(txt => {
-            const field = txt.dataset.field.split('.').pop();
-            txt.value = story[field] || "";
-        });
+        const chronicSection = document.getElementById('sheet-historia');
+        if (chronicSection) {
+            chronicSection.querySelectorAll('textarea').forEach(txt => {
+                const field = txt.dataset.field.split('.').pop();
+                txt.value = story[field] || "";
+            });
+        }
     },
 
     toggleSheetEdit(enable) {
@@ -1435,6 +1619,25 @@ const app = {
 
             // Selects
             sheet.querySelectorAll('select[data-field]').forEach(sel => sel.disabled = false);
+
+            // Alinhamento -> Select
+            const alignmentEl = document.getElementById('sheet-alignment');
+            if (alignmentEl) {
+                const current = alignmentEl.innerText;
+                alignmentEl.innerHTML = `
+                    <select data-field="bio.alignment" class="wizard-select small">
+                        <option value="Leal e Bom" ${current === 'Leal e Bom' ? 'selected' : ''}>Leal e Bom</option>
+                        <option value="Neutro e Bom" ${current === 'Neutro e Bom' ? 'selected' : ''}>Neutro e Bom</option>
+                        <option value="Caótico e Bom" ${current === 'Caótico e Bom' ? 'selected' : ''}>Caótico e Bom</option>
+                        <option value="Leal e Neutro" ${current === 'Leal e Neutro' ? 'selected' : ''}>Leal e Neutro</option>
+                        <option value="Neutro" ${current === 'Neutro' ? 'selected' : ''}>Neutro</option>
+                        <option value="Caótico e Neutro" ${current === 'Caótico e Neutro' ? 'selected' : ''}>Caótico e Neutro</option>
+                        <option value="Leal e Mau" ${current === 'Leal e Mau' ? 'selected' : ''}>Leal e Mau</option>
+                        <option value="Neutro e Mau" ${current === 'Neutro e Mau' ? 'selected' : ''}>Neutro e Mau</option>
+                        <option value="Caótico e Mau" ${current === 'Caótico e Mau' ? 'selected' : ''}>Caótico e Mau</option>
+                    </select>
+                `;
+            }
         } else {
             // Restore display mode or discard changes
             if (this.currentCharacter) this.populateSheet(this.currentCharacter);
@@ -1447,73 +1650,53 @@ const app = {
         }
     },
 
-    async saveSheet() {
-        const sheet = document.getElementById('character-sheet');
-        const char = this.currentCharacter;
-        if (!char) return;
-
-        try {
-            this.showLoading(true);
-
-            // 1. Collect all data-field values
-            // Inputs
-            sheet.querySelectorAll('input[data-field]').forEach(i => {
-                let val = i.type === 'checkbox' ? i.checked : i.value;
-                if (i.type === 'number') val = parseFloat(val) || 0;
-                this.setNestedValue(char, i.dataset.field, val);
-            });
-
-            // Selects
-            sheet.querySelectorAll('select[data-field]').forEach(s => {
-                this.setNestedValue(char, s.dataset.field, s.value);
-            });
-
-            // Textareas
-            sheet.querySelectorAll('textarea[data-field]').forEach(t => {
-                this.setNestedValue(char, t.dataset.field, t.value);
-            });
-
-            // 2. Special fields (Attack/Spells/Inventory lists will be handled in separate PR)
-
-            // 3. Save to Firebase
-            const { updateCharacter } = await import('./data.js');
-            await updateCharacter(char.id, char);
-
-            this.toggleSheetEdit(false);
-            this.populateSheet(char);
-            this.updateHeaderTracker(char);
-            this.showAlert("Ficha guardada nos anais do tempo.", "Sincronização Concluída");
-
-        } catch (error) {
-            console.error("Erro ao salvar:", error);
-            this.showAlert("A magia falhou em registrar seus feitos.", "Falha na Transcrição");
-        } finally {
-            this.showLoading(false);
+    // --- Dynamic Lists: Add/Remove ---
+    addListItem(path, template) {
+        if (!this.currentCharacter) return;
+        const keys = path.split('.');
+        let target = this.currentCharacter;
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!target[keys[i]]) target[keys[i]] = {};
+            target = target[keys[i]];
         }
+        const lastKey = keys[keys.length - 1];
+        if (!target[lastKey]) target[lastKey] = [];
+        target[lastKey].push({ ...template });
+        this.populateSheet(this.currentCharacter);
+        this.toggleSheetEdit(true); // Manter modo edição
     },
 
-    addAttackRow() {
-        const tbody = document.getElementById('attacks-body');
-        if (!tbody) return;
-        const index = tbody.querySelectorAll('.attack-row').length;
-        const row = document.createElement('tr');
-        row.className = 'attack-row';
-        row.dataset.index = index;
-        row.innerHTML = `
-            <td class="editable-attack"><input type="text" value="" data-field="nome"></td>
-            <td class="editable-attack"><input type="text" value="" data-field="bonus"></td>
-            <td class="editable-attack"><input type="text" value="" data-field="dano"></td>
-            <td class="col-actions">
-                <button class="delete-atk-btn"><i class="fas fa-trash-alt"></i></button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    removeListItem(path, index) {
+        if (!this.currentCharacter) return;
+        const keys = path.split('.');
+        let target = this.currentCharacter;
+        for (let i = 0; i < keys.length - 1; i++) target = target[keys[i]];
+        const lastKey = keys[keys.length - 1];
+        target[lastKey].splice(index, 1);
+        this.populateSheet(this.currentCharacter);
+        this.toggleSheetEdit(true);
+    },
+
+    toggleProficiency(type, field) {
+        if (!this.currentCharacter) return;
+        if (!this.currentCharacter.proficiencies_choice) {
+            this.currentCharacter.proficiencies_choice = { skills: [], expertise: [], saves: [] };
+        }
+        const list = this.currentCharacter.proficiencies_choice[type] || [];
+        const idx = list.indexOf(field);
+        if (idx === -1) {
+            list.push(field);
+        } else {
+            list.splice(idx, 1);
+        }
+        this.currentCharacter.proficiencies_choice[type] = list;
+        this.populateSheet(this.currentCharacter);
+        this.toggleSheetEdit(true);
     },
 
     cancelSheetEdit() {
-        // Restore from backup
         if (this.characterBackup) {
-            this.currentCharacter = this.characterBackup;
+            this.currentCharacter = JSON.parse(JSON.stringify(this.characterBackup));
             this.populateSheet(this.currentCharacter);
         }
         this.toggleSheetEdit(false);
@@ -1521,62 +1704,76 @@ const app = {
 
     async saveSheetChanges() {
         if (!this.currentCharacter) return;
-        this.toggleLoading(true);
+
         const sheet = document.getElementById('character-sheet');
+        const updates = {
+            bio: { ...this.currentCharacter.bio },
+            attributes: { ...this.currentCharacter.attributes },
+            stats: { ...this.currentCharacter.stats },
+            story: { ...this.currentCharacter.story },
+            combat: { ...this.currentCharacter.combat || {} },
+            spells: { ...this.currentCharacter.spells || {} },
+            inventory: { ...this.currentCharacter.inventory || {} },
+            proficiencies_choice: { ...this.currentCharacter.proficiencies_choice || {} }
+        };
+
+        // Gather basic inputs
+        sheet.querySelectorAll('[data-field]').forEach(el => {
+            const field = el.dataset.field;
+            const keys = field.split('.');
+            let val;
+
+            if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') {
+                val = el.type === 'number' ? parseInt(el.value) || 0 : el.value;
+            } else {
+                // For editable spans replaced by inputs
+                const input = el.querySelector('input, select');
+                if (input) {
+                    val = input.type === 'number' ? parseInt(input.value) || 0 : input.value;
+                } else {
+                    return; // Skip if no input found
+                }
+            }
+
+            // Deep set
+            let target = updates;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!target[keys[i]]) target[keys[i]] = {};
+                target = target[keys[i]];
+            }
+            target[keys[keys.length - 1]] = val;
+        });
+
+        // Gather Lists (Special treatment to ensure arrays are preserved and updated)
+        const gatherList = (selector, path) => {
+            const items = [];
+            sheet.querySelectorAll(`${selector} .list-item-v2`).forEach(row => {
+                const item = {};
+                row.querySelectorAll('input').forEach(input => {
+                    const f = input.dataset.field;
+                    item[f] = input.type === 'number' ? parseInt(input.value) || 0 : input.value;
+                });
+                items.push(item);
+            });
+            const keys = path.split('.');
+            let target = updates;
+            for (let i = 0; i < keys.length - 1; i++) target = target[keys[i]];
+            target[keys[keys.length - 1]] = items;
+        };
+
+        gatherList('#attacks-body', 'combat.attacks');
+        gatherList('#spells-body', 'spells.list');
+        gatherList('#inventory-body', 'inventory.items');
 
         try {
-            const updated = JSON.parse(JSON.stringify(this.currentCharacter)); // Deep clone
-            if (!updated.secoes) updated.secoes = {};
-
-            // Collect inputs
-            sheet.querySelectorAll('[data-field]').forEach(el => {
-                const field = el.dataset.field; // e.g. "basico.Nome"
-                let val;
-
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    if (el.type === 'checkbox') {
-                        val = el.checked;
-                    } else {
-                        val = el.value;
-                        if (el.type === 'number') val = parseInt(val) || 0;
-                    }
-                } else if (el.classList.contains('editable-toggle')) {
-                    val = el.classList.contains('fas'); // Boolean for toggles
-                } else {
-                    // Fallback for elements that already have inputs inside
-                    const input = el.querySelector('input, textarea');
-                    if (input) {
-                        val = input.value;
-                        if (input.type === 'number') val = parseInt(val) || 0;
-                    }
-                }
-
-                if (val !== undefined) this.setNestedValue(updated.secoes, field, val);
-            });
-
-            // Collect attacks separately as they are an array
-            const attackRows = sheet.querySelectorAll('.attack-row');
-            const attacks = [];
-            attackRows.forEach(row => {
-                const atk = {};
-                row.querySelectorAll('[data-field]').forEach(inputEl => {
-                    const f = inputEl.dataset.field;
-                    const val = inputEl.tagName === 'INPUT' ? inputEl.value : inputEl.innerText;
-                    if (f) atk[f] = val;
-                });
-                if (atk.nome) attacks.push(atk);
-            });
-            if (!updated.secoes.combate) updated.secoes.combate = {};
-            updated.secoes.combate.Ataques = attacks;
-
-            await saveCharacter(this.user.uid, this.currentSystem, updated);
-            this.currentCharacter = updated;
+            const { updateCharacter } = await import('./data.js');
+            await updateCharacter(this.currentCharacter.id, updates);
+            this.currentCharacter = { ...this.currentCharacter, ...updates };
+            this.populateSheet(this.currentCharacter);
             this.toggleSheetEdit(false);
-            this.populateSheet(updated);
-            this.selectCharacter(updated);
-            this.showAlert("Ficha consagrada nos anais com sucesso!", "Êxito");
+            this.showAlert("Ficha salva com sucesso!", "Grimório de Personagens");
         } catch (err) {
-            this.showAlert("Erro ao salvar: " + err.message, "Karma Ruim");
+            this.showAlert("Erro ao salvar: " + err.message, "Aviso");
         } finally {
             this.toggleLoading(false);
         }
