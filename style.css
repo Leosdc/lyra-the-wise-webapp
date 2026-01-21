@@ -3053,7 +3053,17 @@ body.delete-mode .card-delete-btn {
 
 /* --- Modal de Confirmação Customizado --- */
 #confirm-modal {
-    z-index: 3000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    /* Flex centering */
+    align-items: center;
+    justify-content: center;
+    z-index: 6000;
+    /* Higher than everything */
 }
 
 #confirm-modal .modal-backdrop {
@@ -3062,9 +3072,13 @@ body.delete-mode .card-delete-btn {
 }
 
 .confirm-box {
+    position: relative;
     max-width: 450px !important;
     text-align: center;
     padding: 2.5rem !important;
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     animation: confirmPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -3151,6 +3165,8 @@ body.damien-theme .hp-input {
 .chronic-notes .medieval-textarea {
     height: 250px !important;
     margin-bottom: 2rem;
+    background: rgba(253, 246, 227, 0.9) !important;
+    /* Force consistency */
 }
 
 .chronic-notes .medieval-textarea.large {
@@ -3168,12 +3184,14 @@ body.damien-theme .hp-input {
 .header-center {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.5rem 1.5rem;
-    border-radius: 50px;
-    border: 1px solid var(--gold);
-    backdrop-filter: blur(5px);
+    gap: 1.2rem;
+    background: rgba(18, 12, 10, 0.7);
+    padding: 0.4rem 1.2rem;
+    border-radius: 40px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    /* Subtle border */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .header-token-wrapper {
@@ -3182,12 +3200,12 @@ body.damien-theme .hp-input {
 }
 
 .header-token-wrapper img {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 3px solid var(--gold);
+    border: 2px solid var(--gold);
     object-fit: cover;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
     background: var(--dark-charcoal);
 }
 
@@ -3263,6 +3281,33 @@ body.damien-theme .hp-input {
 body.damien-theme .header-center {
     border-color: var(--damien-purple);
     box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+}
+
+/* --- Global Override for Medieval Inputs (Standardization) --- */
+.medieval-input,
+.medieval-textarea,
+.medieval-select,
+.chronicle-editor textarea {
+    background-color: rgba(253, 246, 227, 0.95) !important;
+    color: #2c1e16 !important;
+    /* Ink color */
+    border: 1px solid var(--gold);
+    transition: all 0.3s ease;
+}
+
+.medieval-input:focus,
+.medieval-textarea:focus,
+.medieval-select:focus,
+.chronicle-editor textarea:focus {
+    background-color: #fff !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    border-color: var(--gold-bright);
+}
+
+.medieval-input::placeholder,
+.medieval-textarea::placeholder {
+    color: rgba(44, 30, 22, 0.6);
+    font-style: italic;
 }
 
 body.damien-theme .header-hp-fill {

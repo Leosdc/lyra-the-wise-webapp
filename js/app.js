@@ -421,6 +421,26 @@ const app = {
                 e.target.value = ''; // Reset input
             }
         });
+
+        // Settings & Profile
+        document.getElementById('settings-btn')?.addEventListener('click', () => this.openSettings());
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => this.saveSettings());
+
+        // Cursor Selector Delegation
+        document.getElementById('cursor-selector')?.addEventListener('click', (e) => {
+            const option = e.target.closest('.cursor-option');
+            if (option) {
+                document.querySelectorAll('.cursor-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+
+                // Optional: Preview cursor immediately
+                const cursor = option.dataset.cursor;
+                if (cursor) {
+                    document.body.className = document.body.className.replace(/cursor-\S+/g, '');
+                    document.body.classList.add(`cursor-${cursor}`);
+                }
+            }
+        });
     },
 
     // Resize image using canvas
