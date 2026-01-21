@@ -2317,8 +2317,8 @@ h4,
     width: 90%;
     text-align: center;
     padding: 3rem;
-    background: #fdf6e3;
-    border: 3px double #8b4513;
+    background: var(--parchment);
+    border: 3px double var(--gold);
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
     position: relative;
     margin: auto;
@@ -2331,14 +2331,14 @@ h4,
 
 .alert-icon {
     font-size: 3rem;
-    color: #8b4513;
+    color: var(--gold);
     margin-bottom: 1rem;
     display: block;
 }
 
 #alert-title {
     font-family: 'Cinzel', serif;
-    color: #2c1e16;
+    color: var(--ink);
     margin-bottom: 1rem;
     font-size: 1.4rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -2346,7 +2346,7 @@ h4,
 }
 
 #alert-message {
-    color: #5a4a3a;
+    color: var(--ink);
     font-size: 1rem;
     line-height: 1.5;
 }

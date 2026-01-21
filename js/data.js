@@ -47,6 +47,15 @@ export const getCharacter = async (id) => {
     return null;
 };
 
+export const updateCharacter = async (charId, updates) => {
+    const docRef = doc(db, COLLECTIONS.CHARACTERS, charId);
+    const data = {
+        ...updates,
+        updatedAt: new Date().toISOString()
+    };
+    await updateDoc(docRef, data);
+};
+
 export const saveCharacter = async (userId, systemId, charData) => {
     const data = {
         ...charData,
@@ -65,9 +74,6 @@ export const saveCharacter = async (userId, systemId, charData) => {
         return docRef.id;
     }
 };
-
-
-
 export const deleteCharacter = async (id) => {
     await deleteDoc(doc(db, COLLECTIONS.CHARACTERS, id));
 };

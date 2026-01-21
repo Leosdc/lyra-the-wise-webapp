@@ -104,16 +104,33 @@ export const NavigationModule = {
         if (!confirmed) return;
 
         try {
-            await context.deleteItemCallback(id, type); // App handles data deletion to keep import circle clean? Or pass delete fn?
-            // Better: Pass specific delete function in context, OR App handles it.
-            // Let's assume context has deleteItemCallback which calls deleteCharacter/Monster etc.
-
+            await context.deleteItemCallback(id, type);
             context.showAlert("Item excluído com sucesso.", "Cripta do Esquecimento");
-            if (context.refreshList) context.refreshList(type); // Smart refresh
+            if (context.refreshList) context.refreshList(type);
         } catch (error) {
             console.error(error);
             context.showAlert("Erro ao excluir o item.", "Erro Arcano");
         }
+    },
+
+    updateDropdownScroll(container) {
+        if (!container) return;
+        const wrapper = container.parentElement;
+        const up = wrapper?.querySelector('.dropdown-scroll-arrow.up');
+        const down = wrapper?.querySelector('.dropdown-scroll-arrow.down');
+
+        if (!up || !down) return;
+
+        const scrollPos = container.scrollTop;
+        const containerHeight = container.clientHeight;
+        const totalHeight = container.scrollHeight;
+        const threshold = 5;
+
+        const canScrollUp = scrollPos > threshold;
+        const canScrollDown = scrollPos + containerHeight < totalHeight - threshold;
+
+        up.classList.toggle('hidden', !canScrollUp);
+        down.classList.toggle('hidden', !canScrollDown || totalHeight <= containerHeight);
     },
 
     async viewMonster(id, context) {
@@ -174,8 +191,7 @@ export const NavigationModule = {
         }
     },
 
-    // --- Header ---
-    updateHeaderTracker(char) {
+    updateHeaderTracker(char, isDamien) {
         const tracker = document.getElementById('header-char-tracker');
         if (!char) {
             tracker?.classList.add('hidden');
@@ -183,7 +199,6 @@ export const NavigationModule = {
         }
 
         tracker?.classList.remove('hidden');
-        const isDamien = localStorage.getItem('lyra_theme') === 'damien';
 
         const tokenEl = document.getElementById('header-token');
         if (tokenEl) tokenEl.src = char.tokenUrl || (isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
@@ -212,7 +227,6 @@ export const NavigationModule = {
         if (acVal) acVal.innerText = ac;
     },
 
-    // --- Scroll Indicators ---
     updateScrollIndicators() {
         const up = document.getElementById('scroll-up');
         const down = document.getElementById('scroll-down');
@@ -243,25 +257,5 @@ export const NavigationModule = {
         const z = modal ? "10001" : "9000";
         up.style.zIndex = z;
         down.style.zIndex = z;
-    },
-
-    updateDropdownScroll(container) {
-        if (!container) return;
-        const wrapper = container.parentElement;
-        const up = wrapper.querySelector('.dropdown-scroll-arrow.up');
-        const down = wrapper.querySelector('.dropdown-scroll-arrow.down');
-
-        if (!up || !down) return;
-
-        const scrollPos = container.scrollTop;
-        const containerHeight = container.clientHeight;
-        const totalHeight = container.scrollHeight;
-        const threshold = 5;
-
-        const canScrollUp = scrollPos > threshold;
-        const canScrollDown = scrollPos + containerHeight < totalHeight - threshold;
-
-        up.classList.toggle('hidden', !canScrollUp);
-        down.classList.toggle('hidden', !canScrollDown || totalHeight <= containerHeight);
     }
 };

@@ -32,10 +32,11 @@ export const AuthUI = {
             // Load user settings (Theme, Profile)
             SettingsModule.loadUserPreferences(user);
         } else {
-            userActions?.classList.add('hidden');
+            userActions?.classList.remove('hidden'); // Ensure container is visible to show login button
             if (loginBtn) {
                 loginBtn.innerHTML = `<i class="fas fa-key"></i> Entrar`;
                 loginBtn.onclick = () => login();
+                loginBtn.classList.remove('hidden');
             }
             tracker?.classList.add('hidden');
 
