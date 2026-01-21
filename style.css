@@ -2604,6 +2604,74 @@ h4,
     color: var(--ink);
 }
 
+/* Character Card Deletion Styles */
+.medieval-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-delete-btn {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: rgba(139, 0, 0, 0.8) !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 20 !important;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.medieval-card:hover .card-delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card-delete-btn:hover {
+    background: var(--crimson) !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px var(--crimson) !important;
+    transform: scale(1.1) rotate(10deg);
+}
+
+/* Bulk Delete Mode */
+body.delete-mode .medieval-card {
+    border-color: var(--crimson) !important;
+    box-shadow: 0 0 15px rgba(139, 0, 0, 0.3) !important;
+    animation: wiggle 0.5s infinite ease-in-out;
+}
+
+body.delete-mode .card-delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(-0.5deg);
+    }
+
+    50% {
+        transform: rotate(0.5deg);
+    }
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .wizard-nav {
     display: flex;
     justify-content: space-between;
@@ -2611,4 +2679,249 @@ h4,
     margin-top: 2.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(44, 30, 22, 0.1);
+}
+
+/* --- Ficha 2.0: Layout e Abas --- */
+.bio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.1);
+}
+
+.stats-main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+}
+
+.attributes-column,
+.skills-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.top-vitals-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vital-mini-box {
+    background: rgba(244, 228, 188, 0.3);
+    border: 1px solid var(--gold);
+    padding: 0.8rem;
+    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.vital-mini-box span {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.7;
+    display: block;
+    margin-bottom: 0.3rem;
+    letter-spacing: 1px;
+}
+
+.vital-mini-box strong {
+    font-size: 1.2rem;
+    color: var(--crimson);
+}
+
+/* Combat Tab Styles */
+.combat-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px) 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.hp-container-main {
+    display: flex;
+    gap: 1rem;
+}
+
+.hp-box-full {
+    background: rgba(139, 0, 0, 0.05);
+    border: 2px solid var(--crimson);
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    flex: 1;
+    text-align: center;
+}
+
+.hp-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.hp-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--crimson);
+    width: 70px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-family: inherit;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.hp-input:focus {
+    outline: none;
+    border-bottom-color: var(--crimson);
+}
+
+.hp-input.small {
+    font-size: 1.2rem;
+    width: 60px;
+}
+
+.hp-temp {
+    background: rgba(44, 30, 22, 0.05);
+    border: 1px dashed var(--ink);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.combat-details-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+}
+
+/* Inventory & Coins */
+.coins-pouch {
+    background: rgba(244, 228, 188, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--gold);
+}
+
+.coins-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+}
+
+.coin-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.coin-item span {
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+.coin-item pc {
+    color: #cd7f32;
+}
+
+.coin-item pp {
+    color: #aaa;
+}
+
+.coin-item po {
+    color: #d4af37;
+}
+
+.coin-item input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--gold);
+    text-align: center;
+    border-radius: 4px;
+    padding: 0.2rem;
+}
+
+.encumbrance-tracker {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.weight-bar {
+    height: 25px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 1rem;
+    border: 1px solid var(--ink);
+}
+
+.weight-bar .bar {
+    height: 100%;
+    background: linear-gradient(90deg, #d4af37, var(--crimson));
+    width: 0%;
+    transition: 0.5s;
+}
+
+.weight-bar span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Magic Tab Slots */
+.spell-slots-tracker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.slot-box {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--gold);
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.traits-full-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Dark Mode / Damien Theme Adjustments */
+body.damien-theme .hp-box-full {
+    background: rgba(147, 51, 234, 0.1);
+    border-color: var(--damien-purple);
+}
+
+body.damien-theme .hp-input {
+    color: var(--damien-purple);
+}
+
+body.damien-theme .weight-bar .bar {
+    background: linear-gradient(90deg, #4c1d95, #9333ea);
 }

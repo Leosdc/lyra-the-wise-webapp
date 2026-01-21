@@ -101,3 +101,15 @@ export const saveSession = async (userId, systemId, sessionData) => {
     const docRef = await addDoc(collection(db, COLLECTIONS.SESSIONS), data);
     return docRef.id;
 };
+
+export const deleteCharacter = async (id) => {
+    await deleteDoc(doc(db, COLLECTIONS.CHARACTERS, id));
+};
+
+export const deleteMonster = async (id) => {
+    await deleteDoc(doc(db, COLLECTIONS.MONSTERS, id));
+};
+
+export const deleteSession = async (id) => {
+    await deleteDoc(doc(db, COLLECTIONS.SESSIONS, id));
+};

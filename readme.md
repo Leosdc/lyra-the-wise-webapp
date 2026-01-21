@@ -57,7 +57,8 @@ And forge the impossible — with magic, courage, and passion divine."
 ---
 
 <p align="center">
-  🧙 <strong>WebApp de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Suporte a Sistemas</strong>
+  🧙 <strong>WebApp de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Suporte a Sistemas</strong><br>
+  🚀 <strong>Versão Alfa 1.0</strong>
 </p>
 
 <p align="center"> <strong>Lyra the Wise WebApp</strong> é a versão web da sábia anciã que transforma seu navegador em uma <strong>mesa de RPG inteligente</strong>, unindo narrativa, automação e gestão de personagens.
@@ -78,7 +79,8 @@ And forge the impossible — with magic, courage, and passion divine."
 - [👤 Fichas & Personagens](#-fichas--personagens)  
 - [🎭 Assistente do Mestre](#-assistente-do-mestre)  
 - [📖 História & Campanha](#-história--campanha)  
-- [🚀 Instalação Local](#-instalação)
+- [📚 Roadmap do Multiverso](#-roadmap-do-multiverso)
+- [🚀 Instalação Local](#-instalação-local)
 
 ---
 
@@ -86,9 +88,10 @@ And forge the impossible — with magic, courage, and passion divine."
 
 ### 📝 **Sistema Completo de Fichas**
 - **Adaptável a vários sistemas:** Templates personalizáveis via `constants.js`.
+- **D&D 5e (Alfa - 50%):** Ficha funcional com Atributos, CA, HP, XP, Perícias e Ataques.
 - **Criação Assistida por IA:** Lyra tece os detalhes de história e personalidade para você.
-- **Edição Intuitiva:** Interface medieval imersiva para gerenciar HP, CA e atributos.
-- **Cálculos Automáticos:** Modificadores e status principais calculados em tempo real.
+- **Edição Intuitiva:** Interface medieval imersiva com botões customizados para stats.
+- **Cálculos Automáticos:** Modificadores, Percepção Passiva e Iniciativa automáticos.
 
 ### 🎭 **Narrativa com IA (Google Gemini)**
 - **Descrições imersivas:** Fale com Lyra para expandir cenas e diálogos.
@@ -119,7 +122,33 @@ And forge the impossible — with magic, courage, and passion divine."
 
 ---
 
-## 🚀 Instalação (Desenvolvimento)
+## 📚 **Roadmap do Multiverso**
+
+O Lyra the Wise WebApp está em seus primeiros passos ancestrais. Aqui está o horizonte que buscamos alcançar:
+
+### 🛠️ **Status Atual: Alfa 1.0**
+- [x] **Ficha D&D 5e (Core):** ~50% (Funcionalidades básicas de combate e atributos).
+- [x] **Easter Egg:** Invasão rúnica de Damien Kael (10% chance).
+- [x] **Dashboard:** Trivia e acesso rápido.
+
+### 🌌 **Fase 1: Estabilização de Fichas (Em Breve)**
+- [ ] **Finalização D&D 5e:** Suporte completo a Magias (slots e descrições) e Inventário.
+- [ ] **Exportação PDF:** Gerar ficha clássica em PDF direto do navegador.
+- [ ] **Sistemas Adicionais:** Moldes iniciais para *Ordem Paranormal* e *Tormenta20*.
+
+### 🎭 **Fase 2: Assistente do Mestre (Roadmap)**
+- [ ] **Bestiário Ativo:** Criar e salvar monstros dinamicamente com IA.
+- [ ] **Gerador de Armadilhas:** Perigos ambientais com cálculos de ND.
+- [ ] **Painel do Mestre (GM Screen):** Visão geral de múltiplos personagens em uma única tela.
+
+### 📜 **Fase 3: Crônicas e Mundo (Longo Prazo)**
+- [ ] **Gestão de Campanhas:** Linha do tempo de sessões e NPCs recorrentes.
+- [ ] **Gerador de Vilões:** NPCs antagonistas com motivações profundas por IA.
+- [ ] **Módulo de Mapas:** Integração básica para visualização de cenas e descrições espaciais.
+
+---
+
+## 🚀 **Instalação Local**
 
 ### Pré-requisitos
 - Um servidor web simples (ex: `Live Server` do VS Code).

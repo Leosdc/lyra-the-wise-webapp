@@ -46,3 +46,81 @@ export const SUPPORTED_SYSTEMS = [
     { id: "wfrp4e", name: "Warhammer Fantasy 4ª Edição" },
     { id: "13thage", name: "13th Age" }
 ];
+
+export const SYSTEM_TEMPLATES = {
+    "dnd5e": {
+        bio: {
+            name: "",
+            class: "",
+            level: 1,
+            race: "",
+            background: "",
+            alignment: "",
+            xp: 0,
+            playerName: ""
+        },
+        attributes: {
+            str: 10,
+            dex: 10,
+            con: 10,
+            int: 10,
+            wis: 10,
+            cha: 10
+        },
+        stats: {
+            hp_current: 0,
+            hp_max: 0,
+            hp_temp: 0,
+            ac: 10,
+            initiative: 0,
+            speed: "9m",
+            proficiency_bonus: 2,
+            passive_perception: 10,
+            hit_dice_total: "1d8",
+            hit_dice_current: 1
+        },
+        proficiencies_choice: {
+            saving_throws: [], // ["str", "con"]
+            skills: [], // ["athletics", "perception"]
+            expertise: [] // ["stealth"]
+        },
+        death_saves: {
+            successes: 0,
+            failures: 0
+        },
+        attacks: [], // { name, bonus, damage, type, range, properties }
+        spells: {
+            ability: "int",
+            save_dc: 8,
+            attack_bonus: 0,
+            slots: {
+                l1: { total: 0, used: 0 },
+                l2: { total: 0, used: 0 },
+                l3: { total: 0, used: 0 },
+                l4: { total: 0, used: 0 },
+                l5: { total: 0, used: 0 },
+                l6: { total: 0, used: 0 },
+                l7: { total: 0, used: 0 },
+                l8: { total: 0, used: 0 },
+                l9: { total: 0, used: 0 }
+            },
+            list: [] // { name, level, prepared, description }
+        },
+        inventory: {
+            coins: { pc: 0, pp: 0, pe: 0, po: 0, pl: 0 },
+            items: [], // { name, weight, quantity, equipped, description }
+            encumbrance: { current: 0, limit: 150 }
+        },
+        story: {
+            traits: "",
+            ideals: "",
+            bonds: "",
+            flaws: "",
+            appearance: "",
+            languages: "",
+            other_proficiencies: "",
+            notes: ""
+        },
+        conditions: [] // ["exhaustion_1"]
+    }
+};
