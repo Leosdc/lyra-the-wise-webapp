@@ -295,10 +295,10 @@ const app = {
                 return;
             }
 
-            // Validate file size (max 5MB before compression)
-            const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+            // Validate file size (max 2MB before compression)
+            const MAX_SIZE = 2 * 1024 * 1024; // 2MB
             if (file.size > MAX_SIZE) {
-                this.showAlert("Imagem muito grande! Máximo permitido: 5MB.", "Erro");
+                this.showAlert("Imagem muito pesada! O limite original é de 2MB. Tente reduzir o arquivo ou usar outro formato.", "Arquivo Grande");
                 return;
             }
 
@@ -345,7 +345,7 @@ const app = {
                 canvas.toBlob((blob) => {
                     if (blob) resolve(blob);
                     else reject(new Error('Falha ao processar imagem'));
-                }, 'image/jpeg', 0.85);
+                }, 'image/jpeg', 0.7); // 70% quality is perfect for 400x400 tokens
             };
 
             img.onerror = () => reject(new Error('Falha ao carregar imagem'));
@@ -1261,6 +1261,9 @@ const app = {
                         <td class="editable-attack" data-field="nome">-</td>
                         <td class="editable-attack" data-field="bonus">-</td>
                         <td class="editable-attack" data-field="dano">-</td>
+                        <td class="col-actions">
+                            <button class="delete-atk-btn"><i class="fas fa-trash-alt"></i></button>
+                        </td>
                     </tr>`;
             } else {
                 attacksBody.innerHTML = attacks.map((atk, i) => `
@@ -1268,6 +1271,9 @@ const app = {
                         <td class="editable-attack" data-field="nome">${atk.nome || '-'}</td>
                         <td class="editable-attack" data-field="bonus">${atk.bonus || '-'}</td>
                         <td class="editable-attack" data-field="dano">${atk.dano || '-'}</td>
+                        <td class="col-actions">
+                            <button class="delete-atk-btn"><i class="fas fa-trash-alt"></i></button>
+                        </td>
                     </tr>`).join('');
             }
         }
@@ -1327,10 +1333,24 @@ const app = {
                     el.classList.toggle('far');
                 };
             });
+
+            // Delete Attack delegation
+            const attacksBody = document.getElementById('attacks-body');
+            if (attacksBody) {
+                attacksBody.onclick = (e) => {
+                    const btn = e.target.closest('.delete-atk-btn');
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        if (row) row.remove();
+                    }
+                };
+            }
         } else {
             sheet.querySelectorAll('.editable-toggle').forEach(el => el.onclick = null);
             const addAtkBtn = document.getElementById('add-attack-btn');
             if (addAtkBtn) addAtkBtn.onclick = null;
+            const attacksBody = document.getElementById('attacks-body');
+            if (attacksBody) attacksBody.onclick = null;
         }
     },
 
@@ -1345,6 +1365,9 @@ const app = {
             <td class="editable-attack"><input type="text" value="" data-field="nome"></td>
             <td class="editable-attack"><input type="text" value="" data-field="bonus"></td>
             <td class="editable-attack"><input type="text" value="" data-field="dano"></td>
+            <td class="col-actions">
+                <button class="delete-atk-btn"><i class="fas fa-trash-alt"></i></button>
+            </td>
         `;
         tbody.appendChild(row);
     },

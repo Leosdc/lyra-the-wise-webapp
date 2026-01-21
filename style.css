@@ -438,6 +438,20 @@ h4,
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     z-index: 5000;
     animation: slideDown 0.2s ease;
+    overflow: hidden;
+}
+
+.dropdown-header {
+    padding: 1rem 1.25rem 0.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.dropdown-header strong {
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
 }
 
 .dropdown-scroll-wrapper {
@@ -1463,9 +1477,30 @@ h4,
 .edit-mode .attacks-table td input {
     width: 100%;
     border: 1px solid var(--gold);
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--ink);
     padding: 0.3rem;
     font-family: inherit;
+}
+
+.delete-atk-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 5px;
+    font-size: 0.9rem;
+}
+
+.delete-atk-btn:hover {
+    color: var(--crimson);
+    transform: scale(1.2);
+}
+
+.sheet-container:not(.edit-mode) .delete-atk-btn,
+.sheet-container:not(.edit-mode) .col-actions {
+    display: none;
 }
 
 .vital-stats {
