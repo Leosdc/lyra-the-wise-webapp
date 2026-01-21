@@ -104,13 +104,24 @@ export const NavigationModule = {
         if (!confirmed) return;
 
         try {
-            await context.deleteItemCallback(id, type);
+            if (type === 'character') await context.deleteCharacter(id);
+            else if (type === 'monster') await context.deleteMonster(id);
+            else if (type === 'session') await context.deleteSession(id);
+            else if (type === 'trap') await context.deleteTrap(id);
+
             context.showAlert("Item excluído com sucesso.", "Cripta do Esquecimento");
             if (context.refreshList) context.refreshList(type);
         } catch (error) {
             console.error(error);
             context.showAlert("Erro ao excluir o item.", "Erro Arcano");
         }
+    },
+
+    async viewItem(type, id, context) {
+        if (type === 'monster') return this.viewMonster(id, context);
+        if (type === 'trap') return this.viewTrap(id, context);
+        if (type === 'session') return this.viewSession(id, context);
+        context.showAlert("Este item não pode ser visualizado desta forma.", "Mistério Arcano");
     },
 
     updateDropdownScroll(container) {

@@ -202,7 +202,18 @@ const app = {
             loadSessions: () => this.loadSessions(),
             showMonsterCreator: () => WizardModule.showMonsterCreator(this.getWizardContext()),
             showTrapCreator: () => WizardModule.showTrapCreator(this.getWizardContext()),
-            showAlert: (msg, title) => this.showAlert(msg, title)
+            showAlert: (msg, title) => this.showAlert(msg, title),
+            showConfirm: (msg, title) => this.showConfirm(msg, title),
+            deleteCharacter: (id) => deleteCharacter(id),
+            deleteMonster: (id) => deleteMonster(id),
+            deleteTrap: (id) => deleteTrap(id),
+            deleteSession: (id) => deleteSession(id),
+            refreshList: (type) => {
+                if (type === 'character') this.loadCharacters();
+                else if (type === 'monster') this.loadMonsters();
+                else if (type === 'trap') this.loadTraps();
+                else if (type === 'session') this.loadSessions();
+            }
         };
     },
 
@@ -401,12 +412,38 @@ const app = {
         this.isWaitingForAI = true;
         try {
             const idToken = await this.user.getIdToken();
-            const response = await sendMessageToLyra(message, idToken, this.chatHistory);
+            const aiContext = await this.getAIContext();
+            const response = await sendMessageToLyra(message, idToken, this.chatHistory, aiContext);
             this.addChatMsg('bot', response);
             this.chatHistory.push({ role: 'user', content: message }, { role: 'model', content: response });
         } catch (error) {
+            console.error(error);
             this.addChatMsg('bot', "Falha mística...");
         } finally { this.isWaitingForAI = false; }
+    },
+
+    async getAIContext() {
+        if (!this.user) return "";
+        try {
+            const characters = await getCharacters(this.user.uid, this.currentSystem);
+            if (!characters || characters.length === 0) return "[Nenhum personagem encontrado no Salão das Fichas]";
+
+            let context = "Você tem acesso ao Salão das Fichas atual:\n";
+            characters.forEach(c => {
+                context += `- ${c.name || c.bio?.name || 'Sem Nome'} (${c.bio?.race || '?'} ${c.bio?.class || '?'}, Nível ${c.bio?.level || 1})\n`;
+            });
+
+            if (this.currentCharacter) {
+                const c = this.currentCharacter;
+                context += `\nO herói atualmente em foco é: ${c.name || 'Sem Nome'}.\n`;
+                context += `Status: PV ${c.stats?.hp_current}/${c.stats?.hp_max}, CA ${c.stats?.ac}.\n`;
+                if (c.story?.appearance) context += `Aparência: ${c.story.appearance}\n`;
+                if (c.story?.backstory) context += `História: ${c.story.backstory.substring(0, 200)}...\n`;
+            }
+            return context;
+        } catch (e) {
+            return "[Erro ao consultar o Salão das Fichas]";
+        }
     },
 
     addChatMsg(sender, text) {
@@ -475,48 +512,29 @@ const app = {
         // GLOBAL CLICK DELEGATE (Cards)
         document.addEventListener('click', (e) => {
             const deleteBtn = e.target.closest('.card-delete-btn');
-            if (deleteBtn) {
-                e.stopImmediatePropagation();
-                const card = deleteBtn.closest('.medieval-card');
-                if (card) NavigationModule.deleteItem(card.dataset.id, card.dataset.type, e); // Need to verify if deleteItem is static or needs context. 
-                // NavigationModule.deleteItem calls showConfirm using document.getElementById, so it's fine.
-                // But it assumes `this` context for some things.
-                // Checking NavigationModule... `this.showConfirm` etc.
-                // NavigationModule methods use `this`. Since we export the object, `this` refers to NavigationModule.
-                // However, NavigationModule needs `showAlert` and `refreshList`. 
-                // Wait, NavigationModule.deleteItem calls `this.showAlert`. NavigationModule DOES NOT have showAlert.
-                // FIX: We need to pass callbacks or bind NavigationModule to app context? No, cleaner to pass deps.
-                // Retrying: Move delete logic to App or fix NavigationModule to accept deps.
-                // Fix: NavigationModule.deleteItem(id, type, e, { showAlert, showConfirm, deleteCallback })
-                // This is getting complicated.
-                // Easier: Keep generic card click handling in App.js and delegate specific actions.
-            }
             const card = e.target.closest('.medieval-card');
-            if (card && !deleteBtn) {
-                // View Item
+
+            if (deleteBtn && card) {
+                e.stopImmediatePropagation();
+                NavigationModule.deleteItem(card.dataset.id, card.dataset.type, this.getNavigationLoaders());
+                return;
+            }
+
+            if (card) {
                 const type = card.dataset.type;
                 const id = card.dataset.id;
-                if (type === 'character') NavigationModule.viewCharacter(id).then(char => {
-                    this.selectCharacter(char);
-                    SheetModule.populateSheet(char, this.getSheetContext());
-                    NavigationModule.switchView('detail-container'); // Wait, viewCharacter opens 'character-sheet' modal.
-                    // The logic in NavigationModule.viewCharacter (from extraction) does openModal('character-sheet').
-                    // And calls populateSheet.
-                    // But NavigationModule doesn't have populateSheet attached anymore (it's in SheetModule).
-                    // So NavigationModule.viewCharacter needs to be updated or we handle it here.
-                });
-                // This confirms that extraction might have broken dependencies.
-                // Strategy: App.js binds the event, then calls:
-                // "App handles the orchestration".
+
                 if (type === 'character') {
                     this.openModal('character-sheet');
                     getCharacter(id).then(c => {
-                        this.selectCharacter(c);
-                        SheetModule.populateSheet(c, this.getSheetContext());
-                        SheetModule.switchSheetTab('geral', this.getSheetContext());
+                        if (c) {
+                            this.selectCharacter(c);
+                            SheetModule.populateSheet(c, this.getSheetContext());
+                            SheetModule.switchSheetTab('geral', this.getSheetContext());
+                        }
                     });
                 } else {
-                    NavigationModule.viewItem(type, id); // For monsters/sessions/traps
+                    NavigationModule.viewItem(type, id, this.getSheetContext());
                 }
             }
         });
