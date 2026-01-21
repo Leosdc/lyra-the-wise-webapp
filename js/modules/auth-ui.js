@@ -22,11 +22,11 @@ export const AuthUI = {
                 `;
                 loginBtn.onclick = () => logout();
             }
-            tracker?.classList.remove('hidden');
-
-            // Restore character if available
-            if (selectCharacter) {
-                selectCharacter(currentCharacter);
+            if (currentCharacter) {
+                tracker?.classList.remove('hidden');
+                if (selectCharacter) selectCharacter(currentCharacter);
+            } else {
+                tracker?.classList.add('hidden');
             }
 
             // Load user settings (Theme, Profile)

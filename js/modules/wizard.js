@@ -149,11 +149,9 @@ export const WizardModule = {
             template.story.flaws = document.getElementById('wiz-flaws').value;
             template.story.mannerisms = document.getElementById('wiz-mannerisms').value;
             template.story.talents = document.getElementById('wiz-talents').value;
-            template.story.notes = document.getElementById('wiz-backstory').value;
-
-            // Appearance (Post-Refactor fix: ensure this is captured if we added a field)
-            const appearance = document.querySelector('textarea[data-field="story.appearance"]')?.value;
-            if (appearance) template.story.appearance = appearance;
+            template.story.appearance = document.getElementById('wiz-appearance')?.value || '';
+            template.story.backstory = document.getElementById('wiz-backstory').value;
+            template.story.notes = template.story.backstory;
 
             let finalData = { name: name, ...template };
 

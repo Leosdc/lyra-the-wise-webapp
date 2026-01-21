@@ -15,12 +15,13 @@ import { SettingsModule } from './modules/settings.js';
 import { AuthUI } from './modules/auth-ui.js';
 import { ListModule } from './modules/lists.js';
 import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue } from './modules/utils.js';
+import { sendMessageToLyra } from './ai.js';
 
 const app = {
     user: null,
     currentCharacter: null,
     currentSystem: localStorage.getItem('lyra_current_system') || 'dnd5e',
-    currentView: localStorage.getItem('lyra_current_view') || 'dashboard',
+    currentView: 'dashboard',
     isDamien: false,
     isDeleteMode: false,
     chatHistory: [],
@@ -222,6 +223,9 @@ const app = {
 
         if (user) {
             NavigationModule.switchView(this.currentView, this.getNavigationLoaders());
+            if (this.currentCharacter) {
+                NavigationModule.updateHeaderTracker(this.currentCharacter, this.isDamien);
+            }
             this.populateCharSwitcher();
         } else {
             NavigationModule.switchView('dashboard', this.getNavigationLoaders());
@@ -399,7 +403,7 @@ const app = {
             const idToken = await this.user.getIdToken();
             const response = await sendMessageToLyra(message, idToken, this.chatHistory);
             this.addChatMsg('bot', response);
-            this.chatHistory.push({ role: 'user', content: message }, { role: 'bot', content: response });
+            this.chatHistory.push({ role: 'user', content: message }, { role: 'model', content: response });
         } catch (error) {
             this.addChatMsg('bot', "Falha mística...");
         } finally { this.isWaitingForAI = false; }
@@ -410,7 +414,8 @@ const app = {
         const div = document.createElement('div');
         div.className = `msg ${sender}`;
         if (sender === 'bot') {
-            div.innerHTML = `<img src="assets/Lyra_Token.png" class="chat-avatar"><span class="msg-content">${text}</span>`;
+            const avatar = this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png';
+            div.innerHTML = `<img src="${avatar}" class="chat-avatar"><span class="msg-content">${text}</span>`;
         } else {
             div.innerHTML = `<span class="msg-content">${text}</span>`;
         }
@@ -527,6 +532,7 @@ const app = {
         });
 
         // Menu
+        document.getElementById('home-btn')?.addEventListener('click', () => this.switchView('dashboard'));
         document.getElementById('menu-btn')?.addEventListener('click', () => NavigationModule.openMenuAtSection('all'));
         document.querySelectorAll('.close-menu, .menu-overlay').forEach(el => el.addEventListener('click', () => NavigationModule.toggleMenu(false)));
 
