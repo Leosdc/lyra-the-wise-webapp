@@ -1,5 +1,5 @@
 
-import { updateCharacter } from '../data.js';
+import { saveCharacter } from '../data.js';
 
 /**
  * Sheet Module
@@ -381,7 +381,7 @@ export const SheetModule = {
         gatherList('#inventory-body', 'inventory.items');
 
         try {
-            await updateCharacter(character.id, updates);
+            await saveCharacter(character.userId, character.systemId, { ...updates, id: character.id });
             // Merge updates
             const updatedChar = { ...character, ...updates };
             this.populateSheet(updatedChar, context);
