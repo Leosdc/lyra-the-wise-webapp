@@ -2912,6 +2912,85 @@ body.delete-mode .card-delete-btn {
     margin-bottom: 1.5rem;
 }
 
+/* --- Modal de Confirmação Customizado --- */
+#confirm-modal {
+    z-index: 3000;
+}
+
+#confirm-modal .modal-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.confirm-box {
+    max-width: 450px !important;
+    text-align: center;
+    padding: 2.5rem !important;
+    animation: confirmPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes confirmPop {
+    from {
+        transform: translate(-50%, -40%) scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.confirm-text {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 2rem;
+    line-height: 1.6;
+    color: var(--ink);
+    font-style: italic;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+#confirm-modal .medieval-btn.secondary {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(44, 30, 22, 0.3);
+    color: var(--ink);
+}
+
+#confirm-modal .medieval-btn.secondary:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+#confirm-modal .medieval-btn {
+    min-width: 120px;
+    transition: all 0.2s ease;
+}
+
+#confirm-modal .medieval-btn:active {
+    transform: scale(0.95);
+}
+
+#confirm-ok-btn {
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+#confirm-ok-btn:hover {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+body.damien-theme .confirm-box {
+    border-color: var(--damien-purple);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.2);
+}
+
+body.damien-theme .confirm-text {
+    color: #e2e8f0;
+}
+
 /* Dark Mode / Damien Theme Adjustments */
 body.damien-theme .hp-box-full {
     background: rgba(147, 51, 234, 0.1);

@@ -117,6 +117,8 @@ export const SYSTEM_TEMPLATES = {
             bonds: "",
             flaws: "",
             appearance: "",
+            mannerisms: "",
+            talents: "",
             languages: "",
             other_proficiencies: "",
             notes: ""

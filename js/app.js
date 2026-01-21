@@ -826,90 +826,76 @@ const app = {
         }
     },
 
-    // --- Actions ---
     async handleWizardFinish() {
         const name = document.getElementById('wiz-name').value.trim();
         const race = document.getElementById('wiz-race').value.trim();
         const className = document.getElementById('wiz-class').value;
 
-        // Validate required fields
-        if (!name) {
-            this.showAlert("O nome do herói é obrigatório!", "Campo Obrigatório");
-            return;
-        }
-        if (!race) {
-            this.showAlert("A raça é obrigatória!", "Campo Obrigatório");
-            return;
-        }
-        if (!className) {
-            this.showAlert("Selecione uma classe!", "Campo Obrigatório");
+        if (!name || !race || !className) {
+            this.showAlert("Nome, Raça e Classe são obrigatórios para a jornada!", "Campos Faltando");
             return;
         }
 
         this.toggleLoading(true);
         try {
+            const { SYSTEM_TEMPLATES } = await import('./constants.js');
+            const template = JSON.parse(JSON.stringify(SYSTEM_TEMPLATES[this.currentSystem] || SYSTEM_TEMPLATES['dnd5e']));
+
+            // Mapping Wizard values to Alfa 2.0 Structure
+            template.bio.name = name;
+            template.bio.race = race;
+            template.bio.class = className;
+            template.bio.background = document.getElementById('wiz-background').value;
+            template.bio.alignment = document.getElementById('wiz-alignment').value;
+            template.bio.level = 1;
+
+            template.attributes.str = parseInt(document.getElementById('wiz-str').value) || 10;
+            template.attributes.dex = parseInt(document.getElementById('wiz-dex').value) || 10;
+            template.attributes.con = parseInt(document.getElementById('wiz-con').value) || 10;
+            template.attributes.int = parseInt(document.getElementById('wiz-int').value) || 10;
+            template.attributes.wis = parseInt(document.getElementById('wiz-wis').value) || 10;
+            template.attributes.cha = parseInt(document.getElementById('wiz-cha').value) || 10;
+
             const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
-            const background = document.getElementById('wiz-background').value;
-            const alignment = document.getElementById('wiz-alignment').value;
-            const speed = document.getElementById('wiz-speed').value;
+            template.proficiencies_choice.skills = skills;
 
-            const basicData = {
-                name: name,
-                secoes: {
-                    basico: {
-                        Nome: name,
-                        Raça: race,
-                        Classe: className,
-                        Antecedente: background,
-                        Alinhamento: alignment,
-                        Nível: 1,
-                        Velocidade: speed
-                    },
-                    atributos: {
-                        Força: document.getElementById('wiz-str').value,
-                        Destreza: document.getElementById('wiz-dex').value,
-                        Constituição: document.getElementById('wiz-con').value,
-                        Inteligência: document.getElementById('wiz-int').value,
-                        Sabedoria: document.getElementById('wiz-wis').value,
-                        Carisma: document.getElementById('wiz-cha').value
-                    },
-                    pericias: skills.reduce((acc, skill) => ({ ...acc, [skill]: "Proficiente" }), {}),
-                    combate: {
-                        HP: 10 + this.calculateModifier(document.getElementById('wiz-con').value),
-                        CA: 10 + this.calculateModifier(document.getElementById('wiz-dex').value),
-                        Iniciativa: this.calculateModifier(document.getElementById('wiz-dex').value)
-                    },
-                    historia: {
-                        Personalidade: document.getElementById('wiz-traits').value,
-                        Ideais: document.getElementById('wiz-ideals').value,
-                        Vínculos: document.getElementById('wiz-bonds').value,
-                        Defeitos: document.getElementById('wiz-flaws').value,
-                        História: document.getElementById('wiz-backstory').value
-                    }
-                }
-            };
+            template.stats.speed = document.getElementById('wiz-speed').value || "9m";
 
-            let finalData = basicData;
+            // Story & Fluff
+            template.story.traits = document.getElementById('wiz-traits').value;
+            template.story.ideals = document.getElementById('wiz-ideals').value;
+            template.story.bonds = document.getElementById('wiz-bonds').value;
+            template.story.flaws = document.getElementById('wiz-flaws').value;
+            template.story.notes = document.getElementById('wiz-backstory').value;
+
+            let finalData = { name: name, ...template };
+
             if (this.creationMode === 'ai') {
                 const idToken = await this.user.getIdToken();
-                // We send the 'crunch' to get the 'fluff'
-                const aiResult = await createCharacterWithLyra(basicData, idToken);
+                const aiResult = await createCharacterWithLyra(finalData, idToken);
                 if (aiResult) {
-                    finalData.secoes.historia = {
-                        Personalidade: aiResult.traits || aiResult.Personalidade || finalData.secoes.historia.Personalidade,
-                        Ideais: aiResult.ideals || aiResult.Ideais || finalData.secoes.historia.Ideais,
-                        Vínculos: aiResult.bonds || aiResult.Vínculos || finalData.secoes.historia.Vínculos,
-                        Defeitos: aiResult.flaws || aiResult.Defeitos || finalData.secoes.historia.Defeitos,
-                        História: aiResult.backstory || aiResult.História || finalData.secoes.historia.História
-                    };
+                    finalData.story.traits = aiResult.traits || aiResult.Personalidade || finalData.story.traits;
+                    finalData.story.ideals = aiResult.ideals || aiResult.Ideais || finalData.story.ideals;
+                    finalData.story.bonds = aiResult.bonds || aiResult.Vínculos || finalData.story.bonds;
+                    finalData.story.flaws = aiResult.flaws || aiResult.Defeitos || finalData.story.flaws;
+                    finalData.story.mannerisms = aiResult.mannerisms || aiResult.Maneirismos || finalData.story.mannerisms;
+                    finalData.story.talents = aiResult.talents || aiResult.Talentos || finalData.story.talents;
+                    finalData.story.notes = aiResult.backstory || aiResult.História || finalData.story.notes;
                 }
             }
+
+            // Run initial calculation to set HP, Save DC, etc.
+            this.calculateDND5eStats(finalData);
+            // Set current HP to max HP initially
+            finalData.stats.hp_current = finalData.stats.hp_max;
 
             await saveCharacter(this.user.uid, this.currentSystem, finalData);
             this.closeModal();
             this.loadCharacters();
+            this.showAlert(`${name} acaba de ser invocado no multiverso!`, "Herói Criado");
         } catch (error) {
-            this.showAlert("Erro ao consagrar herói: " + error.message, "Karma Ruim");
+            console.error("Erro na Wizard:", error);
+            this.showAlert("A convergência falhou: " + error.message, "Erro Místico");
         } finally {
             this.toggleLoading(false);
         }
@@ -1136,7 +1122,12 @@ const app = {
             'trap': 'esta armadilha'
         }[type] || 'este item';
 
-        if (!confirm(`Tem certeza que deseja apagar ${itemTypeLabel}? Esta ação é permanente.`)) return;
+        const confirmed = await this.showConfirm(
+            `Tem certeza que deseja apagar ${itemTypeLabel}? Esta ação é permanente e não poderá ser desfeita nos anais do tempo.`,
+            "Sentença de Apagamento"
+        );
+
+        if (!confirmed) return;
 
         try {
             if (type === 'character') await deleteCharacter(id);
@@ -1668,6 +1659,31 @@ const app = {
         ['fichas-list', 'monsters-list', 'traps-list', 'sessions-list', 'chat-messages'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.innerHTML = '';
+        });
+    },
+
+    showConfirm(message, title = "Aviso do Destino") {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirm-modal');
+            const titleEl = document.getElementById('confirm-title');
+            const msgEl = document.getElementById('confirm-message');
+            const okBtn = document.getElementById('confirm-ok-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+            titleEl.innerText = title;
+            msgEl.innerText = message;
+            modal.classList.remove('hidden');
+
+            const cleanup = (result) => {
+                modal.classList.add('hidden');
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            };
+
+            okBtn.onclick = () => cleanup(true);
+            cancelBtn.onclick = () => cleanup(false);
+            modal.querySelector('.modal-backdrop').onclick = () => cleanup(false);
         });
     },
 

@@ -340,6 +340,19 @@
         </section>
     </main>
 
+    <!-- Menu de Confirmação Customizado -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content medieval-scroll-bg confirm-box">
+            <h2 id="confirm-title" class="scroll-title">Aviso do Destino</h2>
+            <p id="confirm-message" class="confirm-text">Deseja prosseguir com esta ação?</p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-btn" class="medieval-btn secondary">Voltar</button>
+                <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modals & Wizards -->
     <div id="modal-wrapper" class="hidden">
         <div class="modal-backdrop"></div>
@@ -753,6 +766,10 @@
                                         class="medieval-textarea"></textarea></div>
                                 <div class="form-group"><label>Defeitos</label><textarea data-field="story.flaws"
                                         class="medieval-textarea"></textarea></div>
+                                <div class="form-group"><label>Maneirismos</label><textarea
+                                        data-field="story.mannerisms" class="medieval-textarea"></textarea></div>
+                                <div class="form-group"><label>Talento de Interpretação</label><textarea
+                                        data-field="story.talents" class="medieval-textarea"></textarea></div>
                             </div>
                             <div class="chronic-notes">
                                 <h4 class="section-title">Aparência & História</h4>
