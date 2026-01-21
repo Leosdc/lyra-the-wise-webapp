@@ -75,20 +75,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Larger SVG Sword Cursor - 48x48 for better visibility */
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32'%3E%3Cpath d='M4.5 2C3 2 2 3 2 4.5v.5L16 16l1-1L4.5 2z' fill='%23C0C0C0'/%3E%3Cpath d='M16 16l8 8 2-2-8-8-2 2z' fill='%238B4513'/%3E%3Cpath d='M14 18l4-4 2 2-4 4-2-2z' fill='%23FFD700'/%3E%3C/svg%3E") 2 2, auto !important;
-}
-
-button,
-.action-card,
-.nav-btn,
-.medieval-card,
-.medieval-btn,
-select,
-a,
-input,
-textarea {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 32 32'%3E%3Cpath d='M4.5 2C3 2 2 3 2 4.5v.5L16 16l1-1L4.5 2z' fill='%23C0C0C0'/%3E%3Cpath d='M16 16l8 8 2-2-8-8-2 2z' fill='%238B4513'/%3E%3Cpath d='M14 18l4-4 2 2-4 4-2-2z' fill='%23FFD700'/%3E%3C/svg%3E") 2 2, pointer !important;
 }
 
 /* User Profile Actions */
@@ -283,7 +269,7 @@ textarea {
     font-size: 0.85rem;
     padding: 2px 25px 2px 5px;
     cursor: pointer !important;
-    /* Custom medieval arrow */
+    /* Custom medieval arrow - utilizes current text color (gold/amethyst) */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23f1c40f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right center;
@@ -3314,6 +3300,102 @@ body.damien-theme .header-hp-fill {
     background: linear-gradient(90deg, #4c1d95, #9333ea);
 }
 
-body.damien-theme .weight-bar .bar {
-    background: linear-gradient(90deg, #4c1d95, #9333ea);
+
+/* --- Final Polishing & Damien Theme Fixes --- */
+
+/* 1. Scroll Indicators (Explicit Definition) */
+#scroll-up,
+#scroll-down {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--dark-panel);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    z-index: 9000;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    animation: bounce 2s infinite;
+}
+
+#scroll-up {
+    top: 100px;
+}
+
+/* Adjust position as needed, usually below header */
+#scroll-down {
+    bottom: 20px;
+}
+
+#scroll-up.hidden,
+#scroll-down.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 2. Damien Theme - Purple Arrows for Selects */
+body.damien-theme .medieval-select,
+body.damien-theme .wizard-container .medieval-select {
+    /* Amethyst Purple Arrow SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%239b59b6'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+    border-color: var(--gold) !important;
+    /* Ensures purple border */
+}
+
+/* 3. Damien Theme - Eliminate White Lines & Fix Colors */
+body.damien-theme hr {
+    border-color: var(--damien-purple);
+    background: var(--damien-purple);
+}
+
+/* Force dark backgrounds on inputs in Damien mode to prevent white flashes */
+body.damien-theme input,
+body.damien-theme textarea,
+body.damien-theme select {
+    background-color: rgba(20, 0, 35, 0.9) !important;
+    color: #e2e8f0 !important;
+    border-color: var(--damien-purple) !important;
+}
+
+/* Specific fix for borders that might be showing as white/light */
+body.damien-theme .medieval-card,
+body.damien-theme .header-center,
+body.damien-theme .header-dropdown-content {
+    border-color: var(--damien-purple) !important;
+}
+
+/* Fix Scroll Indicators for Damien */
+body.damien-theme #scroll-up,
+body.damien-theme #scroll-down {
+    border-color: var(--damien-purple);
+    color: var(--damien-purple);
+    background: rgba(20, 0, 35, 0.95);
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
 }
