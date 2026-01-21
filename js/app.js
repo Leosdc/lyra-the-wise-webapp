@@ -12,6 +12,7 @@ const app = {
     wizardStep: 1,
     creationMode: 'ai', // 'ai' or 'manual'
     currentCharacter: null,
+    isDamien: false, // Infiltration flag
     rpgTrivia: [
         "Dungeons & Dragons foi criado por Gary Gygax e Dave Arneson em 1974.",
         "O primeiro RPG comercializado foi o D&D original, vindo de um jogo de guerra chamado 'Chainmail'.",
@@ -26,7 +27,6 @@ const app = {
         "O dragão Bahamut é inspirado na mitologia árabe, onde é um peixe gigante que sustenta a Terra.",
         "A primeira edição de D&D vinha em uma modesta caixa de madeira com três livretes.",
         "A 'Gygaxian Naturalism' é o termo para mundos de RPG que funcionam como ecossistemas reais.",
-        "O 'Gamer Gate' original era o nome de uma taverna lendária em uma das primeiras campanhas de Gary.",
         "O primeiro personagem de Gary Gygax foi um mago chamado Mordenkainen.",
         "A TSR (empresa do D&D) quase faliu em 1982 devido a uma linha de agulhas de crochê tematizadas.",
         "Stephen King quase escreveu um suplemento oficial para o sistema GURPS nos anos 80.",
@@ -34,7 +34,36 @@ const app = {
         "Em 'Vampiro: A Máscara', o termo 'Kindred' foi escolhido para soar mais elegante que 'vampiro'.",
         "O sistema 'Pathfinder' surgiu de uma edição de D&D (3.5) que os fãs se recusaram a abandonar.",
         "A revista 'Dragon Magazine' publicou mais de 400 edições de conteúdo oficial de D&D.",
-        "O termo 'Critical Hit' foi introduzido pela primeira vez em um jogo chamado 'Empire of the Petal Throne'."
+        "O termo 'Critical Hit' foi introduzido pela primeira vez em um jogo chamado 'Empire of the Petal Throne'.",
+        "O primeiro cenário de campanha publicado foi Blackmoor, de Dave Arneson.",
+        "O conceito de Pontos de Vida (HP) foi adaptado de jogos navais para simular a resistência de heróis.",
+        "O Mímico foi criado por Gygax para impedir que jogadores saíssem abrindo baús sem checar armadilhas.",
+        "A aventura 'Tumba dos Horrores' foi feita especificamente para desafiar jogadores de níveis muito altos.",
+        "Vin Diesel joga D&D há mais de 30 anos e tem o nome de seu personagem tatuado no peito.",
+        "A cena inicial de 'E.T.: O Extraterrestre' mostra os personagens jogando D&D em casa.",
+        "O termo 'Dungeon Master' é uma marca registrada da Wizards of the Coast.",
+        "A deusa Tiamat, embora baseada na Babilônia, teve sua forma de 5 cabeças inventada para o RPG.",
+        "No início, os jogadores ganhavam experiência (XP) encontrando ouro, e não derrotando monstros.",
+        "A classe Paladino foi inspirada nos Doze Pares de França da literatura medieval.",
+        "O 'D20 System' foi lançado sob uma licença aberta (OGL), permitindo que qualquer um criasse jogos compatíveis.",
+        "A 'Sessão Zero' é considerada a regra não escrita mais importante para alinhar expectativas no grupo.",
+        "A Sanidade foi introduzida como mecânica principal no RPG 'Chamado de Cthulhu' em 1981.",
+        "A maior campanha contínua de RPG do mundo está ativa há mais de 40 anos com o mesmo mestre.",
+        "O RPG brasileiro 'Tormenta' nasceu como um encarte para a revista Dragão Brasil em 1999.",
+        "O d10 é o único dado comum de RPG que não é um sólido platônico regular.",
+        "A primeira tradução oficial de D&D para o português foi lançada pela Grow em 1992.",
+        "Existem dados de RPG feitos de pedras preciosas, metal, ossos e até meteoritos reais.",
+        "O termo 'Tank' veio do RPG de mesa para descrever o personagem que protege o resto do grupo.",
+        "O primeiro RPG de terror foi 'Bunnies & Burrows', onde você jogava com coelhos tentando sobreviver.",
+        "A 'Maldição dos Dados' é a superstição de que dados podem ter 'sorte' ou 'azar' acumulados.",
+        "O sistema GURPS é famoso por ter suplementos tão detalhados que são usados como referência histórica.",
+        "No cenário 'Dark Sun', a magia é tão poderosa que drena a vida das plantas ao redor do conjurador.",
+        "O Alinhamento original de D&D tinha apenas três opções: Ordeiro, Neutro e Caótico.",
+        "A classe Monge foi inspirada nos filmes de artes marciais dos anos 70 que Gygax adorava.",
+        "Muitos nomes em Greyhawk são anagramas dos nomes dos amigos de Gary Gygax.",
+        "O 'X-Card' é uma ferramenta de segurança moderna usada para pular temas sensíveis na mesa.",
+        "O Beholder foi ideia de Terry Kuntz, irmão de um dos jogadores originais de Gary.",
+        "O RPG é hoje reconhecido por psicólogos como uma ferramenta eficaz para desenvolver empatia e socialização."
     ],
     triviaIndex: 0,
 
@@ -42,10 +71,20 @@ const app = {
         console.log("⚔️ Lyra WebApp Initializing...");
         // Applying initial view immediately to prevent flicker
         this.switchView(this.currentView);
+
+        // 10% chance for Damien Kael Easter Egg
+        this.isDamien = Math.random() < 0.1;
+        if (this.isDamien) {
+            document.body.classList.add('damien-theme');
+            console.warn("💀 Damien Kael has infiltrated the system...");
+        }
+
+        initAuth(this.handleAuthStateChange.bind(this));
         this.populateSystems();
-        this.bindEvents();
         this.showRandomTrivia();
-        initAuth((user) => this.handleAuthStateChange(user));
+        this.bindEvents();
+
+        if (this.isDamien) this.applyDamienAssets();
     },
 
     populateSystems() {
@@ -105,19 +144,26 @@ const app = {
 
         const updateText = () => {
             triviaEl.classList.add('fade-out');
-
             setTimeout(() => {
-                this.triviaIndex = (this.triviaIndex + 1) % this.rpgTrivia.length;
-                triviaEl.innerText = this.rpgTrivia[this.triviaIndex];
+                let text = this.rpgTrivia[this.triviaIndex];
+
+                // Damien Rune Conversion
+                if (this.isDamien) {
+                    text = [...text].map(char => {
+                        if (char === ' ') return ' ';
+                        // Random Runic character from Unicode range 0x16A0 - 0x16F0
+                        return String.fromCharCode(0x16A0 + Math.floor(Math.random() * 80));
+                    }).join('');
+                }
+
+                triviaEl.textContent = text;
                 triviaEl.classList.remove('fade-out');
+                this.triviaIndex = (this.triviaIndex + 1) % this.rpgTrivia.length;
             }, 800);
         };
 
-        // Initial set
-        triviaEl.innerText = this.rpgTrivia[this.triviaIndex];
-
-        // Start interval - change every 12 seconds for better reading
-        setInterval(updateText, 12000);
+        updateText();
+        setInterval(updateText, 10000);
     },
 
     bindEvents() {
@@ -608,7 +654,7 @@ const app = {
         // But selectCharacter previously tried to update it. I'll leave it but wrap with check.
         const tokenImg = document.querySelector('.header-char-token');
         if (tokenImg) {
-            tokenImg.src = char.tokenUrl || 'assets/Lyra_Token.png';
+            tokenImg.src = char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
         }
     },
 
@@ -975,7 +1021,7 @@ const app = {
                 const isCurrent = this.currentCharacter?.id === char.id;
                 return `
                     <div class="char-switcher-item ${isCurrent ? 'active' : ''}" data-char-id="${char.id}">
-                        <img src="${char.tokenUrl || 'assets/Lyra_Token.png'}" class="switcher-token" alt="">
+                        <img src="${char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png')}" class="switcher-token" alt="">
                         <div class="switcher-info">
                             <strong>${char.name || b.Nome || 'Sem Nome'}</strong>
                             <span>${b.Raça || '?'} ${b.Classe || '?'} (Nív ${b.Nível || 1})</span>
@@ -1131,7 +1177,7 @@ const app = {
         // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
         document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} • Nível ${b.Nível || 1}`;
-        document.getElementById('sheet-token').src = char.tokenUrl || 'assets/Lyra_Token.png';
+        document.getElementById('sheet-token').src = char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
         document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
         document.getElementById('sheet-hp-max').innerText = comb.HP_Max || comb.HP || 10;
         document.getElementById('sheet-ca').innerText = comb.CA || 10;
@@ -1306,7 +1352,7 @@ const app = {
 
                 if (isNum && val.startsWith('+')) val = val.substring(1);
 
-                if (field.includes('atributos') || field.includes('CA') || field.includes('Vida') || field.includes('Iniciativa') || field.includes('HP') || field.includes('XP')) {
+                if ((field.includes('atributos') || field.includes('CA') || field.includes('Vida') || field.includes('Iniciativa') || field.includes('HP') || field.includes('XP')) && !field.includes('Dados_Vida')) {
                     el.innerHTML = `
                         <div class="attribute-control">
                             <button class="spinner-btn minus"><i class="fas fa-minus"></i></button>
@@ -1548,7 +1594,28 @@ const app = {
     },
 
     // PDF Export
-    async exportPDF() { alert("Abrindo portal de exportação no EC2..."); }
+    async exportPDF() { alert("Abrindo portal de exportação no EC2..."); },
+
+    // Damien Assets Infiltration
+    applyDamienAssets() {
+        // Logo
+        const logo = document.querySelector('.header-logo');
+        if (logo) logo.src = 'assets/Damien_logo.png';
+
+        // Hero Image
+        const lyraImg = document.querySelector('.hero-lyra');
+        if (lyraImg) lyraImg.src = 'assets/Damien_Kael.png';
+
+        // Scroll Title (change text)
+        const scrollTitle = document.querySelector('.scroll-title');
+        if (scrollTitle) scrollTitle.textContent = "Sussurros do Abismo";
+
+        // Default Character sheet token
+        const sheetToken = document.getElementById('sheet-token');
+        if (sheetToken && sheetToken.src.includes('Lyra_Token.png')) {
+            sheetToken.src = 'assets/Damien_Token.png';
+        }
+    }
 };
 
 window.app = app;

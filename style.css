@@ -24,6 +24,47 @@
     --border-medieval: 2px solid var(--gold);
 }
 
+/* Damien Kael Easter Egg Theme */
+.damien-theme {
+    --gold: #9b59b6;
+    /* Amethyst */
+    --gold-bright: #d185f5;
+    --dark-charcoal: #0d0012;
+    --dark-panel: rgba(20, 0, 35, 0.9);
+    --parchment: #e6dbf1;
+    --ink: #2a0035;
+    --crimson: #4b0082;
+    /* Indigo */
+    --glass: rgba(155, 89, 182, 0.05);
+}
+
+.damien-theme.medieval-theme {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
+        url('assets/Animação_Damien.gif') !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    min-height: 100vh !important;
+}
+
+.damien-theme .scroll-paper {
+    background: radial-gradient(circle at center, #d8b4fe 0%, #b088f9 100%);
+    border: 3px double #9b59b6;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+
+.damien-theme .scroll-title {
+    color: #4b0082;
+    font-family: 'Grenze Gotisch', serif;
+    letter-spacing: 4px;
+}
+
+.damien-theme #rpg-trivia {
+    color: #2a0035;
+    font-size: 1.4rem;
+}
+
 * {
     margin: 0;
     padding: 0;
