@@ -1467,6 +1467,17 @@ const app = {
         }
     },
 
+    getNestedValue(obj, path) {
+        if (!path) return undefined;
+        const parts = path.split('.');
+        let current = obj;
+        for (const part of parts) {
+            if (current === undefined || current === null) return undefined;
+            current = current[part];
+        }
+        return current;
+    },
+
     setNestedValue(obj, path, value) {
         const parts = path.split('.');
         let current = obj;
