@@ -149,62 +149,98 @@
 
 /* Custom Cursors Application */
 .cursor-sword-gold,
-.cursor-sword-gold * {
+.cursor-sword-gold *,
+.cursor-sword-gold a,
+.cursor-sword-gold button,
+.cursor-sword-gold .nav-btn {
     cursor: url('assets/cursors/sword_gold.png') 0 0, auto !important;
 }
 
 .cursor-sword-silver,
-.cursor-sword-silver * {
+.cursor-sword-silver *,
+.cursor-sword-silver a,
+.cursor-sword-silver button,
+.cursor-sword-silver .nav-btn {
     cursor: url('assets/cursors/sword_silver.png') 0 0, auto !important;
 }
 
 .cursor-sword-crimson,
-.cursor-sword-crimson * {
+.cursor-sword-crimson *,
+.cursor-sword-crimson a,
+.cursor-sword-crimson button,
+.cursor-sword-crimson .nav-btn {
     cursor: url('assets/cursors/sword_crimson.png') 0 0, auto !important;
 }
 
 .cursor-sword-shadow,
-.cursor-sword-shadow * {
+.cursor-sword-shadow *,
+.cursor-sword-shadow a,
+.cursor-sword-shadow button,
+.cursor-sword-shadow .nav-btn {
     cursor: url('assets/cursors/sword_shadow.png') 0 0, auto !important;
 }
 
 .cursor-sword-emerald,
-.cursor-sword-emerald * {
+.cursor-sword-emerald *,
+.cursor-sword-emerald a,
+.cursor-sword-emerald button,
+.cursor-sword-emerald .nav-btn {
     cursor: url('assets/cursors/sword_emerald.png') 0 0, auto !important;
 }
 
 .cursor-staff-crystal,
-.cursor-staff-crystal * {
+.cursor-staff-crystal *,
+.cursor-staff-crystal a,
+.cursor-staff-crystal button,
+.cursor-staff-crystal .nav-btn {
     cursor: url('assets/cursors/staff_crystal.png') 0 0, auto !important;
 }
 
 .cursor-staff-sunlight,
-.cursor-staff-sunlight * {
+.cursor-staff-sunlight *,
+.cursor-staff-sunlight a,
+.cursor-staff-sunlight button,
+.cursor-staff-sunlight .nav-btn {
     cursor: url('assets/cursors/staff_sunlight.png') 0 0, auto !important;
 }
 
 .cursor-staff-lunar,
-.cursor-staff-lunar * {
+.cursor-staff-lunar *,
+.cursor-staff-lunar a,
+.cursor-staff-lunar button,
+.cursor-staff-lunar .nav-btn {
     cursor: url('assets/cursors/staff_lunar.png') 0 0, auto !important;
 }
 
 .cursor-staff-shadow,
-.cursor-staff-shadow * {
+.cursor-staff-shadow *,
+.cursor-staff-shadow a,
+.cursor-staff-shadow button,
+.cursor-staff-shadow .nav-btn {
     cursor: url('assets/cursors/staff_shadow.png') 0 0, auto !important;
 }
 
 .cursor-staff-emerald,
-.cursor-staff-emerald * {
+.cursor-staff-emerald *,
+.cursor-staff-emerald a,
+.cursor-staff-emerald button,
+.cursor-staff-emerald .nav-btn {
     cursor: url('assets/cursors/staff_emerald.png') 0 0, auto !important;
 }
 
 .cursor-potion-red,
-.cursor-potion-red * {
+.cursor-potion-red *,
+.cursor-potion-red a,
+.cursor-potion-red button,
+.cursor-potion-red .nav-btn {
     cursor: url('assets/cursors/potion_red.png') 0 0, auto !important;
 }
 
 .cursor-potion-blue,
-.cursor-potion-blue * {
+.cursor-potion-blue *,
+.cursor-potion-blue a,
+.cursor-potion-blue button,
+.cursor-potion-blue .nav-btn {
     cursor: url('assets/cursors/potion_blue.png') 0 0, auto !important;
 }
 
@@ -3368,7 +3404,8 @@ body.damien-theme select {
 /* Specific fix for borders that might be showing as white/light */
 body.damien-theme .medieval-card,
 body.damien-theme .header-center,
-body.damien-theme .header-dropdown-content {
+body.damien-theme .header-dropdown-content,
+body.damien-theme .app-header {
     border-color: var(--damien-purple) !important;
 }
 

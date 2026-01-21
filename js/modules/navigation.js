@@ -184,22 +184,32 @@ export const NavigationModule = {
 
         tracker?.classList.remove('hidden');
         const isDamien = localStorage.getItem('lyra_theme') === 'damien';
-        document.getElementById('header-token').src = char.tokenUrl || (isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
-        document.getElementById('header-name').innerText = char.name || char.bio?.name || 'Sem Nome';
+
+        const tokenEl = document.getElementById('header-token');
+        if (tokenEl) tokenEl.src = char.tokenUrl || (isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
+
+        const nameEl = document.getElementById('header-name');
+        if (nameEl) nameEl.innerText = char.name || char.bio?.name || 'Sem Nome';
 
         const level = char.bio?.level || char.secoes?.basico?.Nível || 1;
         const race = char.bio?.race || char.secoes?.basico?.Raça || 'Raça?';
         const clazz = char.bio?.class || char.secoes?.basico?.Classe || 'Classe?';
 
-        document.getElementById('header-info').innerText = `${race} ${clazz} (Nív ${level})`;
+        const infoEl = document.getElementById('header-info');
+        if (infoEl) infoEl.innerText = `${race} ${clazz} (Nív ${level})`;
 
         const hpCurr = char.stats?.hp_current ?? char.secoes?.combate?.HP ?? 10;
         const hpMax = char.stats?.hp_max ?? char.secoes?.combate?.HP_Max ?? 10;
         const ac = char.stats?.ac ?? char.secoes?.combate?.CA ?? 10;
 
-        document.getElementById('header-hp-bar').style.width = `${Math.min((hpCurr / hpMax) * 100, 100)}%`;
-        document.getElementById('header-hp-text').innerText = `${hpCurr}/${hpMax}`;
-        document.getElementById('header-ac-val').innerText = ac;
+        const hpBar = document.getElementById('header-hp-bar');
+        if (hpBar) hpBar.style.width = `${Math.min((hpCurr / hpMax) * 100, 100)}%`;
+
+        const hpText = document.getElementById('header-hp-text');
+        if (hpText) hpText.innerText = `${hpCurr}/${hpMax}`;
+
+        const acVal = document.getElementById('header-ac-val');
+        if (acVal) acVal.innerText = ac;
     },
 
     // --- Scroll Indicators ---

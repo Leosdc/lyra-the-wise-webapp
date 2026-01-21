@@ -120,10 +120,10 @@ export const SheetModule = {
                 const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
                 const val = mods[`${s.id}Mod`] + (isProf ? mods.profBonus : 0);
                 return `
-                    <div class="prof-item">
-                        <span class="prof-indicator prof-toggle ${isProf ? 'active' : ''}" data-type="saves" data-field="${s.id}"></span>
-                        <span class="prof-label">${s.l}</span>
-                        <span class="prof-val">${val >= 0 ? `+${val}` : val}</span>
+                    <div class="save-item ${isProf ? 'proficient' : ''}">
+                        <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: pointer;" data-type="saves" data-field="${s.id}"></i>
+                        <span>${s.l}</span>
+                        <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
                     </div>
                 `;
             }).join('');
@@ -153,10 +153,10 @@ export const SheetModule = {
                 const val = mods[`${attr}Mod`] + (isProf ? mods.profBonus : 0) + (isExpert ? mods.profBonus : 0);
 
                 return `
-                    <div class="prof-item">
-                        <span class="prof-indicator prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" data-type="skills" data-field="${sk.id}"></span>
-                        <span class="prof-label">${sk.l}</span>
-                        <span class="prof-val">${val >= 0 ? `+${val}` : val}</span>
+                    <div class="skill-item ${isProf ? 'proficient' : ''}">
+                        <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" style="font-size: 0.5rem; color: ${isProf || isExpert ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf || isExpert ? 1 : 0.3}; cursor: pointer;" data-type="skills" data-field="${sk.id}"></i>
+                        <span>${sk.l}</span>
+                        <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
                     </div>
                 `;
             }).join('');
