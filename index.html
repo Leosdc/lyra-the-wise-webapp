@@ -622,10 +622,16 @@
                             <div class="combat-top-row">
                                 <div class="death-saves">
                                     <span>Salva-Vidas contra Morte</span>
-                                    <div class="death-row">Sucessos <input type="checkbox" id="death-s1"> <input
-                                            type="checkbox" id="death-s2"> <input type="checkbox" id="death-s3"></div>
-                                    <div class="death-row">Fracassos <input type="checkbox" id="death-f1"> <input
-                                            type="checkbox" id="death-f2"> <input type="checkbox" id="death-f3"></div>
+                                    <div class="death-row successes">Sucessos
+                                        <input type="checkbox" id="death-s1" data-field="combate.Morte_S1">
+                                        <input type="checkbox" id="death-s2" data-field="combate.Morte_S2">
+                                        <input type="checkbox" id="death-s3" data-field="combate.Morte_S3">
+                                    </div>
+                                    <div class="death-row failures">Fracassos
+                                        <input type="checkbox" id="death-f1" data-field="combate.Morte_F1">
+                                        <input type="checkbox" id="death-f2" data-field="combate.Morte_F2">
+                                        <input type="checkbox" id="death-f3" data-field="combate.Morte_F3">
+                                    </div>
                                 </div>
                                 <div class="hit-dice-box">
                                     <span>Dados de Vida</span>

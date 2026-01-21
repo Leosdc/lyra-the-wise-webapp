@@ -600,7 +600,8 @@ const app = {
 
         document.getElementById('header-char-name').textContent = char.name || b.Nome || 'Sem Nome';
         document.getElementById('header-char-level').textContent = `Nível ${b.Nível || 1}`;
-        document.getElementById('header-char-stats').textContent = `PV: ${comb.HP || 10}/${comb.HP_Max || comb.HP || 10} | CA: ${comb.CA || 10}`;
+        const statsEl = document.getElementById('header-char-stats');
+        if (statsEl) statsEl.style.display = 'none';
 
         // Update token if available index.html uses header-char-token? No, I should check.
         // Actually, looking at index.html, there is no token in the header tracker yet.
@@ -1129,7 +1130,7 @@ const app = {
 
         // Geral
         document.getElementById('sheet-char-name').innerText = char.name || b.Nome || 'Sem Nome';
-        document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} (Nível ${b.Nível || 1})`;
+        document.getElementById('sheet-char-info').innerText = `${b.Raça || '?'} • ${b.Classe || '?'} • Nível ${b.Nível || 1}`;
         document.getElementById('sheet-token').src = char.tokenUrl || 'assets/Lyra_Token.png';
         document.getElementById('sheet-hp-curr').innerText = comb.HP || 10;
         document.getElementById('sheet-hp-max').innerText = comb.HP_Max || comb.HP || 10;
@@ -1237,8 +1238,11 @@ const app = {
 
         // Combate (Saves e Hit Dice)
         document.getElementById('sheet-hit-dice').innerText = comb.Dados_Vida || "1d8";
-        // Death saves reset
-        document.querySelectorAll('.death-row input').forEach(i => i.checked = false);
+        // Death saves loading
+        document.querySelectorAll('.death-row input[data-field]').forEach(i => {
+            const val = this.getNestedValue(char.secoes, i.dataset.field);
+            i.checked = !!val;
+        });
 
         // Recursos & Inventário
         document.getElementById('sheet-features').innerText = rec.Habilidades || "Nenhuma habilidade registrada.";
@@ -1287,6 +1291,9 @@ const app = {
         document.getElementById('save-sheet-btn').classList.toggle('hidden', !enable);
         document.getElementById('add-attack-btn')?.classList.toggle('hidden', !enable);
 
+        // Control static inputs (like death saves)
+        sheet.querySelectorAll('.death-saves input').forEach(i => i.disabled = !enable);
+
         if (enable) {
             this.characterBackup = JSON.parse(JSON.stringify(this.currentCharacter));
 
@@ -1298,13 +1305,29 @@ const app = {
                 const isNum = isStrictNum || field.includes('HP') || field.includes('CA') || field.includes('XP');
 
                 if (isNum && val.startsWith('+')) val = val.substring(1);
-                el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
 
-                if (field.includes('atributos')) {
-                    el.querySelector('input').addEventListener('input', (e) => {
+                if (field.includes('atributos') || field.includes('CA') || field.includes('Vida') || field.includes('Iniciativa') || field.includes('HP') || field.includes('XP')) {
+                    el.innerHTML = `
+                        <div class="attribute-control">
+                            <button class="spinner-btn minus"><i class="fas fa-minus"></i></button>
+                            <input type="number" value="${val}" data-field="${field}">
+                            <button class="spinner-btn plus"><i class="fas fa-plus"></i></button>
+                        </div>
+                    `;
+                    const input = el.querySelector('input');
+                    const btnMinus = el.querySelector('.minus');
+                    const btnPlus = el.querySelector('.plus');
+
+                    const updateScore = () => {
                         const scoreMod = el.parentElement.querySelector('.score-mod');
-                        if (scoreMod) scoreMod.innerText = this.formatModifier(e.target.value);
-                    });
+                        if (scoreMod) scoreMod.innerText = this.formatModifier(input.value);
+                    };
+
+                    input.addEventListener('input', updateScore);
+                    btnMinus.onclick = () => { input.value = parseInt(input.value) - 1; updateScore(); };
+                    btnPlus.onclick = () => { input.value = parseInt(input.value) + 1; updateScore(); };
+                } else {
+                    el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
                 }
             });
 
@@ -1396,8 +1419,12 @@ const app = {
                 let val;
 
                 if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    val = el.value;
-                    if (el.type === 'number') val = parseInt(val) || 0;
+                    if (el.type === 'checkbox') {
+                        val = el.checked;
+                    } else {
+                        val = el.value;
+                        if (el.type === 'number') val = parseInt(val) || 0;
+                    }
                 } else if (el.classList.contains('editable-toggle')) {
                     val = el.classList.contains('fas'); // Boolean for toggles
                 } else {
