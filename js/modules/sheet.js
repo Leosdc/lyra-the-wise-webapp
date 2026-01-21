@@ -178,11 +178,13 @@ export const SheetModule = {
 
         // Death Saves
         const ds = char.death_saves || { successes: 0, failures: 0 };
+        const succ = parseInt(ds.successes) || 0;
+        const fail = parseInt(ds.failures) || 0;
         for (let i = 1; i <= 3; i++) {
             const sEl = document.getElementById(`death-s${i}`);
             const fEl = document.getElementById(`death-f${i}`);
-            if (sEl) sEl.checked = ds.successes >= i;
-            if (fEl) fEl.checked = ds.failures >= i;
+            if (sEl) sEl.checked = succ >= i;
+            if (fEl) fEl.checked = fail >= i;
         }
 
         // Inventory Tab

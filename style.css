@@ -2693,15 +2693,21 @@ body.damien-theme .item-desc-input {
 
 /* Lyra's Guidance System (Wizard) */
 .lyra-guidance-container {
-    position: absolute;
-    bottom: -20px;
-    right: -40px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     display: flex;
     align-items: flex-end;
     gap: 15px;
-    z-index: 100;
+    z-index: 10000;
     pointer-events: none;
+    /* Let clicks pass through if not on bubble */
     animation: guidanceReveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.lyra-guidance-container * {
+    pointer-events: auto;
+    /* Re-enable clicks on children */
 }
 
 @keyframes guidanceReveal {
@@ -2741,6 +2747,7 @@ body.damien-theme .item-desc-input {
     margin: 0;
     font-style: italic;
     color: var(--ink);
+    font-family: 'Cinzel', serif;
 }
 
 .bubble-tail {
@@ -2753,6 +2760,48 @@ body.damien-theme .item-desc-input {
     border-left: 1px solid var(--gold);
     border-bottom: 1px solid var(--gold);
     transform: rotate(45deg);
+}
+
+/* Missing Modal Styles */
+.medieval-modal {
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-box {
+    text-align: center;
+}
+
+.confirm-text {
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 1.5rem 0 2rem 0;
+    line-height: 1.6;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Deletion State Visual Cues */
