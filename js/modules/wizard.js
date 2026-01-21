@@ -160,19 +160,26 @@ export const WizardModule = {
                 const aiResult = await createCharacterWithLyra(finalData, idToken);
                 if (aiResult) {
                     // Merge AI results
-                    ['traits', 'ideals', 'bonds', 'flaws', 'mannerisms', 'talents', 'notes'].forEach(k => {
-                        const aiKey = k === 'notes' ? 'backstory' : k; // Map notes to backstory
-                        // TODO: Robust mapping for AI keys (Portuguese/English)
-                        if (aiResult[k]) finalData.story[k] = aiResult[k];
+                    const fieldMap = {
+                        traits: ['traits', 'Personalidade', 'Tracos'],
+                        ideals: ['ideals', 'Ideais'],
+                        bonds: ['bonds', 'Vínculos', 'Vinculos'],
+                        flaws: ['flaws', 'Defeitos'],
+                        mannerisms: ['mannerisms', 'Maneirismos'],
+                        talents: ['talents', 'Talentos'],
+                        appearance: ['appearance', 'Aparência', 'Aparencia'],
+                        backstory: ['backstory', 'História', 'Historia', 'background'],
+                        notes: ['notes', 'História', 'Historia']
+                    };
+
+                    Object.keys(fieldMap).forEach(key => {
+                        const possibleKeys = fieldMap[key];
+                        const foundKey = possibleKeys.find(pk => aiResult[pk]);
+                        if (foundKey) {
+                            finalData.story[key] = aiResult[foundKey];
+                            if (key === 'backstory') finalData.story.notes = aiResult[foundKey];
+                        }
                     });
-                    // Fallback for AI Portuguese keys
-                    if (aiResult.Personalidade) finalData.story.traits = aiResult.Personalidade;
-                    if (aiResult.Ideais) finalData.story.ideals = aiResult.Ideais;
-                    if (aiResult.Vínculos) finalData.story.bonds = aiResult.Vínculos;
-                    if (aiResult.Defeitos) finalData.story.flaws = aiResult.Defeitos;
-                    if (aiResult.Maneirismos) finalData.story.mannerisms = aiResult.Maneirismos;
-                    if (aiResult.Talentos) finalData.story.talents = aiResult.Talentos;
-                    if (aiResult.História) finalData.story.notes = aiResult.História;
                 }
             }
 

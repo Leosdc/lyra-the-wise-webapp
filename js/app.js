@@ -234,9 +234,20 @@ const app = {
 
         if (user) {
             NavigationModule.switchView(this.currentView, this.getNavigationLoaders());
-            if (this.currentCharacter) {
-                NavigationModule.updateHeaderTracker(this.currentCharacter, this.isDamien);
+
+            // Restore character from persistence
+            const savedChatId = localStorage.getItem(`lyra_char_${user.uid}_${this.currentSystem}`);
+            if (savedChatId) {
+                getCharacter(savedChatId).then(char => {
+                    if (char) this.selectCharacter(char);
+                });
+            } else {
+                // Auto-select first if none saved
+                getCharacters(user.uid, this.currentSystem).then(chars => {
+                    if (chars.length > 0) this.selectCharacter(chars[0]);
+                });
             }
+
             this.populateCharSwitcher();
         } else {
             NavigationModule.switchView('dashboard', this.getNavigationLoaders());
@@ -244,7 +255,6 @@ const app = {
     },
 
     switchView(viewId) {
-        // Logic for handling views
         if (viewId === 'dashboard') {
             // Dashboard is always accessible
         } else if (!this.user) {
@@ -252,6 +262,7 @@ const app = {
             return;
         }
 
+        this.currentView = viewId;
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
     },
 
@@ -307,13 +318,20 @@ const app = {
     },
 
     selectCharacter(char) {
+        if (!char) {
+            this.currentCharacter = null;
+            NavigationModule.updateHeaderTracker(null, this.isDamien);
+            return;
+        }
         this.currentCharacter = char;
         NavigationModule.updateHeaderTracker(char, this.isDamien);
         this.isDeleteMode = false;
-        // Also persist selection
-        if (this.currentSystem) localStorage.setItem(`lyra_char_${this.currentSystem}`, char.id);
 
-        // Re-populate switcher to update active state
+        // Persist with User UID to avoid cross-user issues
+        if (this.user) {
+            localStorage.setItem(`lyra_char_${this.user.uid}_${this.currentSystem}`, char.id);
+        }
+
         this.populateCharSwitcher();
     },
 
@@ -538,6 +556,12 @@ const app = {
                 }
             }
         });
+
+        // Chat Navigation
+        const chatCloseBtn = document.getElementById('chat-close-btn');
+        if (chatCloseBtn) {
+            chatCloseBtn.addEventListener('click', () => this.switchView('dashboard'));
+        }
 
         // Navigation
         document.querySelectorAll('.nav-btn, .action-card').forEach(btn => {

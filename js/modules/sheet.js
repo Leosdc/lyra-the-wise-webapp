@@ -245,8 +245,10 @@ export const SheetModule = {
         const chronicSection = document.getElementById('sheet-historia');
         if (chronicSection) {
             chronicSection.querySelectorAll('textarea').forEach(txt => {
-                const field = txt.dataset.field.split('.').pop();
+                const parts = txt.dataset.field.split('.');
+                const field = parts.length > 1 ? parts[1] : parts[0];
                 txt.value = story[field] || "";
+                txt.readOnly = true; // Lock by default
             });
         }
     },
