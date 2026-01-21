@@ -173,62 +173,62 @@ textarea {
 /* Custom Cursors Application */
 .cursor-sword-gold,
 .cursor-sword-gold * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_gold_1768971092688.png') 0 0, auto !important;
+    cursor: url('assets/cursors/sword_gold.png') 0 0, auto !important;
 }
 
 .cursor-sword-silver,
 .cursor-sword-silver * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_silver_1768971106313.png') 0 0, auto !important;
+    cursor: url('assets/cursors/sword_silver.png') 0 0, auto !important;
 }
 
 .cursor-sword-crimson,
 .cursor-sword-crimson * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_crimson_1768971119712.png') 0 0, auto !important;
+    cursor: url('assets/cursors/sword_crimson.png') 0 0, auto !important;
 }
 
 .cursor-sword-shadow,
 .cursor-sword-shadow * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_shadow_1768971133849.png') 0 0, auto !important;
+    cursor: url('assets/cursors/sword_shadow.png') 0 0, auto !important;
 }
 
 .cursor-sword-emerald,
 .cursor-sword-emerald * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_sword_emerald_1768971146995.png') 0 0, auto !important;
+    cursor: url('assets/cursors/sword_emerald.png') 0 0, auto !important;
 }
 
 .cursor-staff-crystal,
 .cursor-staff-crystal * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_crystal_1768971160123.png') 0 0, auto !important;
+    cursor: url('assets/cursors/staff_crystal.png') 0 0, auto !important;
 }
 
 .cursor-staff-sunlight,
 .cursor-staff-sunlight * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_sunlight_1768971174166.png') 0 0, auto !important;
+    cursor: url('assets/cursors/staff_sunlight.png') 0 0, auto !important;
 }
 
 .cursor-staff-lunar,
 .cursor-staff-lunar * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_lunar_1768971187426.png') 0 0, auto !important;
+    cursor: url('assets/cursors/staff_lunar.png') 0 0, auto !important;
 }
 
 .cursor-staff-shadow,
 .cursor-staff-shadow * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_shadow_1768971460663.png') 0 0, auto !important;
+    cursor: url('assets/cursors/staff_shadow.png') 0 0, auto !important;
 }
 
 .cursor-staff-emerald,
 .cursor-staff-emerald * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_staff_emerald_nature_1768971473975.png') 0 0, auto !important;
+    cursor: url('assets/cursors/staff_emerald.png') 0 0, auto !important;
 }
 
 .cursor-potion-red,
 .cursor-potion-red * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_potion_red_1768971199083.png') 0 0, auto !important;
+    cursor: url('assets/cursors/potion_red.png') 0 0, auto !important;
 }
 
 .cursor-potion-blue,
 .cursor-potion-blue * {
-    cursor: url('C:/Users/PC/.gemini/antigravity/brain/a148fb58-cdfd-46c0-ac1c-0201dd71c0e1/cursor_potion_blue_1768971212299.png') 0 0, auto !important;
+    cursor: url('assets/cursors/potion_blue.png') 0 0, auto !important;
 }
 
 /* Ultra-Thin Medieval Scrollbar */
@@ -507,6 +507,8 @@ h4,
     position: sticky;
     top: 0;
     z-index: 1000;
+    /* Ensure token can overflow visibly if needed, but not cut by viewport */
+    overflow: visible;
 }
 
 .header-content {
@@ -3183,12 +3185,22 @@ body.damien-theme .hp-input {
     backdrop-filter: blur(5px);
 }
 
+.header-token-wrapper {
+    position: relative;
+    /* Move token down slightly to avoid cutting at viewport top */
+    margin-top: 10px;
+    z-index: 1001;
+}
+
 .header-token-wrapper img {
-    width: 45px;
-    height: 45px;
+    width: 60px;
+    /* Making it a bit larger and more prominent */
+    height: 60px;
     border-radius: 50%;
-    border: 2px solid var(--gold);
+    border: 3px solid var(--gold);
     object-fit: cover;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    background: var(--dark-charcoal);
 }
 
 .tracker-info {
