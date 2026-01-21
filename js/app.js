@@ -44,6 +44,7 @@ const app = {
         this.populateSystems();
         this.showRandomTrivia();
         this.bindEvents();
+        this.initMusicPlayer();
 
         // Start Trivia Rotation
         setInterval(() => this.showRandomTrivia(), 15000);
@@ -129,8 +130,8 @@ const app = {
 
             list.innerHTML = characters.map(char => {
                 const isCurrent = this.currentCharacter?.id === char.id;
-                const race = char.bio?.race || char.secoes?.basico?.Raça || 'Raça?';
-                const clazz = char.bio?.class || char.secoes?.basico?.Classe || 'Classe?';
+                const race = char.bio?.race || char.secoes?.basico?.Raça || '-';
+                const clazz = char.bio?.class || char.secoes?.basico?.Classe || '-';
                 const level = char.bio?.level || char.secoes?.basico?.Nível || 1;
 
                 return `
@@ -139,7 +140,7 @@ const app = {
                             <img src="${char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png')}" alt="Token" class="switcher-token">
                             <div class="switcher-info">
                                 <strong>${char.name || char.bio?.name || 'Sem Nome'}</strong>
-                                <span>${race} ${clazz} (Nív ${level})</span>
+                                <span>${race || '-'} | ${clazz || '-'} (Nív ${level})</span>
                             </div>
                         </div>
                     </div>
@@ -476,6 +477,58 @@ const app = {
         }
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
+    },
+
+    initMusicPlayer() {
+        const player = document.getElementById('mystic-player');
+        const audio = document.getElementById('lyra-bg-music');
+        const playBtn = document.getElementById('btn-play-pause');
+        const volumeSlider = document.getElementById('player-volume');
+        const progressBar = document.getElementById('player-progress-bar');
+        const orb = player?.querySelector('.player-orb');
+        const minimize = player?.querySelector('.player-minimize');
+
+        if (!player || !audio) return;
+
+        // Toggle Expand/Collapse
+        orb.onclick = () => player.classList.toggle('collapsed');
+        minimize.onclick = (e) => {
+            e.stopPropagation();
+            player.classList.add('collapsed');
+        };
+
+        // Play/Pause
+        playBtn.onclick = () => {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                player.classList.add('playing');
+            } else {
+                audio.pause();
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                player.classList.remove('playing');
+            }
+        };
+
+        // Volume
+        volumeSlider.oninput = (e) => {
+            audio.volume = e.target.value;
+        };
+
+        // Progress Tracking
+        audio.ontimeupdate = () => {
+            if (audio.duration) {
+                const pct = (audio.currentTime / audio.duration) * 100;
+                if (progressBar) progressBar.style.width = pct + '%';
+            }
+        };
+
+        // Handle browser autoplay policies (Play on first user interaction if needed)
+        // document.addEventListener('click', () => {
+        //     if (audio.paused && !player.classList.contains('manually-paused')) {
+        //         audio.play().catch(() => {});
+        //     }
+        // }, { once: true });
     },
 
     toggleDamienMode(enable) {

@@ -288,7 +288,7 @@ export const SheetModule = {
             if (alignmentEl) {
                 const current = alignmentEl.innerText;
                 alignmentEl.innerHTML = `
-                    <select data-field="bio.alignment" class="wizard-select small">
+                    <select data-field="bio.alignment" class="medieval-select">
                         <option value="Leal e Bom" ${current === 'Leal e Bom' ? 'selected' : ''}>Leal e Bom</option>
                         <option value="Neutro e Bom" ${current === 'Neutro e Bom' ? 'selected' : ''}>Neutro e Bom</option>
                         <option value="Caótico e Bom" ${current === 'Caótico e Bom' ? 'selected' : ''}>Caótico e Bom</option>

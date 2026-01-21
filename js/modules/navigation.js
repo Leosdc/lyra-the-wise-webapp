@@ -62,7 +62,10 @@ export const NavigationModule = {
         let tokenHtml = "";
 
         if (type === 'character') {
-            subtitle = `${item.secoes?.basico?.Raça || ''} ${item.secoes?.basico?.Classe || ''} (Nív ${item.secoes?.basico?.Nível || 1})`;
+            const race = item.bio?.race || item.secoes?.basico?.Raça || '-';
+            const clazz = item.bio?.class || item.secoes?.basico?.Classe || '-';
+            const level = item.bio?.level || item.secoes?.basico?.Nível || 1;
+            subtitle = `${race} | ${clazz} (Nív ${level})`;
             if (item.tokenUrl) tokenHtml = `<img src="${item.tokenUrl}" class="card-token" alt="Token">`;
         }
         if (type === 'monster') subtitle = `${item.secoes?.Tipo || ''} (ND ${item.secoes?.ND || '?'})`;
@@ -236,6 +239,14 @@ export const NavigationModule = {
 
         const acVal = document.getElementById('header-ac-val');
         if (acVal) acVal.innerText = ac;
+
+        const ini = char.stats?.initiative ?? 0;
+        const iniVal = document.getElementById('header-ini-val');
+        if (iniVal) iniVal.innerText = (ini >= 0 ? '+' : '') + ini;
+
+        const prof = char.stats?.proficiency_bonus ?? 2;
+        const profVal = document.getElementById('header-prof-val');
+        if (profVal) profVal.innerText = (prof >= 0 ? '+' : '') + prof;
     },
 
     updateScrollIndicators() {

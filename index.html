@@ -90,14 +90,24 @@
                         <span id="header-info" class="header-sub">Raça Classe (Nív 1)</span>
                     </div>
                     <div class="header-stats-row">
-                        <div class="header-hp-container">
+                        <div class="header-hp-container" title="Pontos de Vida">
                             <div id="header-hp-bar" class="header-hp-fill"></div>
                             <span id="header-hp-text">10/10</span>
                         </div>
-                        <div class="header-ac-badge" title="Classe de Armadura">
+                        <div class="header-stat-badge" title="Iniciativa">
+                            <i class="fas fa-bolt"></i>
+                            <span class="label">INI</span>
+                            <span id="header-ini-val">+0</span>
+                        </div>
+                        <div class="header-stat-badge" title="Classe de Armadura">
                             <i class="fas fa-shield-halved"></i>
                             <span class="label">CA</span>
                             <span id="header-ac-val">10</span>
+                        </div>
+                        <div class="header-stat-badge" title="Bônus de Proficiência">
+                            <i class="fas fa-scroll"></i>
+                            <span class="label">PROF</span>
+                            <span id="header-prof-val">+2</span>
                         </div>
                     </div>
                 </div>
@@ -145,7 +155,7 @@
     <nav id="side-menu" class="side-menu hidden">
         <div class="menu-overlay"></div>
         <div class="menu-content parchment">
-            <button class="close-menu">&times;</button>
+            <button class="close-menu close-btn-medieval"><i class="fas fa-times"></i></button>
 
             <div class="menu-section" data-section="creation">
                 <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
@@ -297,7 +307,7 @@
             <div class="chat-container parchment">
                 <div class="chat-header">
                     <h2><i class="fas fa-scroll"></i> Pergunte à Lyra</h2>
-                    <button id="chat-close-btn" class="chat-close-btn medieval-btn small icon-only" title="Fechar Chat">
+                    <button id="chat-close-btn" class="chat-close-btn close-btn-medieval" title="Fechar Chat">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -375,7 +385,7 @@
     <div id="modal-wrapper" class="hidden">
         <div class="modal-backdrop"></div>
         <div class="modal-content parchment">
-            <button class="close-modal"><i class="fas fa-xmark"></i></button>
+            <button class="close-modal close-btn-medieval"><i class="fas fa-times"></i></button>
             <div id="detail-container" class="hidden"></div> <!-- Added detail container -->
             <div id="modal-body">
                 <!-- Painel de Configurações Arcanas -->
@@ -878,6 +888,7 @@
     <!-- Custom Alert Modal -->
     <div id="alert-modal" class="modal-overlay hidden">
         <div class="medieval-modal alert-content">
+            <button class="close-btn close-btn-medieval" data-modal="alert-modal"><i class="fas fa-times"></i></button>
             <div class="lyra-corner top-left"></div>
             <div class="lyra-corner top-right"></div>
             <div class="alert-body">
@@ -897,6 +908,39 @@
     </div>
     <div id="scroll-down" class="scroll-indicator">
         <i class="fa-solid fa-chevron-down"></i>
+    </div>
+
+    <!-- Mystic Music Player (Bottom-Left) -->
+    <div id="mystic-player" class="mystic-player-floating collapsed">
+        <audio id="lyra-bg-music" src="assets/The Whisper of the Stars.mp3" loop></audio>
+
+        <div class="player-toggle">
+            <div class="player-orb">
+                <i class="fas fa-compact-disc"></i>
+                <div class="magic-pulse"></div>
+            </div>
+            <span class="player-now-playing">Whispers of the Stars</span>
+        </div>
+
+        <div class="player-interface parchment">
+            <div class="player-header">
+                <strong>Melodia Arcana</strong>
+                <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="player-body">
+                <div class="track-name">"The Whisper of the Stars"</div>
+                <div class="player-controls-row">
+                    <button id="btn-play-pause" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
+                    <div class="volume-container">
+                        <i class="fas fa-volume-low"></i>
+                        <input type="range" id="player-volume" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="player-progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/app.js" type="module"></script>
