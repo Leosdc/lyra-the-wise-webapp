@@ -378,6 +378,63 @@
             <button class="close-modal"><i class="fas fa-xmark"></i></button>
             <div id="detail-container" class="hidden"></div> <!-- Added detail container -->
             <div id="modal-body">
+                <!-- Painel de Configurações Arcanas -->
+                <div id="settings-modal" class="wizard-container hidden">
+                    <h2 class="scroll-title">Ajustes do Perfil</h2>
+                    <div class="settings-content">
+                        <div class="form-group">
+                            <label>Apelido Arcano</label>
+                            <input type="text" id="setting-nickname" class="medieval-input"
+                                placeholder="Seu nome de aventureiro">
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp (Opcional)</label>
+                            <input type="text" id="setting-whatsapp" class="medieval-input"
+                                placeholder="Para contato entre guildas">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição do Aventureiro</label>
+                            <textarea id="setting-bio" class="medieval-textarea"
+                                placeholder="Conte sua lenda..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Arsenal de Cursores</label>
+                            <div class="cursor-grid" id="cursor-selector">
+                                <!-- Swords -->
+                                <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada"><img
+                                        src="assets/cursors/sword_gold.png"></div>
+                                <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata"><img
+                                        src="assets/cursors/sword_silver.png"></div>
+                                <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim"><img
+                                        src="assets/cursors/sword_crimson.png"></div>
+                                <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria"><img
+                                        src="assets/cursors/sword_shadow.png"></div>
+                                <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda"><img
+                                        src="assets/cursors/sword_emerald.png"></div>
+                                <!-- Staffs -->
+                                <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal"><img
+                                        src="assets/cursors/staff_crystal.png"></div>
+                                <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar"><img
+                                        src="assets/cursors/staff_sunlight.png"></div>
+                                <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar"><img
+                                        src="assets/cursors/staff_lunar.png"></div>
+                                <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio"><img
+                                        src="assets/cursors/staff_shadow.png"></div>
+                                <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda"><img
+                                        src="assets/cursors/staff_emerald.png"></div>
+                                <!-- Potions -->
+                                <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida"><img
+                                        src="assets/cursors/potion_red.png"></div>
+                                <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana"><img
+                                        src="assets/cursors/potion_blue.png"></div>
+                            </div>
+                        </div>
+                        <div class="settings-actions">
+                            <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Wizard Steps (Characters) -->
                 <div id="creation-wizard" class="wizard-container hidden">
                     <div id="char-choice-step" class="wizard-step" data-step="0">
@@ -813,84 +870,6 @@
         </div>
     </div>
 
-    <!-- Modal de Configurações -->
-    <div id="settings-modal" class="modal-wrapper hidden">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container">
-            <div class="parchment settings-pane">
-                <button class="close-modal">&times;</button>
-                <div class="scroll-paper">
-                    <h2 class="scroll-title">Ajustes do Perfil</h2>
-                    <div class="settings-content">
-                        <div class="form-group">
-                            <label>Apelido Arcano</label>
-                            <input type="text" id="setting-nickname" class="medieval-input"
-                                placeholder="Seu nome de aventureiro">
-                        </div>
-                        <div class="form-group">
-                            <label>WhatsApp (Opcional)</label>
-                            <input type="text" id="setting-whatsapp" class="medieval-input"
-                                placeholder="Para contato entre guildas">
-                        </div>
-                        <div class="form-group">
-                            <label>Descrição do Aventureiro</label>
-                            <textarea id="setting-bio" class="medieval-textarea"
-                                placeholder="Conte sua lenda..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Arsenal de Cursores</label>
-                            <div class="cursor-grid" id="cursor-selector">
-                                <!-- Swords -->
-                                <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada">
-                                    <img src="assets/cursors/sword_gold.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata">
-                                    <img src="assets/cursors/sword_silver.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim">
-                                    <img src="assets/cursors/sword_crimson.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria">
-                                    <img src="assets/cursors/sword_shadow.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda">
-                                    <img src="assets/cursors/sword_emerald.png">
-                                </div>
-                                <!-- Staffs -->
-                                <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal">
-                                    <img src="assets/cursors/staff_crystal.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar">
-                                    <img src="assets/cursors/staff_sunlight.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar">
-                                    <img src="assets/cursors/staff_lunar.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio">
-                                    <img src="assets/cursors/staff_shadow.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda">
-                                    <img src="assets/cursors/staff_emerald.png">
-                                </div>
-                                <!-- Potions -->
-                                <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida">
-                                    <img src="assets/cursors/potion_red.png">
-                                </div>
-                                <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana">
-                                    <img src="assets/cursors/potion_blue.png">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-actions">
-                            <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Custom Alert Modal -->
     <div id="alert-modal" class="modal-overlay hidden">

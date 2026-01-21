@@ -94,27 +94,18 @@ textarea {
 /* User Profile Actions */
 .user-profile-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Horizontal again */
     align-items: center;
-    gap: 5px;
+    gap: 15px;
+    /* More space */
 }
 
 .user-profile-actions.hidden {
     display: none;
 }
 
-/* Settings Modal & Pane */
-.settings-pane {
-    max-width: 600px;
-    width: 90%;
-    margin: 40px auto;
-    padding: 30px;
-    position: relative;
-    z-index: 10002;
-    background: var(--parchment);
-    border: 3px double var(--gold);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-}
+/* User Profile Actions Moved */
 
 .settings-content {
     display: flex;
@@ -3187,19 +3178,16 @@ body.damien-theme .hp-input {
 
 .header-token-wrapper {
     position: relative;
-    /* Move token down slightly to avoid cutting at viewport top */
-    margin-top: 10px;
     z-index: 1001;
 }
 
 .header-token-wrapper img {
     width: 60px;
-    /* Making it a bit larger and more prominent */
     height: 60px;
     border-radius: 50%;
     border: 3px solid var(--gold);
     object-fit: cover;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
     background: var(--dark-charcoal);
 }
 
