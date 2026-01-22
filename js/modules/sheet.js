@@ -97,10 +97,12 @@ export const SheetModule = {
 
         // Note: Alignment moved to header as requested
         document.getElementById('sheet-char-info').innerHTML = `
-            ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 110px; display: inline-block;')} • 
-            ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 130px; display: inline-block;')} • 
-            ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 140px; display: inline-block;')} • 
-            Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; display: inline-block;')}
+            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100px;')} • 
+                ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 110px;')} • 
+                ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 130px;')} • 
+                Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 40px; text-align: center;')}
+            </div>
         `;
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
 
