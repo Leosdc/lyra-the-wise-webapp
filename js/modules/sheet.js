@@ -380,11 +380,18 @@ export const SheetModule = {
         // Gather basic inputs
         sheet.querySelectorAll('[data-field]:not([data-list])').forEach(el => {
             const field = el.dataset.field;
+            // Skip death saves, handled specifically below
+            if (field.startsWith('death_saves.')) return;
+
             const keys = field.split('.');
             let val;
 
             if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') {
-                val = el.type === 'number' ? parseInt(el.value) || 0 : el.value;
+                if (el.type === 'checkbox') {
+                    val = el.checked;
+                } else {
+                    val = el.type === 'number' ? parseInt(el.value) || 0 : el.value;
+                }
             } else {
                 const input = el.querySelector('input, select');
                 if (input) {
@@ -400,6 +407,11 @@ export const SheetModule = {
             }
             target[keys[keys.length - 1]] = val;
         });
+
+        // Specific handling for Death Saves (grouped checkboxes as a counter)
+        const succCount = sheet.querySelectorAll('[data-field="death_saves.successes"]:checked').length;
+        const failCount = sheet.querySelectorAll('[data-field="death_saves.failures"]:checked').length;
+        updates.death_saves = { successes: succCount, failures: failCount };
 
         // Gather Lists
         const gatherList = (selector, path) => {
