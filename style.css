@@ -1764,6 +1764,7 @@ h4,
     justify-content: center;
     cursor: pointer;
     transition: 0.3s;
+    opacity: 0;
 }
 
 .token-upload-overlay i {
@@ -1771,12 +1772,12 @@ h4,
     font-size: 1.5rem;
 }
 
-.token-upload-overlay:hover {
-    background: rgba(0, 0, 0, 0.8);
+.char-token-wrapper:hover .token-upload-overlay {
+    opacity: 1;
 }
 
-.edit-mode .token-upload-overlay {
-    display: flex !important;
+.token-upload-overlay:hover {
+    background: rgba(0, 0, 0, 0.8);
 }
 
 .char-name-info {

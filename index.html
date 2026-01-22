@@ -161,6 +161,9 @@
                 <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
                 <div class="menu-grid">
                     <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i> Personagens</button>
+                    <button class="nav-btn" data-view="itens"><i class="fas fa-gem"></i> Itens</button>
+                    <button class="nav-btn" data-view="grimorio"><i class="fas fa-book-journal-whills"></i>
+                        Grimório</button>
                     <button class="nav-btn" data-view="monstros"><i class="fas fa-dragon"></i> Bestiário</button>
                     <button class="nav-btn" data-view="armadilhas"><i class="fas fa-skull-crossbones"></i>
                         Armadilhas</button>
@@ -332,6 +335,36 @@
                 </div>
             </div>
             <div id="fichas-list" class="items-grid"></div>
+        </section>
+
+        <!-- Itens View -->
+        <section id="itens" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-gem"></i> Galeria de Itens</h2>
+                <div class="header-actions">
+                    <button class="medieval-btn small" onclick="alert('Em breve: Forja e Inventário Global')"><i
+                            class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-grid"
+                style="display:flex; justify-content:center; padding: 2rem; opacity: 0.6; font-style:italic;">
+                <p>O cofre está vazio... por enquanto.</p>
+            </div>
+        </section>
+
+        <!-- Grimorio View -->
+        <section id="grimorio" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-book-journal-whills"></i> Grimório Místico</h2>
+                <div class="header-actions">
+                    <button class="medieval-btn small" onclick="alert('Em breve: Biblioteca de Magias')"><i
+                            class="fas fa-plus"></i> Nova Magia</button>
+                </div>
+            </div>
+            <div class="items-grid"
+                style="display:flex; justify-content:center; padding: 2rem; opacity: 0.6; font-style:italic;">
+                <p>As páginas estão em branco...</p>
+            </div>
         </section>
 
         <!-- Monstros View -->
@@ -674,7 +707,7 @@
                             <div class="char-token-wrapper">
                                 <img id="sheet-token" src="assets/Lyra_Token.png" alt="Token" class="char-token">
                                 <input type="file" id="token-upload" accept="image/*" class="hidden">
-                                <label for="token-upload" id="token-upload-btn" class="token-upload-overlay hidden">
+                                <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
                                     <i class="fas fa-camera"></i>
                                 </label>
                             </div>
