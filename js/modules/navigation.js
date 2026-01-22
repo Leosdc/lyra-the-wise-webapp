@@ -11,7 +11,7 @@ export const NavigationModule = {
 
     // --- View Switching ---
     async switchView(viewId, loaders) {
-        localStorage.setItem('lyra_current_view', viewId);
+        sessionStorage.setItem('lyra_current_view', viewId);
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
 
         const targetView = document.getElementById(viewId);

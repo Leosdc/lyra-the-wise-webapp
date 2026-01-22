@@ -21,7 +21,7 @@ const app = {
     user: null,
     currentCharacter: null,
     currentSystem: localStorage.getItem('lyra_current_system') || 'dnd5e',
-    currentView: localStorage.getItem('lyra_current_view') || 'dashboard',
+    currentView: sessionStorage.getItem('lyra_current_view') || 'dashboard',
     isDamien: false,
     isDeleteMode: false,
     chatHistory: [],
@@ -269,7 +269,7 @@ const app = {
         }
 
         this.currentView = viewId;
-        localStorage.setItem('lyra_current_view', viewId);
+        sessionStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
     },
 
