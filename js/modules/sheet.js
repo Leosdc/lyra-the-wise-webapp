@@ -74,14 +74,23 @@ export const SheetModule = {
         // Run Engine
         const mods = this.calculateDND5eStats(char);
 
-        // Header Info
-        document.getElementById('sheet-char-name').innerText = char.name || char.bio?.name || 'Sem Nome';
-        document.getElementById('sheet-char-info').innerText = `${char.bio?.race || '?'} • ${char.bio?.class || '?'} • Nível ${char.bio?.level || 1}`;
-        document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
-
         // Helper to create seamless input
-        const mkInput = (val, field, type = 'text', title = '') =>
-            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}">`;
+        const mkInput = (val, field, type = 'text', title = '', style = '') =>
+            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}" style="${style}">`;
+
+        // Header Info
+        document.getElementById('sheet-char-name').innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;');
+
+        const race = char.bio?.race || '';
+        const clazz = char.bio?.class || '';
+        const level = char.bio?.level || 1;
+
+        document.getElementById('sheet-char-info').innerHTML = `
+            ${mkInput(race, 'bio.race', 'text', 'Raça', 'width: 100px; display: inline-block;')} • 
+            ${mkInput(clazz, 'bio.class', 'text', 'Classe', 'width: 120px; display: inline-block;')} • 
+            Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; display: inline-block;')}
+        `;
+        document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
 
         // Main Tab
         const b = char.bio || {};
@@ -94,7 +103,15 @@ export const SheetModule = {
 
         for (const [id, data] of Object.entries(bioMap)) {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+            if (!el) continue;
+
+            if (data.f === 'bio.alignment') {
+                const alignments = ["Leal e Bom", "Neutro e Bom", "Caótico e Bom", "Leal e Neutro", "Neutro", "Caótico e Neutro", "Leal e Mau", "Neutro e Mau", "Caótico e Mau"];
+                const options = alignments.map(a => `<option value="${a}" ${a === data.v ? 'selected' : ''}>${a}</option>`).join('');
+                el.innerHTML = `<select data-field="${data.f}" class="medieval-select seamless" style="width: 100%;" title="${data.t}">${options}</select>`;
+            } else {
+                el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+            }
         }
 
         document.getElementById('sheet-prof').innerText = mods.profBonus >= 0 ? `+${mods.profBonus}` : mods.profBonus;
@@ -114,7 +131,7 @@ export const SheetModule = {
             scoresGrid.innerHTML = attrMap.map(a => `
                 <div class="score-card" title="${a.t}">
                     <span class="score-label">${a.l}</span>
-                    <div style="width: 100%; text-align: center;">${mkInput(a.v, `attributes.${a.id}`, 'number', a.t)}</div>
+                    ${mkInput(a.v, `attributes.${a.id}`, 'number', a.t, 'width: 50px; text-align: center; font-size: 1.4rem; font-weight: bold; background: transparent; border: none; padding: 0;')}
                     <span class="score-mod">${a.m >= 0 ? `+${a.m}` : a.m}</span>
                 </div>
             `).join('');
@@ -325,7 +342,7 @@ export const SheetModule = {
         };
 
         // Gather basic inputs
-        sheet.querySelectorAll('[data-field]').forEach(el => {
+        sheet.querySelectorAll('[data-field]:not([data-list])').forEach(el => {
             const field = el.dataset.field;
             const keys = field.split('.');
             let val;

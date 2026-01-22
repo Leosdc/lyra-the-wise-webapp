@@ -2068,7 +2068,8 @@ h4,
     cursor: pointer;
     position: relative;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
+    /* Changed from rgba */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2138,6 +2139,7 @@ h4,
     padding: 4px 8px;
     background: rgba(0, 0, 0, 0.03);
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .save-item.proficient {
@@ -2194,6 +2196,7 @@ h4,
     gap: 0.8rem;
     font-size: 0.9rem;
     opacity: 0.6;
+    cursor: pointer;
 }
 
 .skill-item.proficient {
@@ -3759,6 +3762,14 @@ body.damien-theme .medieval-card,
 body.damien-theme .header-center,
 body.damien-theme .header-dropdown-content,
 body.damien-theme .app-header {
+    border-color: var(--damien-purple) !important;
+}
+
+/* Fix for Backstory Textareas in Damien Theme to match standard textareas */
+body.damien-theme .chronic-notes .medieval-textarea,
+body.damien-theme .traits-full-grid .medieval-textarea {
+    background-color: rgba(20, 0, 35, 0.9) !important;
+    color: #e2e8f0 !important;
     border-color: var(--damien-purple) !important;
 }
 

@@ -863,7 +863,7 @@ const app = {
             }
             // Allow clicking the entire proficiency row (skill or save)
             const profBtn = e.target.closest('.prof-toggle') || e.target.closest('.skill-item') || e.target.closest('.save-item');
-            if (profBtn && document.getElementById('character-sheet').classList.contains('edit-mode')) {
+            if (profBtn) {
                 // If we clicked the row, find the actual toggle button or its data
                 const target = profBtn.classList.contains('prof-toggle') ? profBtn : profBtn.querySelector('.prof-toggle');
                 if (target) {
