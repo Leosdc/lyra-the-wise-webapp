@@ -1864,46 +1864,56 @@ h4,
     margin: 1rem 0;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.3rem;
-    font-size: 0.8rem;
-    color: var(--crimson);
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-body.damien-theme .form-group label {
-    color: var(--gold-bright);
-    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
-}
-
-.extra-info.grid-2 {
+/* Main Stats Grid - Attributes & Saves vs Skills (Fixed Overlap) */
+.stats-main-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem 1.5rem;
+    grid-template-columns: minmax(340px, 1fr) 1fr;
+    gap: 2rem;
+    align-items: start;
+    /* Prevents stretching and overlapping */
+    width: 100%;
 }
 
-.section-title {
-    font-family: 'Cinzel', serif;
-    color: var(--crimson);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    margin: 1.5rem 0 0.5rem;
-    padding-bottom: 0.2rem;
+@media (max-width: 900px) {
+    .stats-main-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-body.damien-theme .section-title {
-    color: var(--gold-bright);
-    border-bottom-color: var(--gold);
-    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
+/* Hit Dice Row - Single Line Fix */
+.hit-dice-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    width: 100%;
 }
 
-/* Saves List */
+.hit-dice-row span {
+    white-space: nowrap;
+}
+
+/* Attributes Grid - Strictly Vertical */
+.scores-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 20px;
+}
+
+.score-card {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+}
+
+/* Saves List - 3 Columns Clean */
 .saves-list {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
@@ -1912,180 +1922,18 @@ body.damien-theme .section-title {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.8rem;
     padding: 0.5rem;
     border: 1px solid rgba(44, 30, 22, 0.2);
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.3);
+    min-height: 60px;
+    /* Uniform height */
 }
 
-.save-item.proficient {
-    background: rgba(212, 175, 55, 0.2);
-    border-color: var(--gold);
-}
-
-.save-total {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: var(--ink);
-}
-
-.save-item span {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    opacity: 0.7;
-}
-
-/* Skills List */
-.skills-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.3rem;
-}
-
-.skill-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-}
-
-.skill-item.proficient {
-    background: rgba(212, 175, 55, 0.15);
-}
-
-.skill-total {
-    font-weight: bold;
-    min-width: 2rem;
-    text-align: right;
-}
-
-.skill-item i {
-    font-size: 0.7rem;
-    color: var(--gold);
-}
-
-.skill-item span {
-    font-size: 0.85rem;
-}
-
-.skill-item small {
-    opacity: 0.6;
-}
-
-/* Edit Mode Styles */
-.sheet-container.edit-mode .editable,
-.sheet-container.edit-mode .editable-area {
-    background: rgba(255, 255, 255, 0.5);
-    border-bottom: 1px dashed var(--gold);
-    min-height: 1.2rem;
-    cursor: text;
-}
-
-.sheet-container.edit-mode input[type="text"],
-.sheet-container.edit-mode input[type="number"],
-.sheet-container.edit-mode textarea {
-    width: 100%;
-    background: transparent;
-    border: 1px solid var(--gold);
-    font-family: inherit;
-    font-size: inherit;
-    color: var(--ink);
-    padding: 2px 5px;
-    text-align: center;
-}
-
-/* Hide default spinners */
-.sheet-container.edit-mode input::-webkit-outer-spin-button,
-.sheet-container.edit-mode input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-}
-
-.sheet-container.edit-mode input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-
-/* Custom Medieval Spinners */
-.attribute-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 5px;
-}
-
-.attribute-control input {
-    max-width: 50px !important;
-}
-
-.spinner-btn {
-    background: rgba(44, 30, 22, 0.1);
-    border: 1px solid var(--gold);
-    color: var(--ink);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: 50%;
-    font-size: 14px;
-    transition: 0.2s;
-    user-select: none;
-}
-
-.spinner-btn:hover {
-    background: var(--gold);
-    color: #fff;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-}
-
-.spinner-btn:active {
-    transform: scale(0.9);
-}
-
-.sheet-container.edit-mode .editable-toggle {
-    cursor: pointer;
-    color: var(--gold);
-}
-
-/* Combat & Attacks */
-.combat-top-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-}
-
-.death-saves,
-.hit-dice-box {
-    padding: 0.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.death-saves span {
-    display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: var(--ink);
-    margin-bottom: 5px;
-    letter-spacing: 1px;
-}
-
-.death-row {
-    font-size: 0.85rem;
-    font-family: 'Cinzel', serif;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 5px;
-    color: #4a3423;
-}
-
+/* Death Saves - Fix Background Issue */
 .death-row input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -2096,107 +1944,40 @@ body.damien-theme .section-title {
     cursor: pointer;
     position: relative;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    /* Changed from rgba */
+    background: transparent !important;
+    /* Force transparent unless checked */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.death-row input[type="checkbox"]:hover {
-    box-shadow: 0 0 5px var(--gold);
-    transform: scale(1.1);
-}
-
 .death-row.successes input[type="checkbox"]:checked {
-    background: #2e7d32;
-    /* Rich green */
+    background: #2e7d32 !important;
     border-color: var(--gold);
-}
-
-.death-row.successes input[type="checkbox"]:checked::after {
-    content: '\f132';
-    /* shield-halved */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 10px;
-    color: #fff;
 }
 
 .death-row.failures input[type="checkbox"]:checked {
-    background: var(--crimson);
+    background: var(--crimson) !important;
     border-color: var(--gold);
 }
 
-.death-row.failures input[type="checkbox"]:checked::after {
-    content: '\f54c';
-    /* skull */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 10px;
-    color: #fff;
+/* Enforce Chronicle Label Colors */
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--crimson) !important;
+    /* Force Red for Lyra */
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.attacks-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.attack-item {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 10px;
-    padding: 5px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Saves & Skills */
-.saves-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.save-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 0.9rem;
-    padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-}
-
-.save-item:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: var(--gold);
-}
-
-.save-item.proficient {
-    color: var(--crimson);
-    font-weight: 600;
-}
-
-.scores-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    margin-bottom: 20px;
-}
-
-.score-card {
-    display: grid;
-    grid-template-columns: 50px 1fr 50px;
-    /* Precise column control */
-    align-items: center;
-    gap: 10px;
-    padding: 2px 0;
+body.damien-theme .form-group label {
+    color: var(--gold-bright) !important;
+    /* Force Purple for Damien */
+    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
 }
 
 .score-card .score-label {

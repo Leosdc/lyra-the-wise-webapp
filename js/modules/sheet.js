@@ -97,11 +97,11 @@ export const SheetModule = {
 
         // Note: Alignment moved to header as requested
         document.getElementById('sheet-char-info').innerHTML = `
-            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
-                ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100px;')} • 
-                ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 110px;')} • 
-                ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 130px;')} • 
-                Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 40px; text-align: center;')}
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto;">
+                ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 120px; text-overflow: ellipsis;')} • 
+                ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 120px; text-overflow: ellipsis;')} • 
+                ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 130px; text-overflow: ellipsis;')} • 
+                <span style="white-space: nowrap;">Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 40px; text-align: center;')}</span>
             </div>
         `;
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
