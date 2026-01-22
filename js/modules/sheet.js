@@ -88,10 +88,11 @@ export const SheetModule = {
         }
 
         // Header Info
+        // Header Info
         const race = char.bio?.race || 'Humano';
         const clazz = char.bio?.class || 'Guerreiro';
         const alignment = char.bio?.alignment || 'Neutro';
-        const level = char.bio?.level || 1;
+        const charLevel = char.bio?.level || 1;
 
         // Header Info - Name & Level Combined
         document.getElementById('sheet-char-name').innerHTML = `
@@ -99,7 +100,7 @@ export const SheetModule = {
                 ${mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;')}
                 <div style="display: flex; flex-direction: column; align-items: center;">
                     <span style="font-family: 'Cinzel'; font-size: 0.6rem; color: var(--gold); font-weight: bold; text-transform: uppercase;">Nível</span>
-                    ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 1.5rem;')}
+                    ${mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 1.5rem;')}
                 </div>
             </div>
         `;
