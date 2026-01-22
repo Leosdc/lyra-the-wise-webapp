@@ -1933,7 +1933,30 @@ h4,
     /* Uniform height */
 }
 
-/* Death Saves - Fix Background Issue */
+/* Death Saves - Horizontal Alignment */
+.death-saves {
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.death-row {
+    font-size: 0.85rem;
+    font-family: 'Cinzel', serif;
+    display: flex;
+    flex-direction: row !important;
+    /* Force Horizontal */
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    color: #4a3423;
+    white-space: nowrap;
+    width: 100%;
+}
+
 .death-row input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -1945,10 +1968,12 @@ h4,
     position: relative;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent !important;
-    /* Force transparent unless checked */
-    display: flex;
+    display: inline-flex;
+    /* Fix for alignment */
     align-items: center;
     justify-content: center;
+    margin: 0;
+    /* Remove potential margins */
 }
 
 /* Fix Temp HP Alignment */

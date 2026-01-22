@@ -88,14 +88,22 @@ export const SheetModule = {
         }
 
         // Header Info
-        document.getElementById('sheet-char-name').innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;');
+        // Header Info - Name & Level Combined
+        document.getElementById('sheet-char-name').innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                ${mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;')}
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-family: 'Cinzel'; font-size: 0.6rem; color: var(--gold); font-weight: bold; text-transform: uppercase;">Nível</span>
+                    ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 1.5rem;')}
+                </div>
+            </div>
+        `;
 
         const race = char.bio?.race || 'Humano';
         const clazz = char.bio?.class || 'Guerreiro';
         const alignment = char.bio?.alignment || 'Neutro';
-        const level = char.bio?.level || 1;
 
-        // Note: Alignment moved to header as requested
+        // Note: Level moved to Name block
         document.getElementById('sheet-char-info').innerHTML = `
             <div style="display: flex; align-items: start; gap: 1.5rem; flex-wrap: wrap;">
                 <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
@@ -109,10 +117,6 @@ export const SheetModule = {
                 <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
                     <span class="header-label">Alinhamento</span>
                     ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 150px;')}
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
-                    <span class="header-label">Nível</span>
-                    ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center;')}
                 </div>
             </div>
         `;
