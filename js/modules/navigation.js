@@ -1,5 +1,6 @@
 
 import { getMonster, getTrap, getSession } from '../data.js';
+import { escapeHTML } from './utils.js';
 
 /**
  * Navigation Module
@@ -78,8 +79,8 @@ export const NavigationModule = {
                 <div class="card-glow"></div>
                 ${tokenHtml}
                 <div class="card-info">
-                    <h3>${item.name || item.title || 'Sem Nome'}</h3>
-                    <span class="card-subtitle">${subtitle}</span>
+                    <h3>${escapeHTML(item.name || item.title || 'Sem Nome')}</h3>
+                    <span class="card-subtitle">${escapeHTML(subtitle)}</span>
                 </div>
             </div>
         `;

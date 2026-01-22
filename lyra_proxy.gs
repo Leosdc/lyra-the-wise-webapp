@@ -37,6 +37,19 @@ function doPost(e) {
     }
 
     console.log('[SECURITY] Acesso autorizado para:', result.users[0].email);
+    const userId = result.users[0].localId;
+
+    // === RATE LIMITING (NOVO) ===
+    const cache = CacheService.getUserCache();
+    const cacheKey = `rate_limit_${userId}`;
+    const requestCount = parseInt(cache.get(cacheKey) || '0');
+
+    if (requestCount > 50) { // Limite: 50 requisições/hora
+        console.warn(`[SECURITY] Rate Limit excedido para ${result.users[0].email}`);
+        return createResponse({ error: 'Limite de requisições excedido. Tente novamente em 1 hora.' });
+    }
+
+    cache.put(cacheKey, (requestCount + 1).toString(), 3600); // Expira em 1 hora
 
   } catch (err) {
     console.error('[SECURITY] Erro na validação:', err);

@@ -79,12 +79,23 @@ export const SheetModule = {
         document.getElementById('sheet-char-info').innerText = `${char.bio?.race || '?'} • ${char.bio?.class || '?'} • Nível ${char.bio?.level || 1}`;
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
 
+        // Helper to create seamless input
+        const mkInput = (val, field, type = 'text', title = '') =>
+            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}">`;
+
         // Main Tab
         const b = char.bio || {};
-        document.getElementById('sheet-background').innerText = b.background || "Nenhum";
-        document.getElementById('sheet-alignment').innerText = b.alignment || "Neutro";
-        document.getElementById('sheet-xp').innerText = b.xp || "0";
-        document.getElementById('sheet-player-name').innerText = b.playerName || "-";
+        const bioMap = {
+            'sheet-background': { v: b.background || "Nenhum", f: 'bio.background', t: 'Antecedente do personagem' },
+            'sheet-alignment': { v: b.alignment || "Neutro", f: 'bio.alignment', t: 'Alinhamento moral e ético' }, // Note: Select implementation might be better, but keeping input for flexibility as per request
+            'sheet-xp': { v: b.xp || "0", f: 'bio.xp', t: 'Pontos de Experiência atuais' },
+            'sheet-player-name': { v: b.playerName || "-", f: 'bio.playerName', t: 'Nome do Jogador' }
+        };
+
+        for (const [id, data] of Object.entries(bioMap)) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+        }
 
         document.getElementById('sheet-prof').innerText = mods.profBonus >= 0 ? `+${mods.profBonus}` : mods.profBonus;
         document.getElementById('sheet-passive-percep').innerText = char.stats.passive_perception;
@@ -93,17 +104,17 @@ export const SheetModule = {
         const scoresGrid = document.getElementById('sheet-scores');
         if (scoresGrid) {
             const attrMap = [
-                { id: 'str', l: 'FOR', v: char.attributes.str, m: mods.strMod },
-                { id: 'dex', l: 'DEX', v: char.attributes.dex, m: mods.dexMod },
-                { id: 'con', l: 'CON', v: char.attributes.con, m: mods.conMod },
-                { id: 'int', l: 'INT', v: char.attributes.int, m: mods.intMod },
-                { id: 'wis', l: 'WIS', v: char.attributes.wis, m: mods.wisMod },
-                { id: 'cha', l: 'CHA', v: char.attributes.cha, m: mods.chaMod }
+                { id: 'str', l: 'FOR', v: char.attributes.str, m: mods.strMod, t: 'Força: Potência física e atletismo' },
+                { id: 'dex', l: 'DEX', v: char.attributes.dex, m: mods.dexMod, t: 'Destreza: Agilidade, reflexos e equilíbrio' },
+                { id: 'con', l: 'CON', v: char.attributes.con, m: mods.conMod, t: 'Constituição: Saúde, vigor e força vital' },
+                { id: 'int', l: 'INT', v: char.attributes.int, m: mods.intMod, t: 'Inteligência: Acuidade mental, memória e raciocínio' },
+                { id: 'wis', l: 'WIS', v: char.attributes.wis, m: mods.wisMod, t: 'Sabedoria: Percepção, intuição e força de vontade' },
+                { id: 'cha', l: 'CHA', v: char.attributes.cha, m: mods.chaMod, t: 'Carisma: Força de personalidade e liderança' }
             ];
             scoresGrid.innerHTML = attrMap.map(a => `
-                <div class="score-card">
+                <div class="score-card" title="${a.t}">
                     <span class="score-label">${a.l}</span>
-                    <span class="score-val editable" data-field="attributes.${a.id}">${a.v}</span>
+                    <div style="width: 100%; text-align: center;">${mkInput(a.v, `attributes.${a.id}`, 'number', a.t)}</div>
                     <span class="score-mod">${a.m >= 0 ? `+${a.m}` : a.m}</span>
                 </div>
             `).join('');
@@ -113,14 +124,18 @@ export const SheetModule = {
         const savesContainer = document.getElementById('sheet-saves');
         if (savesContainer) {
             const saves = [
-                { id: 'str', l: 'Força' }, { id: 'dex', l: 'Destreza' }, { id: 'con', l: 'Constituição' },
-                { id: 'int', l: 'Inteligência' }, { id: 'wis', l: 'Sabedoria' }, { id: 'cha', l: 'Carisma' }
+                { id: 'str', l: 'Força', t: 'Resistir a empurrões ou aprisionamentos' },
+                { id: 'dex', l: 'Destreza', t: 'Esquivar de efeitos de área' },
+                { id: 'con', l: 'Constituição', t: 'Suportar venenos e doenças' },
+                { id: 'int', l: 'Inteligência', t: 'Desacreditar ilusões' },
+                { id: 'wis', l: 'Sabedoria', t: 'Resistir a efeitos mentais' },
+                { id: 'cha', l: 'Carisma', t: 'Resistir a possessão' }
             ];
             savesContainer.innerHTML = saves.map(s => {
                 const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
                 const val = mods[`${s.id}Mod`] + (isProf ? mods.profBonus : 0);
                 return `
-                    <div class="save-item ${isProf ? 'proficient' : ''}">
+                    <div class="save-item ${isProf ? 'proficient' : ''}" title="${s.t}">
                         <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: pointer;" data-type="saves" data-field="${s.id}"></i>
                         <span>${s.l}</span>
                         <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
@@ -133,15 +148,24 @@ export const SheetModule = {
         const skillsContainer = document.getElementById('sheet-skills');
         if (skillsContainer) {
             const skills = [
-                { id: 'acrobacia', l: 'Acrobacia (Des)' }, { id: 'adestrar_animais', l: 'Adestrar Animais (Sab)' },
-                { id: 'arcanismo', l: 'Arcanismo (Int)' }, { id: 'atletismo', l: 'Atletismo (For)' },
-                { id: 'atuacao', l: 'Atuação (Car)' }, { id: 'enganacao', l: 'Enganação (Car)' },
-                { id: 'furtividade', l: 'Furtividade (Des)' }, { id: 'historia', l: 'História (Int)' },
-                { id: 'intimidacao', l: 'Intimidação (Car)' }, { id: 'intuicao', l: 'Intuição (Sab)' },
-                { id: 'investigacao', l: 'Investigação (Int)' }, { id: 'medicina', l: 'Medicina (Sab)' },
-                { id: 'natureza', l: 'Natureza (Int)' }, { id: 'percepcao', l: 'Percepção (Sab)' },
-                { id: 'persuasao', l: 'Persuasão (Car)' }, { id: 'prestidigitacao', l: 'Prestidigitação (Des)' },
-                { id: 'religiao', l: 'Religião (Int)' }, { id: 'sobrevivencia', l: 'Sobrevivência (Sab)' }
+                { id: 'acrobacia', l: 'Acrobacia (Des)', t: 'Manter equilíbrio e realizar manobras' },
+                { id: 'adestrar_animais', l: 'Adestrar Animais (Sab)', t: 'Acalmar ou controlar bestas' },
+                { id: 'arcanismo', l: 'Arcanismo (Int)', t: 'Conhecimento sobre magia e planos' },
+                { id: 'atletismo', l: 'Atletismo (For)', t: 'Escalar, nadar e pular' },
+                { id: 'atuacao', l: 'Atuação (Car)', t: 'Entreter plateias' },
+                { id: 'enganacao', l: 'Enganação (Car)', t: 'Mentir e ocultar a verdade' },
+                { id: 'furtividade', l: 'Furtividade (Des)', t: 'Esconder-se e mover-se em silêncio' },
+                { id: 'historia', l: 'História (Int)', t: 'Conhecimento sobre o passado' },
+                { id: 'intimidacao', l: 'Intimidação (Car)', t: 'Ameaçar e coagir' },
+                { id: 'intuicao', l: 'Intuição (Sab)', t: 'Detectar mentiras e emoções' },
+                { id: 'investigacao', l: 'Investigação (Int)', t: 'Procurar pistas e deduzir' },
+                { id: 'medicina', l: 'Medicina (Sab)', t: 'Estabilizar feridos e diagnosticar' },
+                { id: 'natureza', l: 'Natureza (Int)', t: 'Conhecimento sobre flora e fauna' },
+                { id: 'percepcao', l: 'Percepção (Sab)', t: 'Notar detalhes ao redor' },
+                { id: 'persuasao', l: 'Persuasão (Car)', t: 'Convencer diplomaticamente' },
+                { id: 'prestidigitacao', l: 'Prestidigitação (Des)', t: 'Mãos leves e truques manuais' },
+                { id: 'religiao', l: 'Religião (Int)', t: 'Conhecimento sobre divindades' },
+                { id: 'sobrevivencia', l: 'Sobrevivência (Sab)', t: 'Rastrear e caçar' }
             ];
             skillsContainer.innerHTML = skills.map(sk => {
                 const isProf = (char.proficiencies_choice?.skills || []).includes(sk.id);
@@ -153,7 +177,7 @@ export const SheetModule = {
                 const val = mods[`${attr}Mod`] + (isProf ? mods.profBonus : 0) + (isExpert ? mods.profBonus : 0);
 
                 return `
-                    <div class="skill-item ${isProf ? 'proficient' : ''}">
+                    <div class="skill-item ${isProf ? 'proficient' : ''}" title="${sk.t}">
                         <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" style="font-size: 0.5rem; color: ${isProf || isExpert ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf || isExpert ? 1 : 0.3}; cursor: pointer;" data-type="skills" data-field="${sk.id}"></i>
                         <span>${sk.l}</span>
                         <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
@@ -164,9 +188,9 @@ export const SheetModule = {
 
         // Combat Tab
         const s = char.stats || {};
-        document.getElementById('sheet-ca').innerText = s.ac;
-        document.getElementById('sheet-inic').innerText = s.initiative >= 0 ? `+ ${s.initiative} ` : s.initiative;
-        document.getElementById('sheet-speed').innerText = s.speed;
+        document.getElementById('sheet-ca').innerHTML = mkInput(s.ac, 'stats.ac', 'number', 'Classe de Armadura');
+        document.getElementById('sheet-inic').innerHTML = mkInput(s.initiative, 'stats.initiative', 'number', 'Iniciativa');
+        document.getElementById('sheet-speed').innerHTML = mkInput(s.speed, 'stats.speed', 'text', 'Deslocamento');
 
         document.getElementById('sheet-hp-curr').value = s.hp_current;
         document.getElementById('sheet-hp-max').value = s.hp_max;
@@ -174,7 +198,7 @@ export const SheetModule = {
 
         document.getElementById('sheet-hd-curr').value = s.hit_dice_current || 0;
         const hdTotalEl = document.getElementById('sheet-hd-total');
-        if (hdTotalEl) hdTotalEl.innerText = s.hit_dice_total || `${b.level}d${b.hitDie || 8}`;
+        if (hdTotalEl) hdTotalEl.innerHTML = mkInput(s.hit_dice_total || `${b.level}d${b.hitDie || 8}`, 'stats.hit_dice_total', 'text', 'Total de Dados de Vida');
 
         // Death Saves
         const ds = char.death_saves || { successes: 0, failures: 0 };
@@ -193,6 +217,7 @@ export const SheetModule = {
         document.querySelectorAll('.coin-item input').forEach(input => {
             const field = input.dataset.field.split('.').pop();
             input.value = coins[field] || 0;
+            input.title = `Moedas de ${field.toUpperCase()}`;
         });
 
         const weightBar = document.getElementById('weight-progress');
@@ -208,10 +233,10 @@ export const SheetModule = {
         if (attacksBody) {
             attacksBody.innerHTML = (char.combat?.attacks || []).map((atk, i) => `
                 <div class="list-item-v2" data-index="${i}">
-                    <input type="text" value="${atk.name || ''}" placeholder="Nome" data-list="combat.attacks" data-field="name" readonly>
-                    <input type="text" value="${atk.bonus || ''}" placeholder="Bônus" data-list="combat.attacks" data-field="bonus" readonly>
-                    <input type="text" value="${atk.damage || ''}" placeholder="Dano" data-list="combat.attacks" data-field="damage" readonly>
-                    <button class="icon-btn delete-list-item" data-list="combat.attacks" data-index="${i}"><i class="fas fa-trash"></i></button>
+                    <input type="text" value="${atk.name || ''}" placeholder="Nome" data-list="combat.attacks" data-field="name" title="Nome da Arma">
+                    <input type="text" value="${atk.bonus || ''}" placeholder="Bônus" data-list="combat.attacks" data-field="bonus" title="Bônus de Ataque">
+                    <input type="text" value="${atk.damage || ''}" placeholder="Dano" data-list="combat.attacks" data-field="damage" title="Dano">
+                    <button class="icon-btn delete-list-item" data-list="combat.attacks" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
         }
@@ -221,10 +246,10 @@ export const SheetModule = {
         if (spellsBody) {
             spellsBody.innerHTML = (char.spells?.list || []).map((sp, i) => `
                 <div class="list-item-v2" data-index="${i}">
-                    <input type="text" value="${sp.name || ''}" placeholder="Magia" data-list="spells.list" data-field="name" readonly>
-                    <input type="text" value="${sp.level || ''}" placeholder="Nív" data-list="spells.list" data-field="level" readonly>
-                    <input type="text" value="${sp.range || ''}" placeholder="Alcance" data-list="spells.list" data-field="range" readonly>
-                    <button class="icon-btn delete-list-item" data-list="spells.list" data-index="${i}"><i class="fas fa-trash"></i></button>
+                    <input type="text" value="${sp.name || ''}" placeholder="Magia" data-list="spells.list" data-field="name" title="Nome da Magia">
+                    <input type="text" value="${sp.level || ''}" placeholder="Nív" data-list="spells.list" data-field="level" title="Nível">
+                    <input type="text" value="${sp.range || ''}" placeholder="Alcance" data-list="spells.list" data-field="range" title="Alcance/Duração">
+                    <button class="icon-btn delete-list-item" data-list="spells.list" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
         }
@@ -235,12 +260,12 @@ export const SheetModule = {
             inventoryBody.innerHTML = (char.inventory?.items || []).map((it, i) => `
                 <div class="list-item-v2 inventory-row" data-index="${i}">
                     <div class="item-main-row">
-                        <input type="text" value="${it.name || ''}" placeholder="Item" data-list="inventory.items" data-field="name" readonly>
-                        <input type="number" value="${it.quantity || 1}" placeholder="Qtd" data-list="inventory.items" data-field="quantity" readonly>
-                        <input type="text" value="${it.weight || 0}" placeholder="Peso" data-list="inventory.items" data-field="weight" readonly>
-                        <button class="icon-btn delete-list-item" data-list="inventory.items" data-index="${i}"><i class="fas fa-trash"></i></button>
+                        <input type="text" value="${it.name || ''}" placeholder="Item" data-list="inventory.items" data-field="name" title="Nome do Item">
+                        <input type="number" value="${it.quantity || 1}" placeholder="Qtd" data-list="inventory.items" data-field="quantity" title="Quantidade">
+                        <input type="text" value="${it.weight || 0}" placeholder="Peso" data-list="inventory.items" data-field="weight" title="Peso (lbs)">
+                        <button class="icon-btn delete-list-item" data-list="inventory.items" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>
                     </div>
-                    <textarea class="item-desc-input" placeholder="Descrição do item..." data-list="inventory.items" data-field="description" readonly>${it.description || ''}</textarea>
+                    <textarea class="item-desc-input" placeholder="Descrição do item..." data-list="inventory.items" data-field="description" title="Descrição e Efeitos">${it.description || ''}</textarea>
                 </div>
             `).join('');
         }
@@ -249,82 +274,39 @@ export const SheetModule = {
         const story = char.story || {};
         const chronicSection = document.getElementById('sheet-historia');
         if (chronicSection) {
+            const insights = {
+                'traits': 'Traços de Personalidade: Hábitos simples e virtudes',
+                'ideals': 'Ideais: Crenças profundas e filosofias',
+                'bonds': 'Vínculos: Pessoas ou locais importantes',
+                'flaws': 'Defeitos: Vícios, medos e fraquezas',
+                'mannerisms': 'Maneirismos: Tiques e gestos',
+                'talents': 'Talentos: Habilidades de interpretação',
+                'appearance': 'Aparência: Descrição visual detalhada',
+                'notes': 'Notas: Histórico completo e diário',
+            };
+
             chronicSection.querySelectorAll('textarea').forEach(txt => {
                 const parts = txt.dataset.field.split('.');
                 const field = parts.length > 1 ? parts[1] : parts[0];
                 txt.value = story[field] || "";
-                txt.readOnly = true; // Lock by default
+                txt.readOnly = false; // Always editable
+                txt.title = insights[field] || "Insite sua história";
             });
         }
+
+        // Ensure buttons are in correct state
+        const saveBtn = document.getElementById('save-sheet-btn');
+        if (saveBtn) saveBtn.classList.remove('hidden');
     },
 
     toggleSheetEdit(enable, character, context) {
-        const sheet = document.getElementById('character-sheet');
-        sheet.classList.toggle('edit-mode', enable);
-        document.getElementById('edit-sheet-btn').classList.toggle('hidden', enable);
-        document.getElementById('cancel-sheet-btn')?.classList.toggle('hidden', !enable);
-        document.getElementById('save-sheet-btn').classList.toggle('hidden', !enable);
-
-        if (enable) {
-            this.characterBackup = JSON.parse(JSON.stringify(character));
-
-            // Editable Spans (Principal)
-            sheet.querySelectorAll('.editable').forEach(el => {
-                const val = el.innerText === '-' ? '' : el.innerText;
-                const field = el.dataset.field;
-                const isNum = field.includes('attributes') || field.includes('xp');
-                el.innerHTML = `<input type="${isNum ? 'number' : 'text'}" value="${val}" data-field="${field}">`;
-            });
-
-            // Textareas (Crônicas)
-            sheet.querySelectorAll('textarea[data-field]').forEach(txt => txt.readOnly = false);
-
-            // Inputs Diretos (Combate/Mochila)
-            sheet.querySelectorAll('input[data-field], textarea[data-field]').forEach(input => {
-                input.readOnly = false;
-                input.disabled = false;
-            });
-
-            // Selects
-            sheet.querySelectorAll('select[data-field]').forEach(sel => sel.disabled = false);
-
-            // Alignment -> Select
-            const alignmentEl = document.getElementById('sheet-alignment');
-            if (alignmentEl) {
-                const current = alignmentEl.innerText;
-                alignmentEl.innerHTML = `
-                    <select data-field="bio.alignment" class="medieval-select">
-                        <option value="Leal e Bom" ${current === 'Leal e Bom' ? 'selected' : ''}>Leal e Bom</option>
-                        <option value="Neutro e Bom" ${current === 'Neutro e Bom' ? 'selected' : ''}>Neutro e Bom</option>
-                        <option value="Caótico e Bom" ${current === 'Caótico e Bom' ? 'selected' : ''}>Caótico e Bom</option>
-                        <option value="Leal e Neutro" ${current === 'Leal e Neutro' ? 'selected' : ''}>Leal e Neutro</option>
-                        <option value="Neutro" ${current === 'Neutro' ? 'selected' : ''}>Neutro</option>
-                        <option value="Caótico e Neutro" ${current === 'Caótico e Neutro' ? 'selected' : ''}>Caótico e Neutro</option>
-                        <option value="Leal e Mau" ${current === 'Leal e Mau' ? 'selected' : ''}>Leal e Mau</option>
-                        <option value="Neutro e Mau" ${current === 'Neutro e Mau' ? 'selected' : ''}>Neutro e Mau</option>
-                        <option value="Caótico e Mau" ${current === 'Caótico e Mau' ? 'selected' : ''}>Caótico e Mau</option>
-                    </select>
-                `;
-            }
-        } else {
-            // Restore display mode or discard changes
-            if (character) this.populateSheet(character, context);
-            sheet.querySelectorAll('textarea[data-field]').forEach(txt => txt.readOnly = true);
-            sheet.querySelectorAll('input[data-field]').forEach(input => {
-                input.readOnly = true;
-                input.disabled = (input.type === 'checkbox');
-            });
-            sheet.querySelectorAll('select[data-field]').forEach(sel => sel.disabled = true);
-        }
+        // Deprecated / Simplified: Just ensuring save button is visible.
+        // The sheet is now always editable.
     },
 
     cancelSheetEdit(character, context) {
-        if (this.characterBackup) {
-            // Restore logical state by returning backup, caller handles assignment
-            this.toggleSheetEdit(false, this.characterBackup, context);
-            return this.characterBackup;
-        }
-        this.toggleSheetEdit(false, character, context);
+        // Just reload
+        this.populateSheet(character, context);
         return character;
     },
 

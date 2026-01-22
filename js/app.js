@@ -456,14 +456,25 @@ const app = {
     async handleSendMessage() {
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
+
+        // Debounce / Rate Limit
+        const now = Date.now();
+        if (now - (this.lastMessageTime || 0) < 2000) {
+            this.showAlert("Aguarde um pouco antes de enviar outra mensagem.", "Calma, viajante!");
+            return;
+        }
+
         if (!message || this.isWaitingForAI) return;
         if (!this.user) {
             this.addChatMsg('bot', "⚠️ Voce precisa fazer login.");
             return;
         }
+
+        this.lastMessageTime = now;
         this.addChatMsg('user', message);
         input.value = '';
         this.isWaitingForAI = true;
+
         try {
             const idToken = await this.user.getIdToken();
             const aiContext = await this.getAIContext();
