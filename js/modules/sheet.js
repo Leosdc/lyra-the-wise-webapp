@@ -88,6 +88,11 @@ export const SheetModule = {
         }
 
         // Header Info
+        const race = char.bio?.race || 'Humano';
+        const clazz = char.bio?.class || 'Guerreiro';
+        const alignment = char.bio?.alignment || 'Neutro';
+        const level = char.bio?.level || 1;
+
         // Header Info - Name & Level Combined
         document.getElementById('sheet-char-name').innerHTML = `
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -98,10 +103,6 @@ export const SheetModule = {
                 </div>
             </div>
         `;
-
-        const race = char.bio?.race || 'Humano';
-        const clazz = char.bio?.class || 'Guerreiro';
-        const alignment = char.bio?.alignment || 'Neutro';
 
         // Note: Level moved to Name block
         document.getElementById('sheet-char-info').innerHTML = `
