@@ -569,12 +569,19 @@ const app = {
             }
         };
 
-        // Handle browser autoplay policies (Play on first user interaction if needed)
-        // document.addEventListener('click', () => {
-        //     if (audio.paused && !player.classList.contains('manually-paused')) {
-        //         audio.play().catch(() => {});
-        //     }
-        // }, { once: true });
+        // Autoplay Attempt
+        const attemptPlay = () => {
+            audio.volume = 0.4;
+            audio.play().then(() => {
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                player.classList.add('playing');
+            }).catch(e => console.log("Autoplay blocked by browser policy (interacting will fix it)."));
+        };
+
+        attemptPlay();
+        document.body.addEventListener('click', () => {
+            if (audio.paused) attemptPlay();
+        }, { once: true });
     },
 
     toggleDamienMode(enable) {
@@ -586,6 +593,23 @@ const app = {
         const sheetToken = document.getElementById('sheet-token');
         const hToken = document.getElementById('header-token');
         const alertParchment = document.querySelector('#alert-modal .medieval-modal');
+
+        // Music Switch
+        const audio = document.getElementById('lyra-bg-music');
+        const trackName = document.querySelector('.track-name');
+        if (audio && trackName) {
+            const currentSrc = audio.getAttribute('src');
+            const targetSrc = enable ? 'assets/The Hunger Beyond the Veil.mp3' : 'assets/The Whisper of the Stars.mp3';
+            const targetName = enable ? '"The Hunger Beyond the Veil"' : '"The Whisper of the Stars"';
+
+            if (currentSrc !== targetSrc) {
+                const wasPlaying = !audio.paused;
+                audio.src = targetSrc;
+                trackName.textContent = targetName;
+                if (wasPlaying) audio.play().catch(() => { });
+                else audio.play().catch(() => { }); // Try to auto-play on switch
+            }
+        }
 
         if (enable) {
             document.body.classList.add('damien-theme');
@@ -733,6 +757,7 @@ const app = {
             const card = e.target.closest('.medieval-card');
 
             if (deleteBtn && card) {
+                e.preventDefault();
                 e.stopImmediatePropagation();
                 NavigationModule.deleteItem(card.dataset.id, card.dataset.type, this.getNavigationLoaders());
                 return;

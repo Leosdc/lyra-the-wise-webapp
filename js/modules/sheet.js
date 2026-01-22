@@ -103,15 +103,16 @@ export const SheetModule = {
 
         for (const [id, data] of Object.entries(bioMap)) {
             const el = document.getElementById(id);
-            if (!el) continue;
+            if (el) el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+        }
 
-            if (data.f === 'bio.alignment') {
-                const alignments = ["Leal e Bom", "Neutro e Bom", "Caótico e Bom", "Leal e Neutro", "Neutro", "Caótico e Neutro", "Leal e Mau", "Neutro e Mau", "Caótico e Mau"];
-                const options = alignments.map(a => `<option value="${a}" ${a === data.v ? 'selected' : ''}>${a}</option>`).join('');
-                el.innerHTML = `<select data-field="${data.f}" class="medieval-select seamless" style="width: 100%;" title="${data.t}">${options}</select>`;
-            } else {
-                el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
-            }
+        // Explicit Alignment Dropdown Override
+        const alignEl = document.getElementById('sheet-alignment');
+        if (alignEl) {
+            const alignments = ["Leal e Bom", "Neutro e Bom", "Caótico e Bom", "Leal e Neutro", "Neutro", "Caótico e Neutro", "Leal e Mau", "Neutro e Mau", "Caótico e Mau"];
+            const currentAlign = b.alignment || "Neutro";
+            const options = alignments.map(a => `<option value="${a}" ${a === currentAlign ? 'selected' : ''}>${a}</option>`).join('');
+            alignEl.innerHTML = `<select data-field="bio.alignment" class="medieval-select seamless" style="width: 100%;" title="Alinhamento moral e ético">${options}</select>`;
         }
 
         document.getElementById('sheet-prof').innerText = mods.profBonus >= 0 ? `+${mods.profBonus}` : mods.profBonus;

@@ -153,7 +153,8 @@ function callGeminiCharacter(charData) {
   2. Ideais
   3. Vínculos
   4. Defeitos
-  5. Uma História (Backstory) envolvente baseada nestes dados.
+  5. Aparência Física (detalhada)
+  6. Uma História (Backstory) envolvente baseada nestes dados.
   
   Retorne APENAS um JSON puro no seguinte formato:
   {
@@ -161,6 +162,7 @@ function callGeminiCharacter(charData) {
     "ideals": "...",
     "bonds": "...",
     "flaws": "...",
+    "appearance": "...",
     "backstory": "..."
   }`;
 
