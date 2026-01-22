@@ -14,7 +14,7 @@ import { WizardModule } from './modules/wizard.js';
 import { SettingsModule } from './modules/settings.js';
 import { AuthUI } from './modules/auth-ui.js';
 import { ListModule } from './modules/lists.js';
-import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue } from './modules/utils.js';
+import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue, parseMarkdown } from './modules/utils.js';
 import { sendMessageToLyra } from './ai.js';
 
 const app = {
@@ -517,9 +517,9 @@ const app = {
         div.className = `msg ${sender}`;
         if (sender === 'bot') {
             const avatar = this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png';
-            div.innerHTML = `<img src="${avatar}" class="chat-avatar"><span class="msg-content">${text}</span>`;
+            div.innerHTML = `<img src="${avatar}" class="chat-avatar"><span class="msg-content">${parseMarkdown(text)}</span>`;
         } else {
-            div.innerHTML = `<span class="msg-content">${text}</span>`;
+            div.innerHTML = `<span class="msg-content">${parseMarkdown(text)}</span>`;
         }
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;

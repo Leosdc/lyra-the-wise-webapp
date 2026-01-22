@@ -179,3 +179,17 @@ export const SYSTEM_TEMPLATES = {
         conditions: [] // ["exhaustion_1"]
     }
 };
+
+export const RACES = [
+    "Anão", "Elfo", "Halfling", "Humano", "Draconato", "Gnomo", "Meio-Elfo", "Meio-Orc", "Tiefling"
+];
+
+export const CLASSES = [
+    "Bárbaro", "Bardo", "Bruxo", "Clérigo", "Druida", "Feiticeiro", "Guerreiro", "Ladino", "Mago", "Monge", "Paladino", "Patrulheiro", "Artífice"
+];
+
+export const ALIGNMENTS = [
+    "Leal e Bom", "Neutro e Bom", "Caótico e Bom",
+    "Leal e Neutro", "Neutro", "Caótico e Neutro",
+    "Leal e Mau", "Neutro e Mau", "Caótico e Mau"
+];

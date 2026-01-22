@@ -1782,18 +1782,23 @@ h4,
 
 .char-name-info {
     flex: 1;
-    text-align: center;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    text-align: left;
 }
 
 .char-name-info h2 {
     font-size: 2rem;
     margin: 0;
+    line-height: 1;
 }
 
 .char-subtitle {
     font-size: 1rem;
     opacity: 0.8;
     font-style: italic;
+    align-self: center;
 }
 
 .sheet-actions {
@@ -1871,6 +1876,12 @@ h4,
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     margin: 1.5rem 0 0.5rem;
     padding-bottom: 0.2rem;
+}
+
+body.damien-theme .section-title {
+    color: var(--gold-bright);
+    border-bottom-color: var(--gold);
+    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
 }
 
 /* Saves List */
@@ -2127,7 +2138,7 @@ h4,
 /* Saves & Skills */
 .saves-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-top: 10px;
 }
@@ -2135,12 +2146,20 @@ h4,
 .save-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
     font-size: 0.9rem;
-    padding: 4px 8px;
+    padding: 6px 10px;
     background: rgba(0, 0, 0, 0.03);
     border-radius: 4px;
     cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.save-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--gold);
 }
 
 .save-item.proficient {
@@ -2149,9 +2168,53 @@ h4,
 }
 
 .scores-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 20px;
+}
+
+.score-card {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: 50px 1fr 50px;
+    /* Precise column control */
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+}
+
+.score-card .score-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    /* Increased from 0.75rem */
+    color: var(--ink);
+    opacity: 0.7;
+    text-align: left;
+    /* Align Left */
+}
+
+/* Specific styling for the input inside score-card which we verified in sheet.js is bare */
+.score-card input {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.score-card .score-mod {
+    background: rgba(139, 0, 0, 0.1);
+    /* Light red tint for Lyra */
+    color: var(--crimson);
+    border-radius: 12px;
+    padding: 2px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    min-width: 40px;
+}
+
+body.damien-theme .score-card .score-mod {
+    background: rgba(155, 89, 182, 0.1);
+    color: var(--gold-bright);
 }
 
 .score-box {

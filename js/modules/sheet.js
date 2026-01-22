@@ -1,5 +1,6 @@
 
 import { updateCharacter } from '../data.js';
+import { RACES, CLASSES, ALIGNMENTS } from '../constants.js';
 
 /**
  * Sheet Module
@@ -78,16 +79,27 @@ export const SheetModule = {
         const mkInput = (val, field, type = 'text', title = '', style = '') =>
             `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}" style="${style}">`;
 
+        // Helper to create seamless select
+        const mkSelect = (val, field, options, title = '', style = '') => {
+            const opts = options.map(opt => `<option value="${opt}" ${opt === val ? 'selected' : ''}>${opt}</option>`).join('');
+            // Add custom option if current value is not in list
+            const customOpt = (val && !options.includes(val)) ? `<option value="${val}" selected>${val} (Custom)</option>` : '';
+            return `<select data-field="${field}" class="medieval-select seamless" title="${title}" style="${style}">${customOpt}${opts}</select>`;
+        }
+
         // Header Info
         document.getElementById('sheet-char-name').innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;');
 
-        const race = char.bio?.race || '';
-        const clazz = char.bio?.class || '';
+        const race = char.bio?.race || 'Humano';
+        const clazz = char.bio?.class || 'Guerreiro';
+        const alignment = char.bio?.alignment || 'Neutro';
         const level = char.bio?.level || 1;
 
+        // Note: Alignment moved to header as requested
         document.getElementById('sheet-char-info').innerHTML = `
-            ${mkInput(race, 'bio.race', 'text', 'Raça', 'width: 100px; display: inline-block;')} • 
-            ${mkInput(clazz, 'bio.class', 'text', 'Classe', 'width: 120px; display: inline-block;')} • 
+            ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 110px; display: inline-block;')} • 
+            ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 130px; display: inline-block;')} • 
+            ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 140px; display: inline-block;')} • 
             Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; display: inline-block;')}
         `;
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
@@ -96,7 +108,7 @@ export const SheetModule = {
         const b = char.bio || {};
         const bioMap = {
             'sheet-background': { v: b.background || "Nenhum", f: 'bio.background', t: 'Antecedente do personagem' },
-            'sheet-alignment': { v: b.alignment || "Neutro", f: 'bio.alignment', t: 'Alinhamento moral e ético' }, // Note: Select implementation might be better, but keeping input for flexibility as per request
+            'sheet-alignment': { v: b.alignment || "Neutro", f: 'bio.alignment', t: 'Alinhamento moral e ético' },
             'sheet-xp': { v: b.xp || "0", f: 'bio.xp', t: 'Pontos de Experiência atuais' },
             'sheet-player-name': { v: b.playerName || "-", f: 'bio.playerName', t: 'Nome do Jogador' }
         };

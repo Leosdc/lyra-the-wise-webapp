@@ -62,9 +62,34 @@ export function setNestedValue(obj, path, value) {
     current[parts[parts.length - 1]] = value;
 }
 
+
 export function escapeHTML(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+export function parseMarkdown(text) {
+    if (!text) return '';
+    let html = escapeHTML(text); // Sanitize first
+
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+
+    // Italic
+    html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+
+    // Clean bullets
+    html = html.replace(/^\s*[\-\*]\s+(.*)/gim, '<br>• $1');
+
+    // Newlines
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
 }
