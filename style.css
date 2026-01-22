@@ -1951,9 +1951,36 @@ h4,
     justify-content: center;
 }
 
+/* Fix Temp HP Alignment */
+#sheet-temp-hp,
+#sheet-hd-curr {
+    text-align: center !important;
+}
+
+/* Force Section Title Colors Globally */
+.section-title,
+.details-container h2 {
+    color: var(--crimson) !important;
+}
+
+body.damien-theme .section-title,
+body.damien-theme .details-container h2 {
+    color: var(--gold-bright) !important;
+    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
+}
+
 .death-row.successes input[type="checkbox"]:checked {
     background: #2e7d32 !important;
     border-color: var(--gold);
+}
+
+.death-row.successes input[type="checkbox"]:checked::after {
+    content: '\f132';
+    /* shield-halved */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
 }
 
 .death-row.failures input[type="checkbox"]:checked {
@@ -1961,8 +1988,18 @@ h4,
     border-color: var(--gold);
 }
 
+.death-row.failures input[type="checkbox"]:checked::after {
+    content: '\f54c';
+    /* skull */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+}
+
 /* Enforce Chronicle Label Colors */
-.form-group label {
+.form-group label,
+.header-label {
     display: block;
     margin-bottom: 0.3rem;
     font-size: 0.8rem;
@@ -1974,7 +2011,8 @@ h4,
     text-transform: uppercase;
 }
 
-body.damien-theme .form-group label {
+body.damien-theme .form-group label,
+body.damien-theme .header-label {
     color: var(--gold-bright) !important;
     /* Force Purple for Damien */
     text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);

@@ -97,11 +97,23 @@ export const SheetModule = {
 
         // Note: Alignment moved to header as requested
         document.getElementById('sheet-char-info').innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto;">
-                ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 120px; text-overflow: ellipsis;')} • 
-                ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 120px; text-overflow: ellipsis;')} • 
-                ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 130px; text-overflow: ellipsis;')} • 
-                <span style="white-space: nowrap;">Nível ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 40px; text-align: center;')}</span>
+            <div style="display: flex; align-items: start; gap: 1.5rem; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <span class="header-label">Raça</span>
+                    ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 130px;')}
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <span class="header-label">Classe</span>
+                    ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 140px;')}
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <span class="header-label">Alinhamento</span>
+                    ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 150px;')}
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <span class="header-label">Nível</span>
+                    ${mkInput(level, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center;')}
+                </div>
             </div>
         `;
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
