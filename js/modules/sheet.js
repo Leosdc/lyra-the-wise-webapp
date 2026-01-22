@@ -94,34 +94,37 @@ export const SheetModule = {
         const alignment = char.bio?.alignment || 'Neutro';
         const charLevel = char.bio?.level || 1;
 
-        // Header Info - Name & Level Combined
+        // Header Info - Consolidated for clean alignment
         document.getElementById('sheet-char-name').innerHTML = `
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                ${mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome do Personagem', 'font-size: 2rem; font-family: Cinzel; text-align: left; width: auto;')}
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-family: 'Cinzel'; font-size: 0.6rem; color: var(--gold); font-weight: bold; text-transform: uppercase;">Nível</span>
-                    ${mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 1.5rem;')}
+            <div style="display: flex; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 5px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span class="header-label">Nome do Personagem</span>
+                    ${mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome', 'font-size: 1.8rem; font-family: Cinzel; width: auto; font-weight: bold;')}
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                    <span class="header-label">Nível</span>
+                    ${mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 60px; text-align: center; font-size: 1.4rem; font-weight: bold;')}
                 </div>
             </div>
         `;
 
-        // Note: Level moved to Name block
         document.getElementById('sheet-char-info').innerHTML = `
-            <div style="display: flex; align-items: start; gap: 1.5rem; flex-wrap: wrap;">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+            <div style="display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
                     <span class="header-label">Raça</span>
                     ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 130px;')}
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
                     <span class="header-label">Classe</span>
-                    ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 140px;')}
+                    ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 130px;')}
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
                     <span class="header-label">Alinhamento</span>
-                    ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 150px;')}
+                    ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 156px;')}
                 </div>
             </div>
         `;
+
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
 
         // Main Tab

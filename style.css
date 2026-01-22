@@ -1948,14 +1948,18 @@ h4,
     font-family: 'Cinzel', serif;
     display: flex;
     flex-direction: row !important;
-    /* Force Horizontal */
     align-items: center;
     gap: 10px;
     margin-top: 0;
-    color: #4a3423;
+    color: var(--crimson) !important;
     white-space: nowrap;
     width: 100%;
 }
+
+body.damien-theme .death-row {
+    color: var(--purple-bright) !important;
+}
+
 
 .death-row input[type="checkbox"] {
     appearance: none;
@@ -1969,12 +1973,16 @@ h4,
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent !important;
     display: inline-flex;
-    /* Fix for alignment */
     align-items: center;
     justify-content: center;
     margin: 0;
-    /* Remove potential margins */
 }
+
+.death-row input[type="checkbox"]:not(:checked) {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
 
 /* Fix Temp HP Alignment */
 #sheet-temp-hp,
