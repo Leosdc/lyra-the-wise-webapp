@@ -78,6 +78,13 @@ body.damien-theme select {
     border-color: var(--damien-purple) !important;
 }
 
+body.damien-theme input:focus,
+body.damien-theme textarea:focus,
+body.damien-theme select:focus {
+    color: var(--damien-purple) !important;
+    background-color: #fff !important;
+}
+
 body.damien-theme .medieval-card,
 body.damien-theme .header-center,
 body.damien-theme .header-dropdown-content,
