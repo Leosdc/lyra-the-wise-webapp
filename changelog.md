@@ -2,6 +2,13 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
 
+## [2.2.0] - 2026-01-23
+### 🎨 Refinamento Visual & Unificação Estrutural
+- **Novo Layout da Ficha**: Cabeçalho do personagem reestruturado em Grid de duas linhas para melhor visualização (Nome/Nível e Detalhes/Save).
+- **CSS Modularizado**: Reorganização completa dos arquivos de estilo em módulos (`layout`, `components`, `sheet`, etc.) com unificação de variáveis.
+- **Restauração de Funcionalidades**: Barra de Carga (Load/Encumbrance) visualmente restaurada no inventário e correção de quebra de linha nos Dados de Vida.
+- **Polimento Global**: Ajuste de margens nas abas da ficha, posicionamento do nome no cabeçalho global e correção do nome da música tema de Damien.
+
 ## [2.1.0] - 2026-01-21
 ### ⚙️ Personalização & Suavização Arcana
 - **Portal de Configurações**: Novo menu de ajustes de perfil (Apelido, WhatsApp, Bio).

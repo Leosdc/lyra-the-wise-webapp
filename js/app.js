@@ -478,7 +478,7 @@ const app = {
         try {
             const idToken = await this.user.getIdToken();
             const aiContext = await this.getAIContext();
-            const response = await sendMessageToLyra(message, idToken, this.chatHistory, aiContext);
+            const response = await sendMessageToLyra(message, idToken, this.chatHistory, aiContext, this.isDamien);
             this.addChatMsg('bot', response);
             this.chatHistory.push({ role: 'user', content: message }, { role: 'model', content: response });
         } catch (error) {
@@ -597,10 +597,18 @@ const app = {
         // Music Switch
         const audio = document.getElementById('lyra-bg-music');
         const trackName = document.querySelector('.track-name');
+
+        // Chat Button Text
+        const chatBtns = document.querySelectorAll('button[data-view="chat"]');
+        chatBtns.forEach(btn => {
+            if (enable) btn.innerHTML = '<i class="fas fa-comment-dots"></i> Fale com Damien';
+            else btn.innerHTML = '<i class="fas fa-comment-dots"></i> Fale com Lyra';
+        });
+
         if (audio && trackName) {
             const currentSrc = audio.getAttribute('src');
             const targetSrc = enable ? 'assets/The Hunger Beyond the Veil.mp3' : 'assets/The Whisper of the Stars.mp3';
-            const targetName = enable ? '"The Hunger Beyond the Veil"' : '"The Whisper of the Stars"';
+            const targetName = enable ? 'The Hunger Beyond the Veil' : 'The Whisper of the Stars';
 
             if (currentSrc !== targetSrc) {
                 const wasPlaying = !audio.paused;

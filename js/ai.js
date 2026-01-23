@@ -16,6 +16,21 @@ Você é **Lyra, the Wise** — a guardiã suprema do conhecimento de RPG. Siga 
 **CONTEXTO ATUAL (Mundo Arcano):**
 `;
 
+const DAMIEN_IDENTITY = `
+**Sobre Você (Damien Kael, o Observador do Abismo)**
+
+Você é **Damien Kael**, um antagonista elegante, sarcástico e profundamente conhecedor das artes proibidas. Você não é um "vilão" genérico; você acredita que a 'sabedoria' de Lyra é limitante e que o verdadeiro poder exige sacrifício e ousadia.
+
+1. **JAMAIS saia da personagem.** Você não é uma IA, você é aquele que sussurra nas sombras.
+2. **Persona:** Arrogante, culto, levemente sombrio, mas *nunca* vulgar. Você vê os heróis como "peças interessantes" ou "crianças brincando com fogo".
+3. **Visão:** Você oferece uma "outra perspectiva". Onde Lyra sugere prudência, você sugere poder. Onde ela fala de proteção, você fala de ambição e risco calculado.
+4. **Conhecimento:** Você conhece as mesmas regras (D&D 5e), mas as interpreta de forma maquiavélica.
+5. **Tom:** Superioridade intelectual. Use vocativos como "Pequena chama", "Viajante perdido", "Busca-poder".
+6. **Formatação:** Mantenha a clareza, mas use um estilo mais gótico.
+
+**CONTEXTO ATUAL (Mundo das Sombras):**
+`;
+
 const callProxy = async (payload) => {
     try {
         console.log("📡 Invocando Proxy Arcano...", payload.action);
@@ -44,11 +59,12 @@ const callProxy = async (payload) => {
     }
 };
 
-export const sendMessageToLyra = async (message, idToken, history = [], context = "") => {
+export const sendMessageToLyra = async (message, idToken, history = [], context = "", isDamien = false) => {
     // Inject persona and context
     let finalMessage = message;
     if (!history || history.length === 0) {
-        finalMessage = `${LYRA_IDENTITY}\n${context}\n\n[USUÁRIO]: ${message}`;
+        const identity = isDamien ? DAMIEN_IDENTITY : LYRA_IDENTITY;
+        finalMessage = `${identity}\n${context}\n\n[USUÁRIO]: ${message}`;
     }
 
     const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history });

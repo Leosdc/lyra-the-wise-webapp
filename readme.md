@@ -58,7 +58,7 @@ And forge the impossible — with magic, courage, and passion divine."
 
 <p align="center">
   🧙 <strong>WebApp de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Suporte a Sistemas</strong><br>
-  🚀 <strong>Versão Alfa 2.1</strong>
+  🚀 <strong>Versão Alfa 2.2</strong>
 </p>
 
 <p align="center"> <strong>Lyra the Wise WebApp</strong> é a versão web da sábia anciã que transforma seu navegador em uma <strong>mesa de RPG inteligente</strong>, unindo narrativa, automação e gestão de personagens.
@@ -126,8 +126,9 @@ And forge the impossible — with magic, courage, and passion divine."
 
 O Lyra the Wise WebApp está em seus primeiros passos ancestrais. Aqui está o horizonte que buscamos alcançar:
 
-### 🛠️ **Status Atual: Alfa 2.1**
-- [x] **Ficha D&D 5e (Core):** ~85% (Combate, Atributos, Proficiências e Listas Dinâmicas).
+### 🛠️ **Status Atual: Alfa 2.2**
+- [x] **Refinamento de UI:** Layout de ficha otimizado (Grid 2-row) e correções de espaçamento.
+- [x] **Ficha D&D 5e (Core):** ~90% (Combate, Atributos, Proficiências, Listas Dinâmicas e Inventário com Carga).
 - [x] **Portal de Personalização:** Configurações de perfil e 12 cursores épicos.
 - [x] **Motor Computacional:** Fórmulas fielmente aplicadas conforme manuais técnicos.
 - [x] **Easter Egg:** Invasão rúnica de Damien Kael (10% chance).
