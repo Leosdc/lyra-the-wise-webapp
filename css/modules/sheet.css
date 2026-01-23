@@ -635,3 +635,75 @@
     display: flex;
     justify-content: flex-end;
 }
+
+/* === Restored Styles from Backup === */
+
+/* Death Save Visuals */
+.death-row.successes input[type="checkbox"]:checked {
+    background: #2e7d32 !important;
+    border-color: var(--gold);
+}
+
+.death-row.successes input[type="checkbox"]:checked::after {
+    content: '\f132';
+    /* shield-halved */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.death-row.failures input[type="checkbox"]:checked {
+    background: var(--crimson) !important;
+    border-color: var(--gold);
+}
+
+.death-row.failures input[type="checkbox"]:checked::after {
+    content: '\f54c';
+    /* skull */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Form Layout Fixes */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.form-row .form-group {
+    min-width: 0;
+}
+
+/* Traits Grid Layout (Side-by-Side) */
+.traits-full-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.sheet-container input[type="text"],
+.sheet-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+}

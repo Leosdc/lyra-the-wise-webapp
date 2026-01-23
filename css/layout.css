@@ -52,7 +52,10 @@
     position: absolute !important;
     top: 100%;
     left: 0;
-    min-width: 820px;
+    min-width: 300px;
+    /* Reduced from 820px */
+    width: max-content;
+    max-width: 800px;
     background: #f4e4bc;
     border: 3px double var(--gold);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -67,74 +70,40 @@
     animation: slideDown 0.3s ease;
 }
 
-.dropdown-sections {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-}
-
-.dropdown-column h3 {
-    font-family: 'Cinzel', serif;
-    color: var(--crimson);
-    font-size: 1rem;
-    border-bottom: 2px solid rgba(139, 0, 0, 0.2);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.dropdown-column .nav-btn {
-    display: block;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    padding: 0.5rem 0.8rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    color: var(--ink);
-    cursor: pointer;
-    transition: 0.2s;
-    border-radius: 4px;
-}
-
-.dropdown-column .nav-btn:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--crimson);
-    padding-left: 1.2rem;
-}
+/* ... dropdown sections ... */
 
 /* Character Tracker Header */
 .header-center {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    background: rgba(18, 14, 10, 0.9);
-    padding: 10px 24px;
-    border-radius: 12px;
-    border: 1px solid var(--gold);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    transition: all 0.3s ease;
-    margin: 12px 20px 0 20px;
-    min-width: 450px;
+    gap: 1rem;
+    animation: fadeIn 0.5s ease;
+    /* Reverted: Background and styles removed from container */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    min-width: 0;
+    margin: 0 20px;
 }
 
 .header-center:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(241, 196, 15, 0.2);
-    border-color: var(--gold-bright);
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
 }
 
 .tracker-info {
     display: flex;
-    flex-direction: column;
-    flex: 1;
-    justify-content: center;
-    gap: 6px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 3rem;
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 2.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    min-width: 450px;
 }
 
 .header-name-row {
@@ -531,4 +500,33 @@
 
 .user-profile-actions.hidden {
     display: none;
+}
+
+/* Notification Bell */
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--crimson);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    animation: bounce 2s infinite;
+}
+
+.notification-wrapper button:hover .notification-badge {
+    animation: none;
+    transform: scale(1.1);
 }

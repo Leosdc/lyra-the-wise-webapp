@@ -144,6 +144,12 @@
                     <input type="hidden" id="system-selector" value="dnd5e">
                 </div>
                 <div id="user-profile-actions" class="user-profile-actions hidden">
+                    <div class="notification-wrapper">
+                        <button id="changelog-btn" class="medieval-btn small icon-only" title="Novidades">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">!</span>
+                        </button>
+                    </div>
                     <button id="settings-btn" class="medieval-btn small icon-only" title="Configurações"><i
                             class="fas fa-cog"></i></button>
                     <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
@@ -1004,6 +1010,76 @@
         </div>
         <div class="loading-text">Tecendo a Trama...</div>
     </div>
+
+    <!-- Alpha Warning Popup -->
+    <div id="alpha-warning" class="alpha-warning-popup">
+        <div class="warning-content">
+            <button id="close-alpha-warning" class="close-btn-medieval small"><i class="fas fa-times"></i></button>
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <div class="warning-text">
+                <strong>Versão Alpha</strong>
+                <p>O Lyra ainda está em desenvolvimento inicial. Você pode encontrar bugs e instabilidade.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changelog Modal -->
+    <div id="changelog-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal">
+            <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title text-center"><i class="fas fa-scroll"></i> Pergaminho de Atualizações</h2>
+            <div class="changelog-list parchment-content">
+                <div class="changelog-item">
+                    <h3>v0.1.0 - Alpha Release</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Lançamento inicial da criação de fichas.</li>
+                        <li><i class="fas fa-check"></i> Sistema de chat com Lyra.</li>
+                        <li><i class="fas fa-check"></i> Gerador de NPCs e Itens básicos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Alpha Warning Close
+            const alphaWarning = document.getElementById('alpha-warning');
+            const closeAlpha = document.getElementById('close-alpha-warning');
+            if (closeAlpha && alphaWarning) {
+                closeAlpha.addEventListener('click', () => {
+                    alphaWarning.classList.add('hidden');
+                });
+            }
+
+            // Changelog Logic
+            const changelogBtn = document.getElementById('changelog-btn');
+            const changelogModal = document.getElementById('changelog-modal');
+            const closeChangelog = document.getElementById('close-changelog');
+
+            if (changelogBtn && changelogModal) {
+                changelogBtn.addEventListener('click', () => {
+                    changelogModal.classList.remove('hidden');
+                    // Optional: Remove badge on click
+                    const badge = changelogBtn.querySelector('.notification-badge');
+                    if (badge) badge.style.display = 'none';
+                });
+            }
+
+            if (closeChangelog && changelogModal) {
+                closeChangelog.addEventListener('click', () => {
+                    changelogModal.classList.add('hidden');
+                });
+            }
+
+            // Close modal on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target === changelogModal) {
+                    changelogModal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
