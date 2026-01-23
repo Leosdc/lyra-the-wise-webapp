@@ -149,11 +149,11 @@ export const SheetModule = {
         if (scoresGrid) {
             const attrMap = [
                 { id: 'str', l: 'FOR', v: char.attributes.str, m: mods.strMod, t: 'Força: Potência física e atletismo' },
-                { id: 'dex', l: 'DEX', v: char.attributes.dex, m: mods.dexMod, t: 'Destreza: Agilidade, reflexos e equilíbrio' },
+                { id: 'dex', l: 'DES', v: char.attributes.dex, m: mods.dexMod, t: 'Destreza: Agilidade, reflexos e equilíbrio' },
                 { id: 'con', l: 'CON', v: char.attributes.con, m: mods.conMod, t: 'Constituição: Saúde, vigor e força vital' },
                 { id: 'int', l: 'INT', v: char.attributes.int, m: mods.intMod, t: 'Inteligência: Acuidade mental, memória e raciocínio' },
-                { id: 'wis', l: 'WIS', v: char.attributes.wis, m: mods.wisMod, t: 'Sabedoria: Percepção, intuição e força de vontade' },
-                { id: 'cha', l: 'CHA', v: char.attributes.cha, m: mods.chaMod, t: 'Carisma: Força de personalidade e liderança' }
+                { id: 'wis', l: 'SAB', v: char.attributes.wis, m: mods.wisMod, t: 'Sabedoria: Percepção, intuição e força de vontade' },
+                { id: 'cha', l: 'CAR', v: char.attributes.cha, m: mods.chaMod, t: 'Carisma: Força de personalidade e liderança' }
             ];
             scoresGrid.innerHTML = attrMap.map(a => `
                 <div class="score-card" title="${a.t}">

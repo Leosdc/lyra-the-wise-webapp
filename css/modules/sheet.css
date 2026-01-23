@@ -262,6 +262,24 @@
     letter-spacing: 2px;
 }
 
+/* Fix "Ataques" Title specifically if needed, or ensuring section-title is consistent */
+.attacks-section .section-title {
+    color: var(--crimson) !important;
+    margin-top: 2rem;
+    /* Added spacing as requested */
+    display: block;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 0.5rem;
+}
+
+/* Hit Dice Input Visibility Fix */
+.hit-dice-row input:focus,
+.hit-dice-row input:active {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px var(--gold);
+}
+
 .sheet-section p {
     color: #664d3b;
     font-style: italic;
