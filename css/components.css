@@ -1,0 +1,880 @@
+/* Buttons */
+.medieval-btn {
+    background: linear-gradient(145deg, #2c1e16, #120b08);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.medieval-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.medieval-btn.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+}
+
+.medieval-btn.secondary {
+    background: transparent;
+    border-color: #888;
+    color: #888;
+}
+
+.medieval-btn.secondary:hover {
+    background: #888;
+    color: #fff;
+    box-shadow: none;
+}
+
+.medieval-btn.icon-only {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close Button */
+.close-btn-medieval {
+    width: 32px;
+    height: 32px;
+    background: #c0392b;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-btn-medieval:hover {
+    background: #e74c3c;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+    border-color: var(--gold-bright);
+}
+
+/* Medieval Inputs */
+.medieval-input,
+.medieval-textarea,
+.medieval-select,
+.chronicle-editor textarea {
+    background-color: rgba(253, 246, 227, 0.95) !important;
+    color: #2c1e16 !important;
+    border: 1px solid var(--gold);
+    transition: all 0.3s ease;
+    font-size: 1.1rem !important;
+}
+
+.medieval-input:focus,
+.medieval-textarea:focus,
+.medieval-select:focus,
+.chronicle-editor textarea:focus {
+    background-color: #fff !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    border-color: var(--gold-bright);
+    outline: none;
+}
+
+.medieval-input::placeholder,
+.medieval-textarea::placeholder {
+    color: rgba(44, 30, 22, 0.6);
+    font-style: italic;
+}
+
+/* Seamless Inputs */
+.medieval-input.seamless {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    padding: 2px 5px !important;
+    color: inherit !important;
+    font-weight: inherit;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.medieval-input.seamless:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px dashed rgba(212, 175, 55, 0.5) !important;
+}
+
+.medieval-input.seamless:focus {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid var(--gold) !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    cursor: text;
+    color: #000 !important;
+}
+
+.medieval-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--parchment) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding: 8px 32px 8px 12px !important;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    color: var(--ink);
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.medieval-select option {
+    background-color: var(--dark-charcoal);
+    color: var(--gold-bright);
+    font-family: 'Inter', sans-serif;
+    padding: 10px;
+}
+
+.parchment .medieval-select,
+.wizard-container .medieval-select {
+    background-color: rgba(44, 30, 22, 0.9);
+    border: 1px solid var(--gold) !important;
+    border-radius: 4px;
+    padding: 8px 30px 8px 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23f1c40f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+/* Custom Select Dropdown (RESTORED) */
+.custom-select-container {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.custom-select-trigger:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-trigger i {
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+}
+
+.custom-select-container.open .custom-select-trigger i {
+    transform: rotate(180deg);
+}
+
+.custom-select-options-wrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    z-index: 5000;
+}
+
+.custom-select-options {
+    background: rgba(20, 15, 10, 0.98);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    animation: slideDown 0.2s ease;
+}
+
+.custom-select-option {
+    padding: 0.75rem 1rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.15s;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-option:last-child {
+    border-bottom: none;
+}
+
+.custom-select-option:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--gold);
+}
+
+.custom-select-option.selected {
+    background: rgba(212, 175, 55, 0.3);
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.custom-select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 3px;
+}
+
+/* Parchment Containers */
+.parchment {
+    background: url('https://www.transparenttextures.com/patterns/pizzelle.png'), var(--parchment);
+    color: var(--ink);
+    padding: 2rem;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d3c29a;
+}
+
+/* Scroll Container (Trivia - Design element) */
+.scroll-container {
+    perspective: 1500px;
+    margin: 1rem 0;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.scroll-paper {
+    position: relative;
+    border: 3px double var(--gold);
+    background: radial-gradient(circle at center, rgba(244, 228, 188, 0.98) 0%, rgba(220, 201, 155, 0.95) 100%);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    padding: 3rem 5rem;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+}
+
+/* Medieval Cards */
+.medieval-card {
+    background: rgba(20, 15, 10, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 4px;
+    padding: 2rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.medieval-card::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    pointer-events: none;
+}
+
+.medieval-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+    background: rgba(30, 25, 20, 0.95);
+}
+
+.medieval-card:hover::before {
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.card-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+/* Card with Token (Centered) */
+.medieval-card.has-token {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+.card-token {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.card-info {
+    flex: 1;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+    padding-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #666;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+/* Selection and Deletion States */
+.medieval-card.is-delete-mode {
+    border: 2px solid var(--crimson) !important;
+    animation: pulseRed 2s infinite;
+}
+
+.medieval-card.is-selected {
+    border-color: var(--gold-bright) !important;
+    box-shadow: 0 0 25px var(--gold-bright) !important;
+    transform: scale(1.02);
+}
+
+.medieval-card.is-selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--gold);
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.card-delete-btn {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: rgba(139, 0, 0, 0.8) !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 20 !important;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.medieval-card:hover .card-delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card-delete-btn:hover {
+    background: var(--crimson) !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px var(--crimson) !important;
+    transform: scale(1.1) rotate(10deg);
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-wrapper .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+#modal-wrapper .modal-content {
+    position: relative;
+    max-width: 1100px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 5001;
+    animation: modalSlideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.1);
+    border: 3px double var(--gold);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(44, 30, 22, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--ink);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.close-modal:hover {
+    background: var(--crimson);
+    color: #fff;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 15px var(--crimson);
+}
+
+/* Alert Content (RESTORED) */
+.alert-content {
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    padding: 3rem;
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+    position: relative;
+    margin: auto;
+}
+
+.alert-body {
+    margin-bottom: 2rem;
+}
+
+.alert-icon {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+#alert-title {
+    font-family: 'Cinzel', serif;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+#alert-message {
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Confirmation Modal */
+#confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000;
+}
+
+#confirm-modal .modal-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.confirm-box {
+    position: relative;
+    max-width: 450px !important;
+    text-align: center;
+    padding: 2.5rem !important;
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    animation: confirmPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-text {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 2rem;
+    line-height: 1.6;
+    color: var(--ink);
+    font-style: italic;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+/* Mystic Music Player */
+.mystic-player-floating {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    z-index: 9500;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.player-orb {
+    width: 50px;
+    height: 50px;
+    background: var(--dark-charcoal);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+    z-index: 2;
+}
+
+.player-orb:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+.player-orb i {
+    font-size: 1.4rem;
+}
+
+.mystic-player-floating.playing .player-orb i {
+    animation: rotate 4s linear infinite;
+}
+
+.player-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.player-now-playing {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--gold-bright);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: 0.3s;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.mystic-player-floating:hover .player-now-playing {
+    opacity: 1;
+}
+
+.magic-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mystic-player-floating.playing .magic-pulse {
+    animation: magicPulseShadow 2.5s infinite;
+}
+
+@keyframes magicPulseShadow {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+.player-interface {
+    width: 260px;
+    margin-bottom: 15px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+    transform-origin: bottom left;
+}
+
+.mystic-player-floating.collapsed .player-interface {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    pointer-events: none;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.2);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
+.player-header strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--crimson);
+}
+
+.player-minimize {
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.track-name {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.player-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+#btn-play-pause {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--crimson);
+    color: white;
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+#btn-play-pause:hover {
+    transform: scale(1.1);
+    background: #a93226;
+}
+
+.volume-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-size: 0.8rem;
+}
+
+#player-volume {
+    width: 100%;
+    cursor: pointer;
+    height: 4px;
+    accent-color: var(--crimson);
+}
+
+.download-link {
+    color: var(--gold);
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+
+.download-link:hover {
+    color: var(--gold-bright);
+    transform: translateY(-2px);
+}
+
+.progress-container {
+    height: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--sunlight));
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scroll Indicators */
+#scroll-up,
+#scroll-down {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--dark-panel);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    z-index: 9000;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    animation: bounce 2s infinite;
+}
+
+#scroll-up {
+    top: 100px;
+}
+
+#scroll-down {
+    bottom: 20px;
+}
+
+#scroll-up.hidden,
+#scroll-down.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Fix Textarea Scrollbars in General */
+.medieval-textarea {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
+}

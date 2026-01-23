@@ -1,0 +1,211 @@
+/* Dashboard & View Headers */
+.hero-section {
+    padding: 2rem 4rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    min-height: calc(100vh - 85px);
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5rem;
+    margin-top: 2rem;
+    padding: 0 2rem;
+}
+
+.hero-artwork {
+    flex-shrink: 0;
+}
+
+.hero-lyra {
+    max-width: 250px;
+    width: 250px;
+    height: 350px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.lyra-story {
+    text-align: left;
+    max-width: 800px;
+}
+
+.lyra-story h2 {
+    display: none;
+}
+
+.scroll-title {
+    font-family: 'Cinzel', serif;
+    color: #2c1e16;
+    border-bottom: 2px solid rgba(44, 30, 22, 0.2);
+    margin: 0 auto 1.5rem auto;
+    padding-bottom: 0.8rem;
+    text-align: center;
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    width: auto;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3);
+}
+
+.scroll-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+    animation: mystic-line 3s infinite ease-in-out;
+}
+
+@keyframes mystic-line {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+
+    50% {
+        width: 100%;
+        left: 0;
+    }
+
+    100% {
+        width: 0%;
+        left: 100%;
+    }
+}
+
+#rpg-trivia {
+    color: #2c1e16;
+    font-style: italic;
+    line-height: 1.8;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 500;
+    transition: opacity 0.8s ease-in-out;
+    min-height: 3.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#rpg-trivia.fade-out {
+    opacity: 0;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 4rem 2rem 4rem;
+    width: 100%;
+    flex: 1;
+    overflow-y: visible;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    align-content: flex-start;
+    margin-top: 2rem;
+}
+
+.quick-actions::-webkit-scrollbar {
+    display: none;
+}
+
+.action-card {
+    background: rgba(20, 20, 20, 0.7);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(15px);
+    color: var(--gold);
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.action-card:hover {
+    transform: translateY(-8px) scale(1.1);
+    border-color: var(--gold-bright);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.4);
+    background: rgba(30, 30, 30, 0.9);
+    z-index: 100;
+}
+
+.action-card i {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+    transition: 0.4s;
+}
+
+.action-card:hover i {
+    transform: scale(1.2) rotate(5deg);
+    color: var(--gold-bright);
+}
+
+.action-card span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.view-header h2 {
+    color: var(--gold);
+    font-size: 2.2rem;
+}
+
+/* Mobile Responsiveness for Dashboard */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0 1rem;
+    }
+
+    .hero-content-wrapper {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 0;
+    }
+
+    .lyra-story {
+        text-align: center;
+    }
+
+    .hero-lyra {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+    }
+}

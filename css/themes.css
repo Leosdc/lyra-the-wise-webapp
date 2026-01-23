@@ -1,0 +1,262 @@
+/* Damien Kael Easter Egg Theme */
+.damien-theme {
+    --gold: #9b59b6;
+    /* Amethyst */
+    --gold-bright: #d185f5;
+    --dark-charcoal: #0d0012;
+    --dark-panel: rgba(20, 0, 35, 0.9);
+    --parchment: #e6dbf1;
+    --ink: #2a0035;
+    --crimson: #4b0082;
+    /* Indigo */
+    --glass: rgba(155, 89, 182, 0.05);
+    /* Colors specific to Damien */
+    --damien-purple: #9b59b6;
+    --purple-bright: #d185f5;
+}
+
+.damien-theme.medieval-theme {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
+        url('../assets/Animação_Damien.gif') !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    background-position: center !important;
+    min-height: 100vh !important;
+}
+
+.damien-theme .scroll-paper {
+    background: radial-gradient(circle at center, #d8b4fe 0%, #b088f9 100%);
+    border: 3px double #9b59b6;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+
+.damien-theme .scroll-title {
+    color: #4b0082;
+    font-family: 'Grenze Gotisch', serif;
+    letter-spacing: 4px;
+}
+
+.damien-theme #rpg-trivia {
+    color: #2a0035;
+    font-size: 1.4rem;
+}
+
+/* Damien Theme Overrides */
+body.damien-theme .medieval-select,
+body.damien-theme .wizard-container .medieval-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%239b59b6'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+    border-color: var(--gold) !important;
+}
+
+body.damien-theme hr {
+    border-color: var(--damien-purple);
+    background: var(--damien-purple);
+}
+
+body.damien-theme input,
+body.damien-theme textarea,
+body.damien-theme select {
+    background-color: rgba(20, 0, 35, 0.9) !important;
+    color: #e2e8f0 !important;
+    border-color: var(--damien-purple) !important;
+}
+
+body.damien-theme .medieval-card,
+body.damien-theme .header-center,
+body.damien-theme .header-dropdown-content,
+body.damien-theme .app-header {
+    border-color: var(--damien-purple) !important;
+}
+
+body.damien-theme .chronic-notes .medieval-textarea,
+body.damien-theme .traits-full-grid .medieval-textarea {
+    background-color: rgba(20, 0, 35, 0.9) !important;
+    color: #e2e8f0 !important;
+    border-color: var(--damien-purple) !important;
+}
+
+body.damien-theme #scroll-up,
+body.damien-theme #scroll-down {
+    border-color: var(--damien-purple);
+    color: var(--damien-purple);
+    background: rgba(20, 0, 35, 0.95);
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
+}
+
+body.damien-theme .section-title,
+body.damien-theme .details-container h2 {
+    color: var(--gold-bright) !important;
+    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
+}
+
+body.damien-theme .form-group label,
+body.damien-theme .header-label {
+    color: var(--gold-bright) !important;
+    text-shadow: 0 0 5px rgba(209, 133, 245, 0.3);
+}
+
+body.damien-theme .score-card .score-mod {
+    background: rgba(155, 89, 182, 0.1);
+    color: var(--gold-bright);
+}
+
+body.damien-theme .death-row {
+    color: var(--purple-bright) !important;
+}
+
+body.damien-theme .item-desc-input {
+    background: rgba(147, 51, 234, 0.05) !important;
+    color: #e2e8f0;
+}
+
+/* Custom Cursors Application */
+.cursor-sword-gold,
+.cursor-sword-gold *,
+.cursor-sword-gold a,
+.cursor-sword-gold button,
+.cursor-sword-gold .nav-btn {
+    cursor: url('../assets/cursors/sword_gold.png') 0 0, auto !important;
+}
+
+.cursor-sword-silver,
+.cursor-sword-silver *,
+.cursor-sword-silver a,
+.cursor-sword-silver button,
+.cursor-sword-silver .nav-btn {
+    cursor: url('../assets/cursors/sword_silver.png') 0 0, auto !important;
+}
+
+.cursor-sword-crimson,
+.cursor-sword-crimson *,
+.cursor-sword-crimson a,
+.cursor-sword-crimson button,
+.cursor-sword-crimson .nav-btn {
+    cursor: url('../assets/cursors/sword_crimson.png') 0 0, auto !important;
+}
+
+.cursor-sword-shadow,
+.cursor-sword-shadow *,
+.cursor-sword-shadow a,
+.cursor-sword-shadow button,
+.cursor-sword-shadow .nav-btn {
+    cursor: url('../assets/cursors/sword_shadow.png') 0 0, auto !important;
+}
+
+.cursor-sword-emerald,
+.cursor-sword-emerald *,
+.cursor-sword-emerald a,
+.cursor-sword-emerald button,
+.cursor-sword-emerald .nav-btn {
+    cursor: url('../assets/cursors/sword_emerald.png') 0 0, auto !important;
+}
+
+.cursor-staff-crystal,
+.cursor-staff-crystal *,
+.cursor-staff-crystal a,
+.cursor-staff-crystal button,
+.cursor-staff-crystal .nav-btn {
+    cursor: url('../assets/cursors/staff_crystal.png') 0 0, auto !important;
+}
+
+.cursor-staff-sunlight,
+.cursor-staff-sunlight *,
+.cursor-staff-sunlight a,
+.cursor-staff-sunlight button,
+.cursor-staff-sunlight .nav-btn {
+    cursor: url('../assets/cursors/staff_sunlight.png') 0 0, auto !important;
+}
+
+.cursor-staff-lunar,
+.cursor-staff-lunar *,
+.cursor-staff-lunar a,
+.cursor-staff-lunar button,
+.cursor-staff-lunar .nav-btn {
+    cursor: url('../assets/cursors/staff_lunar.png') 0 0, auto !important;
+}
+
+.cursor-staff-shadow,
+.cursor-staff-shadow *,
+.cursor-staff-shadow a,
+.cursor-staff-shadow button,
+.cursor-staff-shadow .nav-btn {
+    cursor: url('../assets/cursors/staff_shadow.png') 0 0, auto !important;
+}
+
+.cursor-staff-emerald,
+.cursor-staff-emerald *,
+.cursor-staff-emerald a,
+.cursor-staff-emerald button,
+.cursor-staff-emerald .nav-btn {
+    cursor: url('../assets/cursors/staff_emerald.png') 0 0, auto !important;
+}
+
+.cursor-potion-red,
+.cursor-potion-red *,
+.cursor-potion-red a,
+.cursor-potion-red button,
+.cursor-potion-red .nav-btn {
+    cursor: url('../assets/cursors/potion_red.png') 0 0, auto !important;
+}
+
+.cursor-potion-blue,
+.cursor-potion-blue *,
+.cursor-potion-blue a,
+.cursor-potion-blue button,
+.cursor-potion-blue .nav-btn {
+    cursor: url('../assets/cursors/potion_blue.png') 0 0, auto !important;
+}
+
+.cursor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.cursor-option {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cursor-option:hover {
+    background: rgba(241, 196, 15, 0.1);
+    border-color: var(--gold);
+    transform: scale(1.05);
+}
+
+.cursor-option.active {
+    background: rgba(241, 196, 15, 0.2);
+    border-color: var(--gold);
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.cursor-option img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.settings-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
