@@ -6,7 +6,7 @@ import {
     getTraps, getTrap, saveTrap, deleteTrap,
     getSessions, getSession, saveSession, deleteSession
 } from './data.js';
-import { RPG_TRIVIA, SUPPORTED_SYSTEMS } from './constants.js';
+import { RPG_TRIVIA, SUPPORTED_SYSTEMS, APP_VERSION } from './constants.js';
 
 import { NavigationModule } from './modules/navigation.js';
 import { SheetModule } from './modules/sheet.js';
@@ -14,6 +14,7 @@ import { WizardModule } from './modules/wizard.js';
 import { SettingsModule } from './modules/settings.js';
 import { AuthUI } from './modules/auth-ui.js';
 import { ListModule } from './modules/lists.js';
+import LyricsModule from './modules/lyrics.js';
 import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue, parseMarkdown } from './modules/utils.js';
 import { sendMessageToLyra } from './ai.js';
 
@@ -45,7 +46,21 @@ const app = {
         this.showRandomTrivia();
         this.bindEvents();
         this.initMusicPlayer();
+
+        // Initialize Lyrics
+        LyricsModule.init();
+        LyricsModule.setTheme(this.isDamien);
+
         WizardModule.initGuidanceListeners();
+
+        // Check Changelog Notification
+        const storedVersion = localStorage.getItem('lyraAppVersion');
+        const badge = document.querySelector('.notification-badge');
+        if (storedVersion !== APP_VERSION) {
+            if (badge) badge.style.display = 'flex';
+        } else {
+            if (badge) badge.style.display = 'none';
+        }
 
         // Start Trivia Rotation
         setInterval(() => this.showRandomTrivia(), 15000);
@@ -601,9 +616,20 @@ const app = {
         // Chat Button Text
         const chatBtns = document.querySelectorAll('button[data-view="chat"]');
         chatBtns.forEach(btn => {
-            if (enable) btn.innerHTML = '<i class="fas fa-comment-dots"></i> Fale com Damien';
-            else btn.innerHTML = '<i class="fas fa-comment-dots"></i> Fale com Lyra';
+            const fontStyle = 'font-family: "Cinzel", serif; font-weight: bold; font-size: 0.9rem;'; // Explicit styling
+            if (enable) btn.innerHTML = `<i class="fas fa-comment-dots"></i> <span style='${fontStyle}'>Fale com Damien</span>`;
+            else btn.innerHTML = `<i class="fas fa-comment-dots"></i> <span style='${fontStyle}'>Fale com Lyra</span>`;
         });
+
+        // Chat Header Title
+        const chatHeaderTitle = document.querySelector('.chat-header h2');
+        if (chatHeaderTitle) {
+            if (enable) chatHeaderTitle.innerHTML = '<i class="fas fa-scroll"></i> Pergunte a Damien';
+            else chatHeaderTitle.innerHTML = '<i class="fas fa-scroll"></i> Pergunte à Lyra';
+        }
+
+        // Lyrics Switch
+        LyricsModule.setTheme(enable);
 
         if (audio && trackName) {
             const currentSrc = audio.getAttribute('src');
@@ -618,6 +644,9 @@ const app = {
                 else audio.play().catch(() => { }); // Try to auto-play on switch
             }
         }
+
+        // Lyrics Switch
+        LyricsModule.setTheme(enable);
 
         if (enable) {
             document.body.classList.add('damien-theme');
@@ -815,6 +844,13 @@ const app = {
         // Menu
         document.getElementById('home-btn')?.addEventListener('click', () => this.switchView('dashboard'));
         document.getElementById('menu-btn')?.addEventListener('click', () => NavigationModule.openMenuAtSection('all'));
+
+        // Changelog Button Check
+        document.getElementById('changelog-btn')?.addEventListener('click', () => {
+            localStorage.setItem('lyraAppVersion', APP_VERSION);
+            const badge = document.querySelector('.notification-badge');
+            if (badge) badge.style.display = 'none';
+        });
         document.querySelectorAll('.close-menu, .menu-overlay').forEach(el => el.addEventListener('click', () => NavigationModule.toggleMenu(false)));
 
         // Wizard Controls

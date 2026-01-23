@@ -95,35 +95,26 @@ export const SheetModule = {
         const charLevel = char.bio?.level || 1;
 
         // Header Info - Consolidated for clean alignment
-        document.getElementById('sheet-char-name').innerHTML = `
-            <div style="display: flex; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 5px;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span class="header-label">Nome do Personagem</span>
-                    ${mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome', 'font-size: 1.8rem; font-family: Cinzel; width: auto; font-weight: bold;')}
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                    <span class="header-label">Nível</span>
-                    ${mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 60px; text-align: center; font-size: 1.4rem; font-weight: bold;')}
-                </div>
-            </div>
-        `;
+        // Render Name (with input)
+        const nameContainer = document.getElementById('sheet-char-name');
+        if (nameContainer) {
+            nameContainer.innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome', 'font-size: 2rem; font-family: Cinzel; background: transparent; border: none; width: 100%; font-weight: bold; color: inherit;');
+        }
 
-        document.getElementById('sheet-char-info').innerHTML = `
-            <div style="display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span class="header-label">Raça</span>
-                    ${mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 130px;')}
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span class="header-label">Classe</span>
-                    ${mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 130px;')}
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span class="header-label">Alinhamento</span>
-                    ${mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 156px;')}
-                </div>
-            </div>
-        `;
+        // Render Level
+        const levelContainer = document.getElementById('sheet-level-val');
+        if (levelContainer) {
+            levelContainer.innerHTML = mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 2rem; font-weight: bold; background: transparent; border: none; color: inherit;');
+        }
+
+        // Render Dropdowns (Race, Class, Alignment)
+        const alignmentEl = document.getElementById('sheet-alignment-display');
+        const raceEl = document.getElementById('sheet-race-display');
+        const classEl = document.getElementById('sheet-class-display');
+
+        if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 100%;');
+        if (raceEl) raceEl.innerHTML = mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100%;');
+        if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 100%;');
 
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
 
