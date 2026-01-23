@@ -344,12 +344,21 @@ export const SheetModule = {
                 txt.value = story[field] || "";
                 txt.readOnly = false; // Always editable
                 txt.title = insights[field] || "Insite sua história";
+
+                // Auto-Resize Trigger
+                this.autoResizeTextarea(txt);
+                txt.addEventListener('input', () => this.autoResizeTextarea(txt));
             });
         }
 
         // Ensure buttons are in correct state
         const saveBtn = document.getElementById('save-sheet-btn');
         if (saveBtn) saveBtn.classList.remove('hidden');
+    },
+
+    autoResizeTextarea(el) {
+        el.style.height = 'auto'; // Reset to recalculate shrink
+        el.style.height = (el.scrollHeight + 2) + 'px'; // Expand
     },
 
     toggleSheetEdit(enable, character, context) {

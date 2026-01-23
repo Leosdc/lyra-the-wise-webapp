@@ -182,20 +182,23 @@
 
 .guidance-bubble {
     width: 280px;
-    padding: 1rem !important;
-    font-size: 0.85rem;
-    line-height: 1.4;
+    padding: 1.2rem !important;
+    font-size: 0.95rem;
+    line-height: 1.5;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     position: relative;
     border: 3px double var(--gold) !important;
+    background: var(--parchment);
 }
 
 .guidance-bubble p {
     margin: 0;
-    font-style: italic;
-    color: var(--ink);
+    font-style: normal;
+    font-weight: 600;
+    color: #2c1e16;
     font-family: 'Cinzel', serif;
+    /* Kept usage but made bold/normal */
 }
 
 .bubble-tail {

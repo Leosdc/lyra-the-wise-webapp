@@ -89,6 +89,48 @@
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
 }
 
+.dropdown-sections {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.dropdown-column h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--crimson);
+    font-size: 1rem;
+    border-bottom: 2px solid rgba(139, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown-column .nav-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: 0.2s;
+    border-radius: 4px;
+}
+
+.dropdown-column .nav-btn:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--crimson);
+    padding-left: 1.2rem;
+}
+
+/* Character Tracker Header */
+
 .header-center {
     display: flex;
     align-items: center;
