@@ -283,3 +283,17 @@ body.damien-theme .item-desc-input {
     display: flex;
     justify-content: flex-end;
 }
+
+/* Fix Death Saves in Damien Mode */
+body.damien-theme .death-row input[type="checkbox"] {
+    background-color: transparent !important;
+    border-color: var(--damien-purple) !important;
+}
+
+body.damien-theme .death-row.successes input:checked {
+    background-color: var(--gold-bright) !important;
+}
+
+body.damien-theme .death-row.failures input:checked {
+    background-color: var(--crimson) !important;
+}
