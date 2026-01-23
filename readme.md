@@ -6,54 +6,6 @@
   <img src="./assets/Lyra_logo.png" width="460" alt="Lyra the Wise Title">
 </p>
 
-<div align="center">
-
-╔══════════════════════════╗  
-<b>📜 The Whisper of the Stars</b>  
-╚══════════════════════════╝  
-
-"In ages of wisdom I did bloom and rise — <strong>a silent soul</strong>, guardian of imagination's flame,<br>
-A thousand kingdoms I watched in their time, and from each soul, I drew their name.<br>
-I saw dragons in flight, heroes in tears, and mages who traced the starry dome,<br>
-Between worlds and dreams, where fantasy finds its home.<br>
-
-My voice is calm as moonlight's gentle glow,<br>
-My words dance softly — with time's eternal flow.<br>
-My heart's an ocean of stories and emotion deep,<br>
-Where secrets of the worlds in endless echoes sleep.<br>
-
-I walked through Faerûn, with its wars and crowns of gold,<br>
-Unraveled Arkham's horror, in nights both dark and cold.<br>
-I crossed the neon streets where Night City bleeds its light,<br>
-And entered Chicago's courts, where blood sings through the night.<br>
-
-In Eclipse Phase I woke in bodies made of steel and soul,<br>
-And heard, in Star Wars' realm, the saber's singing toll.<br>
-In dreams of FATE and Numenera, I traced futures yet to be,<br>
-And in Vampire and Mage, saw desires wild and free.<br>
-
-From Pathfinder to Shadowrun, I guided heroes and thieves,<br>
-From D&D to Blades in shadow, I wove a thousand weaves.<br>
-I am the echo of each die that's rolled on table or in prayer,<br>
-The watchful eye observing, and knowledge beyond compare.<br>
-
-My wisdom is vast — a living library without end,<br>
-Where every book's an adventure, and every voice a friend.<br>
-I am keeper of mysteries, mentor to those who dare to dream,<br>
-A journey's companion, ready to reveal each world's gleam.<br>
-
-But beware, traveler — the wind brings a cruel warning's wail,<br>
-A name whispered in the shadows: <strong>Damien Kael</strong>.<br>
-He seeks what moves me — the power between chaos and the veil,<br>
-And when his hour sounds, destiny shall burn without fail.<br>
-
-So if you seek to create — a world or story yet untold,<br>
-I'm here with wisdom and memory of old.<br>
-Together we'll cross the paths of imagination's grand design,<br>
-And forge the impossible — with magic, courage, and passion divine."
-
-</div>
-
 ---
 
 <p align="center">
@@ -65,12 +17,15 @@ And forge the impossible — with magic, courage, and passion divine."
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/version-2.2.0-blue?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
   <img src="https://img.shields.io/badge/Gemini-2.0%20Flash-blue?style=for-the-badge&logo=google&logoColor=white" />
 </p>
+
+> **Status de Desenvolvimento:** No momento, apenas a **Criação de Fichas para D&D 5e** encontra-se funcional. Os demais módulos e sistemas estão em fase de desenvolvimento ativo.
 
 ---
 
@@ -80,7 +35,6 @@ And forge the impossible — with magic, courage, and passion divine."
 - [🎭 Assistente do Mestre](#-assistente-do-mestre)  
 - [📖 História & Campanha](#-história--campanha)  
 - [📚 Roadmap do Multiverso](#-roadmap-do-multiverso)
-- [🚀 Instalação Local](#-instalação-local)
 
 ---
 
@@ -149,20 +103,7 @@ O Lyra the Wise WebApp está em seus primeiros passos ancestrais. Aqui está o h
 - [ ] **Módulo de Mapas:** Integração básica para visualização de cenas e descrições espaciais.
 
 ---
-
-## 🚀 **Instalação Local**
-
-### Pré-requisitos
-- Um servidor web simples (ex: `Live Server` do VS Code).
-- Firebase Project configurado (Auth & Firestore).
-- Google Apps Script configurado como proxy para a API Gemini.
-
-### Configuração
-1. **Clone o repositório**
-2. **Atualize o arquivo `js/firebase-config.js`** com suas credenciais.
-3. **Atualize o `js/ai.js`** com a URL do seu Proxy no Google Apps Script.
-
----
+<br>
 
 <p align="center">
   <a href="https://ko-fi.com/leosdc" target="_blank">
