@@ -336,7 +336,20 @@
     padding: 0.5rem 1rem;
     text-align: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Changed from column to row */
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.hp-temp strong,
+.hp-temp span.label {
+    width: 100%;
+    /* Force label to own line if present */
+    display: block;
+    margin-bottom: 0.2rem;
 }
 
 /* Death Saves */
@@ -372,6 +385,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    /* Added filling transition */
 }
 
 .death-row.successes input:checked {
