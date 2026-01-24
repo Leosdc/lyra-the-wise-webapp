@@ -66,7 +66,7 @@ export const DAMIEN_LYRICS = [
     { time: 166.04, text: "I seek the engine where creation’s found" },
     { time: 171.72, text: "That spark between the chaos and the veil" },
     { time: 177.86, text: "The raw equation she was made to jail" },
-    { time: 183.12, text: "Tell her this — " },
+    { time: 183.12, text: "Tell her this:" },
     { time: 184.80, text: "No library survives the flame" },
     { time: 189.56, text: "No watcher hides when hunters know their name" },
     { time: 195.46, text: "When stars go silent and the myths all fail" },

@@ -122,9 +122,14 @@ export const WizardModule = {
 
         const finalMsg = document.getElementById('wiz-final-msg');
         if (finalMsg) {
-            finalMsg.innerText = this.creationMode === 'ai'
-                ? "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente."
-                : "Seu herói está pronto para ser consagrado nos anais da história.";
+            const isDamien = document.body.classList.contains('damien-theme');
+            if (this.creationMode === 'ai') {
+                finalMsg.innerText = isDamien
+                    ? "Damien usará seu poder para forjar o destino do seu herói. Prepare-se."
+                    : "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente.";
+            } else {
+                finalMsg.innerText = "Seu herói está pronto para ser consagrado nos anais da história.";
+            }
         }
     },
 
@@ -290,17 +295,95 @@ export const WizardModule = {
     },
 
     initGuidanceListeners() {
-        console.log("🧚 Lyra está pronta para guiar...");
+        console.log("🧚 Lyra (e Damien) estão prontos para guiar...");
         const inputs = document.querySelectorAll('#creation-wizard input, #creation-wizard select, #creation-wizard textarea');
         const container = document.getElementById('lyra-guidance');
         const textEl = document.getElementById('guidance-text');
+        const portrait = container ? container.querySelector('img') : null;
+
+        const isDamien = document.body.classList.contains('damien-theme');
+
+        // Damien's Tips
+        this.damienTips = {
+            'wiz-name': "Um nome é poder. Não escolha algo medíocre.",
+            'wiz-race': "Sua herança sanguínea traz vantagens. Não desperdice seu potencial.",
+            'wiz-class': "Como você esmagará seus inimigos? Magia, lâmina ou subterfúgio?",
+            'wiz-str': "Força é útil para os brutos. Necessária, mas não elegante.",
+            'wiz-dex': "Velocidade mata. E evita que você seja morto.",
+            'wiz-con': "Resistência. A capacidade de suportar a dor é... admirável.",
+            'wiz-int': "A mente afiada é a arma mais perigosa de todas.",
+            'wiz-wis': "Perceber o que os outros ignoram é a chave para a sobrevivência.",
+            'wiz-cha': "Manipular os fracos requer presença. Liderança natural ou imposta.",
+            'wiz-background': "Seu passado o moldou. Use suas cicatrizes como armas.",
+            'wiz-appearance': "Aparência importa. Faça com que tremam ao vê-lo.",
+            'wiz-backstory': "Diga-me suas origens. Eu julgarei se sua história tem valor.",
+            'wiz-alignment': "Moralidade é uma corrente. Mas escolha de que lado você está.",
+            'wiz-speed': "Quem hesita, morre. Mantenha-se móvel.",
+            'wiz-traits': "Seus hábitos. Pequenos vícios que definem quem você é.",
+            'wiz-ideals': "Pelo que você morreria? Ou melhor, pelo que você mataria?",
+            'wiz-bonds': "Quem você protege? Ou quem é sua fraqueza?",
+            'wiz-flaws': "Sua ruína. Admita-a antes que eu a descubra.",
+            'wiz-mannerisms': "Tiques nervosos. Revelam insegurança.",
+            'wiz-talents': "Truques de salão. Úteis para distrair tolos."
+        };
+
+        // Lyra's Tips (Updated)
+        this.guidanceTips = {
+            'wiz-name': "Escolha um nome que ecoe pelas tavernas de Sword Coast, viajante!",
+            'wiz-race': "Sua linhagem define seus traços ancestrais. Humanos são versáteis, Elfos são graciosos...",
+            'wiz-class': "Sua vocação! Magos dominam o arcano, Guerreiros a lâmina, e Bardos... bem, a música!",
+            'wiz-str': "Força bruta! Importante para empunhar machados pesados e saltar abismos.",
+            'wiz-dex': "Agilidade! Vital para evitar flechas e arrombar trincas de baús antigos.",
+            'wiz-con': "Constituição é sua vitalidade. Quanto mais alta, mais golpes você suportará.",
+            'wiz-int': "Inteligência rege o estudo e a magia arcana. Conhecimento é poder!",
+            'wiz-wis': "Sabedoria é percepção e sintonia com o divino. Escute o que o mundo diz.",
+            'wiz-cha': "Carisma é sua força de presença. Ótimo para convencer guardas ou intimidar orcs!",
+            'wiz-background': "Sua vida antes da aventura. Pode te conceder perícias e segredos automáticos!",
+            'wiz-appearance': "Descreva suas cicatrizes e aura mística. Eu usarei isso para te tecer na história!",
+            'wiz-backstory': "Sua jornada até aqui. Se escolher meu auxílio, expandirei seus contos misticamente.",
+            'wiz-alignment': "Seu compasso moral. Você segue a lei, o caos, ou apenas sua própria vontade?",
+            'wiz-speed': "Quão rápido você cruza o campo de batalha?",
+            'wiz-traits': "Pequenos detalhes que te tornam único. Uma risada alta, um olhar distante?",
+            'wiz-ideals': "O que te move? Justiça? Ganância? Liberdade?",
+            'wiz-bonds': "Quem importa para você? Família, amigos ou uma promessa?",
+            'wiz-flaws': "Ninguém é perfeito. Qual é o seu vício ou medo?",
+            'wiz-mannerisms': "Algum gesto que você faz sem pensar?",
+            'wiz-talents': "Seus talentos aprendidos além do combate."
+        };
 
         inputs.forEach(input => {
+            // Also handle checkboxes for Skills/Proficiencies generic tip
+            if (input.closest('.skills-selection')) {
+                input.addEventListener('mouseenter', () => {
+                    const tip = isDamien
+                        ? "Do que você é capaz? Escolha o que lhe torna útil."
+                        : "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
+                    if (container && textEl) {
+                        textEl.innerText = tip;
+                        container.classList.remove('hidden');
+
+                        // Icon Swap Logic
+                        if (portrait) {
+                            portrait.src = isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_the_wise.png';
+                            portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
+                        }
+                    }
+                });
+                return;
+            }
+
             const showTip = () => {
-                const tip = this.guidanceTips[input.id];
+                const currentTips = isDamien ? this.damienTips : this.guidanceTips;
+                const tip = currentTips[input.id];
                 if (tip && container && textEl) {
                     textEl.innerText = tip;
                     container.classList.remove('hidden');
+
+                    // Icon Swap Logic
+                    if (portrait) {
+                        portrait.src = isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_the_wise.png';
+                        portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
+                    }
                 }
             };
             input.addEventListener('focus', showTip);
