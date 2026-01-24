@@ -30,10 +30,10 @@
 ---
 
 ## 🧭 **Índice**
-- [🧙 Principais Recursos](#-principais-recursos)  
-- [👤 Fichas & Personagens](#-fichas--personagens)  
-- [🎭 Assistente do Mestre](#-assistente-do-mestre)  
-- [📖 História & Campanha](#-história--campanha)  
+- [📋 Recursos Principais](#-recursos-principais)
+- [👤 Personagens](#-personagens-fichas-arcanas)
+- [🐉 Bestiário & Perigos](#-bestiário--perigos)
+- [📖 Diários de Sessão](#-diários-de-sessão)
 - [📚 Roadmap do Multiverso](#-roadmap-do-multiverso)
 
 ---
