@@ -29,15 +29,24 @@ export const uploadCharacterToken = async (userId, characterId, file) => {
 };
 
 export const getCharacters = async (userId, systemId) => {
-    const q = query(
-        collection(db, COLLECTIONS.CHARACTERS),
-        where("userId", "==", userId),
-        where("systemId", "==", systemId)
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.CHARACTERS),
+            where("userId", "==", userId),
+            where("systemId", "==", systemId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    } catch (error) {
+        if (error.code === 'permission-denied') {
+            console.error('🔒 Acesso negado. Verifique suas permissões.');
+            // Only throw user-friendly error if needed, or handle upstream
+            throw new Error('Permissão negada ao acessar os anais dos personagens.');
+        }
+        throw error;
+    }
 };
 
 export const getCharacter = async (id) => {

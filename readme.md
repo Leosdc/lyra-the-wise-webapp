@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/Lyra_Token.png" width="280" alt="Lyra the Wise">
+  <img src="./assets/tokens/lyra.png" width="280" alt="Lyra the Wise">
 </p>
 
 <p align="center">

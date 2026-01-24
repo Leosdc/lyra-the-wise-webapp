@@ -56,6 +56,8 @@ export const SettingsModule = {
         };
 
         localStorage.setItem(`lyra_prefs_${user.uid}`, JSON.stringify(prefs));
+        // SECURITY NOTE: Never store sensitive data (tokens, passwords) in localStorage.
+        // Use sessionStorage for temporary sensitive state or Firestore for permanent secure storage.
 
         this.applyPreferences(prefs);
 

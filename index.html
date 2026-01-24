@@ -6,10 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyra the Wise - RPG WebApp</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="assets/Lyra_Token.png" type="image/png">
+    <link rel="icon" href="assets/tokens/lyra.png" type="image/png">
+
+    <!-- ✅ Performance: Preconnect to Font Origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- ✅ Performance: Async Font Loading -->
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=Grenze+Gotisch:wght@700&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -82,7 +89,7 @@
 
             <div id="header-char-tracker" class="header-center hidden">
                 <div class="header-token-wrapper">
-                    <img id="header-token" src="assets/Lyra_Token.png" alt="Token">
+                    <img id="header-token" src="assets/tokens/lyra.png" alt="Token">
                 </div>
                 <div id="header-char-info" class="tracker-info">
                     <div class="header-name-row">
@@ -726,7 +733,7 @@
                         <!-- Left: Token -->
                         <div class="header-token-section">
                             <div class="char-token-wrapper">
-                                <img id="sheet-token" src="assets/Lyra_Token.png" alt="Token" class="char-token">
+                                <img id="sheet-token" src="assets/tokens/lyra.png" alt="Token" class="char-token">
                                 <input type="file" id="token-upload" accept="image/*" class="hidden">
                                 <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
                                     <i class="fas fa-camera"></i>
@@ -1010,7 +1017,7 @@
 
     <!-- Mystic Music Player (Bottom-Left) -->
     <div id="mystic-player" class="mystic-player-floating collapsed">
-        <audio id="lyra-bg-music" src="assets/The Whisper of the Stars.mp3" loop></audio>
+        <audio id="lyra-bg-music" src="assets/music/lyra-theme.mp3" loop></audio>
 
         <div class="player-toggle">
             <div class="player-orb">
@@ -1060,7 +1067,7 @@
             <i class="fas fa-exclamation-triangle warning-icon"></i>
             <div class="warning-text">
                 <strong>Versão Alpha</strong>
-                <p>O Lyra ainda está em desenvolvimento inicial. Você pode encontrar bugs e instabilidade.</p>
+                <p>O website ainda está em desenvolvimento inicial. Você pode encontrar bugs e instabilidade.</p>
             </div>
         </div>
     </div>

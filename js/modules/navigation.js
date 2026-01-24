@@ -216,7 +216,7 @@ export const NavigationModule = {
         tracker?.classList.remove('hidden');
 
         const tokenEl = document.getElementById('header-token');
-        if (tokenEl) tokenEl.src = char.tokenUrl || (isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
+        if (tokenEl) tokenEl.src = char.tokenUrl || (isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png');
 
         const nameEl = document.getElementById('header-name');
         if (nameEl) nameEl.innerText = char.name || char.bio?.name || 'Sem Nome';

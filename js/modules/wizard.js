@@ -141,6 +141,17 @@ export const WizardModule = {
             return;
         }
 
+        // Security Validation
+        if (name.length > 50) {
+            context.showAlert("O nome é muito longo (máximo 50 caracteres).", "Nome Inválido");
+            return;
+        }
+        // Allow letters, spaces, apostrophes and hyphens (common in fantasy names)
+        if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(name)) {
+            context.showAlert("O nome contém caracteres proibidos pelos deuses.", "Nome Inválido");
+            return;
+        }
+
         context.toggleLoading(true);
         try {
             const template = JSON.parse(JSON.stringify(SYSTEM_TEMPLATES[context.currentSystem] || SYSTEM_TEMPLATES['dnd5e']));
@@ -362,7 +373,7 @@ export const WizardModule = {
 
                         // Icon Swap Logic
                         if (portrait) {
-                            portrait.src = isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_the_wise.png';
+                            portrait.src = isDamien ? 'assets/tokens/damien.png' : 'assets/Lyra_the_wise.png';
                             portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
                         }
                     }
@@ -380,7 +391,7 @@ export const WizardModule = {
 
                     // Icon Swap Logic
                     if (portrait) {
-                        portrait.src = isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_the_wise.png';
+                        portrait.src = isDamien ? 'assets/tokens/damien.png' : 'assets/Lyra_the_wise.png';
                         portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
                     }
                 }

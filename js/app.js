@@ -155,7 +155,7 @@ const app = {
                 return `
                     <div class="char-switcher-item ${isCurrent ? 'active' : ''}" data-char-id="${char.id}">
                         <div class="switcher-item-content">
-                            <img src="${char.tokenUrl || (this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png')}" alt="Token" class="switcher-token">
+                            <img src="${char.tokenUrl || (this.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png')}" alt="Token" class="switcher-token">
                             <div class="switcher-info">
                                 <strong>${char.name || char.bio?.name || 'Sem Nome'}</strong>
                                 <span>${race || '-'} | ${clazz || '-'} (Nív ${level})</span>
@@ -533,7 +533,7 @@ const app = {
         const div = document.createElement('div');
         div.className = `msg ${sender}`;
         if (sender === 'bot') {
-            const avatar = this.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png';
+            const avatar = this.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png';
             div.innerHTML = `<img src="${avatar}" class="chat-avatar"><span class="msg-content">${parseMarkdown(text)}</span>`;
         } else {
             div.innerHTML = `<span class="msg-content">${parseMarkdown(text)}</span>`;
@@ -635,7 +635,7 @@ const app = {
 
         if (audio && trackName) {
             const currentSrc = audio.getAttribute('src');
-            const targetSrc = enable ? 'assets/The Hunger Beyond the Veil.mp3' : 'assets/The Whisper of the Stars.mp3';
+            const targetSrc = enable ? 'assets/music/damien-theme.mp3' : 'assets/music/lyra-theme.mp3';
             const targetName = enable ? 'The Hunger Beyond the Veil' : 'The Whisper of the Stars';
 
             if (currentSrc !== targetSrc) {
@@ -675,12 +675,12 @@ const app = {
 
         // Update tokens if they are default
         if (sheetToken) {
-            if (enable && sheetToken.src.includes('Lyra')) sheetToken.src = 'assets/Damien_Token.png';
-            else if (!enable && sheetToken.src.includes('Damien')) sheetToken.src = 'assets/Lyra_Token.png';
+            if (enable && sheetToken.src.includes('Lyra')) sheetToken.src = 'assets/tokens/damien.png';
+            else if (!enable && sheetToken.src.includes('Damien')) sheetToken.src = 'assets/tokens/lyra.png';
         }
         if (hToken) {
-            if (enable && hToken.src.includes('Lyra')) hToken.src = 'assets/Damien_Token.png';
-            else if (!enable && hToken.src.includes('Damien')) hToken.src = 'assets/Lyra_Token.png';
+            if (enable && hToken.src.includes('Lyra')) hToken.src = 'assets/tokens/damien.png';
+            else if (!enable && hToken.src.includes('Damien')) hToken.src = 'assets/tokens/lyra.png';
         }
     },
 

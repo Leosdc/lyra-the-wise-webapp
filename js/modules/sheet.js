@@ -116,7 +116,7 @@ export const SheetModule = {
         if (raceEl) raceEl.innerHTML = mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100%;');
         if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 100%;');
 
-        document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/Damien_Token.png' : 'assets/Lyra_Token.png');
+        document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png');
 
         // Main Tab
         const b = char.bio || {};

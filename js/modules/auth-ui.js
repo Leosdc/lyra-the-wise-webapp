@@ -17,7 +17,7 @@ export const AuthUI = {
             userActions?.classList.remove('hidden');
             if (loginBtn) {
                 loginBtn.innerHTML = `
-                    <img src="${user.photoURL || 'assets/Lyra_Token.png'}" class="user-avatar" alt="Avatar">
+                    <img src="${user.photoURL || 'assets/tokens/lyra.png'}" class="user-avatar" alt="Avatar">
                     <span>Sair</span>
                 `;
                 loginBtn.onclick = () => logout();

@@ -72,6 +72,8 @@ export function escapeHTML(str) {
 
 export function parseMarkdown(text) {
     if (!text) return '';
+    // SECURITY: Currently using escapeHTML() which is safe for simple text.
+    // If accepting raw HTML in the future, MUST use a sanitizer like DOMPurify.
     let html = escapeHTML(text); // Sanitize first
 
     // Headers
