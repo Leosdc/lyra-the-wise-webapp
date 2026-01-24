@@ -130,6 +130,17 @@ export const WizardModule = {
             } else {
                 finalMsg.innerText = "Seu herói está pronto para ser consagrado nos anais da história.";
             }
+
+            // Update Start Screen Choice Card
+            const aiCard = document.querySelector('.choice-card[data-mode="ai"]');
+            if (aiCard) {
+                const title = aiCard.querySelector('h4');
+                const p = aiCard.querySelector('p');
+                if (title) title.innerText = isDamien ? "Com Damien" : "Com Lyra";
+                if (p) p.innerText = isDamien
+                    ? "O Poder Verdadeiro forjará seu destino."
+                    : "A Sabedoria Ancestral irá tecer sua lenda.";
+            }
         }
     },
 
@@ -355,6 +366,7 @@ export const WizardModule = {
             // Also handle checkboxes for Skills/Proficiencies generic tip
             if (input.closest('.skills-selection')) {
                 input.addEventListener('mouseenter', () => {
+                    const isDamien = document.body.classList.contains('damien-theme');
                     const tip = isDamien
                         ? "Do que você é capaz? Escolha o que lhe torna útil."
                         : "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
@@ -373,6 +385,7 @@ export const WizardModule = {
             }
 
             const showTip = () => {
+                const isDamien = document.body.classList.contains('damien-theme');
                 const currentTips = isDamien ? this.damienTips : this.guidanceTips;
                 const tip = currentTips[input.id];
                 if (tip && container && textEl) {
