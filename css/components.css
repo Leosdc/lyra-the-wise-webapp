@@ -539,8 +539,8 @@
 
 .close-modal {
     position: absolute;
-    top: 1px;
-    right: 1px;
+    top: 2px;
+    right: 2px;
     background: rgba(44, 30, 22, 0.1);
     border: 1px solid var(--gold);
     color: var(--ink);
