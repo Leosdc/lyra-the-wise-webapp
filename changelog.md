@@ -2,7 +2,18 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
 
-## [2.2.0] - 2026-01-23
+
+## [2.3.0] - 2026-01-23
+### 🎭 Personas Dinâmicas & Polimento Visual
+- **Wizard Duplo**: O criador de personagens agora reage ao tema. Lyra guia com sabedoria, enquanto Damien (tema roxo) oferece conselhos cínicos e voltados ao poder.
+- **Cobertura Total**: Ambos os tutores agora guiam todos os campos, incluindo Alinhamento, Velocidade e a aba completa de Crônicas.
+- **Refinamento de UI**:
+    - Ajuste fino na posição do botão de fechar (X).
+    - Fontes temáticas (*Cinzel*) aplicadas consistentemente na aba Crônicas.
+    - Correção de legibilidade nos inputs do tema Damien.
+    - Ícones de Saves de Morte corrigidos e coloridos no tema Damien.
+- **Tradução**: Atributos da ficha forçados para PT-BR (FOR, DES, CON, INT, SAB, CAR).
+
 ### 🎨 Refinamento Visual & Unificação Estrutural
 - **Novo Layout da Ficha**: Cabeçalho do personagem reestruturado em Grid de duas linhas para melhor visualização (Nome/Nível e Detalhes/Save).
 - **CSS Modularizado**: Reorganização completa dos arquivos de estilo em módulos (`layout`, `components`, `sheet`, etc.) com unificação de variáveis.

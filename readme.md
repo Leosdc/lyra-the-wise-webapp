@@ -10,14 +10,14 @@
 
 <p align="center">
   🧙 <strong>WebApp de RPG Completo</strong> • 🤖 <strong>IA Narrativa</strong> • 📜 <strong>Fichas Automáticas</strong> • ⚔️ <strong>Suporte a Sistemas</strong><br>
-  🚀 <strong>Versão Alfa 2.2</strong>
+  🚀 <strong>Versão Alfa 2.3</strong>
 </p>
 
 <p align="center"> <strong>Lyra the Wise WebApp</strong> é a versão web da sábia anciã que transforma seu navegador em uma <strong>mesa de RPG inteligente</strong>, unindo narrativa, automação e gestão de personagens.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.2.0-blue?style=for-the-badge&logo=none" />
+  <img src="https://img.shields.io/badge/version-2.3.0-blue?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
@@ -42,8 +42,8 @@
 
 ### 📝 **Sistema Completo de Fichas**
 - **Adaptável a vários sistemas:** Templates personalizáveis via `constants.js`.
-- **D&D 5e (Alfa - 50%):** Ficha funcional com Atributos, CA, HP, XP, Perícias e Ataques.
-- **Criação Assistida por IA:** Lyra tece os detalhes de história e personalidade para você.
+- **D&D 5e (Alfa - 60%):** Ficha funcional com Atributos, CA, HP, XP, Perícias, Ataques e Crônicas.
+- **Criação Assistida por IA:** Lyra (ou Damien) tecem os detalhes de história e personalidade para você.
 - **Edição Intuitiva:** Interface medieval imersiva com botões customizados para stats.
 - **Cálculos Automáticos:** Modificadores, Percepção Passiva e Iniciativa automáticos.
 
@@ -65,7 +65,7 @@
 - Trivia randômica sobre a história do RPG.
 
 ### 👤 Personagens (Fichas Arcanas)
-- Criador interativo (Wizard) com modos Manual e IA.
+- Criador interativo (Wizard) com modos Manual e IA (Personas Duplas).
 - Ficha detalhada com abas para Atributos, Perícias, Combate e História.
 
 ### 🐉 Bestiário & Perigos
@@ -80,12 +80,13 @@
 
 O Lyra the Wise WebApp está em seus primeiros passos ancestrais. Aqui está o horizonte que buscamos alcançar:
 
-### 🛠️ **Status Atual: Alfa 2.2**
-- [x] **Refinamento de UI:** Layout de ficha otimizado (Grid 2-row) e correções de espaçamento.
-- [x] **Ficha D&D 5e (Core):** ~90% (Combate, Atributos, Proficiências, Listas Dinâmicas e Inventário com Carga).
+### 🛠️ **Status Atual: Alfa 2.3**
+- [x] **Refinamento de UI:** Layout de ficha otimizado, fontes temáticas e inputs corrigidos.
+- [x] **Wizard Dinâmico:** Orientação por persona (Lyra/Damien) baseada no tema ativo.
+- [x] **Ficha D&D 5e (Core):** ~95% (Combate, Atributos, Proficiências, Listas Dinâmicas, Crônicas e Inventário).
 - [x] **Portal de Personalização:** Configurações de perfil e 12 cursores épicos.
 - [x] **Motor Computacional:** Fórmulas fielmente aplicadas conforme manuais técnicos.
-- [x] **Easter Egg:** Invasão rúnica de Damien Kael (10% chance).
+- [x] **Easter Egg:** Invasão rúnica de Damien Kael (10% chance) com suporte total.
 
 ### 🌌 **Fase 1: Estabilização de Fichas (Em Breve)**
 - [ ] **Finalização D&D 5e:** Suporte completo a Magias (slots e descrições) e Inventário.

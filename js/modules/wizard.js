@@ -55,21 +55,7 @@ export const WizardModule = {
         this.triviaIndex = 0;
         this.isWaitingForAI = false;
 
-        // Guidance Dictionary
-        this.guidanceTips = {
-            'wiz-name': "Escolha um nome que ecoe pelas tavernas de Sword Coast, viajante!",
-            'wiz-race': "Sua linhagem define seus traços ancestrais. Humanos são versáteis, Elfos são graciosos...",
-            'wiz-class': "Sua vocação! Magos dominam o arcano, Guerreiros a lâmina, e Bardos... bem, a música!",
-            'wiz-str': "Força bruta! Importante para empunhar machados pesados e saltar abismos.",
-            'wiz-dex': "Agilidade! Vital para evitar flechas e arrombar trincas de baús antigos.",
-            'wiz-con': "Constituição é sua vitalidade. Quanto mais alta, mais golpes você suportará.",
-            'wiz-int': "Inteligência rege o estudo e a magia arcana. Conhecimento é poder!",
-            'wiz-wis': "Sabedoria é percepção e sintonia com o divino. Escute o que o mundo diz.",
-            'wiz-cha': "Carisma é sua força de presença. Ótimo para convencer guardas ou intimidar orcs!",
-            'wiz-background': "Sua vida antes da aventura. Pode te conceder perícias e segredos automáticos!",
-            'wiz-appearance': "Descreva suas cicatrizes e aura mística. Eu usarei isso para te tecer na história!",
-            'wiz-backstory': "Sua jornada até aqui. Se escolher meu auxílio, expandirei seus contos misticamente."
-        };
+
         const mode = card.dataset.mode;
         this.creationMode = mode;
         const wizardContainer = card.closest('.wizard-container');
