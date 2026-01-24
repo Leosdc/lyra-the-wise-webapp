@@ -998,9 +998,22 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    padding-left: 0;
+    list-style: none;
+}
+
+.changelog-item li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
 }
 
 .changelog-item li i {
     color: var(--gold);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    /* Align with text baseline */
+    flex-shrink: 0;
 }

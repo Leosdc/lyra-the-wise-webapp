@@ -15,6 +15,7 @@ import { SettingsModule } from './modules/settings.js';
 import { AuthUI } from './modules/auth-ui.js';
 import { ListModule } from './modules/lists.js';
 import LyricsModule from './modules/lyrics.js';
+import { ChangelogModule } from './modules/changelog-loader.js';
 import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue, parseMarkdown } from './modules/utils.js';
 import { sendMessageToLyra } from './ai.js';
 
@@ -52,6 +53,7 @@ const app = {
         LyricsModule.setTheme(this.isDamien);
 
         WizardModule.initGuidanceListeners();
+        ChangelogModule.loadChangelog();
 
         // Check Changelog Notification
         const storedVersion = localStorage.getItem('lyraAppVersion');
