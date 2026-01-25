@@ -1,4 +1,4 @@
-const AI_PROXY_URL = "https://script.google.com/macros/s/AKfycbxargXcnX6vxelFHruR0l1uZEVqP3etr-6kENsB5TB55luDv0uet_JJbOvE6-65WUyH5w/exec";
+const AI_PROXY_URL = "https://script.google.com/macros/s/AKfycbx3BNv7cg8xphsW_vruFIW_Etgww9RBoJGv4TzvEk-QD8gG7h0R-QBg5wDpbWVNkR4uow/exec";
 
 const SHARED_LORE = `
 ### LORE: A TRÍADE DO ECO ETERNO
