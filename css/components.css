@@ -955,7 +955,7 @@
 }
 
 .warning-text strong {
-    color: var(--gold-bright);
+    color: var(--crimson);
     display: block;
     margin-bottom: 5px;
     font-family: 'Cinzel', serif;
@@ -964,8 +964,17 @@
 .warning-text p {
     font-size: 0.85rem;
     margin: 0;
-    color: #ccc;
+    color: var(--ink);
     line-height: 1.4;
+}
+
+/* Eldrin Override for Inner Text */
+.eldrin-theme .warning-text strong {
+    color: var(--gold-bright);
+}
+
+.eldrin-theme .warning-text p {
+    color: #eee;
 }
 
 #close-alpha-warning {

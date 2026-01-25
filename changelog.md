@@ -3,6 +3,13 @@
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
 
 
+## [2.3.1] - 2026-01-24
+### 🎻 A Balada de Eldrin & Ajustes de Harmonia
+- **Tema Eldrin (Beta)**: Implementação completa do tema "Eldrin, The Bard" (Azul e Dourado) com música e token dedicados.
+- **Harmonia Musical**: Correção no player de música para exibir corretamente o nome da faixa em todos os temas (Lyra, Damien, Eldrin).
+- **Legibilidade**: Ajuste de contraste no popup "Versão Alpha" para garantir leitura clara em fundos claros e escuros.
+- **Lírica Sincronizada**: As letras da tela inicial agora respeitam a música do personagem ativo.
+
 ## [2.3.0] - 2026-01-23
 ### 🎭 Personas Dinâmicas & Polimento Visual
 - **Wizard Duplo**: O criador de personagens agora reage ao tema. Lyra guia com sabedoria, enquanto Damien (tema roxo) oferece conselhos cínicos e voltados ao poder.

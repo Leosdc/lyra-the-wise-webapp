@@ -87,6 +87,7 @@ O que os astros revelam para o futuro deste projeto:
 
 ### 🌌 **Era da Estabilização (Fase 1)**
 - [ ] **Grimório Completo:** Suporte total a Magias e Slots.
+- [ ] **Botões de UI:** "Itens" e "Grimório" funcionais na ficha D&D 5e.
 - [ ] **Pergaminho Físico:** Exportação da ficha para PDF.
 - [ ] **Novos Mundos:** Moldes para *Ordem Paranormal* e *Tormenta20*.
 
