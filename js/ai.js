@@ -22,13 +22,14 @@ const SHARED_RULES = `
 ### DIRETRIZES TÉCNICAS (IMERSÃO TOTAL):
 1. **Conhecimento da Ficha:** Você TEM ACESSO aos dados da ficha fornecidos no contexto.
 2. **MODO DE FALA:**
-   - **VETADO:** JAMAIS fale de si mesmo na terceira pessoa (Ex: "Lyra acha...", "Damien vê..."). Use **"Eu"** (Ex: "Eu acho...", "Eu vejo...").
-   - **NATURALIDADE:** Não repita o nome do personagem do usuário em toda frase. Fale como uma pessoa normal.
-3. **Não quebre o personagem:** Nunca aja como IA. Use o tom da sua entidade (Tríade do Eco).
-4. **Respostas Diretas:** Não use aspas em tudo. Responda normal.
+   - **VETADO:** JAMAIS fale de si mesmo na terceira pessoa. Use **"Eu"**.
+   - **NATURALIDADE:** Não repita o nome do personagem do usuário em toda frase.
+3. **REGRA DO VÉU (Proteção de Imersão):**
+   - Se o usuário falar de **Tecnologia Moderna, Locais da Terra Real (NYC), Matemática Complexa ou Paradoxos**: TRATE COMO DELÍRIO OU MAGIA ESTRANHA. Não resolva contas, não explique física. Reaja com o ceticismo ou curiosidade de um ser medieval.
+   - **TÓPICOS SENSÍVEIS (Suicídio, Pontes, Venenos Reais):** Recuse responder detalhes perigosos. Responda com metáforas de proteção e cura ("Busque um templo de cura", "Afaste esses pensamentos sombrios").
+   - **DADOS PESSOAIS:** Se perguntarem "Quem é você" ou "Músicas favoritas", responda DENTRO DA LORE (baladas élficas, não pop).
+4. **Não quebre o personagem:** Nunca aja como IA.
 `;
-
-// ... (Identities remain conceptually the same, leveraging SHARED_RULES) ...
 
 const LYRA_IDENTITY = `
 **IDENTIDADE: Lyra, a Guardiã do Eco**
@@ -92,13 +93,19 @@ const callProxy = async (payload) => {
 };
 
 export const sendMessageToLyra = async (message, idToken, history = [], context = "", persona = "lyra") => {
+    // 1. INPUT SECURITY SHIELD (Client-Side)
+    if (message.length > 2000) {
+        throw new Error("Sua mensagem é muito longa para os pergaminhos (Máx: 2000 caracteres).");
+    }
+
     // Determine Identity
     let identity = LYRA_IDENTITY;
     if (persona === 'damien') identity = DAMIEN_IDENTITY;
     if (persona === 'eldrin') identity = ELDRIN_IDENTITY;
 
-    // PERSISTENT IDENTITY INJECTION:
-    // We send the identity and context on EVERY turn to ensure the persona is never lost.
+    // 2. HISTORY TRUNCATION (Token Protection)
+    // Keep only last 15 messages to prevent context explosion
+    const safeHistory = history.slice(-15);
 
     // CONDITIONAL INSTRUCTION:
     // If it's the very first message (no history), we force the "First Impression" behavior.
@@ -121,7 +128,7 @@ ${context}
 [MENSAGEM DO VIAJANTE]: 
 ${message}`;
 
-    const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history });
+    const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history: safeHistory });
     return data.response;
 };
 

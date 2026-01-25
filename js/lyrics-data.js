@@ -73,6 +73,7 @@ export const DAMIEN_LYRICS = [
     { time: 201.31, text: "Creation kneels — to Damien Kael" },
     { time: 207.30, text: "So dream, creator — but dream with care" },
     { time: 213.46, text: "For every world you build, I’m already there" },
+    { time: 219.36, text: "And when you feel your story slip the rail" },
     { time: 225.16, text: "That’s not an error. That’s me." }
 ];
 
