@@ -1,4 +1,7 @@
 
+import { db } from '../auth.js';
+import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 /**
  * Settings Module
  * Handles user preferences, profile updates, and theming (cursors).
@@ -6,9 +9,33 @@
 
 export const SettingsModule = {
 
-    loadUserPreferences(user) {
+    async loadUserPreferences(user) {
         if (!user) return;
-        const prefs = JSON.parse(localStorage.getItem(`lyra_prefs_${user.uid}`) || '{}');
+
+        const userRef = doc(db, 'user_preferences', user.uid);
+        let prefs = {};
+
+        try {
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                prefs = docSnap.data();
+            } else {
+                // Migration: Check localStorage one last time
+                const localData = localStorage.getItem(`lyra_prefs_${user.uid}`);
+                if (localData) {
+                    console.log("🔄 Migrando preferências para a nuvem...");
+                    prefs = JSON.parse(localData);
+                    // Save to Firestore
+                    await setDoc(userRef, prefs);
+                    // Remove from insecure storage
+                    localStorage.removeItem(`lyra_prefs_${user.uid}`);
+                }
+            }
+        } catch (error) {
+            console.error("Erro ao carregar preferências:", error);
+        }
+
         this.applyPreferences(prefs);
     },
 
@@ -40,7 +67,7 @@ export const SettingsModule = {
         }
     },
 
-    saveSettings(user, { showAlert, closeModal }) {
+    async saveSettings(user, { showAlert, closeModal }) {
         if (!user) return;
 
         const nickname = document.getElementById('setting-nickname').value;
@@ -55,13 +82,19 @@ export const SettingsModule = {
             cursor: selectedCursor
         };
 
-        localStorage.setItem(`lyra_prefs_${user.uid}`, JSON.stringify(prefs));
-        // SECURITY NOTE: Never store sensitive data (tokens, passwords) in localStorage.
-        // Use sessionStorage for temporary sensitive state or Firestore for permanent secure storage.
+        try {
+            await setDoc(doc(db, 'user_preferences', user.uid), prefs);
 
-        this.applyPreferences(prefs);
+            // Clean legacy data if exists (just in case)
+            localStorage.removeItem(`lyra_prefs_${user.uid}`);
 
-        if (closeModal) closeModal('settings-modal');
-        if (showAlert) showAlert("Preferências consagradas com sucesso!", "Selo Real");
+            this.applyPreferences(prefs);
+
+            if (closeModal) closeModal('settings-modal');
+            if (showAlert) showAlert("Preferências consagradas na nuvem!", "Selo Real");
+        } catch (error) {
+            console.error("Erro ao salvar preferências:", error);
+            if (showAlert) showAlert("Erro ao salvar preferências: " + error.message, "Falha na Escrita");
+        }
     }
 };

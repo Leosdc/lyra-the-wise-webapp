@@ -241,9 +241,9 @@ const app = {
     },
 
     // --- State Handlers ---
-    handleAuthStateChange(user) {
+    async handleAuthStateChange(user) {
         this.user = user;
-        AuthUI.update(user, {
+        await AuthUI.update(user, {
             selectCharacter: (char) => { if (char) this.selectCharacter(char); },
             clearAllViews: () => {
                 const ids = ['fichas-list', 'monsters-list', 'traps-list', 'sessions-list', 'chat-messages'];
