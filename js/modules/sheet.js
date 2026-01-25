@@ -285,6 +285,125 @@ export const SheetModule = {
             `).join('');
         }
 
+        // ========================================
+        // PATCH 2: SPELL SLOTS - IMPLEMENTAÇÃO COMPLETA
+        // ========================================
+        const spellsContainer = document.getElementById('sheet-spell-slots');
+        if (spellsContainer) {
+            if (char.spells?.slots) {
+                const slots = char.spells.slots;
+                const levels = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9'];
+
+                spellsContainer.innerHTML = levels.map(lvl => {
+                    const data = slots[lvl] || { total: 0, used: 0 };
+                    const lvlNum = lvl.replace('l', '');
+
+                    // Não mostrar níveis sem slots
+                    if (!data.total || data.total == 0) return '';
+
+                    return `
+                        <div class="slot-box" title="Círculo ${lvlNum}">
+                            <strong>Nível ${lvlNum}</strong>
+                            <div class="slot-inputs" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                <input 
+                                    type="number" 
+                                    value="${data.used}" 
+                                    data-field="spells.slots.${lvl}.used" 
+                                    min="0" 
+                                    max="${data.total}"
+                                    style="width: 40px; text-align: center; padding: 0.3rem;"
+                                    title="Gastos"
+                                >
+                                <span>/</span>
+                                <span style="font-weight: bold;">${data.total}</span>
+                            </div>
+                            <div class="slot-circles" style="display: flex; gap: 4px; margin-top: 0.5rem;">
+                                ${Array(parseInt(data.total)).fill(0).map((_, i) => `
+                                    <div 
+                                        class="slot-circle ${i < data.used ? 'used' : 'available'}" 
+                                        style="
+                                            width: 12px; 
+                                            height: 12px; 
+                                            border-radius: 50%; 
+                                            background: ${i < data.used ? '#666' : 'var(--gold)'}; 
+                                            border: 1px solid var(--ink);
+                                            cursor: pointer;
+                                        "
+                                        data-level="${lvl}"
+                                        data-index="${i}"
+                                        title="${i < data.used ? 'Gasto' : 'Disponível'}"
+                                    ></div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).filter(Boolean).join('');
+
+                // Event Listener: Clicar nos círculos para marcar/desmarcar
+                spellsContainer.querySelectorAll('.slot-circle').forEach(circle => {
+                    circle.addEventListener('click', (e) => {
+                        const lvl = e.target.dataset.level;
+                        const idx = parseInt(e.target.dataset.index);
+                        const input = spellsContainer.querySelector(`input[data-field="spells.slots.${lvl}.used"]`);
+
+                        if (!input) return;
+
+                        const current = parseInt(input.value) || 0;
+
+                        // Se clicou em um slot usado, reduz
+                        if (idx < current) {
+                            input.value = idx;
+                        } else {
+                            // Se clicou em um disponível, marca até aquele ponto
+                            input.value = idx + 1;
+                        }
+
+                        // Trigger change event para atualizar visualmente
+                        input.dispatchEvent(new Event('input'));
+                    });
+                });
+
+                // Event Listener: Input manual sincroniza os círculos
+                spellsContainer.querySelectorAll('input[data-field^="spells.slots"]').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const lvl = e.target.dataset.field.split('.')[2]; // Extrai "l1" de "spells.slots.l1.used"
+                        const used = parseInt(e.target.value) || 0;
+
+                        // Atualiza os círculos visualmente
+                        spellsContainer.querySelectorAll(`.slot-circle[data-level="${lvl}"]`).forEach((circle, i) => {
+                            if (i < used) {
+                                circle.style.background = '#666';
+                                circle.title = 'Gasto';
+                                circle.classList.add('used');
+                                circle.classList.remove('available');
+                            } else {
+                                circle.style.background = 'var(--gold)';
+                                circle.title = 'Disponível';
+                                circle.classList.add('available');
+                                circle.classList.remove('used');
+                            }
+                        });
+                    });
+                });
+            } else {
+                spellsContainer.innerHTML = '<p style="opacity:0.6; font-style:italic;">Sem slots de magia definidos.</p>';
+            }
+
+            // Cálculo de Spell DC e Ataque
+            const spellAttr = char.spells?.ability || 'int';
+            const attrMap = { int: mods.intMod, wis: mods.wisMod, cha: mods.chaMod };
+            const spellMod = attrMap[spellAttr] || 0;
+
+            const spellDC = 8 + mods.profBonus + spellMod;
+            const spellAtk = mods.profBonus + spellMod;
+
+            const spellDCEl = document.getElementById('sheet-spell-dc');
+            const spellAtkEl = document.getElementById('sheet-spell-atk');
+
+            if (spellDCEl) spellDCEl.innerText = spellDC;
+            if (spellAtkEl) spellAtkEl.innerText = spellAtk >= 0 ? `+${spellAtk}` : spellAtk;
+        }
+
         // Spells List
         const spellsBody = document.getElementById('spells-body');
         if (spellsBody) {
@@ -313,6 +432,76 @@ export const SheetModule = {
                 </div>
             `).join('');
         }
+
+        // ========================================
+        // PATCH 3: ENCUMBRANCE - ATUALIZAÇÃO DINÂMICA
+        // ========================================
+        const updateEncumbrance = () => {
+            if (!char.inventory) return;
+
+            let totalWeight = 0;
+
+            // Calcular peso dos itens
+            const items = Array.from(document.querySelectorAll('#inventory-body .list-item-v2'));
+            items.forEach(row => {
+                const qtyInput = row.querySelector('input[data-field="quantity"]');
+                const weightInput = row.querySelector('input[data-field="weight"]');
+
+                const qty = parseInt(qtyInput?.value) || 1;
+                const weight = parseFloat(weightInput?.value) || 0;
+
+                totalWeight += weight * qty;
+            });
+
+            // Calcular peso das moedas (50 moedas = 1 lb)
+            const coins = char.inventory.coins || {};
+            const totalCoins = (parseInt(document.querySelector('.coin-item.pc input')?.value) || 0) +
+                (parseInt(document.querySelector('.coin-item.pp input')?.value) || 0) +
+                (parseInt(document.querySelector('.coin-item.pe input')?.value) || 0) +
+                (parseInt(document.querySelector('.coin-item.po input')?.value) || 0) +
+                (parseInt(document.querySelector('.coin-item.pl input')?.value) || 0);
+            totalWeight += totalCoins / 50;
+
+            // Limite baseado em Força
+            const strScore = parseInt(char.attributes?.str) || 10;
+            const limit = strScore * 15;
+
+            // Atualizar UI
+            const weightBar = document.getElementById('weight-progress');
+            const weightText = document.getElementById('weight-text');
+
+            if (weightBar && weightText) {
+                const perc = Math.min((totalWeight / limit) * 100, 100);
+                weightBar.style.width = `${perc}%`;
+                weightText.innerText = `${totalWeight.toFixed(1)} / ${limit} lbs`;
+
+                // Feedback visual de sobrecarga
+                if (totalWeight > limit) {
+                    weightBar.style.background = 'linear-gradient(90deg, #c0392b, #e74c3c)';
+                    weightText.style.color = 'var(--crimson)';
+                } else if (totalWeight > limit * 0.75) {
+                    weightBar.style.background = 'linear-gradient(90deg, #f39c12, #f1c40f)';
+                    weightText.style.color = '#f39c12';
+                } else {
+                    weightBar.style.background = 'linear-gradient(90deg, var(--gold-dark), var(--gold))';
+                    weightText.style.color = 'var(--ink)';
+                }
+            }
+
+            // Atualizar objeto do personagem (apenas na memória local por enquanto)
+            if (!char.inventory.encumbrance) char.inventory.encumbrance = {};
+            char.inventory.encumbrance.current = parseFloat(totalWeight.toFixed(2));
+            char.inventory.encumbrance.limit = limit;
+        };
+
+        // Event Listeners para atualização em tempo real
+        const inventoryInputs = document.querySelectorAll('#inventory-body input[data-field], .coin-item input');
+        inventoryInputs.forEach(input => {
+            input.addEventListener('input', updateEncumbrance);
+        });
+
+        // Executar cálculo inicial
+        if (inventoryBody) updateEncumbrance();
 
         // Story Tab
         const story = char.story || {};
@@ -440,6 +629,12 @@ export const SheetModule = {
             const updatedChar = { ...character, ...updates };
             this.populateSheet(updatedChar, context);
             this.toggleSheetEdit(false, updatedChar, context);
+
+            // PATCH 4: HEADER SYNC
+            if (window.app && window.app.selectCharacter) {
+                window.app.selectCharacter(updatedChar);
+            }
+
             context.showAlert("Ficha salva com sucesso!", "Grimório de Personagens");
             return updatedChar;
         } catch (err) {

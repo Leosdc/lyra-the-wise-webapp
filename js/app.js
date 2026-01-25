@@ -18,6 +18,7 @@ import LyricsModule from './modules/lyrics.js';
 import { ChangelogModule } from './modules/changelog-loader.js';
 import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue, parseMarkdown } from './modules/utils.js';
 import { sendMessageToLyra } from './ai.js';
+import { DiceModule } from './modules/dice.js';
 
 const app = {
     user: null,
@@ -54,6 +55,9 @@ const app = {
 
         WizardModule.initGuidanceListeners();
         ChangelogModule.loadChangelog();
+
+        // Init Dice
+        DiceModule.init();
 
         // Check Changelog Notification
         const storedVersion = localStorage.getItem('lyraAppVersion');
@@ -302,6 +306,8 @@ const app = {
             WizardModule.showCreationWizard(this.getWizardContext());
         } else if (action === 'session-editor' || action === 'session-btn') {
             WizardModule.showSessionEditor(this.getWizardContext());
+        } else if (action === 'dice-roller') {
+            DiceModule.openModal();
         } else {
             this.showAlert(`Invocando magia para: ${action}. (Funcionalidade em desenvolvimento)`, "Magia em Preparo");
         }
