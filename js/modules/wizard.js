@@ -18,30 +18,34 @@ export const WizardModule = {
         if (!context.checkAuth()) return;
         console.log("✨ Abrindo Criador de Personagem");
 
-        // Dynamic Theme Text Update
-        const aiCard = document.querySelector('.choice-card[data-mode="ai"]');
-        if (aiCard) {
-            const h4 = aiCard.querySelector('h4');
-            const p = aiCard.querySelector('p');
+        // Dynamic Theme Text Update - Scoped to Creation Wizard
+        const wizardContainer = document.getElementById('creation-wizard');
+        if (wizardContainer) {
+            const aiCard = wizardContainer.querySelector('.choice-card[data-mode="ai"]');
 
-            const finalMsg = document.getElementById('wiz-final-msg');
-            const backstoryInput = document.getElementById('wiz-backstory');
+            if (aiCard) {
+                const h4 = aiCard.querySelector('h4');
+                const p = aiCard.querySelector('p');
 
-            if (document.body.classList.contains('damien-theme')) {
-                h4.innerText = "Com Damien";
-                p.innerText = "O Conquistador forjará seu destino com poder.";
-                if (finalMsg) finalMsg.innerText = "Damien irá forjar a trama final do seu herói.";
-                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Damien pode preencher se você escolher o modo IA)";
-            } else if (document.body.classList.contains('eldrin-theme')) {
-                h4.innerText = "Com Eldrin";
-                p.innerText = "O Bardo Sagaz cantará sua lenda.";
-                if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói.";
-                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Eldrin pode preencher se você escolher o modo IA)";
-            } else {
-                h4.innerText = "Com Lyra";
-                p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
-                if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói.";
-                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)";
+                const finalMsg = wizardContainer.querySelector('#wiz-final-msg');
+                const backstoryInput = wizardContainer.querySelector('#wiz-backstory');
+
+                if (document.body.classList.contains('damien-theme')) {
+                    h4.innerText = "Com Damien";
+                    p.innerText = "O Conquistador forjará seu destino com poder.";
+                    if (finalMsg) finalMsg.innerText = "Damien irá forjar a trama final do seu herói.";
+                    if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Damien pode preencher se você escolher o modo IA)";
+                } else if (document.body.classList.contains('eldrin-theme')) {
+                    h4.innerText = "Com Eldrin";
+                    p.innerText = "O Bardo Sagaz cantará sua lenda.";
+                    if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói.";
+                    if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Eldrin pode preencher se você escolher o modo IA)";
+                } else {
+                    h4.innerText = "Com Lyra";
+                    p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
+                    if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói.";
+                    if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)";
+                }
             }
         }
 
