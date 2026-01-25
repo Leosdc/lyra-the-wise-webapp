@@ -39,18 +39,18 @@ export const WizardModule = {
 
                 if (document.body.classList.contains('damien-theme')) {
                     if (h4) h4.innerText = "Com Damien";
-                    if (p) p.innerText = "O Conquistador forjará seu destino com poder.";
-                    if (finalMsg) finalMsg.innerText = "Damien irá forjar a trama final do seu herói.";
+                    if (p) p.innerText = "O Poder Verdadeiro forjará seu destino.";
+                    if (finalMsg) finalMsg.innerText = "Damien usará seu poder para forjar o destino do seu herói. Prepare-se.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Damien pode preencher se você escolher o modo IA)";
                 } else if (document.body.classList.contains('eldrin-theme')) {
                     if (h4) h4.innerText = "Com Eldrin";
                     if (p) p.innerText = "O Bardo Sagaz cantará sua lenda.";
-                    if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói.";
+                    if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói, entrelaçando destino e inspiração.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Eldrin pode preencher se você escolher o modo IA)";
                 } else {
                     if (h4) h4.innerText = "Com Lyra";
                     if (p) p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
-                    if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói.";
+                    if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)";
                 }
             }
@@ -146,24 +146,12 @@ export const WizardModule = {
 
         const finalMsg = document.getElementById('wiz-final-msg');
         if (finalMsg) {
-            const isDamien = document.body.classList.contains('damien-theme');
-            if (this.creationMode === 'ai') {
-                finalMsg.innerText = isDamien
-                    ? "Damien usará seu poder para forjar o destino do seu herói. Prepare-se."
-                    : "Lyra irá tecer a trama final do seu herói, gerando história, ideais e laços dinâmicamente.";
-            } else {
+            if (this.creationMode !== 'ai') {
                 finalMsg.innerText = "Seu herói está pronto para ser consagrado nos anais da história.";
-            }
-
-            // Update Start Screen Choice Card
-            const aiCard = document.querySelector('.choice-card[data-mode="ai"]');
-            if (aiCard) {
-                const title = aiCard.querySelector('h4');
-                const p = aiCard.querySelector('p');
-                if (title) title.innerText = isDamien ? "Com Damien" : "Com Lyra";
-                if (p) p.innerText = isDamien
-                    ? "O Poder Verdadeiro forjará seu destino."
-                    : "A Sabedoria Ancestral irá tecer sua lenda.";
+            } else {
+                // Determine theme text via centralized updateThemeText()
+                // This ensures Eldrin, Damien, and Lyra are all handled correctly.
+                this.updateThemeText();
             }
         }
     },

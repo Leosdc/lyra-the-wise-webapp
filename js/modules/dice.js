@@ -93,7 +93,8 @@ export const DiceModule = {
             }
 
             // Update History
-            const historyText = quantity > 1 ? `${total} (${rolls.join('+')})` : total;
+            // Fix: Remove verbose summation (1+2+3...)
+            const historyText = total;
             this.history.unshift({ sides, result: historyText, isMulti: quantity > 1 });
             if (this.history.length > 10) this.history.pop();
 
