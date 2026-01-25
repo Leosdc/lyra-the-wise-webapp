@@ -94,7 +94,10 @@ export const SheetModule = {
         const classEl = document.getElementById('sheet-class-display');
 
         if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 100%;');
-        if (raceEl) raceEl.innerHTML = mkInput(race, 'bio.race', 'text', 'Raça', 'width: 100%;', 'list="races-list"');
+        // Custom visual adaptation: Input that looks like a Select to allow typing + list
+        if (raceEl) {
+            raceEl.innerHTML = `<input type="text" value="${race}" data-field="bio.race" class="medieval-select" title="Raça" style="width: 100%;" list="races-list">`;
+        }
         if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 100%;');
 
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png');

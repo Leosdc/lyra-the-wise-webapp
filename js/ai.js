@@ -73,12 +73,19 @@ ${SHARED_RULES}
 export const sendMessageToLyra = async (message, idToken, history = [], context = "", persona = "lyra") => {
     // Inject persona and context
     let finalMessage = message;
-    if (!history || history.length === 0) {
-        let identity = LYRA_IDENTITY;
-        if (persona === 'damien') identity = DAMIEN_IDENTITY;
-        if (persona === 'eldrin') identity = ELDRIN_IDENTITY;
 
+    // Determine Identity
+    let identity = LYRA_IDENTITY;
+    if (persona === 'damien') identity = DAMIEN_IDENTITY;
+    if (persona === 'eldrin') identity = ELDRIN_IDENTITY;
+
+    if (!history || history.length === 0) {
+        // Initial Message: Full Identity Setup
         finalMessage = `${identity}\n${context}\n\n[USUÁRIO]: ${message}`;
+    } else {
+        // Follow-up Message: Context Reminder (Essential for keeping track of sheet changes)
+        // We prepend the context so it's fresh in the model's "working memory" for this turn.
+        finalMessage = `[SISTEMA - CONTEXTO ATUALIZADO DA FICHA]:\n${context}\n\n[USUÁRIO]: ${message}`;
     }
 
     const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history });
