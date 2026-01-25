@@ -654,6 +654,8 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column-reverse;
+    pointer-events: none;
+    /* Fix: Allow clicks to pass through empty areas */
 }
 
 .player-orb {
@@ -671,6 +673,8 @@
     box-shadow: 0 0 15px rgba(241, 196, 15, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
     z-index: 2;
+    pointer-events: auto;
+    /* Fix: Restore interactivity */
 }
 
 .player-orb:hover {
@@ -746,6 +750,8 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     transition: all 0.3s ease;
     transform-origin: bottom left;
+    pointer-events: auto;
+    /* Fix: Restore interactivity */
 }
 
 .mystic-player-floating.collapsed .player-interface {
@@ -1057,84 +1063,88 @@
     letter-spacing: 1px;
 }
 
-/* Medieval Checkbox Group */
-.checkbox-group {
-    margin: 1rem 0;
-    padding: 1rem;
+/* Medieval Checkbox Group - Replaced by Setting Row */
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 0.5rem 0;
+    padding: 0.8rem;
     border: 1px dashed rgba(212, 175, 55, 0.4);
     border-radius: 4px;
     background: rgba(44, 30, 22, 0.05);
 }
 
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
+.setting-label {
     font-family: 'Cinzel', serif;
     font-weight: 600;
     color: var(--ink);
-    position: relative;
-    user-select: none;
     font-size: 1rem;
 }
 
-/* Hide default checkbox */
-.checkbox-label input {
-    position: absolute;
+/* Medieval Switch Toggle */
+.medieval-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    margin-left: 1rem;
+}
+
+.medieval-switch input {
     opacity: 0;
-    cursor: pointer;
-    height: 0;
     width: 0;
+    height: 0;
 }
 
-/* Custom Checkmark */
-.checkmark {
-    height: 22px;
-    width: 22px;
-    background-color: rgba(253, 246, 227, 0.5);
-    border: 2px solid var(--gold);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--parchment);
+    border: 2px solid #888;
+    transition: .4s;
+    border-radius: 34px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.checkbox-label:hover .checkmark {
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #888;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.checkbox-label input:checked~.checkmark {
+input:checked+.slider {
+    background-color: rgba(212, 175, 55, 0.2);
+    border-color: var(--gold);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
     background-color: var(--gold);
-    border-color: var(--ink);
-    color: var(--ink);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
 }
 
-/* Checkmark Icon (using pseudo-element) */
-.checkmark:after {
-    content: '\f00c';
-    /* Font Awesome Check */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    display: none;
-    color: var(--ink);
-    font-size: 0.9rem;
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--gold);
 }
 
-.checkbox-label input:checked~.checkmark:after {
-    display: block;
-}
-
-.hint-text {
-    display: block;
-    margin-top: 0.5rem;
-    margin-left: 2.4rem;
-    /* Aligns with text */
+.toggle-hint {
+    margin-left: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
     font-size: 0.8rem;
-    color: #555;
+    color: #666;
     font-style: italic;
-    opacity: 0.9;
+    opacity: 0.8;
 }

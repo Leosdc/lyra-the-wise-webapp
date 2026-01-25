@@ -268,6 +268,10 @@ const app = {
         });
 
         if (user) {
+            // Load User Preferences (and check auto-play)
+            await SettingsModule.loadUserPreferences(user);
+            this.checkMusicAutoPlay();
+
             NavigationModule.switchView(this.currentView, this.getNavigationLoaders());
 
             // Restore character from persistence
@@ -621,30 +625,38 @@ const app = {
             }
         };
 
-        // Autoplay Attempt
-        // Autoplay Attempt
-        const attemptPlay = () => {
-            // Check Auto-Play Preference
-            const autoPlayPref = document.getElementById('setting-autoplay');
-            if (autoPlayPref && !autoPlayPref.checked) {
-                console.log("🔇 Auto-play desativado pelo usuário.");
-                return;
-            }
-
-            audio.volume = 0.4;
-            audio.play().then(() => {
-                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                player.classList.add('playing');
-            }).catch(e => console.log("Autoplay blocked by browser policy (interacting will fix it)."));
-        };
-
-        // Try immediately (if allowed)
-        attemptPlay();
-
-        // Try on first interaction (if not playing yet AND allowed)
+        // Interaction Unblocker
         document.body.addEventListener('click', () => {
-            if (audio.paused) attemptPlay();
+            if (audio.paused && this.shouldAutoPlay) {
+                this.checkMusicAutoPlay();
+            }
         }, { once: true });
+    },
+
+    checkMusicAutoPlay() {
+        const player = document.getElementById('mystic-player');
+        const audio = document.getElementById('lyra-bg-music');
+        const playBtn = document.getElementById('btn-play-pause');
+        const autoPlayPref = document.getElementById('setting-autoplay');
+
+        if (!audio || !playBtn) return;
+
+        // Check Preference
+        if (autoPlayPref && !autoPlayPref.checked) {
+            console.log("🔇 Auto-play bloqueado por preferência do usuário.");
+            this.shouldAutoPlay = false; // Flag to prevent interaction auto-play
+            return;
+        }
+
+        this.shouldAutoPlay = true;
+
+        audio.volume = 0.4;
+        audio.play().then(() => {
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            if (player) player.classList.add('playing');
+        }).catch(e => {
+            console.log("Autoplay waiting for interaction...");
+        });
     },
 
     // --- Theme Manager ---
