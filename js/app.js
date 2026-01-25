@@ -743,6 +743,12 @@ const app = {
         if (hToken) {
             hToken.src = `assets/tokens/${aiName.toLowerCase()}.png`;
         }
+
+        // Update Existing Chat Avatars
+        const chatAvatars = document.querySelectorAll('.chat-avatar');
+        chatAvatars.forEach(img => {
+            img.src = `assets/tokens/${aiName.toLowerCase()}.png`;
+        });
     },
 
     cycleTheme() {

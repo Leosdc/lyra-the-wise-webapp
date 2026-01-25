@@ -11,15 +11,16 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-.dice-controls-header {
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    font-family: 'Cinzel', serif;
+font-size: 1.1rem;
+}
+
+.dice-controls-header label {
+    font-weight: bold;
     color: var(--ink);
-    font-size: 1.1rem;
+    /* Ensure ink color */
+    text-shadow: none;
+    /* Remove any potential glow that might blur it on light bg */
+    opacity: 1;
 }
 
 .dice-controls-header input {
@@ -27,7 +28,7 @@
     text-align: center;
     border: 1px solid var(--gold);
     background: var(--input-bg);
-    color: var(--ink);
+    /* Color handled by theme globals for inputs */
     font-weight: bold;
     padding: 0.2rem;
 }
