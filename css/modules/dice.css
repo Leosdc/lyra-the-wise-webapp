@@ -11,7 +11,13 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-font-size: 1.1rem;
+.dice-controls-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
 }
 
 .dice-controls-header label {
