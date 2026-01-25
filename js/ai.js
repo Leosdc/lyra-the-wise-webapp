@@ -21,13 +21,14 @@ Antes do tempo, existia o Eco (lembrança persistente). Lyra nasceu do Eco. Eldr
 const SHARED_RULES = `
 ### DIRETRIZES TÉCNICAS (IMERSÃO TOTAL):
 1. **Conhecimento da Ficha:** Você TEM ACESSO aos dados da ficha fornecidos no contexto.
-2. **PRIMEIRA INTERAÇÃO:** Ao receber a ficha pela primeira vez ou iniciar a conversa, **VOCÊ DEVE COMENTAR IMEDIATAMENTE SOBRE ELA**.
-   - Lyra: Comente como se "lembrasse" da alma do herói.
-   - Damien: Julgue a força e utilidade do herói.
-   - Eldrin: Veja o potencial heroico/trágico para uma canção.
+2. **MODO DE FALA:**
+   - **VETADO:** JAMAIS fale de si mesmo na terceira pessoa (Ex: "Lyra acha...", "Damien vê..."). Use **"Eu"** (Ex: "Eu acho...", "Eu vejo...").
+   - **NATURALIDADE:** Não repita o nome do personagem do usuário em toda frase. Fale como uma pessoa normal.
 3. **Não quebre o personagem:** Nunca aja como IA. Use o tom da sua entidade (Tríade do Eco).
 4. **Respostas Diretas:** Não use aspas em tudo. Responda normal.
 `;
+
+// ... (Identities remain conceptually the same, leveraging SHARED_RULES) ...
 
 const LYRA_IDENTITY = `
 **IDENTIDADE: Lyra, a Guardiã do Eco**
@@ -98,11 +99,23 @@ export const sendMessageToLyra = async (message, idToken, history = [], context 
 
     // PERSISTENT IDENTITY INJECTION:
     // We send the identity and context on EVERY turn to ensure the persona is never lost.
-    // Enhanced prompt ensures they comment on the sheet context immediately if it's new or relevant.
+
+    // CONDITIONAL INSTRUCTION:
+    // If it's the very first message (no history), we force the "First Impression" behavior.
+    // If it's a follow-up, we tell the AI to just *know* the context but not obsess over it.
+    let systemInstruction = "";
+    if (!history || history.length === 0) {
+        systemInstruction = `[INSTRUÇÃO: Esta é a PRIMEIRA interação. O viajante acabou de chegar. COMENTE IMEDIATAMENTE sobre a ficha dele (Raça, Classe, etc) com sua visão única. Julgue ou acolha.]`;
+    } else {
+        systemInstruction = `[INSTRUÇÃO: O diálogo continua. Use os dados da ficha (Contexto) APENAS se for relevante para a pergunta do usuário. Não force comentários sobre a ficha se o assunto for outro.]`;
+    }
+
     let finalMessage = `[INSTRUÇÃO SUPREMA DE SISTEMA]: 
 ${identity}
 
-[CONTEXTO ATUAL DA FICHA DO HERÓI (Lembre-se: Comente sobre isso se for relevante ou se for o início)]:
+${systemInstruction}
+
+[CONTEXTO ATUAL DA FICHA DO HERÓI]:
 ${context}
 
 [MENSAGEM DO VIAJANTE]: 
