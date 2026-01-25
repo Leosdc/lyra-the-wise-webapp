@@ -48,6 +48,13 @@ export const SettingsModule = {
             document.body.classList.add(`cursor-${prefs.cursor}`);
         }
 
+        // Apply Audio Prefs
+        const autoPlay = document.getElementById('setting-autoplay');
+        if (autoPlay) {
+            // Default to true if undefined
+            autoPlay.checked = prefs.autoPlayMusic !== false;
+        }
+
         // Fill settings form fields if they exist in DOM
         const nick = document.getElementById('setting-nickname');
         const wa = document.getElementById('setting-whatsapp');
@@ -73,12 +80,14 @@ export const SettingsModule = {
         const nickname = document.getElementById('setting-nickname').value;
         const whatsapp = document.getElementById('setting-whatsapp').value;
         const bio = document.getElementById('setting-bio').value;
+        const autoPlayMusic = document.getElementById('setting-autoplay').checked;
         const selectedCursor = document.querySelector('.cursor-option.active')?.dataset.cursor;
 
         const prefs = {
             nickname,
             whatsapp,
             bio,
+            autoPlayMusic, // Save audio pref
             cursor: selectedCursor
         };
 

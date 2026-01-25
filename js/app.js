@@ -622,7 +622,15 @@ const app = {
         };
 
         // Autoplay Attempt
+        // Autoplay Attempt
         const attemptPlay = () => {
+            // Check Auto-Play Preference
+            const autoPlayPref = document.getElementById('setting-autoplay');
+            if (autoPlayPref && !autoPlayPref.checked) {
+                console.log("🔇 Auto-play desativado pelo usuário.");
+                return;
+            }
+
             audio.volume = 0.4;
             audio.play().then(() => {
                 playBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -630,7 +638,10 @@ const app = {
             }).catch(e => console.log("Autoplay blocked by browser policy (interacting will fix it)."));
         };
 
+        // Try immediately (if allowed)
         attemptPlay();
+
+        // Try on first interaction (if not playing yet AND allowed)
         document.body.addEventListener('click', () => {
             if (audio.paused) attemptPlay();
         }, { once: true });

@@ -464,717 +464,734 @@
                             <textarea id="setting-bio" class="medieval-textarea"
                                 placeholder="Conte sua lenda..."></textarea>
                         </div>
+
+                        <h3 class="settings-subtitle">Configurações de Áudio</h3>
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="setting-autoplay" checked>
+                                <span class="checkmark"></span>
+                                Reproduzir Música Automaticamente
+                            </label>
+                            <small class="hint-text">Se desmarcado, a música não tocará ao iniciar.</small>
+                        </div>
+
                         <div class="form-group">
-                            <label>Arsenal de Cursores</label>
-                            <div class="cursor-grid" id="cursor-selector">
-                                <!-- Swords -->
-                                <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada"><img
-                                        src="assets/cursors/sword_gold.png"></div>
-                                <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata"><img
-                                        src="assets/cursors/sword_silver.png"></div>
-                                <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim"><img
-                                        src="assets/cursors/sword_crimson.png"></div>
-                                <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria"><img
-                                        src="assets/cursors/sword_shadow.png"></div>
-                                <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda"><img
-                                        src="assets/cursors/sword_emerald.png"></div>
-                                <!-- Staffs -->
-                                <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal"><img
-                                        src="assets/cursors/staff_crystal.png"></div>
-                                <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar"><img
-                                        src="assets/cursors/staff_sunlight.png"></div>
-                                <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar"><img
-                                        src="assets/cursors/staff_lunar.png"></div>
-                                <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio"><img
-                                        src="assets/cursors/staff_shadow.png"></div>
-                                <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda"><img
-                                        src="assets/cursors/staff_emerald.png"></div>
-                                <!-- Potions -->
-                                <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida"><img
-                                        src="assets/cursors/potion_red.png"></div>
-                                <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana"><img
-                                        src="assets/cursors/potion_blue.png"></div>
-                            </div>
-                        </div>
-                        <div class="settings-actions">
-                            <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Wizard Steps (Characters) -->
-                <div id="creation-wizard" class="wizard-container hidden">
-                    <div id="char-choice-step" class="wizard-step" data-step="0">
-                        <h3>Como deseja criar, viajante?</h3>
-                        <div class="mode-choices">
-                            <div class="choice-card" data-mode="ai">
-                                <i class="fas fa-wand-magic-sparkles"></i>
-                                <h4>Com Lyra</h4>
-                                <p>A IA tecerá os detalhes arcanos para você.</p>
-                            </div>
-                            <div class="choice-card" data-mode="manual">
-                                <i class="fas fa-feather-pointed"></i>
-                                <h4>Manualmente</h4>
-                                <p>Você mesmo escreve cada detalhe da sua história.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="wizard-progress hidden">
-                        <div class="step-indicator active" data-step="1">1</div>
-                        <div class="step-indicator" data-step="2">2</div>
-                        <div class="step-indicator" data-step="3">3</div>
-                        <div class="step-indicator" data-step="4">4</div>
-                        <div class="step-indicator" data-step="5">5</div>
-                    </div>
-                    <!-- Steps content... same as before -->
-                    <div class="wizard-step" data-step="1">
-                        <h3>Origens</h3>
-                        <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
-                                placeholder="Ex: Valerius"></div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"
-                                    placeholder="Ex: Humano" required></div>
                             <div class="form-group">
-                                <label>Classe</label>
-                                <select id="wiz-class" class="medieval-select" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="Bárbaro">Bárbaro</option>
-                                    <option value="Bardo">Bardo</option>
-                                    <option value="Bruxo">Bruxo</option>
-                                    <option value="Clérigo">Clérigo</option>
-                                    <option value="Druida">Druida</option>
-                                    <option value="Feiticeiro">Feiticeiro</option>
-                                    <option value="Guerreiro">Guerreiro</option>
-                                    <option value="Ladino">Ladino</option>
-                                    <option value="Mago">Mago</option>
-                                    <option value="Monge">Monge</option>
-                                    <option value="Paladino">Paladino</option>
-                                    <option value="Patrulheiro">Patrulheiro</option>
-                                    <option value="Artífice">Artífice</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Alinhamento</label>
-                                <select id="wiz-alignment" class="medieval-select">
-                                    <option value="Leal e Bom">Leal e Bom</option>
-                                    <option value="Neutro e Bom">Neutro e Bom</option>
-                                    <option value="Caótico e Bom">Caótico e Bom</option>
-                                    <option value="Leal e Neutro">Leal e Neutro</option>
-                                    <option value="Neutro">Neutro</option>
-                                    <option value="Caótico e Neutro">Caótico e Neutro</option>
-                                    <option value="Leal e Mau">Leal e Mau</option>
-                                    <option value="Neutro e Mau">Neutro e Mau</option>
-                                    <option value="Caótico e Mau">Caótico e Mau</option>
-                                </select>
-                            </div>
-                            <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
-                                    value="9m"></div>
-                        </div>
-                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"
-                                placeholder="Ex: Acólito"></div>
-                    </div>
-                    <div class="wizard-step hidden" data-step="2">
-                        <h3>Atributos</h3>
-                        <div class="attributes-grid">
-                            <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10" min="0"
-                                    max="25"></div>
-                            <div class="attr-input"><span>DES</span><input type="number" id="wiz-dex" value="10" min="0"
-                                    max="25"></div>
-                            <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10" min="0"
-                                    max="25"></div>
-                            <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10" min="0"
-                                    max="25"></div>
-                            <div class="attr-input"><span>SAB</span><input type="number" id="wiz-wis" value="10" min="0"
-                                    max="25"></div>
-                            <div class="attr-input"><span>CAR</span><input type="number" id="wiz-cha" value="10" min="0"
-                                    max="25"></div>
-                        </div>
-                    </div>
-                    <div class="wizard-step hidden" data-step="3">
-                        <h3>Perícias</h3>
-                        <div class="skills-selection">
-                            <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
-                            <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
-                            <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
-                            <label><input type="checkbox" value="Atletismo"> Atletismo</label>
-                            <label><input type="checkbox" value="Atuação"> Atuação</label>
-                            <label><input type="checkbox" value="Blefar"> Blefar</label>
-                            <label><input type="checkbox" value="Furtividade"> Furtividade</label>
-                            <label><input type="checkbox" value="História"> História</label>
-                            <label><input type="checkbox" value="Intimidação"> Intimidação</label>
-                            <label><input type="checkbox" value="Intuição"> Intuição</label>
-                            <label><input type="checkbox" value="Investigação"> Investigação</label>
-                            <label><input type="checkbox" value="Medicina"> Medicina</label>
-                            <label><input type="checkbox" value="Natureza"> Natureza</label>
-                            <label><input type="checkbox" value="Percepção"> Percepção</label>
-                            <label><input type="checkbox" value="Persuasão"> Persuasão</label>
-                            <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
-                            <label><input type="checkbox" value="Religião"> Religião</label>
-                            <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
-                        </div>
-                    </div>
-                    <div class="wizard-step hidden" data-step="4">
-                        <h3>Crônicas e Personalidade</h3>
-                        <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
-                                class="medieval-textarea"
-                                placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
-                                    class="medieval-textarea"
-                                    placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
-                            </div>
-                            <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
-                                    class="medieval-textarea"
-                                    placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
-                        </div>
-                        <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
-                                class="medieval-textarea"
-                                placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
-                                    class="medieval-textarea"
-                                    placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
-                            </div>
-                            <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
-                                    class="medieval-textarea"
-                                    placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
-                                class="medieval-textarea"
-                                placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
-                        </div>
-                        <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
-                                class="medieval-textarea"
-                                placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="wizard-step hidden" data-step="5">
-                        <h3>Consagração</h3>
-                        <p id="wiz-final-msg">Lyra irá tecer a trama final do seu herói.</p>
-                    </div>
-
-                    <div class="wizard-nav">
-                        <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
-                        <button id="wiz-next" class="medieval-btn small">Próximo</button>
-                        <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
-                    </div>
-
-                    <!-- Lyra's Guidance (Inside Wizard) -->
-                    <div id="lyra-guidance" class="lyra-guidance-container hidden">
-                        <img src="assets/Lyra_the_wise.png" alt="Lyra guidance" class="guidance-portrait">
-                        <div class="guidance-bubble parchment">
-                            <p id="guidance-text">Em que posso ajudá-lo, viajante?</p>
-                            <div class="bubble-tail"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monster Wizard -->
-                <div id="monster-wizard" class="wizard-container hidden">
-                    <div id="mon-choice-step" class="wizard-step">
-                        <h3>Origem da Criatura</h3>
-                        <div class="mode-choices">
-                            <div class="choice-card" data-mode="ai">
-                                <i class="fas fa-dragon"></i>
-                                <h4>Invocar com Lyra</h4>
-                                <p>A IA gerará as estatísticas e a descrição.</p>
-                            </div>
-                            <div class="choice-card" data-mode="manual">
-                                <i class="fas fa-hammer"></i>
-                                <h4>Forjar Manualmente</h4>
-                                <p>Preencha os detalhes da criatura você mesmo.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="mon-form" class="hidden">
-                        <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
-                        <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
-                        <div class="form-row">
-                            <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
-                            <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
-                        </div>
-                        <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
-                                class="medieval-textarea"
-                                placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
-                        <div class="wizard-nav">
-                            <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Session Wizard -->
-                <div id="session-wizard" class="wizard-container hidden">
-                    <div id="sess-choice-step" class="wizard-step">
-                        <h3>Registro da Crônica</h3>
-                        <div class="mode-choices">
-                            <div class="choice-card" data-mode="ai">
-                                <i class="fas fa-scroll"></i>
-                                <h4>Escriba Lyra</h4>
-                                <p>A IA organizará seus pensamentos em um diário.</p>
-                            </div>
-                            <div class="choice-card" data-mode="manual">
-                                <i class="fas fa-pen-nib"></i>
-                                <h4>Própria Pena</h4>
-                                <p>Escreva sua própria crônica de aventura.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="sess-form" class="hidden">
-                        <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
-                        <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title">
-                        </div>
-                        <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
-                                class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea>
-                        </div>
-                        <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
-                                class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea>
-                        </div>
-                        <div class="wizard-nav">
-                            <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Character Sheet -->
-                <div id="character-sheet" class="sheet-container hidden">
-                    <div class="sheet-header">
-                        <!-- Left: Token -->
-                        <div class="header-token-section">
-                            <div class="char-token-wrapper">
-                                <img id="sheet-token" src="assets/tokens/lyra.png" alt="Token" class="char-token">
-                                <input type="file" id="token-upload" accept="image/*" class="hidden">
-                                <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
-                                    <i class="fas fa-camera"></i>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Center: Name & Dropdowns -->
-                        <div class="header-info-section">
-                            <div class="header-row-top">
-                                <h2 id="sheet-char-name" class="editable" data-field="bio.name">Nome do Herói</h2>
-                            </div>
-                            <div class="header-row-bottom">
-                                <div class="header-field-group">
-                                    <label>Alinhamento</label>
-                                    <span id="sheet-alignment-display"></span>
+                                <label>Arsenal de Cursores</label>
+                                <div class="cursor-grid" id="cursor-selector">
+                                    <!-- Swords -->
+                                    <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada"><img
+                                            src="assets/cursors/sword_gold.png"></div>
+                                    <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata"><img
+                                            src="assets/cursors/sword_silver.png"></div>
+                                    <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim"><img
+                                            src="assets/cursors/sword_crimson.png"></div>
+                                    <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria"><img
+                                            src="assets/cursors/sword_shadow.png"></div>
+                                    <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda">
+                                        <img src="assets/cursors/sword_emerald.png"></div>
+                                    <!-- Staffs -->
+                                    <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal">
+                                        <img src="assets/cursors/staff_crystal.png"></div>
+                                    <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar"><img
+                                            src="assets/cursors/staff_sunlight.png"></div>
+                                    <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar"><img
+                                            src="assets/cursors/staff_lunar.png"></div>
+                                    <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio"><img
+                                            src="assets/cursors/staff_shadow.png"></div>
+                                    <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda">
+                                        <img src="assets/cursors/staff_emerald.png"></div>
+                                    <!-- Potions -->
+                                    <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida"><img
+                                            src="assets/cursors/potion_red.png"></div>
+                                    <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana"><img
+                                            src="assets/cursors/potion_blue.png"></div>
                                 </div>
-                                <div class="header-field-group">
-                                    <label>Raça</label>
-                                    <span id="sheet-race-display"></span>
+                            </div>
+                            <div class="settings-actions">
+                                <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wizard Steps (Characters) -->
+                    <div id="creation-wizard" class="wizard-container hidden">
+                        <div id="char-choice-step" class="wizard-step" data-step="0">
+                            <h3>Como deseja criar, viajante?</h3>
+                            <div class="mode-choices">
+                                <div class="choice-card" data-mode="ai">
+                                    <i class="fas fa-wand-magic-sparkles"></i>
+                                    <h4>Com Lyra</h4>
+                                    <p>A IA tecerá os detalhes arcanos para você.</p>
                                 </div>
-                                <div class="header-field-group">
+                                <div class="choice-card" data-mode="manual">
+                                    <i class="fas fa-feather-pointed"></i>
+                                    <h4>Manualmente</h4>
+                                    <p>Você mesmo escreve cada detalhe da sua história.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wizard-progress hidden">
+                            <div class="step-indicator active" data-step="1">1</div>
+                            <div class="step-indicator" data-step="2">2</div>
+                            <div class="step-indicator" data-step="3">3</div>
+                            <div class="step-indicator" data-step="4">4</div>
+                            <div class="step-indicator" data-step="5">5</div>
+                        </div>
+                        <!-- Steps content... same as before -->
+                        <div class="wizard-step" data-step="1">
+                            <h3>Origens</h3>
+                            <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
+                                    placeholder="Ex: Valerius"></div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Raça</label><input type="text" id="wiz-race"
+                                        placeholder="Ex: Humano" required></div>
+                                <div class="form-group">
                                     <label>Classe</label>
-                                    <span id="sheet-class-display"></span>
+                                    <select id="wiz-class" class="medieval-select" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Bárbaro">Bárbaro</option>
+                                        <option value="Bardo">Bardo</option>
+                                        <option value="Bruxo">Bruxo</option>
+                                        <option value="Clérigo">Clérigo</option>
+                                        <option value="Druida">Druida</option>
+                                        <option value="Feiticeiro">Feiticeiro</option>
+                                        <option value="Guerreiro">Guerreiro</option>
+                                        <option value="Ladino">Ladino</option>
+                                        <option value="Mago">Mago</option>
+                                        <option value="Monge">Monge</option>
+                                        <option value="Paladino">Paladino</option>
+                                        <option value="Patrulheiro">Patrulheiro</option>
+                                        <option value="Artífice">Artífice</option>
+                                    </select>
                                 </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Alinhamento</label>
+                                    <select id="wiz-alignment" class="medieval-select">
+                                        <option value="Leal e Bom">Leal e Bom</option>
+                                        <option value="Neutro e Bom">Neutro e Bom</option>
+                                        <option value="Caótico e Bom">Caótico e Bom</option>
+                                        <option value="Leal e Neutro">Leal e Neutro</option>
+                                        <option value="Neutro">Neutro</option>
+                                        <option value="Caótico e Neutro">Caótico e Neutro</option>
+                                        <option value="Leal e Mau">Leal e Mau</option>
+                                        <option value="Neutro e Mau">Neutro e Mau</option>
+                                        <option value="Caótico e Mau">Caótico e Mau</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
+                                        value="9m"></div>
+                            </div>
+                            <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"
+                                    placeholder="Ex: Acólito"></div>
+                        </div>
+                        <div class="wizard-step hidden" data-step="2">
+                            <h3>Atributos</h3>
+                            <div class="attributes-grid">
+                                <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10"
+                                        min="0" max="25"></div>
+                                <div class="attr-input"><span>DES</span><input type="number" id="wiz-dex" value="10"
+                                        min="0" max="25"></div>
+                                <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10"
+                                        min="0" max="25"></div>
+                                <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10"
+                                        min="0" max="25"></div>
+                                <div class="attr-input"><span>SAB</span><input type="number" id="wiz-wis" value="10"
+                                        min="0" max="25"></div>
+                                <div class="attr-input"><span>CAR</span><input type="number" id="wiz-cha" value="10"
+                                        min="0" max="25"></div>
+                            </div>
+                        </div>
+                        <div class="wizard-step hidden" data-step="3">
+                            <h3>Perícias</h3>
+                            <div class="skills-selection">
+                                <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
+                                <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
+                                <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
+                                <label><input type="checkbox" value="Atletismo"> Atletismo</label>
+                                <label><input type="checkbox" value="Atuação"> Atuação</label>
+                                <label><input type="checkbox" value="Blefar"> Blefar</label>
+                                <label><input type="checkbox" value="Furtividade"> Furtividade</label>
+                                <label><input type="checkbox" value="História"> História</label>
+                                <label><input type="checkbox" value="Intimidação"> Intimidação</label>
+                                <label><input type="checkbox" value="Intuição"> Intuição</label>
+                                <label><input type="checkbox" value="Investigação"> Investigação</label>
+                                <label><input type="checkbox" value="Medicina"> Medicina</label>
+                                <label><input type="checkbox" value="Natureza"> Natureza</label>
+                                <label><input type="checkbox" value="Percepção"> Percepção</label>
+                                <label><input type="checkbox" value="Persuasão"> Persuasão</label>
+                                <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
+                                <label><input type="checkbox" value="Religião"> Religião</label>
+                                <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
+                            </div>
+                        </div>
+                        <div class="wizard-step hidden" data-step="4">
+                            <h3>Crônicas e Personalidade</h3>
+                            <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                                        class="medieval-textarea"
+                                        placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                                </div>
+                                <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
+                                        class="medieval-textarea"
+                                        placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
+                            </div>
+                            <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
+                                        class="medieval-textarea"
+                                        placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                                </div>
+                                <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                                        class="medieval-textarea"
+                                        placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
+                                    class="medieval-textarea"
+                                    placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
+                            </div>
+                            <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
+                                    class="medieval-textarea"
+                                    placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)"></textarea>
                             </div>
                         </div>
 
-                        <!-- Right: Level & Save -->
-                        <div class="header-meta-section">
-                            <div class="level-display">
-                                <label>Nível</label>
-                                <span id="sheet-level-val" class="level-value">1</span>
+                        <div class="wizard-step hidden" data-step="5">
+                            <h3>Consagração</h3>
+                            <p id="wiz-final-msg">Lyra irá tecer a trama final do seu herói.</p>
+                        </div>
+
+                        <div class="wizard-nav">
+                            <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                            <button id="wiz-next" class="medieval-btn small">Próximo</button>
+                            <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
+                        </div>
+
+                        <!-- Lyra's Guidance (Inside Wizard) -->
+                        <div id="lyra-guidance" class="lyra-guidance-container hidden">
+                            <img src="assets/Lyra_the_wise.png" alt="Lyra guidance" class="guidance-portrait">
+                            <div class="guidance-bubble parchment">
+                                <p id="guidance-text">Em que posso ajudá-lo, viajante?</p>
+                                <div class="bubble-tail"></div>
                             </div>
-                            <button id="save-sheet-btn" class="medieval-btn small"><i class="fas fa-save"></i>
-                                Salvar</button>
                         </div>
                     </div>
-                    <div class="sheet-tabs">
-                        <button class="sheet-tab active" data-tab="geral">Principal</button>
-                        <button class="sheet-tab" data-tab="combate">Combate</button>
-                        <button class="sheet-tab" data-tab="magia">Grimório</button>
-                        <button class="sheet-tab" data-tab="inventario">Mochila</button>
-                        <button class="sheet-tab" data-tab="historia">Crônicas</button>
+
+                    <!-- Monster Wizard -->
+                    <div id="monster-wizard" class="wizard-container hidden">
+                        <div id="mon-choice-step" class="wizard-step">
+                            <h3>Origem da Criatura</h3>
+                            <div class="mode-choices">
+                                <div class="choice-card" data-mode="ai">
+                                    <i class="fas fa-dragon"></i>
+                                    <h4>Invocar com Lyra</h4>
+                                    <p>A IA gerará as estatísticas e a descrição.</p>
+                                </div>
+                                <div class="choice-card" data-mode="manual">
+                                    <i class="fas fa-hammer"></i>
+                                    <h4>Forjar Manualmente</h4>
+                                    <p>Preencha os detalhes da criatura você mesmo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="mon-form" class="hidden">
+                            <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
+                            <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
+                            <div class="form-row">
+                                <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
+                                <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
+                            </div>
+                            <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
+                            <div class="wizard-nav">
+                                <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="sheet-content">
-                        <!-- Aba Geral: Bio, Atributos, Resistências e Perícias -->
-                        <div id="sheet-geral" class="sheet-section">
-                            <div class="bio-grid">
-                                <div class="form-group"><label>Antecedente</label><span id="sheet-background"
-                                        class="editable" data-field="bio.background"></span></div>
-                                <div class="form-group"><label>XP</label><span id="sheet-xp" class="editable"
-                                        data-field="bio.xp"></span></div>
-                                <div class="form-group"><label>Nome do Jogador</label><span id="sheet-player-name"
-                                        class="editable" data-field="bio.playerName"></span></div>
-                            </div>
-                            <div class="stats-main-grid">
-                                <div class="attributes-column">
-                                    <div class="scores-grid" id="sheet-scores"></div>
-                                    <h4 class="section-title">Testes de Resistência</h4>
-                                    <div class="saves-list" id="sheet-saves"></div>
+
+                    <!-- Session Wizard -->
+                    <div id="session-wizard" class="wizard-container hidden">
+                        <div id="sess-choice-step" class="wizard-step">
+                            <h3>Registro da Crônica</h3>
+                            <div class="mode-choices">
+                                <div class="choice-card" data-mode="ai">
+                                    <i class="fas fa-scroll"></i>
+                                    <h4>Escriba Lyra</h4>
+                                    <p>A IA organizará seus pensamentos em um diário.</p>
                                 </div>
-                                <div class="skills-column">
-                                    <div class="top-vitals-row">
-                                        <div class="vital-mini-box"><span>Proficiência</span><strong
-                                                id="sheet-prof"></strong></div>
-                                        <div class="vital-mini-box"><span>Percepção Passiva</span><strong
-                                                id="sheet-passive-percep"></strong></div>
-                                    </div>
-                                    <h4 class="section-title">Perícias</h4>
-                                    <div class="skills-list" id="sheet-skills"></div>
+                                <div class="choice-card" data-mode="manual">
+                                    <i class="fas fa-pen-nib"></i>
+                                    <h4>Própria Pena</h4>
+                                    <p>Escreva sua própria crônica de aventura.</p>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Aba Combate: PV, CA, Iniciativa, Ataques, Death Saves -->
-                        <div id="sheet-combate" class="sheet-section hidden">
-                            <div class="combat-status-grid">
-                                <div class="vital-box large"><span>CA</span><strong id="sheet-ca" class="editable"
-                                        data-field="stats.ac">10</strong></div>
-                                <div class="vital-box large"><span>Iniciativa</span><strong id="sheet-inic"
-                                        class="editable" data-field="stats.initiative">0</strong></div>
-                                <div class="vital-box large"><span>Velocidade</span><strong id="sheet-speed"
-                                        class="editable" data-field="stats.speed">9m</strong></div>
-                                <div class="hp-container-main">
-                                    <div class="hp-box-full">
-                                        <span class="label">Pontos de Vida</span>
-                                        <div class="hp-controls">
-                                            <input type="number" id="sheet-hp-curr" class="hp-input"
-                                                data-field="stats.hp_current">
-                                            <span class="sep">/</span>
-                                            <input type="number" id="sheet-hp-max" class="hp-input"
-                                                data-field="stats.hp_max">
-                                        </div>
-                                    </div>
-                                    <div class="hp-temp">
-                                        <span>PV Temporários</span>
-                                        <input type="number" id="sheet-hp-temp" class="hp-input small"
-                                            data-field="stats.hp_temp">
-                                    </div>
-                                </div>
+                        <div id="sess-form" class="hidden">
+                            <h3><i class="fas fa-feather-pointed"></i> Crônicas de Sessão</h3>
+                            <div class="form-group"><label>Título da Aventura</label><input type="text" id="sess-title">
                             </div>
-
-                            <div class="combat-details-grid">
-                                <div class="hit-dice-death-saves">
-                                    <div class="hit-dice-block">
-                                        <h4>Dados de Vida</h4>
-                                        <div class="hit-dice-row">
-                                            <input type="number" id="sheet-hd-curr" data-field="stats.hit_dice_current"
-                                                class="medieval-input" style="width: 60px; text-align: center;">
-                                            <span> de </span>
-                                            <span id="sheet-hd-total" class="editable"
-                                                data-field="stats.hit_dice_total">1d8</span>
-                                        </div>
-                                    </div>
-                                    <div class="death-saves-block">
-                                        <h4>Resistência à Morte</h4>
-                                        <div class="death-row successes">Sucessos
-                                            <input type="checkbox" id="death-s1" data-field="death_saves.successes"
-                                                value="1">
-                                            <input type="checkbox" id="death-s2" data-field="death_saves.successes"
-                                                value="2">
-                                            <input type="checkbox" id="death-s3" data-field="death_saves.successes"
-                                                value="3">
-                                        </div>
-                                        <div class="death-row failures">Falhas
-                                            <input type="checkbox" id="death-f1" data-field="death_saves.failures"
-                                                value="1">
-                                            <input type="checkbox" id="death-f2" data-field="death_saves.failures"
-                                                value="2">
-                                            <input type="checkbox" id="death-f3" data-field="death_saves.failures"
-                                                value="3">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="attacks-section">
-                                    <h4 class="section-title">Ataques</h4>
-                                    <div id="attacks-body" class="attacks-list-v2"></div>
-                                    <button id="add-attack-btn" class="medieval-btn small secondary"><i
-                                            class="fas fa-plus"></i> Adicionar Arma</button>
-                                </div>
+                            <div class="form-group"><label>Resumo da Jornada</label><textarea id="sess-summary"
+                                    class="medieval-textarea" placeholder="O que aconteceu nesta sessão?"></textarea>
+                            </div>
+                            <div class="form-group"><label>Notas do Mestre</label><textarea id="sess-notes"
+                                    class="medieval-textarea" placeholder="Segredos, ganchos futuros..."></textarea>
+                            </div>
+                            <div class="wizard-nav">
+                                <button id="sess-finish-btn" class="medieval-btn small">Registrar</button>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Aba Magia: Slots, Grimório, CD -->
-                        <div id="sheet-magia" class="sheet-section hidden">
-                            <div class="magic-header-stats">
-                                <div class="vital-box"><span>CD Salva.</span><strong id="sheet-spell-dc">8</strong>
+                    <!-- Character Sheet -->
+                    <div id="character-sheet" class="sheet-container hidden">
+                        <div class="sheet-header">
+                            <!-- Left: Token -->
+                            <div class="header-token-section">
+                                <div class="char-token-wrapper">
+                                    <img id="sheet-token" src="assets/tokens/lyra.png" alt="Token" class="char-token">
+                                    <input type="file" id="token-upload" accept="image/*" class="hidden">
+                                    <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
                                 </div>
-                                <div class="vital-box"><span>Ataque Mág.</span><strong id="sheet-spell-atk">0</strong>
-                                </div>
-                                <div class="form-group"><label>Atributo de Conjuração</label><select
-                                        id="sheet-spell-attr" data-field="spells.ability" class="medieval-select">
-                                        <option value="int">Inteligência</option>
-                                        <option value="wis">Sabedoria</option>
-                                        <option value="cha">Carisma</option>
-                                    </select></div>
                             </div>
-                            <div class="spell-slots-tracker" id="sheet-spell-slots"></div>
-                            <h4 class="section-title">Livro de Magias</h4>
-                            <div id="spells-body" class="spells-list-v2"></div>
-                            <button id="add-spell-btn" class="medieval-btn small secondary"><i
-                                    class="fas fa-wand-sparkles"></i> Adicionar Magia</button>
-                        </div>
 
-                        <!-- Aba Inventário: Itens, Moedas, Carga -->
-                        <div id="sheet-inventario" class="sheet-section hidden">
-                            <div class="inventory-top-grid">
-                                <div class="coins-pouch">
-                                    <h4>Bolsa de Moedas</h4>
-                                    <div class="coins-grid">
-                                        <div class="coin-item pc"><span>PC</span><input type="number"
-                                                data-field="inventory.coins.pc"></div>
-                                        <div class="coin-item pp"><span>PP</span><input type="number"
-                                                data-field="inventory.coins.pp"></div>
-                                        <div class="coin-item pe"><span>PE</span><input type="number"
-                                                data-field="inventory.coins.pe"></div>
-                                        <div class="coin-item po"><span>PO</span><input type="number"
-                                                data-field="inventory.coins.po"></div>
-                                        <div class="coin-item pl"><span>PL</span><input type="number"
-                                                data-field="inventory.coins.pl"></div>
-                                    </div>
+                            <!-- Center: Name & Dropdowns -->
+                            <div class="header-info-section">
+                                <div class="header-row-top">
+                                    <h2 id="sheet-char-name" class="editable" data-field="bio.name">Nome do Herói</h2>
                                 </div>
-                                <div class="encumbrance-tracker">
-                                    <h4 class="section-title">Carga</h4>
-                                    <div class="weight-bar">
-                                        <div id="weight-progress" class="bar"></div><span id="weight-text">0 / 0
-                                            lbs</span>
+                                <div class="header-row-bottom">
+                                    <div class="header-field-group">
+                                        <label>Alinhamento</label>
+                                        <span id="sheet-alignment-display"></span>
+                                    </div>
+                                    <div class="header-field-group">
+                                        <label>Raça</label>
+                                        <span id="sheet-race-display"></span>
+                                    </div>
+                                    <div class="header-field-group">
+                                        <label>Classe</label>
+                                        <span id="sheet-class-display"></span>
                                     </div>
                                 </div>
                             </div>
-                            <h4 class="section-title">Equipamentos & Tesouros</h4>
-                            <div id="inventory-body" class="inventory-list-v2"></div>
-                            <button id="add-item-btn" class="medieval-btn small secondary"><i
-                                    class="fas fa-box-open"></i> Adicionar Item</button>
-                        </div>
 
-                        <!-- Aba História: Notas, Traços, Exaustão -->
-                        <div id="sheet-historia" class="sheet-section hidden">
-                            <div class="traits-full-grid">
-                                <div class="form-group">
-                                    <h4 class="section-title">Traços de Personalidade</h4><textarea
-                                        data-field="story.traits" class="medieval-textarea"></textarea>
+                            <!-- Right: Level & Save -->
+                            <div class="header-meta-section">
+                                <div class="level-display">
+                                    <label>Nível</label>
+                                    <span id="sheet-level-val" class="level-value">1</span>
                                 </div>
-                                <div class="form-group">
-                                    <h4 class="section-title">Ideais</h4><textarea data-field="story.ideals"
-                                        class="medieval-textarea"></textarea>
+                                <button id="save-sheet-btn" class="medieval-btn small"><i class="fas fa-save"></i>
+                                    Salvar</button>
+                            </div>
+                        </div>
+                        <div class="sheet-tabs">
+                            <button class="sheet-tab active" data-tab="geral">Principal</button>
+                            <button class="sheet-tab" data-tab="combate">Combate</button>
+                            <button class="sheet-tab" data-tab="magia">Grimório</button>
+                            <button class="sheet-tab" data-tab="inventario">Mochila</button>
+                            <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                        </div>
+                        <div class="sheet-content">
+                            <!-- Aba Geral: Bio, Atributos, Resistências e Perícias -->
+                            <div id="sheet-geral" class="sheet-section">
+                                <div class="bio-grid">
+                                    <div class="form-group"><label>Antecedente</label><span id="sheet-background"
+                                            class="editable" data-field="bio.background"></span></div>
+                                    <div class="form-group"><label>XP</label><span id="sheet-xp" class="editable"
+                                            data-field="bio.xp"></span></div>
+                                    <div class="form-group"><label>Nome do Jogador</label><span id="sheet-player-name"
+                                            class="editable" data-field="bio.playerName"></span></div>
                                 </div>
-                                <div class="form-group">
-                                    <h4 class="section-title">Vínculos</h4><textarea data-field="story.bonds"
-                                        class="medieval-textarea"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <h4 class="section-title">Defeitos</h4><textarea data-field="story.flaws"
-                                        class="medieval-textarea"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <h4 class="section-title">Maneirismos</h4><textarea data-field="story.mannerisms"
-                                        class="medieval-textarea"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <h4 class="section-title">Talento de Interpretação</h4><textarea
-                                        data-field="story.talents" class="medieval-textarea"></textarea>
+                                <div class="stats-main-grid">
+                                    <div class="attributes-column">
+                                        <div class="scores-grid" id="sheet-scores"></div>
+                                        <h4 class="section-title">Testes de Resistência</h4>
+                                        <div class="saves-list" id="sheet-saves"></div>
+                                    </div>
+                                    <div class="skills-column">
+                                        <div class="top-vitals-row">
+                                            <div class="vital-mini-box"><span>Proficiência</span><strong
+                                                    id="sheet-prof"></strong></div>
+                                            <div class="vital-mini-box"><span>Percepção Passiva</span><strong
+                                                    id="sheet-passive-percep"></strong></div>
+                                        </div>
+                                        <h4 class="section-title">Perícias</h4>
+                                        <div class="skills-list" id="sheet-skills"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="chronic-notes">
-                                <h4 class="section-title">Aparência & História</h4>
-                                <textarea data-field="story.appearance" class="medieval-textarea"
-                                    placeholder="Aparência física..."></textarea>
-                                <textarea data-field="story.notes" class="medieval-textarea large"
-                                    placeholder="Suas crônicas escritas nas estrelas..."></textarea>
+
+                            <!-- Aba Combate: PV, CA, Iniciativa, Ataques, Death Saves -->
+                            <div id="sheet-combate" class="sheet-section hidden">
+                                <div class="combat-status-grid">
+                                    <div class="vital-box large"><span>CA</span><strong id="sheet-ca" class="editable"
+                                            data-field="stats.ac">10</strong></div>
+                                    <div class="vital-box large"><span>Iniciativa</span><strong id="sheet-inic"
+                                            class="editable" data-field="stats.initiative">0</strong></div>
+                                    <div class="vital-box large"><span>Velocidade</span><strong id="sheet-speed"
+                                            class="editable" data-field="stats.speed">9m</strong></div>
+                                    <div class="hp-container-main">
+                                        <div class="hp-box-full">
+                                            <span class="label">Pontos de Vida</span>
+                                            <div class="hp-controls">
+                                                <input type="number" id="sheet-hp-curr" class="hp-input"
+                                                    data-field="stats.hp_current">
+                                                <span class="sep">/</span>
+                                                <input type="number" id="sheet-hp-max" class="hp-input"
+                                                    data-field="stats.hp_max">
+                                            </div>
+                                        </div>
+                                        <div class="hp-temp">
+                                            <span>PV Temporários</span>
+                                            <input type="number" id="sheet-hp-temp" class="hp-input small"
+                                                data-field="stats.hp_temp">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="combat-details-grid">
+                                    <div class="hit-dice-death-saves">
+                                        <div class="hit-dice-block">
+                                            <h4>Dados de Vida</h4>
+                                            <div class="hit-dice-row">
+                                                <input type="number" id="sheet-hd-curr"
+                                                    data-field="stats.hit_dice_current" class="medieval-input"
+                                                    style="width: 60px; text-align: center;">
+                                                <span> de </span>
+                                                <span id="sheet-hd-total" class="editable"
+                                                    data-field="stats.hit_dice_total">1d8</span>
+                                            </div>
+                                        </div>
+                                        <div class="death-saves-block">
+                                            <h4>Resistência à Morte</h4>
+                                            <div class="death-row successes">Sucessos
+                                                <input type="checkbox" id="death-s1" data-field="death_saves.successes"
+                                                    value="1">
+                                                <input type="checkbox" id="death-s2" data-field="death_saves.successes"
+                                                    value="2">
+                                                <input type="checkbox" id="death-s3" data-field="death_saves.successes"
+                                                    value="3">
+                                            </div>
+                                            <div class="death-row failures">Falhas
+                                                <input type="checkbox" id="death-f1" data-field="death_saves.failures"
+                                                    value="1">
+                                                <input type="checkbox" id="death-f2" data-field="death_saves.failures"
+                                                    value="2">
+                                                <input type="checkbox" id="death-f3" data-field="death_saves.failures"
+                                                    value="3">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="attacks-section">
+                                        <h4 class="section-title">Ataques</h4>
+                                        <div id="attacks-body" class="attacks-list-v2"></div>
+                                        <button id="add-attack-btn" class="medieval-btn small secondary"><i
+                                                class="fas fa-plus"></i> Adicionar Arma</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba Magia: Slots, Grimório, CD -->
+                            <div id="sheet-magia" class="sheet-section hidden">
+                                <div class="magic-header-stats">
+                                    <div class="vital-box"><span>CD Salva.</span><strong id="sheet-spell-dc">8</strong>
+                                    </div>
+                                    <div class="vital-box"><span>Ataque Mág.</span><strong
+                                            id="sheet-spell-atk">0</strong>
+                                    </div>
+                                    <div class="form-group"><label>Atributo de Conjuração</label><select
+                                            id="sheet-spell-attr" data-field="spells.ability" class="medieval-select">
+                                            <option value="int">Inteligência</option>
+                                            <option value="wis">Sabedoria</option>
+                                            <option value="cha">Carisma</option>
+                                        </select></div>
+                                </div>
+                                <div class="spell-slots-tracker" id="sheet-spell-slots"></div>
+                                <h4 class="section-title">Livro de Magias</h4>
+                                <div id="spells-body" class="spells-list-v2"></div>
+                                <button id="add-spell-btn" class="medieval-btn small secondary"><i
+                                        class="fas fa-wand-sparkles"></i> Adicionar Magia</button>
+                            </div>
+
+                            <!-- Aba Inventário: Itens, Moedas, Carga -->
+                            <div id="sheet-inventario" class="sheet-section hidden">
+                                <div class="inventory-top-grid">
+                                    <div class="coins-pouch">
+                                        <h4>Bolsa de Moedas</h4>
+                                        <div class="coins-grid">
+                                            <div class="coin-item pc"><span>PC</span><input type="number"
+                                                    data-field="inventory.coins.pc"></div>
+                                            <div class="coin-item pp"><span>PP</span><input type="number"
+                                                    data-field="inventory.coins.pp"></div>
+                                            <div class="coin-item pe"><span>PE</span><input type="number"
+                                                    data-field="inventory.coins.pe"></div>
+                                            <div class="coin-item po"><span>PO</span><input type="number"
+                                                    data-field="inventory.coins.po"></div>
+                                            <div class="coin-item pl"><span>PL</span><input type="number"
+                                                    data-field="inventory.coins.pl"></div>
+                                        </div>
+                                    </div>
+                                    <div class="encumbrance-tracker">
+                                        <h4 class="section-title">Carga</h4>
+                                        <div class="weight-bar">
+                                            <div id="weight-progress" class="bar"></div><span id="weight-text">0 / 0
+                                                lbs</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h4 class="section-title">Equipamentos & Tesouros</h4>
+                                <div id="inventory-body" class="inventory-list-v2"></div>
+                                <button id="add-item-btn" class="medieval-btn small secondary"><i
+                                        class="fas fa-box-open"></i> Adicionar Item</button>
+                            </div>
+
+                            <!-- Aba História: Notas, Traços, Exaustão -->
+                            <div id="sheet-historia" class="sheet-section hidden">
+                                <div class="traits-full-grid">
+                                    <div class="form-group">
+                                        <h4 class="section-title">Traços de Personalidade</h4><textarea
+                                            data-field="story.traits" class="medieval-textarea"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 class="section-title">Ideais</h4><textarea data-field="story.ideals"
+                                            class="medieval-textarea"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 class="section-title">Vínculos</h4><textarea data-field="story.bonds"
+                                            class="medieval-textarea"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 class="section-title">Defeitos</h4><textarea data-field="story.flaws"
+                                            class="medieval-textarea"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 class="section-title">Maneirismos</h4><textarea
+                                            data-field="story.mannerisms" class="medieval-textarea"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4 class="section-title">Talento de Interpretação</h4><textarea
+                                            data-field="story.talents" class="medieval-textarea"></textarea>
+                                    </div>
+                                </div>
+                                <div class="chronic-notes">
+                                    <h4 class="section-title">Aparência & História</h4>
+                                    <textarea data-field="story.appearance" class="medieval-textarea"
+                                        placeholder="Aparência física..."></textarea>
+                                    <textarea data-field="story.notes" class="medieval-textarea large"
+                                        placeholder="Suas crônicas escritas nas estrelas..."></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
-    <!-- Custom Alert Modal -->
-    <div id="alert-modal" class="modal-overlay hidden">
-        <div class="medieval-modal alert-content">
-            <div class="lyra-corner top-left"></div>
-            <div class="lyra-corner top-right"></div>
-            <div class="alert-body">
-                <i class="fa-solid fa-scroll alert-icon"></i>
-                <h3 id="alert-title">Decreto Real</h3>
-                <p id="alert-message"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Confirm Modal -->
-    <div id="confirm-modal" class="modal-overlay hidden">
-        <div class="medieval-modal confirm-box">
-            <div class="lyra-corner top-left"></div>
-            <div class="lyra-corner top-right"></div>
-            <div class="alert-body">
-                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
-                <h3 id="confirm-title">Confirmar Exclusão</h3>
-                <p id="confirm-message" class="confirm-text"></p>
-            </div>
-            <div class="confirm-actions">
-                <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
-                <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
+        <!-- Custom Alert Modal -->
+        <div id="alert-modal" class="modal-overlay hidden">
+            <div class="medieval-modal alert-content">
+                <div class="lyra-corner top-left"></div>
+                <div class="lyra-corner top-right"></div>
+                <div class="alert-body">
+                    <i class="fa-solid fa-scroll alert-icon"></i>
+                    <h3 id="alert-title">Decreto Real</h3>
+                    <p id="alert-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Scroll Indicators -->
-    <div id="scroll-up" class="scroll-indicator hidden">
-        <i class="fa-solid fa-chevron-up"></i>
-    </div>
-    <div id="scroll-down" class="scroll-indicator">
-        <i class="fa-solid fa-chevron-down"></i>
-    </div>
-
-    <!-- Mystic Music Player (Bottom-Left) -->
-    <div id="mystic-player" class="mystic-player-floating collapsed">
-        <audio id="lyra-bg-music" src="assets/music/lyra-theme.mp3" loop></audio>
-
-        <div class="player-toggle">
-            <div class="player-orb">
-                <i class="fas fa-compact-disc"></i>
-                <div class="magic-pulse"></div>
+        <!-- Custom Confirm Modal -->
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="medieval-modal confirm-box">
+                <div class="lyra-corner top-left"></div>
+                <div class="lyra-corner top-right"></div>
+                <div class="alert-body">
+                    <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                    <h3 id="confirm-title">Confirmar Exclusão</h3>
+                    <p id="confirm-message" class="confirm-text"></p>
+                </div>
+                <div class="confirm-actions">
+                    <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
+                    <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
+                </div>
             </div>
-            <span class="player-now-playing">Whispers of the Stars</span>
         </div>
 
-        <div class="player-interface parchment">
-            <div class="player-header">
-                <strong>Melodia Arcana</strong>
-                <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
+        <!-- Scroll Indicators -->
+        <div id="scroll-up" class="scroll-indicator hidden">
+            <i class="fa-solid fa-chevron-up"></i>
+        </div>
+        <div id="scroll-down" class="scroll-indicator">
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+
+        <!-- Mystic Music Player (Bottom-Left) -->
+        <div id="mystic-player" class="mystic-player-floating collapsed">
+            <audio id="lyra-bg-music" src="assets/music/lyra-theme.mp3" loop></audio>
+
+            <div class="player-toggle">
+                <div class="player-orb">
+                    <i class="fas fa-compact-disc"></i>
+                    <div class="magic-pulse"></div>
+                </div>
+                <span class="player-now-playing">Whispers of the Stars</span>
             </div>
-            <div class="player-body">
-                <div class="track-name">"The Whisper of the Stars"</div>
-                <div class="player-controls-row">
-                    <button id="btn-play-pause" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
-                    <div class="volume-container">
-                        <i class="fas fa-volume-low"></i>
-                        <input type="range" id="player-volume" min="0" max="1" step="0.1" value="0.5">
+
+            <div class="player-interface parchment">
+                <div class="player-header">
+                    <strong>Melodia Arcana</strong>
+                    <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
+                </div>
+                <div class="player-body">
+                    <div class="track-name">"The Whisper of the Stars"</div>
+                    <div class="player-controls-row">
+                        <button id="btn-play-pause" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
+                        <div class="volume-container">
+                            <i class="fas fa-volume-low"></i>
+                            <input type="range" id="player-volume" min="0" max="1" step="0.1" value="0.5">
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div id="player-progress-bar" class="progress-bar"></div>
                     </div>
                 </div>
-                <div class="progress-container">
-                    <div id="player-progress-bar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Dice Modal -->
+        <div id="dice-modal" class="modal-overlay hidden">
+            <div class="dice-modal-content">
+                <button class="close-modal close-btn-medieval"
+                    onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
+                        class="fas fa-times"></i></button>
+                <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
+                    Torre de Dados</h2>
+
+                <div class="dice-controls-header">
+                    <label for="dice-quantity">Quantidade:</label>
+                    <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1"
+                        max="50">
+                </div>
+
+                <div class="dice-controls">
+                    <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6"
+                            style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
+                    <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
+                    <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20"
+                            style="transform: scaleY(1.2);"></i>
+                        d8</button>
+                    <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20"
+                            style="transform: rotate(45deg);"></i> d10</button>
+                    <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
+                    <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20"
+                            style="color: var(--crimson);"></i>
+                        d20</button>
+                    <button class="dice-btn" data-sides="100"><i class="fas fa-percent"></i> d100</button>
+                </div>
+
+                <div class="dice-result-area">
+                    <div id="dice-result-display" class="dice-display">
+                        <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
+                    </div>
+                    <div id="dice-history-list" class="dice-history"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Dice Modal -->
-    <div id="dice-modal" class="modal-overlay hidden">
-        <div class="dice-modal-content">
-            <button class="close-modal close-btn-medieval"
-                onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
-                    class="fas fa-times"></i></button>
-            <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
-                Torre de Dados</h2>
+        <link rel="stylesheet" href="css/modules/dice.css">
 
-            <div class="dice-controls-header">
-                <label for="dice-quantity">Quantidade:</label>
-                <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1" max="50">
+        <script src="js/app.js" type="module"></script>
+
+        <!-- Mystical Loading Overlay -->
+        <div id="mystic-loading" class="hidden">
+            <div class="mystic-spinner">
+                <div class="rune-layer outer"></div>
+                <div class="rune-layer"></div>
+                <div class="rune-layer inner"></div>
             </div>
+            <div class="loading-text">Tecendo a Trama...</div>
+        </div>
 
-            <div class="dice-controls">
-                <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6"
-                        style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
-                <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
-                <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20" style="transform: scaleY(1.2);"></i>
-                    d8</button>
-                <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20"
-                        style="transform: rotate(45deg);"></i> d10</button>
-                <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
-                <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20" style="color: var(--crimson);"></i>
-                    d20</button>
-                <button class="dice-btn" data-sides="100"><i class="fas fa-percent"></i> d100</button>
-            </div>
-
-            <div class="dice-result-area">
-                <div id="dice-result-display" class="dice-display">
-                    <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
+        <!-- Alpha Warning Popup -->
+        <div id="alpha-warning" class="alpha-warning-popup">
+            <div class="warning-content">
+                <button id="close-alpha-warning" class="close-btn-medieval small"><i class="fas fa-times"></i></button>
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <div class="warning-text">
+                    <strong>Versão Alpha</strong>
+                    <p>O website ainda está em desenvolvimento inicial. Você pode encontrar bugs e instabilidade.</p>
                 </div>
-                <div id="dice-history-list" class="dice-history"></div>
             </div>
         </div>
-    </div>
 
-    <link rel="stylesheet" href="css/modules/dice.css">
-
-    <script src="js/app.js" type="module"></script>
-
-    <!-- Mystical Loading Overlay -->
-    <div id="mystic-loading" class="hidden">
-        <div class="mystic-spinner">
-            <div class="rune-layer outer"></div>
-            <div class="rune-layer"></div>
-            <div class="rune-layer inner"></div>
-        </div>
-        <div class="loading-text">Tecendo a Trama...</div>
-    </div>
-
-    <!-- Alpha Warning Popup -->
-    <div id="alpha-warning" class="alpha-warning-popup">
-        <div class="warning-content">
-            <button id="close-alpha-warning" class="close-btn-medieval small"><i class="fas fa-times"></i></button>
-            <i class="fas fa-exclamation-triangle warning-icon"></i>
-            <div class="warning-text">
-                <strong>Versão Alpha</strong>
-                <p>O website ainda está em desenvolvimento inicial. Você pode encontrar bugs e instabilidade.</p>
+        <!-- Changelog Modal -->
+        <div id="changelog-modal" class="modal-overlay hidden">
+            <div class="modal-content medieval-modal">
+                <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
+                <h2 class="modal-title text-center"><i class="fas fa-scroll"></i> Pergaminho de Atualizações</h2>
+                <div class="changelog-list parchment-content">
+                    <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
+                    <p style="text-align:center; opacity:0.7;">Desenrolando pergaminho...</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Changelog Modal -->
-    <div id="changelog-modal" class="modal-overlay hidden">
-        <div class="modal-content medieval-modal">
-            <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
-            <h2 class="modal-title text-center"><i class="fas fa-scroll"></i> Pergaminho de Atualizações</h2>
-            <div class="changelog-list parchment-content">
-                <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
-                <p style="text-align:center; opacity:0.7;">Desenrolando pergaminho...</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Alpha Warning Close
-            const alphaWarning = document.getElementById('alpha-warning');
-            const closeAlpha = document.getElementById('close-alpha-warning');
-            if (closeAlpha && alphaWarning) {
-                closeAlpha.addEventListener('click', () => {
-                    alphaWarning.classList.add('hidden');
-                });
-            }
-
-            // Changelog Logic
-            const changelogBtn = document.getElementById('changelog-btn');
-            const changelogModal = document.getElementById('changelog-modal');
-            const closeChangelog = document.getElementById('close-changelog');
-
-            if (changelogBtn && changelogModal) {
-                changelogBtn.addEventListener('click', () => {
-                    changelogModal.classList.remove('hidden');
-                    // Optional: Remove badge on click
-                    const badge = changelogBtn.querySelector('.notification-badge');
-                    if (badge) badge.style.display = 'none';
-                });
-            }
-
-            if (closeChangelog && changelogModal) {
-                closeChangelog.addEventListener('click', () => {
-                    changelogModal.classList.add('hidden');
-                });
-            }
-
-            // Close modal on outside click
-            window.addEventListener('click', (e) => {
-                if (e.target === changelogModal) {
-                    changelogModal.classList.add('hidden');
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Alpha Warning Close
+                const alphaWarning = document.getElementById('alpha-warning');
+                const closeAlpha = document.getElementById('close-alpha-warning');
+                if (closeAlpha && alphaWarning) {
+                    closeAlpha.addEventListener('click', () => {
+                        alphaWarning.classList.add('hidden');
+                    });
                 }
+
+                // Changelog Logic
+                const changelogBtn = document.getElementById('changelog-btn');
+                const changelogModal = document.getElementById('changelog-modal');
+                const closeChangelog = document.getElementById('close-changelog');
+
+                if (changelogBtn && changelogModal) {
+                    changelogBtn.addEventListener('click', () => {
+                        changelogModal.classList.remove('hidden');
+                        // Optional: Remove badge on click
+                        const badge = changelogBtn.querySelector('.notification-badge');
+                        if (badge) badge.style.display = 'none';
+                    });
+                }
+
+                if (closeChangelog && changelogModal) {
+                    closeChangelog.addEventListener('click', () => {
+                        changelogModal.classList.add('hidden');
+                    });
+                }
+
+                // Close modal on outside click
+                window.addEventListener('click', (e) => {
+                    if (e.target === changelogModal) {
+                        changelogModal.classList.add('hidden');
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>

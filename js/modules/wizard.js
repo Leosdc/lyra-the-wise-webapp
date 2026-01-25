@@ -18,7 +18,14 @@ export const WizardModule = {
         if (!context.checkAuth()) return;
         console.log("✨ Abrindo Criador de Personagem");
 
-        // Dynamic Theme Text Update - Scoped to Creation Wizard
+        this.updateThemeText();
+
+        context.openModal('creation-wizard');
+        this.wizardStep = 0;
+        this.updateWizardUI();
+    },
+
+    updateThemeText() {
         const wizardContainer = document.getElementById('creation-wizard');
         if (wizardContainer) {
             const aiCard = wizardContainer.querySelector('.choice-card[data-mode="ai"]');
@@ -31,27 +38,23 @@ export const WizardModule = {
                 const backstoryInput = wizardContainer.querySelector('#wiz-backstory');
 
                 if (document.body.classList.contains('damien-theme')) {
-                    h4.innerText = "Com Damien";
-                    p.innerText = "O Conquistador forjará seu destino com poder.";
+                    if (h4) h4.innerText = "Com Damien";
+                    if (p) p.innerText = "O Conquistador forjará seu destino com poder.";
                     if (finalMsg) finalMsg.innerText = "Damien irá forjar a trama final do seu herói.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Damien pode preencher se você escolher o modo IA)";
                 } else if (document.body.classList.contains('eldrin-theme')) {
-                    h4.innerText = "Com Eldrin";
-                    p.innerText = "O Bardo Sagaz cantará sua lenda.";
+                    if (h4) h4.innerText = "Com Eldrin";
+                    if (p) p.innerText = "O Bardo Sagaz cantará sua lenda.";
                     if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Eldrin pode preencher se você escolher o modo IA)";
                 } else {
-                    h4.innerText = "Com Lyra";
-                    p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
+                    if (h4) h4.innerText = "Com Lyra";
+                    if (p) p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
                     if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói.";
                     if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)";
                 }
             }
         }
-
-        context.openModal('creation-wizard');
-        this.wizardStep = 0;
-        this.updateWizardUI();
     },
 
     showMonsterCreator(context) {
@@ -113,6 +116,9 @@ export const WizardModule = {
     },
 
     updateWizardUI() {
+        // Enforce theme text update on every UI refresh
+        this.updateThemeText();
+
         document.querySelectorAll('.wizard-step').forEach(s => {
             const stepNum = parseInt(s.dataset.step);
             s.classList.toggle('hidden', stepNum !== this.wizardStep);
