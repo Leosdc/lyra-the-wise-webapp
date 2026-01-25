@@ -17,6 +17,25 @@ export const WizardModule = {
     showCreationWizard(context) {
         if (!context.checkAuth()) return;
         console.log("✨ Abrindo Criador de Personagem");
+
+        // Dynamic Theme Text Update
+        const aiCard = document.querySelector('.choice-card[data-mode="ai"]');
+        if (aiCard) {
+            const h4 = aiCard.querySelector('h4');
+            const p = aiCard.querySelector('p');
+
+            if (document.body.classList.contains('damien-theme')) {
+                h4.innerText = "Com Damien";
+                p.innerText = "O Conquistador forjará seu destino com poder.";
+            } else if (document.body.classList.contains('eldrin-theme')) {
+                h4.innerText = "Com Eldrin";
+                p.innerText = "O Bardo Sagaz cantará sua lenda.";
+            } else {
+                h4.innerText = "Com Lyra";
+                p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
+            }
+        }
+
         context.openModal('creation-wizard');
         this.wizardStep = 0;
         this.updateWizardUI();
