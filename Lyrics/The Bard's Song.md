@@ -14,7 +14,7 @@
 [01:15.30]The hunger even gods despis
 [01:25.50]Oh, one preserves, one must consume
 [01:31.20]One sings of birth, one sings of doom
-[01:37.20]Neither is light, either is sin
+[01:37.20]Neither is lie, either is sin
 [01:41.92]For every end must once begi
 [01:58.50]I watched them cross on shattered ground
 [02:03.82]Where fate itself made not a sound

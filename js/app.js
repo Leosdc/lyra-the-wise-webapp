@@ -54,9 +54,7 @@ const app = {
 
         // Initialize Lyrics
         LyricsModule.init();
-        // Initialize Lyrics
-        LyricsModule.init();
-        // Theme set in setTheme
+
 
 
         WizardModule.initGuidanceListeners();

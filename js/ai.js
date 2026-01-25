@@ -93,23 +93,16 @@ const callProxy = async (payload) => {
 };
 
 export const sendMessageToLyra = async (message, idToken, history = [], context = "", persona = "lyra") => {
-    // 1. INPUT SECURITY SHIELD (Client-Side)
     if (message.length > 2000) {
         throw new Error("Sua mensagem é muito longa para os pergaminhos (Máx: 2000 caracteres).");
     }
 
-    // Determine Identity
     let identity = LYRA_IDENTITY;
     if (persona === 'damien') identity = DAMIEN_IDENTITY;
     if (persona === 'eldrin') identity = ELDRIN_IDENTITY;
 
-    // 2. HISTORY TRUNCATION (Token Protection)
-    // Keep only last 15 messages to prevent context explosion
     const safeHistory = history.slice(-15);
 
-    // CONDITIONAL INSTRUCTION:
-    // If it's the very first message (no history), we force the "First Impression" behavior.
-    // If it's a follow-up, we tell the AI to just *know* the context but not obsess over it.
     let systemInstruction = "";
     if (!history || history.length === 0) {
         systemInstruction = `[INSTRUÇÃO: Esta é a PRIMEIRA interação. O viajante acabou de chegar. COMENTE IMEDIATAMENTE sobre a ficha dele (Raça, Classe, etc) com sua visão única. Julgue ou acolha.]`;
