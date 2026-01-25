@@ -164,12 +164,12 @@ export const WizardModule = {
             template.bio.alignment = document.getElementById('wiz-alignment').value;
             template.bio.level = 1;
 
-            template.attributes.str = parseInt(document.getElementById('wiz-str').value) || 10;
-            template.attributes.dex = parseInt(document.getElementById('wiz-dex').value) || 10;
-            template.attributes.con = parseInt(document.getElementById('wiz-con').value) || 10;
-            template.attributes.int = parseInt(document.getElementById('wiz-int').value) || 10;
-            template.attributes.wis = parseInt(document.getElementById('wiz-wis').value) || 10;
-            template.attributes.cha = parseInt(document.getElementById('wiz-cha').value) || 10;
+            template.attributes.str = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-str').value) || 10));
+            template.attributes.dex = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-dex').value) || 10));
+            template.attributes.con = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-con').value) || 10));
+            template.attributes.int = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-int').value) || 10));
+            template.attributes.wis = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-wis').value) || 10));
+            template.attributes.cha = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-cha').value) || 10));
 
             const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
             template.proficiencies_choice.skills = skills;
@@ -359,22 +359,58 @@ export const WizardModule = {
             'wiz-talents': "Seus talentos aprendidos além do combate."
         };
 
+        // Eldrin's Tips
+        this.eldrinTips = {
+            'wiz-name': "Um nome digno de uma balada épica! Como os bardos cantarão sobre você?",
+            'wiz-race': "De onde vem o seu povo? Das florestas cantantes ou das montanhas de eco profundo?",
+            'wiz-class': "Qual será o instrumento do seu destino? A espada, o grimório ou a lira?",
+            'wiz-str': "A força para erguer o mundo... ou pelo menos um bom barril de hidromel!",
+            'wiz-dex': "A dança da batalha exige pés ligeiros e mãos ágeis.",
+            'wiz-con': "Para aguentar longas jornadas e festas ainda mais longas!",
+            'wiz-int': "A mente é o palco onde as maiores histórias são escritas.",
+            'wiz-wis': "Saber ouvir o silêncio entre as notas é uma virtude rara.",
+            'wiz-cha': "O brilho que atrai olhares e inspira corações. A alma de um herói!",
+            'wiz-background': "Toda lenda tem um começo humilde... ou trágico. Qual é o seu?",
+            'wiz-appearance': "Descreva-se com cores vivas! Deixe-me visualizar sua glória.",
+            'wiz-backstory': "Ah, o prólogo da sua saga! Não economize nos detalhes dramáticos.",
+            'wiz-alignment': "Onde seu coração vibra na canção do cosmos? Ordem ou caos?",
+            'wiz-speed': "O ritmo da sua marcha. Allegro ou Adagio?",
+            'wiz-traits': "Aquelas peculiaridades que tornam um personagem inesquecível.",
+            'wiz-ideals': "A melodia que guia sua alma. Por que você luta?",
+            'wiz-bonds': "Os laços que nos prendem são mais fortes que correntes de ferro.",
+            'wiz-flaws': "Uma falha trágica torna o herói mais humano... e a história mais interessante.",
+            'wiz-mannerisms': "Gestos que falam mais que mil palavras.",
+            'wiz-talents': "Pequenos truques para impressionar a plateia!"
+        };
+
         inputs.forEach(input => {
             // Also handle checkboxes for Skills/Proficiencies generic tip
             if (input.closest('.skills-selection')) {
                 input.addEventListener('mouseenter', () => {
                     const isDamien = document.body.classList.contains('damien-theme');
-                    const tip = isDamien
-                        ? "Do que você é capaz? Escolha o que lhe torna útil."
-                        : "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
+                    const isEldrin = document.body.classList.contains('eldrin-theme');
+
+                    let tip;
+                    if (isDamien) tip = "Do que você é capaz? Escolha o que lhe torna útil.";
+                    else if (isEldrin) tip = "Quais são seus talentos no palco da vida? Em que você brilha?";
+                    else tip = "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
+
                     if (container && textEl) {
                         textEl.innerText = tip;
                         container.classList.remove('hidden');
 
                         // Icon Swap Logic
                         if (portrait) {
-                            portrait.src = isDamien ? 'assets/tokens/damien.png' : 'assets/Lyra_the_wise.png';
-                            portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
+                            if (isDamien) {
+                                portrait.src = 'assets/tokens/damien.png';
+                                portrait.style.borderColor = 'var(--damien-purple)';
+                            } else if (isEldrin) {
+                                portrait.src = 'assets/tokens/eldrin.png';
+                                portrait.style.borderColor = 'var(--eldrin-blue)';
+                            } else {
+                                portrait.src = 'assets/Lyra_the_wise.png';
+                                portrait.style.borderColor = 'var(--gold)';
+                            }
                         }
                     }
                 });
@@ -383,7 +419,13 @@ export const WizardModule = {
 
             const showTip = () => {
                 const isDamien = document.body.classList.contains('damien-theme');
-                const currentTips = isDamien ? this.damienTips : this.guidanceTips;
+                const isEldrin = document.body.classList.contains('eldrin-theme');
+
+                let currentTips;
+                if (isDamien) currentTips = this.damienTips;
+                else if (isEldrin) currentTips = this.eldrinTips;
+                else currentTips = this.guidanceTips;
+
                 const tip = currentTips[input.id];
                 if (tip && container && textEl) {
                     textEl.innerText = tip;
@@ -391,8 +433,16 @@ export const WizardModule = {
 
                     // Icon Swap Logic
                     if (portrait) {
-                        portrait.src = isDamien ? 'assets/tokens/damien.png' : 'assets/Lyra_the_wise.png';
-                        portrait.style.borderColor = isDamien ? 'var(--damien-purple)' : 'var(--gold)';
+                        if (isDamien) {
+                            portrait.src = 'assets/tokens/damien.png';
+                            portrait.style.borderColor = 'var(--damien-purple)';
+                        } else if (isEldrin) {
+                            portrait.src = 'assets/tokens/eldrin.png';
+                            portrait.style.borderColor = 'var(--eldrin-blue)';
+                        } else {
+                            portrait.src = 'assets/Lyra_the_wise.png';
+                            portrait.style.borderColor = 'var(--gold)';
+                        }
                     }
                 }
             };
