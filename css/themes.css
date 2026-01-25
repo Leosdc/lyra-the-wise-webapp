@@ -297,3 +297,86 @@ body.damien-theme .death-row.successes input:checked {
 body.damien-theme .death-row.failures input:checked {
     background-color: var(--crimson) !important;
 }
+
+
+/* =========================================
+   ELDRIN THE BARD THEME (Blue & Gold)
+   ========================================= */
+.eldrin-theme {
+    --gold: #f1c40f;
+    /* Sun Flower Gold */
+    --gold-bright: #f39c12;
+    /* Orange Gold */
+    --gold-light: #f7dc6f;
+
+    --parchment: #d6eaf8;
+    /* Light Blueish Parchment */
+    --ink: #1a5276;
+    /* Deep Ocean Blue */
+
+    --crimson: #e74c3c;
+    /* Bright Red */
+    --glass: rgba(41, 128, 185, 0.1);
+
+    /* Specific */
+    --eldrin-blue: #2980b9;
+    --eldrin-dark: #154360;
+
+    --input-bg: rgba(21, 67, 96, 0.9);
+    --input-border: var(--gold);
+    --input-focus-bg: rgba(30, 80, 120, 0.95);
+
+    --text-shadow-glow: 0 0 8px rgba(41, 128, 185, 0.4);
+}
+
+.eldrin-theme.medieval-theme {
+    /* Use Lyra's background (Default) with a blue tint if possible, or just the same image */
+    background-image: linear-gradient(rgba(21, 67, 96, 0.8), rgba(10, 30, 50, 0.9)),
+        url('../assets/backgrounds/lyra-bg.gif') !important;
+    background-size: cover !important;
+}
+
+/* Scroll Paper */
+.eldrin-theme .scroll-paper {
+    background: radial-gradient(circle at center, #ebf5fb 0%, #d6eaf8 100%);
+    border: 3px double #2980b9;
+    box-shadow: 0 10px 30px rgba(0, 50, 100, 0.4);
+}
+
+.eldrin-theme .scroll-title {
+    color: #154360;
+    font-family: 'Cinzel', serif;
+}
+
+.eldrin-theme .medieval-btn {
+    background: linear-gradient(135deg, var(--eldrin-blue), var(--eldrin-dark));
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
+
+.eldrin-theme .medieval-btn:hover {
+    background: var(--gold);
+    color: var(--eldrin-dark);
+    box-shadow: 0 0 15px var(--eldrin-blue);
+}
+
+/* Overrides for Inputs */
+body.eldrin-theme input,
+body.eldrin-theme textarea,
+body.eldrin-theme select,
+body.eldrin-theme .medieval-card,
+body.eldrin-theme .app-header,
+body.eldrin-theme .header-dropdown-content {
+    border-color: var(--eldrin-blue) !important;
+}
+
+body.eldrin-theme .header-center {
+    background: rgba(21, 67, 96, 0.9);
+    border: 1px solid var(--gold);
+}
+
+body.eldrin-theme .vital-box,
+body.eldrin-theme .score-card {
+    background: rgba(41, 128, 185, 0.1);
+    border-color: var(--eldrin-blue);
+}

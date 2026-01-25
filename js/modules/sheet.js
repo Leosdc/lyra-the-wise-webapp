@@ -1,6 +1,7 @@
 
 import { updateCharacter } from '../data.js';
 import { RACES, CLASSES, ALIGNMENTS } from '../constants.js';
+import { DND5eSystem } from '../systems/dnd5e.js';
 
 /**
  * Sheet Module
@@ -12,68 +13,48 @@ export const SheetModule = {
     characterBackup: null,
 
     // --- Core Logic ---
+    // --- Core Logic ---
     calculateDND5eStats(char) {
-        if (!char.bio) char.bio = {};
-        if (!char.attributes) char.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
-        if (!char.stats) char.stats = { hp_max: 10, hp_current: 10, ac: 10, initiative: 0, speed: "9m" };
-
-        const level = parseInt(char.bio.level) || 1;
-        const profBonus = Math.ceil(level / 4) + 1;
-        char.stats.proficiency_bonus = profBonus;
-
-        const getMod = (val) => Math.floor((parseInt(val) - 10) / 2);
-        const strMod = getMod(char.attributes.str);
-        const dexMod = getMod(char.attributes.dex);
-        const conMod = getMod(char.attributes.con);
-        const intMod = getMod(char.attributes.int);
-        const wisMod = getMod(char.attributes.wis);
-        const chaMod = getMod(char.attributes.cha);
-
-        // Passive Perception
-        const perProf = (char.proficiencies_choice?.skills || []).includes('percepcao') ? profBonus : 0;
-        const perExpert = (char.proficiencies_choice?.expertise || []).includes('percepcao') ? profBonus : 0;
-        char.stats.passive_perception = 10 + wisMod + perProf + perExpert;
-
-        // Initiative
-        char.stats.initiative = dexMod;
-
-        // Encumbrance
-        if (char.inventory) {
-            let totalWeight = 0;
-            (char.inventory.items || []).forEach(item => {
-                totalWeight += (parseFloat(item.weight) || 0) * (parseInt(item.quantity) || 1);
-            });
-            const coins = char.inventory.coins || {};
-            const totalCoins = (parseInt(coins.pc) || 0) + (parseInt(coins.pp) || 0) + (parseInt(coins.pe) || 0) + (parseInt(coins.po) || 0) + (parseInt(coins.pl) || 0);
-            totalWeight += totalCoins / 50;
-
-            char.inventory.encumbrance = {
-                current: parseFloat(totalWeight.toFixed(2)),
-                limit: (parseInt(char.attributes.str) || 10) * 15
-            };
-        }
-
-        // Initial HP Calculation if zero (or not set)
-        if (!char.stats.hp_max || char.stats.hp_max === 0) {
-            const hitDie = char.bio.hitDie ? parseInt(char.bio.hitDie.replace('d', '')) : 8;
-            char.stats.hp_max = hitDie + conMod + ((level - 1) * (Math.floor(hitDie / 2) + 1 + conMod));
-            char.stats.hp_current = char.stats.hp_max;
-        }
-
-        // AC Calculation
-        if (!char.stats.ac || char.stats.ac === 10) {
-            char.stats.ac = 10 + dexMod;
-        }
-
-        return { strMod, dexMod, conMod, intMod, wisMod, chaMod, profBonus };
+        // Delegated to D&D 5e System Module
+        return DND5eSystem.calculateStats(char);
     },
 
     // --- UI Rendering ---
     populateSheet(char, context) {
         if (!char) return;
 
-        // Run Engine
-        const mods = this.calculateDND5eStats(char);
+        // Run Engine (System Module)
+        const systemStats = this.calculateDND5eStats(char);
+
+        // Adapter: Convert new structured stats to legacy flat "mods" object for UI compatibility
+        const mods = {
+            profBonus: systemStats.general.profBonus,
+            strMod: systemStats.attributes.str.mod,
+            dexMod: systemStats.attributes.dex.mod,
+            conMod: systemStats.attributes.con.mod,
+            intMod: systemStats.attributes.int.mod,
+            wisMod: systemStats.attributes.wis.mod,
+            chaMod: systemStats.attributes.cha.mod
+        };
+
+        // Apply Defaults (if empty)
+        if (systemStats.defaults) {
+            if (!char.stats.hp_max || char.stats.hp_max === 0) {
+                char.stats.hp_max = systemStats.defaults.hp_max;
+                char.stats.hp_current = char.stats.hp_max;
+            }
+            if (!char.stats.ac || char.stats.ac === 10) {
+                // Only override if default 10, to allow custom AC
+                // Wait, original logic was "if 10". 
+                // If calculated default is DIFFERENT from 10 (e.g. Dex 14 -> AC 12), we should apply it?
+                // The system stats.general.ac ALREADY does 10+Dex.
+                // So we can just use systemStats.general.ac if we want dynamic.
+                // But to persist it on the sheet as a starting point:
+                if (char.stats.ac === 10 && systemStats.defaults.ac !== 10) {
+                    char.stats.ac = systemStats.defaults.ac;
+                }
+            }
+        }
 
         // Helper to create seamless input
         const mkInput = (val, field, type = 'text', title = '', style = '') =>
@@ -141,8 +122,8 @@ export const SheetModule = {
             alignEl.innerHTML = `<select data-field="bio.alignment" class="medieval-select seamless" style="width: 100%;" title="Alinhamento moral e ético">${options}</select>`;
         }
 
-        document.getElementById('sheet-prof').innerText = mods.profBonus >= 0 ? `+${mods.profBonus}` : mods.profBonus;
-        document.getElementById('sheet-passive-percep').innerText = char.stats.passive_perception;
+        document.getElementById('sheet-prof').innerText = systemStats.general.profBonusFormatted;
+        document.getElementById('sheet-passive-percep').innerText = systemStats.general.passivePerception;
 
         // Scores
         const scoresGrid = document.getElementById('sheet-scores');

@@ -35,13 +35,16 @@ const app = {
         console.log("📜 Lyra the Wise - Inicializando Módulos (v2.0 Refatorado)...");
 
         // 10% chance for Damien Kael Easter Egg (Temporary per session)
-        this.isDamien = Math.random() < 0.1;
-        if (this.isDamien) {
-            this.toggleDamienMode(true);
+        // 10% Chance Damien, 10% Chance Eldrin, 80% Lyra
+        const roll = Math.random();
+        if (roll < 0.1) {
+            this.setTheme('damien');
+        } else if (roll < 0.2) {
+            this.setTheme('eldrin');
         } else {
-            // Ensure we are in Lyra mode if the 10% chance didn't hit
-            this.toggleDamienMode(false);
+            this.setTheme('lyra');
         }
+
 
         initAuth(this.handleAuthStateChange.bind(this));
         this.populateSystems();
@@ -51,7 +54,10 @@ const app = {
 
         // Initialize Lyrics
         LyricsModule.init();
-        LyricsModule.setTheme(this.isDamien);
+        // Initialize Lyrics
+        LyricsModule.init();
+        // Theme set in setTheme
+
 
         WizardModule.initGuidanceListeners();
         ChangelogModule.loadChangelog();
@@ -607,88 +613,122 @@ const app = {
         }, { once: true });
     },
 
-    toggleDamienMode(enable) {
-        this.isDamien = enable;
+    // --- Theme Manager ---
+    setTheme(themeName) {
+        this.currentThemeName = themeName || 'lyra'; // 'lyra', 'damien', 'eldrin'
+        const isDamien = (themeName === 'damien');
+        const isEldrin = (themeName === 'eldrin');
 
+        this.isDamien = isDamien; // Legacy flag for compatibility
+
+        const body = document.body;
         const logo = document.querySelector('.header-logo');
         const lyraImg = document.querySelector('.hero-lyra');
         const scrollTitle = document.querySelector('.scroll-title');
         const sheetToken = document.getElementById('sheet-token');
         const hToken = document.getElementById('header-token');
-        const alertParchment = document.querySelector('#alert-modal .medieval-modal');
 
         // Music Switch
         const audio = document.getElementById('lyra-bg-music');
         const trackName = document.querySelector('.track-name');
 
-        // Chat Button Text
-        const chatBtns = document.querySelectorAll('button[data-view="chat"]');
-        chatBtns.forEach(btn => {
-            const fontStyle = 'font-family: "Cinzel", serif; font-weight: bold; font-size: 0.9rem;'; // Explicit styling
-            if (enable) btn.innerHTML = `<i class="fas fa-comment-dots"></i> <span style='${fontStyle}'>Fale com Damien</span>`;
-            else btn.innerHTML = `<i class="fas fa-comment-dots"></i> <span style='${fontStyle}'>Fale com Lyra</span>`;
-        });
+        // Reset Classes
+        body.classList.remove('damien-theme', 'eldrin-theme');
 
-        // Chat Header Title
-        const chatHeaderTitle = document.querySelector('.chat-header h2');
-        if (chatHeaderTitle) {
-            if (enable) chatHeaderTitle.innerHTML = '<i class="fas fa-scroll"></i> Pergunte a Damien';
-            else chatHeaderTitle.innerHTML = '<i class="fas fa-scroll"></i> Pergunte à Lyra';
-        }
+        // Reset Custom Properties (Lyra Default)
+        document.documentElement.style.removeProperty('--gold');
+        document.documentElement.style.removeProperty('--gold-light');
+        document.documentElement.style.setProperty('--parchment', '#fcf5e5');
+        document.documentElement.style.removeProperty('--ink');
+        document.documentElement.style.removeProperty('--text-dark');
 
-        // Lyrics Switch
-        LyricsModule.setTheme(enable);
+        let targetSrc = 'assets/music/lyra-theme.mp3';
+        let targetName = 'The Whisper of the Stars';
+        let aiName = 'Lyra';
+        let logoSrc = 'assets/Lyra_logo.png';
+        let heroSrc = 'assets/Lyra_the_wise.png';
+        let titleText = "Conhecimento Arcano";
 
-        if (audio && trackName) {
-            const currentSrc = audio.getAttribute('src');
-            const targetSrc = enable ? 'assets/music/damien-theme.mp3' : 'assets/music/lyra-theme.mp3';
-            const targetName = enable ? 'The Hunger Beyond the Veil' : 'The Whisper of the Stars';
-
-            if (currentSrc !== targetSrc) {
-                const wasPlaying = !audio.paused;
-                audio.src = targetSrc;
-                trackName.textContent = targetName;
-                if (wasPlaying) audio.play().catch(() => { });
-                else audio.play().catch(() => { }); // Try to auto-play on switch
-            }
-        }
-
-        // Lyrics Switch
-        LyricsModule.setTheme(enable);
-
-        if (enable) {
-            document.body.classList.add('damien-theme');
+        // Apply Theme
+        if (isDamien) {
+            body.classList.add('damien-theme');
             document.documentElement.style.setProperty('--gold', '#9d6eff');
             document.documentElement.style.setProperty('--gold-light', '#bfa6ff');
             document.documentElement.style.setProperty('--parchment', '#1a1025');
             document.documentElement.style.setProperty('--ink', '#e0d5ff');
             document.documentElement.style.setProperty('--text-dark', '#e0d5ff');
-            // Images
-            if (logo) logo.src = 'assets/Damien_logo.png';
-            if (lyraImg) lyraImg.src = 'assets/Damien_Kael.png';
-            if (scrollTitle) scrollTitle.textContent = "Sussurros do Abismo";
-        } else {
-            document.body.classList.remove('damien-theme');
-            document.documentElement.style.removeProperty('--gold');
-            document.documentElement.style.removeProperty('--gold-light');
-            document.documentElement.style.setProperty('--parchment', '#fcf5e5'); // Restore default
-            document.documentElement.style.removeProperty('--ink');
-            document.documentElement.style.removeProperty('--text-dark');
-            if (logo) logo.src = 'assets/Lyra_logo.png';
-            if (lyraImg) lyraImg.src = 'assets/Lyra_the_wise.png';
-            if (scrollTitle) scrollTitle.textContent = "Conhecimento Arcano";
+
+            targetSrc = 'assets/music/damien-theme.mp3';
+            targetName = 'The Hunger Beyond the Veil';
+            aiName = 'Damien';
+            logoSrc = 'assets/Damien_logo.png';
+            heroSrc = 'assets/Damien_Kael.png';
+            titleText = "Sussurros do Abismo";
+
+        } else if (isEldrin) {
+            body.classList.add('eldrin-theme');
+            // Eldrin Vars are handled in CSS class
+
+            targetSrc = 'assets/music/the-bard-theme.mp3';
+            targetName = 'The Bard’s Lament';
+            aiName = 'Eldrin';
+            logoSrc = 'assets/Eldrin_logo.png';
+            heroSrc = 'assets/Eldrin_the_Bard.png';
+            titleText = "Canções de Outrora";
         }
 
-        // Update tokens if they are default
-        if (sheetToken) {
-            if (enable && sheetToken.src.includes('Lyra')) sheetToken.src = 'assets/tokens/damien.png';
-            else if (!enable && sheetToken.src.includes('Damien')) sheetToken.src = 'assets/tokens/lyra.png';
+        // Logic Updates
+        if (logo) logo.src = logoSrc;
+        if (lyraImg) lyraImg.src = heroSrc;
+        if (scrollTitle) scrollTitle.textContent = titleText;
+
+        // Chat Buttons
+        const chatBtns = document.querySelectorAll('button[data-view="chat"]');
+        chatBtns.forEach(btn => {
+            const fontStyle = 'font-family: "Cinzel", serif; font-weight: bold; font-size: 0.9rem;';
+            btn.innerHTML = `<i class="fas fa-comment-dots"></i> <span style='${fontStyle}'>Fale com ${aiName}</span>`;
+        });
+
+        const chatHeaderTitle = document.querySelector('.chat-header h2');
+        if (chatHeaderTitle) chatHeaderTitle.innerHTML = `<i class="fas fa-scroll"></i> Pergunte a ${aiName}`;
+
+        // Music
+        if (audio) {
+            const currentSrc = audio.getAttribute('src');
+            const nowPlaying = document.querySelector('.player-now-playing');
+
+            // UI Updates (Full Player & Pill)
+            if (trackName) trackName.textContent = targetName;
+            if (nowPlaying) nowPlaying.textContent = targetName;
+
+            // Only reload audio if source changed
+            if (currentSrc !== targetSrc) {
+                const wasPlaying = !audio.paused;
+                audio.src = targetSrc;
+                if (wasPlaying) audio.play().catch(() => { });
+            }
+        }
+
+        // Lyrics
+        LyricsModule.setTheme(themeName);
+
+        // Tokens
+        if (sheetToken && (sheetToken.src.includes('Lyra') || sheetToken.src.includes('Damien') || sheetToken.src.includes('Eldrin'))) {
+            // Only swap if it's a default token
+            sheetToken.src = `assets/tokens/${aiName.toLowerCase()}.png`;
         }
         if (hToken) {
-            if (enable && hToken.src.includes('Lyra')) hToken.src = 'assets/tokens/damien.png';
-            else if (!enable && hToken.src.includes('Damien')) hToken.src = 'assets/tokens/lyra.png';
+            hToken.src = `assets/tokens/${aiName.toLowerCase()}.png`;
         }
     },
+
+    cycleTheme() {
+        if (this.currentThemeName === 'lyra') this.setTheme('damien');
+        else if (this.currentThemeName === 'damien') this.setTheme('eldrin');
+        else this.setTheme('lyra');
+    },
+
+
 
 
     // --- Event Binding (The Glue) ---

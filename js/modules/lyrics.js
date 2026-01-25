@@ -1,4 +1,4 @@
-import { LYRA_LYRICS, DAMIEN_LYRICS } from '../lyrics-data.js';
+import { LYRA_LYRICS, DAMIEN_LYRICS, ELDRIN_LYRICS } from '../lyrics-data.js';
 
 const LyricsModule = {
     currentLyrics: [],
@@ -23,8 +23,11 @@ const LyricsModule = {
         this.startSyncLoop();
     },
 
-    setTheme(isDamien) {
-        this.currentLyrics = isDamien ? DAMIEN_LYRICS : LYRA_LYRICS;
+    setTheme(themeName) {
+        if (themeName === 'damien' || themeName === true) this.currentLyrics = DAMIEN_LYRICS;
+        else if (themeName === 'eldrin') this.currentLyrics = ELDRIN_LYRICS;
+        else this.currentLyrics = LYRA_LYRICS;
+
         this.currentIndex = -1;
         this.clearLyrics();
     },
