@@ -24,15 +24,24 @@ export const WizardModule = {
             const h4 = aiCard.querySelector('h4');
             const p = aiCard.querySelector('p');
 
+            const finalMsg = document.getElementById('wiz-final-msg');
+            const backstoryInput = document.getElementById('wiz-backstory');
+
             if (document.body.classList.contains('damien-theme')) {
                 h4.innerText = "Com Damien";
                 p.innerText = "O Conquistador forjará seu destino com poder.";
+                if (finalMsg) finalMsg.innerText = "Damien irá forjar a trama final do seu herói.";
+                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Damien pode preencher se você escolher o modo IA)";
             } else if (document.body.classList.contains('eldrin-theme')) {
                 h4.innerText = "Com Eldrin";
                 p.innerText = "O Bardo Sagaz cantará sua lenda.";
+                if (finalMsg) finalMsg.innerText = "Eldrin irá compor a balada final do seu herói.";
+                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Eldrin pode preencher se você escolher o modo IA)";
             } else {
                 h4.innerText = "Com Lyra";
                 p.innerText = "A Sabedoria Ancestral irá tecer sua lenda.";
+                if (finalMsg) finalMsg.innerText = "Lyra irá tecer a trama final do seu herói.";
+                if (backstoryInput) backstoryInput.placeholder = "Sua jornada até aqui... (Lyra pode preencher se você escolher o modo IA)";
             }
         }
 
@@ -190,8 +199,30 @@ export const WizardModule = {
             template.attributes.wis = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-wis').value) || 10));
             template.attributes.cha = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-cha').value) || 10));
 
-            const skills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
-            template.proficiencies_choice.skills = skills;
+            // Skill Normalization Map
+            const skillMap = {
+                "Acrobacia": "acrobacia",
+                "Adestramento de Animais": "adestrar_animais",
+                "Arcanismo": "arcanismo",
+                "Atletismo": "atletismo",
+                "Atuação": "atuacao",
+                "Blefar": "enganacao",
+                "Furtividade": "furtividade",
+                "História": "historia",
+                "Intimidação": "intimidacao",
+                "Intuição": "intuicao",
+                "Investigação": "investigacao",
+                "Medicina": "medicina",
+                "Natureza": "natureza",
+                "Percepção": "percepcao",
+                "Persuasão": "persuasao",
+                "Prestidigitação": "prestidigitacao",
+                "Religião": "religiao",
+                "Sobrevivência": "sobrevivencia"
+            };
+
+            const rawSkills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
+            template.proficiencies_choice.skills = rawSkills.map(s => skillMap[s] || s.toLowerCase());
             template.stats.speed = document.getElementById('wiz-speed').value || "9m";
 
             // Story
