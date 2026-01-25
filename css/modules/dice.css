@@ -8,7 +8,28 @@
     width: 90%;
     text-align: center;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.dice-controls-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-family: 'Cinzel', serif;
+    color: var(--ink);
+    font-size: 1.1rem;
+}
+
+.dice-controls-header input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--gold);
+    background: var(--input-bg);
+    color: var(--ink);
+    font-weight: bold;
+    padding: 0.2rem;
 }
 
 .dice-controls {
@@ -36,7 +57,7 @@
 .dice-btn:hover {
     background: rgba(212, 175, 55, 0.1);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dice-btn i {
@@ -99,7 +120,7 @@
 }
 
 .history-item {
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     font-size: 0.9rem;
@@ -108,12 +129,51 @@
     gap: 0.4rem;
 }
 
-.history-item .crit-green { color: #27ae60; font-weight: bold; }
-.history-item .crit-red { color: #c0392b; font-weight: bold; }
+.history-item .crit-green {
+    color: #27ae60;
+    font-weight: bold;
+}
 
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes pop { 0% { transform: scale(0.5); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.history-item .crit-red {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.5);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
 
 /* Mobile Adjustment */
 @media (max-width: 600px) {

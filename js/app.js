@@ -88,9 +88,11 @@ const app = {
 
         let trivia = RPG_TRIVIA[this.triviaIndex];
 
-        // Damien Runic Conversion
-        if (this.isDamien) {
+        // Damien Runic & Eldrin Poetic Conversion
+        if (this.currentThemeName === 'damien') {
             trivia = this.convertToRunic(trivia);
+        } else if (this.currentThemeName === 'eldrin') {
+            trivia = "♫ " + trivia + " ♫";
         }
 
         triviaEl.style.opacity = 0;
@@ -507,7 +509,7 @@ const app = {
         try {
             const idToken = await this.user.getIdToken();
             const aiContext = await this.getAIContext();
-            const response = await sendMessageToLyra(message, idToken, this.chatHistory, aiContext, this.isDamien);
+            const response = await sendMessageToLyra(message, idToken, this.chatHistory, aiContext, this.currentThemeName);
             this.addChatMsg('bot', response);
             this.chatHistory.push({ role: 'user', content: message }, { role: 'model', content: response });
         } catch (error) {
@@ -529,10 +531,28 @@ const app = {
 
             if (this.currentCharacter) {
                 const c = this.currentCharacter;
-                context += `\nO herói atualmente em foco é: ${c.name || 'Sem Nome'}.\n`;
-                context += `Status: PV ${c.stats?.hp_current}/${c.stats?.hp_max}, CA ${c.stats?.ac}.\n`;
+                context += `\n=== PERSONAGEM EM FOCO ===\n`;
+                context += `Nome: ${c.name || 'Sem Nome'}\n`;
+                context += `Raça/Classe: ${c.bio?.race || '?'} ${c.bio?.class || '?'}, Nível ${c.bio?.level || 1}\n`;
+                context += `Vida: ${c.stats?.hp_current}/${c.stats?.hp_max} | CA: ${c.stats?.ac} | Ini: ${c.stats?.initiative > 0 ? '+' : ''}${c.stats?.initiative || 0}\n`;
+
+                // Attributes
+                const attrs = c.attributes || {};
+                context += `Atributos: FOR ${attrs.str || 10}, DES ${attrs.dex || 10}, CON ${attrs.con || 10}, INT ${attrs.int || 10}, SAB ${attrs.wis || 10}, CAR ${attrs.cha || 10}\n`;
+
+                // Proficient Skills (Only show proficient to save tokens)
+                const skills = c.stats?.skills || {};
+                const profSkills = Object.entries(skills).filter(([_, val]) => val.prof).map(([key, _]) => key).join(', ');
+                if (profSkills) context += `Perícias: ${profSkills}\n`;
+
+                // Inventory (Summary)
+                if (c.inventory?.items && c.inventory.items.length > 0) {
+                    const items = c.inventory.items.map(i => i.name).join(', ');
+                    context += `Inventário: ${items}\n`;
+                }
+
                 if (c.story?.appearance) context += `Aparência: ${c.story.appearance}\n`;
-                if (c.story?.backstory) context += `História: ${c.story.backstory.substring(0, 200)}...\n`;
+                if (c.story?.backstory) context += `História (Resumo): ${c.story.backstory.substring(0, 300)}...\n`;
             }
             return context;
         } catch (e) {
@@ -545,7 +565,10 @@ const app = {
         const div = document.createElement('div');
         div.className = `msg ${sender}`;
         if (sender === 'bot') {
-            const avatar = this.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png';
+            let avatar = 'assets/tokens/lyra.png';
+            if (this.currentThemeName === 'damien') avatar = 'assets/tokens/damien.png';
+            if (this.currentThemeName === 'eldrin') avatar = 'assets/tokens/eldrin.png';
+
             div.innerHTML = `<img src="${avatar}" class="chat-avatar"><span class="msg-content">${parseMarkdown(text)}</span>`;
         } else {
             div.innerHTML = `<span class="msg-content">${parseMarkdown(text)}</span>`;

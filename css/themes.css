@@ -326,6 +326,9 @@ body.damien-theme .death-row.failures input:checked {
     --input-border: var(--gold);
     --input-focus-bg: rgba(30, 80, 120, 0.95);
 
+    --header-tracker-bg: rgba(21, 67, 96, 0.9);
+    --header-tracker-border: var(--gold);
+
     --text-shadow-glow: 0 0 8px rgba(41, 128, 185, 0.4);
 }
 
@@ -370,13 +373,22 @@ body.eldrin-theme .header-dropdown-content {
     border-color: var(--eldrin-blue) !important;
 }
 
-body.eldrin-theme .header-center {
-    background: rgba(21, 67, 96, 0.9);
-    border: 1px solid var(--gold);
-}
-
 body.eldrin-theme .vital-box,
 body.eldrin-theme .score-card {
     background: rgba(41, 128, 185, 0.1);
     border-color: var(--eldrin-blue);
+}
+
+/* Fix Death Saves in Eldrin Mode */
+body.eldrin-theme .death-row input[type="checkbox"] {
+    background-color: transparent !important;
+    border-color: var(--eldrin-blue) !important;
+}
+
+body.eldrin-theme .death-row.successes input:checked {
+    background-color: var(--gold) !important;
+}
+
+body.eldrin-theme .death-row.failures input:checked {
+    background-color: var(--crimson) !important;
 }
