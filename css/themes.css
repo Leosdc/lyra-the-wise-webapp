@@ -298,6 +298,21 @@ body.damien-theme .death-row.failures input:checked {
     background-color: var(--crimson) !important;
 }
 
+/* =========================================
+   LOADER OVERRIDES FOR ELDRIN
+   ========================================= */
+.eldrin-theme {
+    --spinner-inner: var(--eldrin-blue);
+    --spinner-outer: rgba(41, 128, 185, 0.3);
+}
+
+/* Optional: Twist the animation glow for Eldrin */
+.eldrin-theme .loading-text {
+    /* Re-declare animation usage if needed, or just variables */
+    --sunlight: #5dade2;
+    /* Light Blue for the pulse */
+}
+
 
 /* =========================================
    ELDRIN THE BARD THEME (Blue & Gold)

@@ -16,6 +16,10 @@
     --header-tracker-bg: rgba(0, 0, 0, 0.3);
     --header-tracker-border: rgba(212, 175, 55, 0.3);
 
+    /* Semantic Variables */
+    --spinner-inner: var(--crimson);
+    --spinner-outer: rgba(212, 175, 55, 0.2);
+
     /* Global Structural Variables */
     --input-bg: rgba(253, 246, 227, 0.95);
     --input-border: var(--gold);
