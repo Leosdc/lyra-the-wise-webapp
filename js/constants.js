@@ -182,7 +182,7 @@ export const SYSTEM_TEMPLATES = {
 };
 
 export const RACES = [
-    "Anão", "Elfo", "Halfling", "Humano", "Draconato", "Gnomo", "Meio-Elfo", "Meio-Orc", "Tiefling"
+    "Aasimar", "Anão", "Draconato", "Elfo", "Gnomo", "Golias", "Humano", "Orc", "Pequenino", "Tiferino"
 ];
 
 export const CLASSES = [

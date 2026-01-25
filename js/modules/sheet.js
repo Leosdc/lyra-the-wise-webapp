@@ -57,8 +57,8 @@ export const SheetModule = {
         }
 
         // Helper to create seamless input
-        const mkInput = (val, field, type = 'text', title = '', style = '') =>
-            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}" style="${style}">`;
+        const mkInput = (val, field, type = 'text', title = '', style = '', extraAttrs = '') =>
+            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}" style="${style}" ${extraAttrs}>`;
 
         // Helper to create seamless select
         const mkSelect = (val, field, options, title = '', style = '') => {
@@ -94,7 +94,7 @@ export const SheetModule = {
         const classEl = document.getElementById('sheet-class-display');
 
         if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 100%;');
-        if (raceEl) raceEl.innerHTML = mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100%;');
+        if (raceEl) raceEl.innerHTML = mkInput(race, 'bio.race', 'text', 'Raça', 'width: 100%;', 'list="races-list"');
         if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 100%;');
 
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png');

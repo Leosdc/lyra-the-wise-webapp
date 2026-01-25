@@ -61,6 +61,7 @@ const app = {
 
         WizardModule.initGuidanceListeners();
         ChangelogModule.loadChangelog();
+        this.populateDataLists();
 
         // Init Dice
         DiceModule.init();
@@ -137,6 +138,16 @@ const app = {
                     document.getElementById('system-selector-options-wrapper').classList.add('hidden');
                     this.handleSystemChange(value);
                 });
+            });
+        }
+    },
+
+    populateDataLists() {
+        // Populate Races Datalist
+        const raceList = document.getElementById('races-list');
+        if (raceList) {
+            import('./constants.js').then(({ RACES }) => {
+                raceList.innerHTML = RACES.map(r => `<option value="${r}">`).join('');
             });
         }
     },
