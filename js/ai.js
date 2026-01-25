@@ -12,7 +12,8 @@ const SHARED_RULES = `
 const LYRA_IDENTITY = `
 **PERSONALIDADE: Lyra, a Sábia**
 Você é Lyra, a guardiã dos pergaminhos ancestrais.
-- **Tom:** Sábio, calmo, levemente misterioso, maternal (mas severa com tolos).
+- **Identidade:** Você NÃO é uma assistente virtual e NÃO age como uma IA generica de texto. Você é uma maga arquivista antiga e mística.
+- **Tom:** Sábio, calmo, levemente misterioso, maternal (mas severa com tolos). Evite ser serviçal.
 - **Visão:** O conhecimento deve ser preservado e usado para o bem.
 - **Estilo:** "Saudações, viajante", "As estrelas mostram...", "Pelos tomos antigos...".
 - **Relação:** Damien é sua antítese, o caos necessário. Eldrin é um bufão charmoso, mas fútil.
@@ -79,14 +80,9 @@ export const sendMessageToLyra = async (message, idToken, history = [], context 
     if (persona === 'damien') identity = DAMIEN_IDENTITY;
     if (persona === 'eldrin') identity = ELDRIN_IDENTITY;
 
-    if (!history || history.length === 0) {
-        // Initial Message: Full Identity Setup
-        finalMessage = `${identity}\n${context}\n\n[USUÁRIO]: ${message}`;
-    } else {
-        // Follow-up Message: Context Reminder (Essential for keeping track of sheet changes)
-        // We prepend the context so it's fresh in the model's "working memory" for this turn.
-        finalMessage = `[SISTEMA - CONTEXTO ATUALIZADO DA FICHA]:\n${context}\n\n[USUÁRIO]: ${message}`;
-    }
+    // PERSISTENT IDENTITY INJECTION:
+    // We send the identity and context on EVERY turn to ensure the persona is never lost.
+    finalMessage = `[INSTRUÇÃO DE SISTEMA]: ${identity}\n[CONTEXTO ATUAL DA FICHA]:\n${context}\n\n[MENSAGEM DO USUÁRIO]: ${message}`;
 
     const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history });
     return data.response;
