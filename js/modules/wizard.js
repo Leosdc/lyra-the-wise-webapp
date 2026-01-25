@@ -421,10 +421,10 @@ export const WizardModule = {
                         // Icon Swap Logic
                         if (portrait) {
                             if (isDamien) {
-                                portrait.src = 'assets/tokens/damien.png';
+                                portrait.src = 'assets/Damien_Kael.png';
                                 portrait.style.borderColor = 'var(--damien-purple)';
                             } else if (isEldrin) {
-                                portrait.src = 'assets/tokens/eldrin.png';
+                                portrait.src = 'assets/Eldrin_the_Bard.png';
                                 portrait.style.borderColor = 'var(--eldrin-blue)';
                             } else {
                                 portrait.src = 'assets/Lyra_the_wise.png';
@@ -453,10 +453,10 @@ export const WizardModule = {
                     // Icon Swap Logic
                     if (portrait) {
                         if (isDamien) {
-                            portrait.src = 'assets/tokens/damien.png';
+                            portrait.src = 'assets/Damien_Kael.png';
                             portrait.style.borderColor = 'var(--damien-purple)';
                         } else if (isEldrin) {
-                            portrait.src = 'assets/tokens/eldrin.png';
+                            portrait.src = 'assets/Eldrin_the_Bard.png';
                             portrait.style.borderColor = 'var(--eldrin-blue)';
                         } else {
                             portrait.src = 'assets/Lyra_the_wise.png';
