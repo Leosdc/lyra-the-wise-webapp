@@ -12,8 +12,6 @@ export const LYRA_LYRICS = [
     { time: 86.10, text: "My words drift softly through eternities" },
     { time: 92.46, text: "My heart an ocean deep with tales untold" },
     { time: 98.94, text: "Where echoes sleep and ancient secrets hold" },
-    { time: 107.46, text: "Oh, oh, oh, oh" },
-    { time: 108.83, text: "Oh, oh, oh, oh" },
     { time: 115.70, text: "I crossed through Faerûn's wars and gilded crowns" },
     { time: 124.74, text: "Through Arkham's nights where creeping dread abounds" },
     { time: 131.20, text: "I traced the neon scars where Night City bleeds" },
