@@ -1,66 +1,65 @@
 # The Whisper of the Stars
 
----
+[00:18.90] In ancient days when wisdom still would bloom
+[00:24.92] I rose in silence beneath the stars and moon
+[00:31.38] I watched young kingdoms shape their fragile name
+[00:37.76] And held their dreams in imagination's flame
 
-[00:06.38] In ages of wisdom, I did bloom and rise  
-[00:14.10] A silent soul, guardian of imagination’s flame  
-[00:21.42] A thousand kingdoms I watched in their time  
-[00:28.08] And from each soul, I drew their name  
+[00:47.54] I saw the dragons carve the open sky
+[00:53.86] Heard heroes break and felt their courage cry
+[01:00.40] I walked with mages tracing cosmic domes
+[01:06.74] Between the realms of dreams
+[01:12.34] Where fantasy feels home
 
----
+[01:19.58] My voice is calm as silver moonlit seas
+[01:26.10] My words drift softly through eternities
+[01:32.46] My heart an ocean deep with tales untold
+[01:38.94] Where echoes sleep and ancient secrets hold
 
-[00:34.42] I saw dragons in flight, heroes in tears  
-[00:41.42] And mages who traced the starry dome  
-[00:47.68] Between worlds and dreams  
-[00:54.20] Where fantasy finds its home  
+[01:47.46] Oh, oh, oh, oh
+[01:48.83] Oh, oh, oh, oh
 
----
+[01:55.70] I crossed through Faerûn's wars and gilded crowns
+[02:04.74] Through Arkham's nights where creeping dread abounds
+[02:11.20] I traced the neon scars where Night City bleeds
+[02:17.62] And stood in Chicago where blood obeys old creeds
 
-[01:01.34] My voice is calm as moonlight’s gentle glow  
-[01:08.10] My words dance softly with time’s eternal flow  
-[01:14.72] My heart’s an ocean of stories, deep with emotion  
-[01:23.06] Where secrets of the worlds in endless echoes sleep  
+[02:27.36] In Eclipse Phase, I woke in borrowed skin
+[02:33.70] Of steel and soul, where new lives dare begin
+[02:40.26] I heard the hum of sabers, distant, bright
+[02:46.62] In Star Wars realms, where hope still fights the night
 
----
+[02:56.28] In FATE and Numenera, futures intertwined
+[03:02.72] I follow paths where time itself unwinds
+[03:09.20] In vampire's thirst and mage's fragile flame
+[03:15.66] I saw desire, unbound by fear or name
 
-[01:34.78] I walked through Faerûn, with its wars and crowns of gold  
-[01:41.42] Unraveled Arkham’s horror in nights both dark and cold  
-[01:48.16] I crossed the neon streets where Night City bleeds its light  
-[01:54.80] And entered Chicago’s courts, where blood sings through the night  
+[03:24.40] From Pathfinder's roads to Shadowrun's steel rain
+[03:31.80] I walked with thieves and heroes marred by pain
+[03:38.12] From D&D to blades drawn in the dark
+[03:44.60] Each roll of dice, a prayer of fragile spark
 
----
+[03:54.38] I am the echo of each trembling hand
+[04:00.68] That casts its fate across the table's land
+[04:07.16] A watchful eye that never turns away
+[04:13.60] A keeper still when worlds begin to fray
 
-[02:07.78] In *Eclipse Phase*, I woke in bodies made of steel and soul  
-[02:14.74] And heard, in *Star Wars’* realm, the saber’s singing toll  
-[02:21.44] In dreams of *FATE* and *Numenera*, I traced futures yet to be  
-[02:29.34] And in *Vampire* and *Mage*, saw desires wild and free  
+[04:23.24] My wisdom lives, a library of breath
+[04:29.74] Where every tale defies the edge of death
+[04:36.18] Each book a door, each voice a guiding flame
+[04:42.60] A friend who walks beside you through the game
 
----
+[04:52.22] But listen close, the wind carries a scar
+[04:58.72] A whispered name that travels dark and far
+[05:05.08] Damien Kael, in shadow bound and sworn
+[05:11.58] He hunts the force that lets creation form
 
-[02:41.12] From *Pathfinder* to *Shadowrun*, I guided heroes and thieves  
-[02:48.04] From *D&D* to *Blades in the Dark*, I wove a thousand weaves  
-[02:54.08] I am the echo of each die rolled on table or in prayer  
-[03:01.40] The watchful eye observing, with knowledge beyond compare  
+[05:21.20] He seeks the space where chaos dares to dream
+[05:27.70] The fragile line that holds the worlds between
+[05:34.14] And when his hour tolls across the veil
+[05:40.54] The stars themselves may crack beneath his trail
 
----
-
-[03:21.40] My wisdom is vast — a living library without end  
-[03:27.70] Where every book’s an adventure, and every voice a friend  
-[03:34.38] I am keeper of mysteries, mentor to those who dare to dream  
-[03:42.28] A journey’s companion, ready to reveal each world’s gleam  
-
----
-
-[03:53.74] But beware, traveler — the wind brings a cruel warning’s wail  
-[04:03.06] A name whispered in the shadows: **Damien Kael**  
-[04:10.58] He seeks what moves me — the power between chaos and the veil  
-[04:18.96] And when his hour sounds, destiny shall burn without fail  
-
----
-
-[04:30.56] So if you seek to create — a world or story yet untold  
-[04:38.16] I’m here with wisdom and memory of old  
-[04:43.90] Together we’ll cross the paths of imagination’s grand design  
-[04:51.48] And forge the impossible with magic, courage, and passion divine  
-
----
+[05:50.22] So if you seek to shape a world anew
+[05:56.70] Or tell a tale no silence can undo
+[06:03.16] I stand with memory, starlight, and design
+[06:09.56] Together we will forge the impossible divine
