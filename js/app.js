@@ -15,6 +15,7 @@ import { SettingsModule } from './modules/settings.js';
 import { AuthUI } from './modules/auth-ui.js';
 import { ListModule } from './modules/lists.js';
 import LyricsModule from './modules/lyrics.js';
+import { ItemsModule } from './modules/items.js';
 import { ChangelogModule } from './modules/changelog-loader.js';
 import { calculateModifier, formatModifier, resizeImage, getNestedValue, setNestedValue, parseMarkdown } from './modules/utils.js';
 import { sendMessageToLyra } from './ai.js';
@@ -55,7 +56,8 @@ const app = {
         // Initialize Lyrics
         LyricsModule.init();
 
-
+        // Initialize Items
+        ItemsModule.init();
 
         WizardModule.initGuidanceListeners();
         ChangelogModule.loadChangelog();
@@ -79,6 +81,7 @@ const app = {
         // Expose helpers globally if needed by inline HTML (legacy)
         window.calculateModifier = calculateModifier;
         window.formatModifier = formatModifier;
+        window.ItemsModule = ItemsModule; // Allow onclick access
     },
 
     showRandomTrivia() {
@@ -257,6 +260,7 @@ const app = {
                 else if (type === 'monster') this.loadMonsters();
                 else if (type === 'trap') this.loadTraps();
                 else if (type === 'session') this.loadSessions();
+                else if (type === 'items') ItemsModule.render();
             }
         };
     },
@@ -313,6 +317,9 @@ const app = {
         this.currentView = viewId;
         sessionStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
+        if (viewId === 'itens') {
+            ItemsModule.render();
+        }
     },
 
     handleQuickAction(action) {

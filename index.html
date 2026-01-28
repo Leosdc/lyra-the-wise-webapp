@@ -376,13 +376,42 @@
             <div class="view-header">
                 <h2><i class="fas fa-gem"></i> Galeria de Itens</h2>
                 <div class="header-actions">
-                    <button class="medieval-btn small" onclick="alert('Em breve: Forja e Inventário Global')"><i
-                            class="fas fa-plus"></i> Novo</button>
+                    <button class="medieval-btn small" onclick="alert('Em breve: Forja e Inventário Global')">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
                 </div>
             </div>
-            <div class="items-grid"
-                style="display:flex; justify-content:center; padding: 2rem; opacity: 0.6; font-style:italic;">
-                <p>O cofre está vazio... por enquanto.</p>
+
+            <!-- Search & Filter Bar -->
+            <div class="items-controls-bar parchment-panel">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="items-search" class="medieval-input" placeholder="Buscar item por nome...">
+                </div>
+                <div class="filter-wrapper">
+                    <i class="fas fa-filter"></i>
+                    <select id="items-filter-type" class="medieval-select">
+                        <option value="all">Todos os Tipos</option>
+                        <optgroup label="Armamentos">
+                            <option value="weapon">Armas</option>
+                            <option value="armor">Armaduras</option>
+                        </optgroup>
+                        <optgroup label="Mágico">
+                            <option value="wondrous">Itens Maravilhosos</option>
+                            <option value="potion">Poções</option>
+                            <option value="ring">Anéis</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div id="items-grid" class="items-grid-layout">
+                <!-- Items populated by JS -->
+            </div>
+            
+            <div id="items-empty-state" class="empty-state-container hidden">
+                <i class="fas fa-box-open"></i>
+                <p>Nenhum item encontrado nos arquivos.</p>
             </div>
         </section>
 
