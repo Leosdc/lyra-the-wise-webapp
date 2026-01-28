@@ -214,7 +214,7 @@ export const ItemsModule = {
         const subtype = (item.subtype || "").toLowerCase();
         const type = (item.type || "").toLowerCase();
 
-        // Specific Weapons
+        // Specific Weapons & Tools
         if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra')) return 'fas fa-sword';
         if (name.includes('machado') || name.includes('machadinha')) return 'fas fa-axe';
         if (name.includes('martelo') || name.includes('malho') || name.includes('maul')) return 'fas fa-hammer';
@@ -222,21 +222,25 @@ export const ItemsModule = {
         if (name.includes('adaga') || name.includes('faca')) return 'fas fa-dagger';
         if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive')) return 'fas fa-staff';
         if (name.includes('maça') || name.includes('mangual') || name.includes('clava')) return 'fas fa-mace';
-        if (name.includes('dardo')) return 'fas fa-location-arrow'; // Dart
-        if (name.includes('funda')) return 'fas fa-circle-dot'; // Sling
-        if (name.includes('chicote')) return 'fas fa-ring'; // Whip
+        if (name.includes('dardo')) return 'fas fa-location-arrow';
+        if (name.includes('funda')) return 'fas fa-circle-dot';
+        if (name.includes('chicote')) return 'fas fa-ring';
+
+        // Weapon Fallback
+        if (type === 'weapon' || subtype.includes('cac') || subtype.includes('dist')) return 'fas fa-sword';
 
         // Armor & Shields
-        if (subtype.includes('escudo')) return 'fas fa-shield-halved';
-        if (type === 'armor') return 'fas fa-shirt';
+        if (subtype.includes('escudo') || name.includes('escudo')) return 'fas fa-shield-halved';
+        if (type === 'armor' || subtype === 'leve' || subtype === 'media' || subtype === 'pesada') return 'fas fa-shirt';
 
         // Magic & Potions
-        if (subtype.includes('pocao')) return 'fas fa-flask';
-        if (subtype.includes('anel')) return 'fas fa-ring';
-        if (subtype.includes('varinha')) return 'fas fa-wand-magic-sparkles';
-        if (type === 'wondrous') return 'fas fa-gem';
+        if (subtype.includes('pocao') || name.includes('poção')) return 'fas fa-flask';
+        if (subtype.includes('anel') || name.includes('anel')) return 'fas fa-ring';
+        if (subtype.includes('varinha') || name.includes('varinha')) return 'fas fa-wand-magic-sparkles';
+        if (type === 'wondrous' || subtype === 'maravilhoso') return 'fas fa-gem';
 
-        return 'fas fa-scroll';
+        // General Fallback
+        return 'fas fa-book-sparkles';
     },
 
     formatType(type) {

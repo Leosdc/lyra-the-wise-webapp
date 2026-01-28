@@ -193,28 +193,3 @@ export const getGlobalItems = async (systemId) => {
         return [];
     }
 };
-
-/**
- * Migration Utility: Uploads local items from a JS object to Firestore.
- * Usage: migrateItemsToFirestore('dnd5e', ITEMS_DATABASE['dnd5e'])
- */
-export const migrateItemsToFirestore = async (systemId, itemsList) => {
-    console.log(`🚀 Iniciando migração de ${itemsList.length} itens para o sistema: ${systemId}...`);
-    let count = 0;
-    for (const item of itemsList) {
-        try {
-            const data = {
-                ...item,
-                systemId,
-                updatedAt: new Date().toISOString(),
-                isGlobal: true // Metadata to distinguish from user-created items if needed
-            };
-            await addDoc(collection(db, COLLECTIONS.GLOBAL_ITEMS), data);
-            count++;
-            if (count % 10 === 0) console.log(`✅ Progress: ${count}/${itemsList.length}`);
-        } catch (err) {
-            console.error(`❌ Erro ao migrar item: ${item.name}`, err);
-        }
-    }
-    console.log(`✨ Migração concluída! ${count} itens inseridos.`);
-};
