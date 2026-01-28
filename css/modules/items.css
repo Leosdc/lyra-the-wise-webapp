@@ -1,17 +1,135 @@
-/* Items Module Styles */
-
-/* Grid Layout */
-.items-grid-layout {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1.5rem;
-    padding: 1.5rem;
-    justify-items: center;
+/* Redesigned Controls Bar - Centered & Premium */
+.items-controls-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 1rem;
+    margin: 0 auto 3rem;
+    max-width: 1000px;
+    background: radial-gradient(circle at center, rgba(30, 20, 10, 0.5) 0%, transparent 80%);
+    position: relative;
 }
 
-/* Item Action Card Extension */
-/* Extends .action-card from dashboard.css */
-/* We use the same class in HTML, but can add specific tweaks here */
+/* Decorative Divider */
+.items-controls-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-dark), var(--gold), var(--gold-dark), transparent);
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+}
+
+.items-search-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-label-medieval {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.4));
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+#items-search {
+    width: 100% !important;
+    height: 60px !important;
+    padding: 0 1.5rem 0 4rem !important;
+    font-size: 1.3rem !important;
+    font-family: 'Cinzel', serif !important;
+    background: #f4e4bc !important;
+    /* Parchment color */
+    color: #2c1e16 !important;
+    /* Ink color */
+    border: 3px double var(--gold-dark) !important;
+    border-radius: 5px !important;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+#items-search:focus {
+    transform: scale(1.02);
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+#items-search::placeholder {
+    color: rgba(44, 30, 22, 0.4);
+    font-style: italic;
+    font-family: 'Inter', sans-serif;
+}
+
+.filter-row {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-group i {
+    color: var(--gold);
+    font-size: 1.1rem;
+}
+
+.filter-group span {
+    font-family: 'Cinzel', serif;
+    color: var(--gold-light);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#items-filter-type {
+    min-width: 240px;
+    height: 42px !important;
+    font-size: 0.95rem !important;
+}
+
+/* Grid Layout Refinement */
+.items-grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2.5rem;
+    padding: 3rem;
+    justify-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 .action-card.rarity-common {
     border-color: rgba(169, 169, 169, 0.4);
 }

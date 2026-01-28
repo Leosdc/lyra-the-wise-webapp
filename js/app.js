@@ -247,6 +247,7 @@ const app = {
             loadMonsters: () => this.loadMonsters(),
             loadTraps: () => this.loadTraps(),
             loadSessions: () => this.loadSessions(),
+            loadItems: () => ItemsModule.render(),
             showMonsterCreator: () => WizardModule.showMonsterCreator(this.getWizardContext()),
             showTrapCreator: () => WizardModule.showTrapCreator(this.getWizardContext()),
             showAlert: (msg, title) => this.showAlert(msg, title),

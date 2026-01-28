@@ -25,6 +25,7 @@ export const NavigationModule = {
         if (viewId === 'monstros' && loaders.loadMonsters) await loaders.loadMonsters();
         if (viewId === 'armadilhas' && loaders.loadTraps) await loaders.loadTraps();
         if (viewId === 'sessoes' && loaders.loadSessions) await loaders.loadSessions();
+        if (viewId === 'itens' && loaders.loadItems) await loaders.loadItems();
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.view === viewId);

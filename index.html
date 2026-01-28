@@ -382,33 +382,39 @@
                 </div>
             </div>
 
-            <!-- Search & Filter Bar -->
-            <div class="items-controls-bar parchment-panel">
-                <div class="search-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="items-search" class="medieval-input" placeholder="Buscar item por nome...">
+            <!-- Redesigned Search & Filter Bar -->
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="items-search" placeholder="O que procuras nos arquivos?">
+                    </div>
                 </div>
-                <div class="filter-wrapper">
-                    <i class="fas fa-filter"></i>
-                    <select id="items-filter-type" class="medieval-select">
-                        <option value="all">Todos os Tipos</option>
-                        <optgroup label="Armamentos">
-                            <option value="weapon">Armas</option>
-                            <option value="armor">Armaduras</option>
-                        </optgroup>
-                        <optgroup label="Mágico">
-                            <option value="wondrous">Itens Maravilhosos</option>
-                            <option value="potion">Poções</option>
-                            <option value="ring">Anéis</option>
-                        </optgroup>
-                    </select>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtrar por:</span>
+                        <select id="items-filter-type" class="medieval-select">
+                            <option value="all">Todos os Tesouros</option>
+                            <optgroup label="Armamentos">
+                                <option value="weapon">Armas</option>
+                                <option value="armor">Armaduras</option>
+                            </optgroup>
+                            <optgroup label="Mágico">
+                                <option value="wondrous">Itens Maravilhosos</option>
+                                <option value="potion">Poções</option>
+                                <option value="ring">Anéis</option>
+                            </optgroup>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div id="items-grid" class="items-grid-layout">
                 <!-- Items populated by JS -->
             </div>
-            
+
             <div id="items-empty-state" class="empty-state-container hidden">
                 <i class="fas fa-box-open"></i>
                 <p>Nenhum item encontrado nos arquivos.</p>
@@ -1165,7 +1171,8 @@
                 <p>Gostaria de usar o website como alpha tester? Contribua com o projeto via Ko-fi:</p>
                 <div style="margin-top: 10px;">
                     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-                    <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I');kofiwidget2.draw();</script>
+                    <script
+                        type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I'); kofiwidget2.draw();</script>
                 </div>
             </div>
         </div>
