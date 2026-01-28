@@ -37,8 +37,11 @@
 
 .damien-theme.medieval-theme {
     background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
-        url('../assets/backgrounds/damien-bg.gif') !important;
+        url('../assets/backgrounds/damien-bg.png') !important;
+
+
     background-size: cover !important;
+
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
     background-position: center !important;
@@ -341,10 +344,12 @@ body.damien-theme .death-row.failures input:checked {
 
 .eldrin-theme.medieval-theme {
     /* Use Lyra's background (Default) with a blue tint if possible, or just the same image */
-    background-image: linear-gradient(rgba(21, 67, 96, 0.8), rgba(10, 30, 50, 0.9)),
-        url('../assets/backgrounds/lyra-bg.gif') !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
+        url('../assets/backgrounds/eldrin-bg.png') !important;
     background-size: cover !important;
 }
+
+
 
 /* Scroll Paper */
 .eldrin-theme .scroll-paper {

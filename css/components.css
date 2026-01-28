@@ -46,30 +46,41 @@
     justify-content: center;
 }
 
-/* Close Button */
-.close-btn-medieval {
-    width: 32px;
-    height: 32px;
-    background: #c0392b;
-    border: 1.5px solid var(--gold);
+/* Close Button (Circular Medieval Style - Standard) */
+.close-btn-medieval,
+.close-modal {
+    width: 40px;
+    height: 40px;
+    background: rgba(44, 30, 22, 0.1);
+    border: 1px solid var(--gold);
     border-radius: 50%;
-    color: white;
+    color: var(--ink);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 1.2rem;
     padding: 0;
     line-height: 1;
+    z-index: 100;
 }
 
-.close-btn-medieval:hover {
-    background: #e74c3c;
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+.close-btn-medieval:hover,
+.close-modal:hover {
+    background: var(--crimson);
+    color: #fff;
+    transform: rotate(360deg) scale(1.1);
+    box-shadow: 0 0 15px var(--crimson);
     border-color: var(--gold-bright);
+}
+
+.close-btn-medieval.small,
+.close-modal.small {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
 }
 
 /* Medieval Inputs */
@@ -601,28 +612,8 @@
 
 .close-modal {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    background: rgba(44, 30, 22, 0.1);
-    border: 1px solid var(--gold);
-    color: var(--ink);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 100;
-}
-
-.close-modal:hover {
-    background: var(--crimson);
-    color: #fff;
-    transform: rotate(90deg) scale(1.1);
-    box-shadow: 0 0 15px var(--crimson);
+    top: 15px;
+    right: 15px;
 }
 
 /* Alert Content (RESTORED) */
@@ -935,6 +926,8 @@
 /* Scroll Indicators */
 #scroll-up,
 #scroll-down {
+    display: none;
+    /* Hidden by default */
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
@@ -953,6 +946,7 @@
     transition: all 0.3s ease;
     animation: bounce 2s infinite;
 }
+
 
 #scroll-up {
     top: 100px;

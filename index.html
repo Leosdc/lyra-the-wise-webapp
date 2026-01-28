@@ -170,7 +170,7 @@
     <nav id="side-menu" class="side-menu hidden">
         <div class="menu-overlay"></div>
         <div class="menu-content parchment">
-            <button class="close-menu close-btn-medieval"><i class="fas fa-times"></i></button>
+            <button class="close-menu close-modal"><i class="fas fa-times"></i></button>
 
             <div class="menu-section" data-section="creation">
                 <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
@@ -344,7 +344,7 @@
             <div class="chat-container parchment">
                 <div class="chat-header">
                     <h2><i class="fas fa-scroll"></i> Pergunte à Lyra</h2>
-                    <button id="chat-close-btn" class="chat-close-btn close-btn-medieval" title="Fechar Chat">
+                    <button id="chat-close-btn" class="chat-close-btn close-modal" title="Fechar Chat">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -498,7 +498,7 @@
     <div id="modal-wrapper" class="hidden">
         <div class="modal-backdrop"></div>
         <div class="modal-content parchment">
-            <button class="close-modal close-btn-medieval"><i class="fas fa-times"></i></button>
+            <button class="close-modal"><i class="fas fa-times"></i></button>
             <div id="detail-container" class="hidden"></div> <!-- Added detail container -->
             <div id="modal-body">
                 <!-- Painel de Configurações Arcanas -->
@@ -1108,9 +1108,10 @@
     <div id="scroll-up" class="scroll-indicator hidden">
         <i class="fa-solid fa-chevron-up"></i>
     </div>
-    <div id="scroll-down" class="scroll-indicator">
+    <div id="scroll-down" class="scroll-indicator hidden">
         <i class="fa-solid fa-chevron-down"></i>
     </div>
+
 
     <!-- Mystic Music Player (Bottom-Left) -->
     <div id="mystic-player" class="mystic-player-floating collapsed">
@@ -1148,8 +1149,7 @@
     <!-- Dice Modal -->
     <div id="dice-modal" class="modal-overlay hidden">
         <div class="dice-modal-content">
-            <button class="close-modal close-btn-medieval"
-                onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
+            <button class="close-modal" onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
                     class="fas fa-times"></i></button>
             <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
                 Torre de Dados</h2>
@@ -1199,7 +1199,7 @@
     <!-- Alpha Warning Popup -->
     <div id="alpha-warning" class="alpha-warning-popup">
         <div class="warning-content">
-            <button id="close-alpha-warning" class="close-btn-medieval small"><i class="fas fa-times"></i></button>
+            <button id="close-alpha-warning" class="close-modal small"><i class="fas fa-times"></i></button>
             <i class="fas fa-exclamation-triangle warning-icon"></i>
             <div class="warning-text">
                 <strong>Versão Alpha</strong>

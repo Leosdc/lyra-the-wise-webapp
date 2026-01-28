@@ -257,10 +257,18 @@ export const NavigationModule = {
         if (!up || !down) return;
 
         let scrollPos, windowHeight, totalHeight;
-        const modal = document.querySelector('#modal-wrapper.active');
-        const parchment = modal ? modal.querySelector('.parchment') : null;
+        // Check for active modal
+        const modal = document.getElementById('modal-wrapper');
+        const isModalOpen = modal && !modal.classList.contains('hidden');
+        const parchment = isModalOpen ? modal.querySelector('.parchment') : null;
 
-        if (modal && parchment) {
+        if (isModalOpen) {
+            if (!parchment) {
+                // If modal is open but has no scrollable area, hide indicators
+                up.classList.add('hidden');
+                down.classList.add('hidden');
+                return;
+            }
             scrollPos = parchment.scrollTop;
             windowHeight = parchment.clientHeight;
             totalHeight = parchment.scrollHeight;
@@ -278,8 +286,9 @@ export const NavigationModule = {
         // Only show down arrow if there is SIGNFICANTLY more content (e.g. > 50px difference)
         down.classList.toggle('hidden', !canScrollDown || (totalHeight - windowHeight) < 50);
 
-        const z = modal ? "10001" : "9000";
+        const z = isModalOpen ? "10001" : "9000";
         up.style.zIndex = z;
         down.style.zIndex = z;
     }
+
 };
