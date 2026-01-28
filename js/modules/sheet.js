@@ -57,15 +57,15 @@ export const SheetModule = {
         }
 
         // Helper to create seamless input
-        const mkInput = (val, field, type = 'text', title = '', style = '', extraAttrs = '') =>
-            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless" title="${title || 'Clique para editar'}" style="${style}" ${extraAttrs}>`;
+        const mkInput = (val, field, type = 'text', title = '', extraClass = '', extraAttrs = '') =>
+            `<input type="${type}" value="${val}" data-field="${field}" class="medieval-input seamless ${extraClass}" title="${title || 'Clique para editar'}" ${extraAttrs}>`;
 
         // Helper to create seamless select
-        const mkSelect = (val, field, options, title = '', style = '') => {
+        const mkSelect = (val, field, options, title = '', extraClass = '') => {
             const opts = options.map(opt => `<option value="${opt}" ${opt === val ? 'selected' : ''}>${opt}</option>`).join('');
             // Add custom option if current value is not in list
             const customOpt = (val && !options.includes(val)) ? `<option value="${val}" selected>${val} (Custom)</option>` : '';
-            return `<select data-field="${field}" class="medieval-select seamless" title="${title}" style="${style}">${customOpt}${opts}</select>`;
+            return `<select data-field="${field}" class="medieval-select seamless ${extraClass}" title="${title}">${customOpt}${opts}</select>`;
         }
 
         // Header Info
@@ -79,13 +79,13 @@ export const SheetModule = {
         // Render Name (with input)
         const nameContainer = document.getElementById('sheet-char-name');
         if (nameContainer) {
-            nameContainer.innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome', 'font-size: 2rem; font-family: Cinzel; background: transparent; border: none; width: 100%; font-weight: bold; color: inherit;');
+            nameContainer.innerHTML = mkInput(char.name || char.bio?.name || 'Sem Nome', 'name', 'text', 'Nome', 'sheet-name-input');
         }
 
         // Render Level
         const levelContainer = document.getElementById('sheet-level-val');
         if (levelContainer) {
-            levelContainer.innerHTML = mkInput(charLevel, 'bio.level', 'number', 'Nível', 'width: 50px; text-align: center; font-size: 2rem; font-weight: bold; background: transparent; border: none; color: inherit;');
+            levelContainer.innerHTML = mkInput(charLevel, 'bio.level', 'number', 'Nível', 'sheet-level-input');
         }
 
         // Render Dropdowns (Race, Class, Alignment)
@@ -93,9 +93,9 @@ export const SheetModule = {
         const raceEl = document.getElementById('sheet-race-display');
         const classEl = document.getElementById('sheet-class-display');
 
-        if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'width: 100%;');
-        if (raceEl) raceEl.innerHTML = mkSelect(race, 'bio.race', RACES, 'Raça', 'width: 100%;');
-        if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'width: 100%;');
+        if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'full-width');
+        if (raceEl) raceEl.innerHTML = mkSelect(race, 'bio.race', RACES, 'Raça', 'full-width');
+        if (classEl) classEl.innerHTML = mkSelect(clazz, 'bio.class', CLASSES, 'Classe', 'full-width');
 
         document.getElementById('sheet-token').src = char.tokenUrl || (context?.isDamien ? 'assets/tokens/damien.png' : 'assets/tokens/lyra.png');
 

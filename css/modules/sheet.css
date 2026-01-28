@@ -8,6 +8,31 @@
     width: 100%;
 }
 
+/* Helper Classes for JS Injection */
+.sheet-name-input {
+    font-size: 2rem !important;
+    font-family: 'Cinzel', serif !important;
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+    font-weight: bold !important;
+    color: inherit !important;
+}
+
+.sheet-level-input {
+    width: 60px !important;
+    text-align: center !important;
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    background: transparent !important;
+    border: none !important;
+    color: inherit !important;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
 /* Force Textarea Styling to match Input */
 .sheet-container textarea {
     background: transparent !important;

@@ -32,4 +32,9 @@
     --scroll-btn-bg: var(--dark-panel);
     --scroll-btn-color: var(--gold);
     --text-shadow-glow: none;
+
+    /* Shadows & Glows */
+    --select-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.1);
+    --select-hover-glow: 0 0 20px rgba(212, 175, 55, 0.3);
+    --select-focus-glow: 0 0 25px rgba(212, 175, 55, 0.4);
 }

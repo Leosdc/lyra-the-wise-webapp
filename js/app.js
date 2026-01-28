@@ -431,15 +431,25 @@ const app = {
     },
 
     openModal(id) {
-        // Simple wrapper for legacy or manual calls
         const wrapper = document.getElementById('modal-wrapper');
-        const content = wrapper?.querySelector('.parchment');
+        const modalBody = document.getElementById('modal-body');
+        const detailContainer = document.getElementById('detail-container');
+
         if (wrapper) {
             wrapper.classList.add('active');
             wrapper.classList.remove('hidden');
+            const content = wrapper.querySelector('.parchment');
             if (content) content.scrollTop = 0;
         }
-        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step, #detail-container').forEach(c => c.classList.add('hidden'));
+
+        // Restore modal body if it was hidden by Item Detail view
+        if (modalBody) modalBody.classList.remove('hidden');
+        if (detailContainer) {
+            detailContainer.innerHTML = '';
+            detailContainer.classList.add('hidden');
+        }
+
+        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
         const target = document.getElementById(id);
         if (target) target.classList.remove('hidden');
         NavigationModule.updateScrollIndicators();
@@ -447,9 +457,19 @@ const app = {
 
     closeModal() {
         const wrapper = document.getElementById('modal-wrapper');
+        const modalBody = document.getElementById('modal-body');
+        const detailContainer = document.getElementById('detail-container');
+
         if (wrapper) {
             wrapper.classList.remove('active');
             wrapper.classList.add('hidden');
+        }
+
+        // Cleanup: Always ensure modal-body is ready for next open
+        if (modalBody) modalBody.classList.remove('hidden');
+        if (detailContainer) {
+            detailContainer.innerHTML = '';
+            detailContainer.classList.add('hidden');
         }
     },
 

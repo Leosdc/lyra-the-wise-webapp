@@ -28,6 +28,11 @@
     --scroll-btn-bg: rgba(20, 0, 35, 0.95);
     --scroll-btn-color: var(--damien-purple);
     --text-shadow-glow: 0 0 8px rgba(209, 133, 245, 0.4);
+
+    /* Shadows & Glows */
+    --select-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(155, 89, 182, 0.2);
+    --select-hover-glow: 0 0 20px rgba(155, 89, 182, 0.4);
+    --select-focus-glow: 0 0 25px rgba(155, 89, 182, 0.5);
 }
 
 .damien-theme.medieval-theme {
@@ -57,32 +62,14 @@
     font-size: 1.4rem;
 }
 
-/* Damien Theme Overrides */
-body.damien-theme .medieval-select,
-body.damien-theme .wizard-container .medieval-select {
-    /* Use variable for arrow URL */
+/* Cleaned up Damien overrides */
+body.damien-theme .medieval-select {
     background-image: var(--select-arrow) !important;
-    border-color: var(--gold) !important;
 }
 
 body.damien-theme hr {
     border-color: var(--damien-purple);
     background: var(--damien-purple);
-}
-
-body.damien-theme input,
-body.damien-theme textarea,
-body.damien-theme select {
-    background-color: rgba(20, 0, 35, 0.9) !important;
-    color: #e2e8f0 !important;
-    border-color: var(--damien-purple) !important;
-}
-
-body.damien-theme input:focus,
-body.damien-theme textarea:focus,
-body.damien-theme select:focus {
-    color: var(--damien-purple) !important;
-    background-color: #fff !important;
 }
 
 body.damien-theme .medieval-card,
@@ -345,6 +332,11 @@ body.damien-theme .death-row.failures input:checked {
     --header-tracker-border: var(--gold);
 
     --text-shadow-glow: 0 0 8px rgba(41, 128, 185, 0.4);
+
+    /* Shadows & Glows */
+    --select-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(41, 128, 185, 0.2);
+    --select-hover-glow: 0 0 20px rgba(41, 128, 185, 0.3);
+    --select-focus-glow: 0 0 25px rgba(41, 128, 185, 0.4);
 }
 
 .eldrin-theme.medieval-theme {
@@ -378,10 +370,7 @@ body.damien-theme .death-row.failures input:checked {
     box-shadow: 0 0 15px var(--eldrin-blue);
 }
 
-/* Overrides for Inputs */
-body.eldrin-theme input,
-body.eldrin-theme textarea,
-body.eldrin-theme select,
+/* Cleaned up Eldrin overrides */
 body.eldrin-theme .medieval-card,
 body.eldrin-theme .app-header,
 body.eldrin-theme .header-dropdown-content {
