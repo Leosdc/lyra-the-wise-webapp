@@ -176,7 +176,7 @@
                 <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
                 <div class="menu-grid">
                     <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i> Personagens</button>
-                    <button class="nav-btn" data-view="itens"><i class="fas fa-gem"></i> Itens</button>
+                    <button class="nav-btn" data-view="itens-selection"><i class="fas fa-gem"></i> Itens</button>
                     <button class="nav-btn" data-view="grimorio"><i class="fas fa-book-journal-whills"></i>
                         Grimório</button>
                     <button class="nav-btn" data-view="monstros"><i class="fas fa-dragon"></i> Bestiário</button>
@@ -251,7 +251,7 @@
                         <i class="fas fa-user-shield"></i>
                         <span>Personagens</span>
                     </button>
-                    <button class="action-card" data-view="itens">
+                    <button class="action-card" data-view="itens-selection">
                         <i class="fas fa-gem"></i>
                         <span>Itens</span>
                     </button>
@@ -371,12 +371,44 @@
             <div id="fichas-list" class="items-grid"></div>
         </section>
 
+        <!-- Itens Selection View -->
+        <section id="itens-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-gem"></i> Biblioteca de Itens</h2>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon">
+                        <i class="fas fa-book-sparkles"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Itens do Sistema</h3>
+                        <p>Acesse o catálogo completo de itens mágicos e equipamentos oficiais.</p>
+                    </div>
+                </div>
+
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Meus Itens Criados</h3>
+                        <p>Forge suas próprias relíquias e visualize o que foi compartilhado com você.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Itens View -->
         <section id="itens" class="view hidden">
             <div class="view-header">
                 <h2><i class="fas fa-gem"></i> Galeria de Itens</h2>
                 <div class="header-actions">
-                    <button class="medieval-btn small" onclick="alert('Em breve: Forja e Inventário Global')">
+                    <button id="back-to-items-selection" class="medieval-btn small secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button id="items-new-btn" class="medieval-btn small">
                         <i class="fas fa-plus"></i> Novo
                     </button>
                 </div>
@@ -1176,6 +1208,70 @@
                     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
                     <script
                         type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I'); kofiwidget2.draw();</script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Creator Modal -->
+    <div id="item-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-item-creator"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-hammer"></i> Forja de Itens</h2>
+            <form id="item-creator-form" class="parchment-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Item</label>
+                        <input type="text" id="create-item-name" class="medieval-input" required
+                            placeholder="Ex: Machado de Fogo">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="create-item-type" class="medieval-select" required>
+                            <option value="weapon">Arma</option>
+                            <option value="armor">Armadura</option>
+                            <option value="wondrous">Magia</option>
+                            <option value="potion">Poção</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Raridade</label>
+                        <select id="create-item-rarity" class="medieval-select" required>
+                            <option value="common">Comum</option>
+                            <option value="uncommon">Incomum</option>
+                            <option value="rare">Raro</option>
+                            <option value="very_rare">Muito Raro</option>
+                            <option value="legendary">Lendário</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descrição e Propriedades</label>
+                    <textarea id="create-item-desc" class="medieval-textarea" rows="4"
+                        placeholder="Descreva o poder deste item..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">Forjar Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Item Modal -->
+    <div id="share-item-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-share-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-share-nodes"></i> Compartilhar Item</h2>
+            <div class="parchment-content">
+                <p>Informe o e-mail do destinatário para enviar esta relíquia:</p>
+                <div class="form-group">
+                    <input type="email" id="share-target-email" class="medieval-input" placeholder="email@exemplo.com"
+                        required>
+                </div>
+                <div class="modal-actions">
+                    <button id="confirm-share-btn" class="medieval-btn">Enviar</button>
                 </div>
             </div>
         </div>

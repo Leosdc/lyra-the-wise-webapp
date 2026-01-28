@@ -318,6 +318,7 @@ const app = {
         this.currentView = viewId;
         sessionStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
+
         if (viewId === 'itens') {
             ItemsModule.render();
         }

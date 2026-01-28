@@ -5,13 +5,35 @@ export const ItemsModule = {
     cachedItems: [],
     isLoading: false,
     lastSystem: null,
+    currentSource: 'system', // 'system' or 'personal'
+    itemToShare: null,
 
     init() {
         this.bindEvents();
     },
 
     bindEvents() {
-        // ... (this stays same, but I need to include it in the replacement chunk)
+        // Selection Panel
+        const selectionView = document.getElementById('itens-selection');
+        if (selectionView) {
+            selectionView.addEventListener('click', (e) => {
+                const card = e.target.closest('.selection-card');
+                if (!card) return;
+
+                this.currentSource = card.dataset.source;
+                NavigationModule.switchView('itens', this.getNavigationContext());
+            });
+        }
+
+        // Back button
+        const backBtn = document.getElementById('back-to-items-selection');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                NavigationModule.switchView('itens-selection', this.getNavigationContext());
+            });
+        }
+
+        // Search & Filter
         const searchInput = document.getElementById('items-search');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -24,14 +46,58 @@ export const ItemsModule = {
             catNav.addEventListener('click', (e) => {
                 const btn = e.target.closest('.cat-btn');
                 if (!btn) return;
-
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
                 this.currentFilterType = btn.dataset.type;
-                this.filterItems(document.getElementById('items-search')?.value || '');
+                this.filterItems(searchInput?.value || '');
             });
         }
+
+        // Creator Modal
+        const newBtn = document.getElementById('items-new-btn');
+        if (newBtn) {
+            newBtn.addEventListener('click', () => {
+                document.getElementById('item-creator-modal').classList.remove('hidden');
+            });
+        }
+
+        const closeCreator = document.getElementById('close-item-creator');
+        if (closeCreator) {
+            closeCreator.addEventListener('click', () => {
+                document.getElementById('item-creator-modal').classList.add('hidden');
+            });
+        }
+
+        const creatorForm = document.getElementById('item-creator-form');
+        if (creatorForm) {
+            creatorForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleCreateItem();
+            });
+        }
+
+        // Sharing Modal
+        const closeShare = document.getElementById('close-share-modal');
+        if (closeShare) {
+            closeShare.addEventListener('click', () => {
+                document.getElementById('share-item-modal').classList.add('hidden');
+                this.itemToShare = null;
+            });
+        }
+
+        const confirmShare = document.getElementById('confirm-share-btn');
+        if (confirmShare) {
+            confirmShare.addEventListener('click', async () => {
+                await this.handleShareConfirm();
+            });
+        }
+    },
+
+    getNavigationContext() {
+        // This will be called by NavigationModule.switchView if needed
+        return {
+            loadItems: () => this.render()
+        };
     },
 
     currentFilterType: 'all',
@@ -40,14 +106,24 @@ export const ItemsModule = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
+        // Reset state
         const searchInput = document.getElementById('items-search');
         if (searchInput) searchInput.value = '';
+        this.currentFilterType = 'all';
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'all'));
 
-        const currentSystem = localStorage.getItem('lyra_current_system') || 'dnd5e';
-        if (this.cachedItems.length === 0 || this.lastSystem !== currentSystem) {
-            await this.loadItemsFromFirebase(currentSystem);
+        // Update Title according to source
+        const title = document.querySelector('#itens .view-header h2');
+        if (title) {
+            if (this.currentSource === 'system') {
+                title.innerHTML = '<i class="fas fa-gem"></i> Galeria de Itens (Sistema)';
+            } else {
+                title.innerHTML = '<i class="fas fa-hammer"></i> Meus Itens Criados';
+            }
         }
 
+        const currentSystem = localStorage.getItem('lyra_current_system') || 'dnd5e';
+        await this.loadItemsFromFirebase(currentSystem);
         this.filterItems('');
     },
 
@@ -63,7 +139,19 @@ export const ItemsModule = {
         }
 
         this.isLoading = true;
-        this.cachedItems = await DataModule.getGlobalItems(systemId);
+
+        if (this.currentSource === 'system') {
+            this.cachedItems = await DataModule.getGlobalItems(systemId);
+        } else {
+            // Personal Items
+            const user = JSON.parse(sessionStorage.getItem('lyra_user'));
+            if (user) {
+                this.cachedItems = await DataModule.getUserItems(user.uid, user.email);
+            } else {
+                this.cachedItems = [];
+            }
+        }
+
         this.lastSystem = systemId;
         this.isLoading = false;
     },
@@ -85,17 +173,32 @@ export const ItemsModule = {
             });
 
         if (filtered.length === 0) {
+            const emptyMsg = this.currentSource === 'system' ?
+                'Nenhum item encontrado nos arquivos sagrados.' :
+                'Você ainda não forjou nenhum item. Comece em "+ Novo"!';
+
             container.innerHTML = `
                 <div class="empty-state-card">
                     <i class="fas fa-skull empty-skull-icon"></i>
                     <div class="empty-text-overlay">
                         <i class="fas fa-search-minus"></i>
-                        <p>Nenhum item encontrado nos arquivos sagrados.</p>
+                        <p>${emptyMsg}</p>
                     </div>
                 </div>
             `;
         } else {
             container.innerHTML = filtered.map(item => this.createItemCard(item)).join('');
+
+            // Re-bind click events for share/delete if personal
+            if (this.currentSource === 'personal') {
+                container.querySelectorAll('.share-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = e.target.closest('.item-card').dataset.id;
+                        this.openShareModal(id);
+                    });
+                });
+            }
         }
     },
 
@@ -123,12 +226,78 @@ export const ItemsModule = {
         const iconClass = this.getItemIcon(item);
         const rarityClass = `rarity-${item.rarity || 'common'}`;
 
+        // Action buttons if personal source and owner
+        let actionButtons = '';
+        if (this.currentSource === 'personal' && item.isOwner) {
+            actionButtons = `
+                <div class="card-actions">
+                    <button class="action-btn share-btn" title="Compartilhar"><i class="fas fa-share-nodes"></i></button>
+                </div>
+            `;
+        }
+
         return `
-            <button class="action-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
-                <i class="${iconClass}"></i>
-                <span>${item.name}</span>
-            </button>
+            <div class="item-card-wrapper" style="position:relative;">
+                ${actionButtons}
+                <button class="action-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
+                    <i class="${iconClass}"></i>
+                    <span>${item.name}</span>
+                </button>
+            </div>
         `;
+    },
+
+    async handleCreateItem() {
+        const user = JSON.parse(sessionStorage.getItem('lyra_user'));
+        if (!user) {
+            alert("Você precisa estar logado para forjar itens.");
+            return;
+        }
+
+        const name = document.getElementById('create-item-name').value;
+        const type = document.getElementById('create-item-type').value;
+        const rarity = document.getElementById('create-item-rarity').value;
+        const description = document.getElementById('create-item-desc').value;
+
+        try {
+            await DataModule.saveUserItem(user.uid, user.email, {
+                name, type, rarity, description,
+                systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
+            });
+
+            document.getElementById('item-creator-modal').classList.add('hidden');
+            document.getElementById('item-creator-form').reset();
+
+            // If already in personal view, refresh
+            if (this.currentSource === 'personal') {
+                await this.render();
+            } else {
+                alert("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao forjar o item. Tente novamente.");
+        }
+    },
+
+    openShareModal(itemId) {
+        this.itemToShare = itemId;
+        document.getElementById('share-item-modal').classList.remove('hidden');
+    },
+
+    async handleShareConfirm() {
+        const email = document.getElementById('share-target-email').value;
+        if (!email) return;
+
+        try {
+            await DataModule.shareItem(this.itemToShare, email);
+            alert(`Item compartilhado com ${email}!`);
+            document.getElementById('share-item-modal').classList.add('hidden');
+            document.getElementById('share-target-email').value = '';
+            this.itemToShare = null;
+        } catch (error) {
+            alert(error.message);
+        }
     },
 
     openItemDetail(itemId) {
@@ -227,12 +396,12 @@ export const ItemsModule = {
         const type = (item.type || "").toLowerCase();
 
         // Specific Weapons & Tools
-        if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra')) return 'fas fa-sword';
+        if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra') || name.includes('arma +')) return 'fas fa-sword';
         if (name.includes('machado') || name.includes('machadinha')) return 'fas fa-axe';
         if (name.includes('martelo') || name.includes('malho') || name.includes('maul')) return 'fas fa-hammer';
         if (name.includes('arco') || name.includes('besta')) return 'fas fa-bullseye';
         if (name.includes('adaga') || name.includes('faca')) return 'fas fa-dagger';
-        if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive')) return 'fas fa-staff';
+        if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive') || name.includes('azagaia')) return 'fas fa-staff';
         if (name.includes('maça') || name.includes('mangual') || name.includes('clava')) return 'fas fa-mace';
         if (name.includes('dardo')) return 'fas fa-location-arrow';
         if (name.includes('funda')) return 'fas fa-circle-dot';
@@ -252,7 +421,7 @@ export const ItemsModule = {
         if (type === 'wondrous' || subtype === 'maravilhoso') return 'fas fa-gem';
 
         // General Fallback
-        return 'fas fa-book-sparkles';
+        return 'fas fa-chess-rook';
     },
 
     formatType(type) {

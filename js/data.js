@@ -18,7 +18,8 @@ const COLLECTIONS = {
     CHARACTERS: "fichas",
     MONSTERS: "monstros",
     SESSIONS: "sessoes",
-    GLOBAL_ITEMS: "itens_database"
+    GLOBAL_ITEMS: "itens_database",
+    USER_ITEMS: "user_items"
 };
 
 // Upload character token image
@@ -192,4 +193,80 @@ export const getGlobalItems = async (systemId) => {
         console.error("Erro ao buscar itens globais:", error);
         return [];
     }
+};
+
+// --- User Created Items ---
+export const saveUserItem = async (userId, userEmail, itemData) => {
+    const data = {
+        ...itemData,
+        userId,
+        createdByEmail: userEmail,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        sharedWith: itemData.sharedWith || []
+    };
+    const docRef = await addDoc(collection(db, COLLECTIONS.USER_ITEMS), data);
+    return docRef.id;
+};
+
+export const getUserItems = async (userId, userEmail) => {
+    try {
+        // Query items created by the user
+        const qCreated = query(
+            collection(db, COLLECTIONS.USER_ITEMS),
+            where("userId", "==", userId)
+        );
+
+        // Query items shared with the user's email
+        const qShared = query(
+            collection(db, COLLECTIONS.USER_ITEMS),
+            where("sharedWith", "array-contains", userEmail)
+        );
+
+        const [snapCreated, snapShared] = await Promise.all([
+            getDocs(qCreated),
+            getDocs(qShared)
+        ]);
+
+        const createdItems = snapCreated.docs.map(doc => ({ id: doc.id, isOwner: true, ...doc.data() }));
+        const sharedItems = snapShared.docs.map(doc => ({ id: doc.id, isOwner: false, ...doc.data() }));
+
+        // Deduplicate in case an item meets both criteria (unlikely but safe)
+        const allItems = [...createdItems];
+        sharedItems.forEach(item => {
+            if (!allItems.find(i => i.id === item.id)) {
+                allItems.push(item);
+            }
+        });
+
+        return allItems.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    } catch (error) {
+        console.error("Erro ao buscar itens do usuário:", error);
+        return [];
+    }
+};
+
+export const shareItem = async (itemId, targetEmail) => {
+    const docRef = doc(db, COLLECTIONS.USER_ITEMS, itemId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) throw new Error("Item não encontrado.");
+
+    const sharedWith = docSnap.data().sharedWith || [];
+    if (!sharedWith.includes(targetEmail)) {
+        sharedWith.push(targetEmail);
+        await updateDoc(docRef, { sharedWith });
+    }
+    return true;
+};
+
+export const deleteUserItem = async (itemId, userId) => {
+    // Only owner can delete
+    const docRef = doc(db, COLLECTIONS.USER_ITEMS, itemId);
+    const snap = await getDoc(docRef);
+    if (snap.exists() && snap.data().userId === userId) {
+        await deleteDoc(docRef);
+        return true;
+    }
+    return false;
 };
