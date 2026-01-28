@@ -395,34 +395,46 @@ export const ItemsModule = {
         const subtype = (item.subtype || "").toLowerCase();
         const type = (item.type || "").toLowerCase();
 
-        // Specific Weapons & Tools
-        if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra') || name.includes('arma +')) return 'fas fa-sword';
-        if (name.includes('machado') || name.includes('machadinha')) return 'fas fa-axe';
+        // ⚔️ Weapons (Using Free FontAwesome 6 alternatives)
+        if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra') || name.includes('arma +')) return 'fas fa-khanda';
+        if (name.includes('machado') || name.includes('machadinha')) return 'fas fa-gavel';
         if (name.includes('martelo') || name.includes('malho') || name.includes('maul')) return 'fas fa-hammer';
         if (name.includes('arco') || name.includes('besta')) return 'fas fa-bullseye';
-        if (name.includes('adaga') || name.includes('faca')) return 'fas fa-dagger';
-        if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive') || name.includes('azagaia')) return 'fas fa-staff';
-        if (name.includes('maça') || name.includes('mangual') || name.includes('clava')) return 'fas fa-mace';
+        if (name.includes('adaga') || name.includes('faca')) return 'fas fa-khanda'; // Best free multi-edged alternative
+        if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive') || name.includes('azagaia')) return 'fas fa-hand-fist';
+        if (name.includes('maça') || name.includes('mangual') || name.includes('clava')) return 'fas fa-gavel';
         if (name.includes('dardo')) return 'fas fa-location-arrow';
         if (name.includes('funda')) return 'fas fa-circle-dot';
         if (name.includes('chicote')) return 'fas fa-ring';
+        if (name.includes('rede')) return 'fas fa-table-cells';
+        if (name.includes('zarabatana')) return 'fas fa-wind';
 
-        // Weapon Fallback
-        if (type === 'weapon' || subtype.includes('cac') || subtype.includes('dist')) return 'fas fa-sword';
+        // Weapon Fallback (Free)
+        if (type === 'weapon' || subtype.includes('cac') || subtype.includes('dist')) return 'fas fa-khanda';
 
-        // Armor & Shields
+        // 🛡️ Armor & Shields (Free)
         if (subtype.includes('escudo') || name.includes('escudo')) return 'fas fa-shield-halved';
         if (type === 'armor' || subtype === 'leve' || subtype === 'media' || subtype === 'pesada') return 'fas fa-shirt';
 
-        // Magic & Potions
+        // ✨ Magic & Potions (Free)
         if (subtype.includes('pocao') || name.includes('poção')) return 'fas fa-flask';
         if (subtype.includes('anel') || name.includes('anel')) return 'fas fa-ring';
         if (subtype.includes('varinha') || name.includes('varinha')) return 'fas fa-wand-magic-sparkles';
         if (type === 'wondrous' || subtype === 'maravilhoso') return 'fas fa-gem';
+        if (subtype.includes('grimório') || name.includes('livro') || name.includes('tomo')) return 'fas fa-book';
+        if (subtype.includes('pergaminho')) return 'fas fa-scroll';
 
-        // General Fallback
+        // 🎒 Gear & Misc (Free)
+        if (name.includes('mochila') || name.includes('saco') || name.includes('bolsa')) return 'fas fa-bag-shopping';
+        if (name.includes('lamparina') || name.includes('lanterna') || name.includes('tocha')) return 'fas fa-fire';
+        if (name.includes('mapa') || name.includes('carta')) return 'fas fa-map';
+        if (name.includes('bússola')) return 'fas fa-compass';
+        if (name.includes('ferramenta') || subtype === 'ferramenta') return 'fas fa-toolbox';
+
+        // General Fallback (Reliable Free Icon)
         return 'fas fa-chess-rook';
     },
+
 
     formatType(type) {
         const map = {

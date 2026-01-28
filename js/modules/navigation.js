@@ -257,38 +257,75 @@ export const NavigationModule = {
         if (!up || !down) return;
 
         let scrollPos, windowHeight, totalHeight;
-        // Check for active modal
-        const modal = document.getElementById('modal-wrapper');
-        const isModalOpen = modal && !modal.classList.contains('hidden');
-        const parchment = isModalOpen ? modal.querySelector('.parchment') : null;
+
+        // Find the active scrollable container
+        // 1. Check for open modals
+        const modalWrapper = document.getElementById('modal-wrapper');
+        const isModalOpen = modalWrapper && !modalWrapper.classList.contains('hidden');
+
+        // Other overlays that might be open
+        const itemCreator = document.getElementById('item-creator-modal');
+        const isItemCreatorOpen = itemCreator && !itemCreator.classList.contains('hidden');
+
+        const shareModal = document.getElementById('share-item-modal');
+        const isShareModalOpen = shareModal && !shareModal.classList.contains('hidden');
+
+        const changelogModal = document.getElementById('changelog-modal');
+        const isChangelogOpen = changelogModal && !changelogModal.classList.contains('hidden');
+
+        let container = null;
 
         if (isModalOpen) {
-            if (!parchment) {
-                // If modal is open but has no scrollable area, hide indicators
-                up.classList.add('hidden');
-                down.classList.add('hidden');
-                return;
-            }
-            scrollPos = parchment.scrollTop;
-            windowHeight = parchment.clientHeight;
-            totalHeight = parchment.scrollHeight;
+            // Priority inside modal wrapper
+            container = modalWrapper.querySelector('.parchment-content, .settings-content, .wizard-step:not(.hidden)');
+            if (!container) container = modalWrapper.querySelector('.modal-content');
+        } else if (isItemCreatorOpen) {
+            container = itemCreator.querySelector('.parchment-content');
+        } else if (isShareModalOpen) {
+            container = shareModal.querySelector('.parchment-content');
+        } else if (isChangelogOpen) {
+            container = changelogModal.querySelector('.parchment-content');
         } else {
+            // Check for active view in main content
+            const activeView = document.querySelector('.view:not(.hidden)');
+            if (activeView) {
+                // Special case for chat which has its own scrollable area
+                if (activeView.id === 'chat') {
+                    container = activeView.querySelector('.chat-messages');
+                } else {
+                    // General view scroll (usually body/html, but let's check)
+                    scrollPos = window.scrollY;
+                    windowHeight = window.innerHeight;
+                    totalHeight = document.documentElement.scrollHeight;
+                }
+            }
+        }
+
+        if (container) {
+            scrollPos = container.scrollTop;
+            windowHeight = container.clientHeight;
+            totalHeight = container.scrollHeight;
+        } else if (scrollPos === undefined) {
+            // Fallback to global if nothing else matches
             scrollPos = window.scrollY;
             windowHeight = window.innerHeight;
             totalHeight = document.documentElement.scrollHeight;
         }
 
-        const threshold = 50;
+        const threshold = 20; // Lower threshold to be more responsive
         const canScrollUp = scrollPos > threshold;
         const canScrollDown = scrollPos + windowHeight < totalHeight - threshold;
 
-        up.classList.toggle('hidden', !canScrollUp);
-        // Only show down arrow if there is SIGNFICANTLY more content (e.g. > 50px difference)
-        down.classList.toggle('hidden', !canScrollDown || (totalHeight - windowHeight) < 50);
+        // Final check: if the container is not actually scrollable (height mismatch), hide both
+        const isTrulyScrollable = totalHeight > windowHeight + 5;
 
-        const z = isModalOpen ? "10001" : "9000";
+        up.classList.toggle('hidden', !canScrollUp || !isTrulyScrollable);
+        down.classList.toggle('hidden', !canScrollDown || !isTrulyScrollable);
+
+        const z = (isModalOpen || isItemCreatorOpen || isShareModalOpen || isChangelogOpen) ? "10001" : "9000";
         up.style.zIndex = z;
         down.style.zIndex = z;
-    }
+    },
+
 
 };
