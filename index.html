@@ -382,31 +382,23 @@
                 </div>
             </div>
 
-            <!-- Redesigned Search & Filter Bar -->
+            <!-- Premium Redesigned Search & Filter Bar -->
             <div class="items-controls-bar">
                 <div class="items-search-container">
+                    <span class="search-label-medieval">Pesquisar Arquivos</span>
                     <div class="search-wrapper">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="items-search" placeholder="O que procuras nos arquivos?">
+                        <input type="text" id="items-search" placeholder="O que desejas encontrar?">
                     </div>
                 </div>
 
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <i class="fas fa-filter"></i>
-                        <span>Filtrar por:</span>
-                        <select id="items-filter-type" class="medieval-select">
-                            <option value="all">Todos os Tesouros</option>
-                            <optgroup label="Armamentos">
-                                <option value="weapon">Armas</option>
-                                <option value="armor">Armaduras</option>
-                            </optgroup>
-                            <optgroup label="Mágico">
-                                <option value="wondrous">Itens Maravilhosos</option>
-                                <option value="potion">Poções</option>
-                                <option value="ring">Anéis</option>
-                            </optgroup>
-                        </select>
+                <div class="category-nav-container">
+                    <div class="category-nav" id="items-category-nav">
+                        <button class="cat-btn active" data-type="all">Tudo</button>
+                        <button class="cat-btn" data-type="weapon">Armas</button>
+                        <button class="cat-btn" data-type="armor">Armaduras</button>
+                        <button class="cat-btn" data-type="wondrous">Magia</button>
+                        <button class="cat-btn" data-type="potion">Poções</button>
                     </div>
                 </div>
             </div>

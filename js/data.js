@@ -17,7 +17,8 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
 const COLLECTIONS = {
     CHARACTERS: "fichas",
     MONSTERS: "monstros",
-    SESSIONS: "sessoes"
+    SESSIONS: "sessoes",
+    GLOBAL_ITEMS: "itens_database"
 };
 
 // Upload character token image
@@ -176,4 +177,44 @@ export const saveSession = async (userId, systemId, sessionData) => {
 
 export const deleteSession = async (id) => {
     await deleteDoc(doc(db, COLLECTIONS.SESSIONS, id));
+};
+
+// --- Global Items Database ---
+export const getGlobalItems = async (systemId) => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.GLOBAL_ITEMS),
+            where("systemId", "==", systemId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error("Erro ao buscar itens globais:", error);
+        return [];
+    }
+};
+
+/**
+ * Migration Utility: Uploads local items from a JS object to Firestore.
+ * Usage: migrateItemsToFirestore('dnd5e', ITEMS_DATABASE['dnd5e'])
+ */
+export const migrateItemsToFirestore = async (systemId, itemsList) => {
+    console.log(`🚀 Iniciando migração de ${itemsList.length} itens para o sistema: ${systemId}...`);
+    let count = 0;
+    for (const item of itemsList) {
+        try {
+            const data = {
+                ...item,
+                systemId,
+                updatedAt: new Date().toISOString(),
+                isGlobal: true // Metadata to distinguish from user-created items if needed
+            };
+            await addDoc(collection(db, COLLECTIONS.GLOBAL_ITEMS), data);
+            count++;
+            if (count % 10 === 0) console.log(`✅ Progress: ${count}/${itemsList.length}`);
+        } catch (err) {
+            console.error(`❌ Erro ao migrar item: ${item.name}`, err);
+        }
+    }
+    console.log(`✨ Migração concluída! ${count} itens inseridos.`);
 };

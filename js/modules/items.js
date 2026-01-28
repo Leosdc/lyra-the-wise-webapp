@@ -1,13 +1,17 @@
-import { ITEMS_DATABASE } from '../items-data.js';
+import * as DataModule from '../data.js';
 import { NavigationModule } from './navigation.js';
 
 export const ItemsModule = {
+    cachedItems: [],
+    isLoading: false,
+    lastSystem: null,
+
     init() {
         this.bindEvents();
     },
 
     bindEvents() {
-        // Search Input
+        // ... (this stays same, but I need to include it in the replacement chunk)
         const searchInput = document.getElementById('items-search');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -15,11 +19,16 @@ export const ItemsModule = {
             });
         }
 
-        // Filter Dropdown (Delegated or Direct)
-        const filterSelect = document.getElementById('items-filter-type');
-        if (filterSelect) {
-            filterSelect.addEventListener('change', (e) => {
-                this.currentFilterType = e.target.value;
+        const catNav = document.getElementById('items-category-nav');
+        if (catNav) {
+            catNav.addEventListener('click', (e) => {
+                const btn = e.target.closest('.cat-btn');
+                if (!btn) return;
+
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                this.currentFilterType = btn.dataset.type;
                 this.filterItems(document.getElementById('items-search')?.value || '');
             });
         }
@@ -27,35 +36,54 @@ export const ItemsModule = {
 
     currentFilterType: 'all',
 
-    render(containerId = 'items-grid') {
+    async render(containerId = 'items-grid') {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        // Initial render with all items (or filtered if state exists)
+        const searchInput = document.getElementById('items-search');
+        if (searchInput) searchInput.value = '';
+
+        const currentSystem = localStorage.getItem('lyra_current_system') || 'dnd5e';
+        if (this.cachedItems.length === 0 || this.lastSystem !== currentSystem) {
+            await this.loadItemsFromFirebase(currentSystem);
+        }
+
         this.filterItems('');
+    },
+
+    async loadItemsFromFirebase(systemId) {
+        const container = document.getElementById('items-grid');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-state-medieval" style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--gold);">
+                    <i class="fas fa-quill-pan-scroll fa-spin" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                    <span style="font-family: 'Cinzel', serif; letter-spacing: 2px;">Consultando os Anais...</span>
+                </div>
+            `;
+        }
+
+        this.isLoading = true;
+        this.cachedItems = await DataModule.getGlobalItems(systemId);
+        this.lastSystem = systemId;
+        this.isLoading = false;
     },
 
     filterItems(queryTerm) {
         const container = document.getElementById('items-grid');
         const emptyState = document.getElementById('items-empty-state');
-        if (!container) return;
-
-        const system = localStorage.getItem('lyra_current_system') || 'dnd5e';
-        const allItems = ITEMS_DATABASE[system] || [];
+        if (!container || this.isLoading) return;
 
         const normalizedQuery = queryTerm.toLowerCase().trim();
 
-        const filtered = allItems.filter(item => {
-            const matchesSearch = item.name.toLowerCase().includes(normalizedQuery) ||
-                (item.description && item.description.toLowerCase().includes(normalizedQuery));
+        const filtered = this.cachedItems
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(normalizedQuery) ||
+                    (item.description && item.description.toLowerCase().includes(normalizedQuery));
 
-            const matchesType = this.matchTypeFilter(item, this.currentFilterType);
-
-            return matchesSearch && matchesType;
-        });
-
-        // Determine if Lyra or Damien theme for specific styles
-        const isDamien = document.body.classList.contains('damien-theme');
+                const matchesType = this.matchTypeFilter(item, this.currentFilterType);
+                return matchesSearch && matchesType;
+            });
 
         if (filtered.length === 0) {
             container.innerHTML = '';
@@ -68,19 +96,18 @@ export const ItemsModule = {
 
     matchTypeFilter(item, filter) {
         if (filter === 'all') return true;
-        if (filter === 'weapon') return item.type === 'weapon';
-        if (filter === 'armor') return item.type === 'armor';
-        if (filter === 'wondrous') return item.type === 'wondrous';
 
-        // Subtype matches (simple check)
-        if (filter === 'potion') return item.subtype === 'pocao';
-        if (filter === 'ring') return item.subtype === 'anel';
+        // Match by type or subtype
+        if (item.type === filter) return true;
+        if (item.subtype === filter) return true;
 
-        return true;
+        // Special case for 'wondrous' to include magic subtypes if filter is 'wondrous'
+        if (filter === 'wondrous' && (item.subtype === 'maravilhoso' || item.subtype === 'anel' || item.subtype === 'varinha')) return true;
+
+        return false;
     },
 
     createItemCard(item) {
-        // EXACT match of the Dashboard .action-card style (160x160 button > i + span)
         const iconClass = this.getItemIcon(item);
         const rarityClass = `rarity-${item.rarity || 'common'}`;
 
@@ -93,8 +120,7 @@ export const ItemsModule = {
     },
 
     openItemDetail(itemId) {
-        const system = localStorage.getItem('lyra_current_system') || 'dnd5e';
-        const item = ITEMS_DATABASE[system]?.find(i => i.id === itemId);
+        const item = this.cachedItems.find(i => i.id === itemId);
         if (!item) return;
 
         const modalWrapper = document.getElementById('modal-wrapper');
@@ -117,45 +143,44 @@ export const ItemsModule = {
         const iconClass = this.getItemIcon(item);
         const typeLabel = this.formatType(item.subtype || item.type);
 
-        // Stats for the grid
-        let statsGrid = '';
-        if (item.damage) statsGrid += `<div class="detail-stat"><strong>Dano</strong><span>${item.damage}</span></div>`;
-        if (item.ac) statsGrid += `<div class="detail-stat"><strong>CA</strong><span>${item.ac}</span></div>`;
-        if (item.weight) statsGrid += `<div class="detail-stat"><strong>Peso</strong><span>${item.weight}</span></div>`;
-        if (item.cost) statsGrid += `<div class="detail-stat"><strong>Preço</strong><span>${item.cost}</span></div>`;
-        if (item.rarity) statsGrid += `<div class="detail-stat"><strong>Raridade</strong><span class="rarity-text ${item.rarity}">${this.translateRarity(item.rarity)}</span></div>`;
+        // Compact stats grid
+        let statsHtml = '';
+        if (item.damage) statsHtml += `<div class="detail-stat"><strong>Dano</strong><span>${item.damage}</span></div>`;
+        if (item.ac) statsHtml += `<div class="detail-stat"><strong>CA</strong><span>${item.ac}</span></div>`;
+        if (item.weight && item.weight !== '-') statsHtml += `<div class="detail-stat"><strong>Peso</strong><span>${item.weight}</span></div>`;
+        if (item.cost && item.cost !== '-') statsHtml += `<div class="detail-stat"><strong>Preço</strong><span>${item.cost}</span></div>`;
+        if (item.rarity) statsHtml += `<div class="detail-stat"><strong>Raridade</strong><span>${this.translateRarity(item.rarity)}</span></div>`;
 
-        // Tags
         const badges = (item.properties || []).map(p => `<span class="detail-badge">${p}</span>`).join('');
 
         return `
             <div class="item-detail-view">
-                <div class="detail-top-section">
-                    <div class="detail-icon-large ${item.rarity || 'common'}">
+                <div class="detail-header">
+                    <div class="detail-icon-large">
                         <i class="${iconClass}"></i>
                     </div>
-                    <div class="detail-header-info">
+                    <div class="detail-title-block">
                         <h2>${item.name}</h2>
-                        <div class="detail-subtitle">${typeLabel}</div>
+                        <span class="detail-subtitle">${typeLabel}</span>
                     </div>
                 </div>
 
-                <div class="detail-stats-container">
-                    ${statsGrid}
+                <div class="detail-stats-grid">
+                    ${statsHtml}
                 </div>
 
-                ${badges ? `<div class="detail-badges-container">${badges}</div>` : ''}
-
-                <div class="detail-divider"></div>
+                ${badges ? `<div class="detail-badges">${badges}</div>` : ''}
 
                 <div class="detail-description">
-                    <h3>Descrição</h3>
+                    <h3>Crônica do Item</h3>
                     <p>${item.description}</p>
                 </div>
 
                 <div class="detail-actions">
-                    <button class="medieval-btn" onclick="ItemsModule.closeModal()">Fechar</button>
-                    <!-- Future: <button class="medieval-btn secondary">Pegar</button> -->
+                    <button class="medieval-btn small secondary" onclick="ItemsModule.closeModal()">Fechar</button>
+                    <button class="medieval-btn small" onclick="alert('Exploração em Alpha: Em breve, este item será adicionado diretamente à sua ficha!')">
+                        <i class="fas fa-hand-holding-magic"></i> Reivindicar Tesouro
+                    </button>
                 </div>
             </div>
         `;
@@ -185,17 +210,33 @@ export const ItemsModule = {
     },
 
     getItemIcon(item) {
-        if (item.subtype?.includes('pocao')) return 'fas fa-flask';
-        if (item.subtype?.includes('anel')) return 'fas fa-ring';
-        if (item.subtype === 'escudo') return 'fas fa-shield-halved';
-        if (item.type === 'armor') return 'fas fa-shirt'; // Or vest
-        if (item.subtype?.includes('cac')) return 'fas fa-khanda'; // Melee
-        if (item.subtype?.includes('dist')) return 'fas fa-bow-arrow'; // Ranged (generic fallback font awesome) checks needed
-        if (item.name.toLowerCase().includes('arco')) return 'fas fa-bullseye';
-        if (item.name.toLowerCase().includes('besta')) return 'fas fa-crosshairs';
-        if (item.type === 'weapon') return 'fas fa-sword';
-        if (item.type === 'wondrous') return 'fas fa-gem';
-        return 'fas fa-box';
+        const name = (item.name || "").toLowerCase();
+        const subtype = (item.subtype || "").toLowerCase();
+        const type = (item.type || "").toLowerCase();
+
+        // Specific Weapons
+        if (name.includes('espada') || name.includes('rapieira') || name.includes('cimitarra')) return 'fas fa-sword';
+        if (name.includes('machado') || name.includes('machadinha')) return 'fas fa-axe';
+        if (name.includes('martelo') || name.includes('malho') || name.includes('maul')) return 'fas fa-hammer';
+        if (name.includes('arco') || name.includes('besta')) return 'fas fa-bullseye';
+        if (name.includes('adaga') || name.includes('faca')) return 'fas fa-dagger';
+        if (name.includes('lança') || name.includes('tridente') || name.includes('alabarda') || name.includes('glaive')) return 'fas fa-staff';
+        if (name.includes('maça') || name.includes('mangual') || name.includes('clava')) return 'fas fa-mace';
+        if (name.includes('dardo')) return 'fas fa-location-arrow'; // Dart
+        if (name.includes('funda')) return 'fas fa-circle-dot'; // Sling
+        if (name.includes('chicote')) return 'fas fa-ring'; // Whip
+
+        // Armor & Shields
+        if (subtype.includes('escudo')) return 'fas fa-shield-halved';
+        if (type === 'armor') return 'fas fa-shirt';
+
+        // Magic & Potions
+        if (subtype.includes('pocao')) return 'fas fa-flask';
+        if (subtype.includes('anel')) return 'fas fa-ring';
+        if (subtype.includes('varinha')) return 'fas fa-wand-magic-sparkles';
+        if (type === 'wondrous') return 'fas fa-gem';
+
+        return 'fas fa-scroll';
     },
 
     formatType(type) {
@@ -204,14 +245,15 @@ export const ItemsModule = {
             'simples_dist': 'Simples (Distância)',
             'marcial_cac': 'Marcial (C-a-C)',
             'marcial_dist': 'Marcial (Distância)',
-            'leve': 'Leve',
-            'media': 'Média',
-            'pesada': 'Pesada',
+            'leve': 'Armadura Leve',
+            'media': 'Armadura Média',
+            'pesada': 'Armadura Pesada',
             'escudo': 'Escudo',
             'pocao': 'Poção',
             'maravilhoso': 'Item Maravilhoso',
             'varinha': 'Varinha',
-            'anel': 'Anel'
+            'anel': 'Anel',
+            'magico': 'Item Mágico'
         };
         return map[type] || type;
     }
