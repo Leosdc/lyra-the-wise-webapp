@@ -94,9 +94,7 @@ export const ItemsModule = {
                     </div>
                 </div>
             `;
-            if (emptyState) emptyState.classList.add('hidden'); // Use our custom center one
         } else {
-            if (emptyState) emptyState.classList.add('hidden');
             container.innerHTML = filtered.map(item => this.createItemCard(item)).join('');
         }
     },
