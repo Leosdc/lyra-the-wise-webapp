@@ -347,6 +347,11 @@ body.damien-theme .death-row.failures input:checked {
     --text-shadow-glow: 0 0 8px rgba(41, 128, 185, 0.4);
 }
 
+/* Fix Eldrin Logo Vertical Alignment */
+.eldrin-theme .header-logo {
+    margin-top: 4px;
+}
+
 .eldrin-theme.medieval-theme {
     /* Use Lyra's background (Default) with a blue tint if possible, or just the same image */
     background-image: linear-gradient(rgba(21, 67, 96, 0.8), rgba(10, 30, 50, 0.9)),

@@ -70,7 +70,6 @@ export const ItemsModule = {
 
     filterItems(queryTerm) {
         const container = document.getElementById('items-grid');
-        const emptyState = document.getElementById('items-empty-state');
         if (!container || this.isLoading) return;
 
         const normalizedQuery = queryTerm.toLowerCase().trim();
@@ -86,8 +85,16 @@ export const ItemsModule = {
             });
 
         if (filtered.length === 0) {
-            container.innerHTML = '';
-            if (emptyState) emptyState.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="empty-state-card">
+                    <i class="fas fa-skull empty-skull-icon"></i>
+                    <div class="empty-text-overlay">
+                        <i class="fas fa-search-minus"></i>
+                        <p>Nenhum item encontrado nos arquivos sagrados.</p>
+                    </div>
+                </div>
+            `;
+            if (emptyState) emptyState.classList.add('hidden'); // Use our custom center one
         } else {
             if (emptyState) emptyState.classList.add('hidden');
             container.innerHTML = filtered.map(item => this.createItemCard(item)).join('');
@@ -97,12 +104,19 @@ export const ItemsModule = {
     matchTypeFilter(item, filter) {
         if (filter === 'all') return true;
 
-        // Match by type or subtype
-        if (item.type === filter) return true;
-        if (item.subtype === filter) return true;
+        const normalizedFilter = filter.toLowerCase();
+
+        // Match by type or subtype with translation support
+        if (item.type === normalizedFilter) return true;
+        if (item.subtype === normalizedFilter) return true;
+
+        // Translations (UI uses English keys, Data might use Portuguese)
+        if (normalizedFilter === 'potion' && (item.subtype === 'pocao' || item.type === 'pocao')) return true;
+        if (normalizedFilter === 'weapon' && (item.subtype === 'arma' || item.type === 'arma')) return true;
+        if (normalizedFilter === 'armor' && (item.subtype === 'armadura' || item.type === 'armadura')) return true;
 
         // Special case for 'wondrous' to include magic subtypes if filter is 'wondrous'
-        if (filter === 'wondrous' && (item.subtype === 'maravilhoso' || item.subtype === 'anel' || item.subtype === 'varinha')) return true;
+        if (normalizedFilter === 'wondrous' && (item.subtype === 'maravilhoso' || item.subtype === 'anel' || item.subtype === 'varinha')) return true;
 
         return false;
     },
