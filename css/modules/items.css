@@ -1,0 +1,171 @@
+/* Items Module Styles */
+
+/* Grid Layout */
+.items-grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+    justify-items: center;
+}
+
+/* Item Action Card Extension */
+/* Extends .action-card from dashboard.css */
+/* We use the same class in HTML, but can add specific tweaks here */
+.action-card.rarity-common {
+    border-color: rgba(169, 169, 169, 0.4);
+}
+
+.action-card.rarity-uncommon {
+    border-color: rgba(30, 255, 0, 0.4);
+}
+
+.action-card.rarity-rare {
+    border-color: rgba(0, 112, 221, 0.4);
+}
+
+.action-card.rarity-very_rare {
+    border-color: rgba(163, 53, 238, 0.4);
+}
+
+.action-card.rarity-legendary {
+    border-color: rgba(255, 128, 0, 0.4);
+}
+
+.action-card.rarity-common:hover {
+    box-shadow: 0 0 15px rgba(169, 169, 169, 0.3);
+}
+
+.action-card.rarity-uncommon:hover {
+    box-shadow: 0 0 15px rgba(30, 255, 0, 0.3);
+}
+
+.action-card.rarity-rare:hover {
+    box-shadow: 0 0 15px rgba(0, 112, 221, 0.3);
+}
+
+.action-card.rarity-very_rare:hover {
+    box-shadow: 0 0 15px rgba(163, 53, 238, 0.3);
+}
+
+.action-card.rarity-legendary:hover {
+    box-shadow: 0 0 15px rgba(255, 128, 0, 0.3);
+}
+
+/* Item Detail View (Inside Modal) */
+.item-detail-view {
+    padding: 1rem;
+    color: var(--ink);
+    /* Modal uses parchment theme usually */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 400px;
+    /* Prevent collapse */
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 2px solid rgba(44, 30, 22, 0.1);
+    padding-bottom: 1rem;
+}
+
+.detail-icon-large {
+    width: 70px;
+    height: 70px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-icon-large i {
+    font-size: 2.5rem;
+    color: var(--gold-dark);
+}
+
+.detail-title-block h2 {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    color: var(--crimson);
+    font-size: 1.8rem;
+}
+
+.detail-subtitle {
+    font-size: 0.9rem;
+    color: var(--ink);
+    opacity: 0.7;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+/* Stats Grid */
+.detail-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.detail-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.detail-stat strong {
+    font-size: 0.7rem;
+    color: var(--ink);
+    opacity: 0.6;
+    text-transform: uppercase;
+}
+
+.detail-stat span {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Description Section */
+.detail-description h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.8rem;
+    color: var(--ink);
+}
+
+.detail-description p {
+    line-height: 1.6;
+    font-size: 1rem;
+    text-align: justify;
+}
+
+.detail-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.detail-badge {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold-dark);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}

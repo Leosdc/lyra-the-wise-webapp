@@ -80,31 +80,15 @@ export const ItemsModule = {
     },
 
     createItemCard(item) {
+        // EXACT match of the Dashboard .action-card style (160x160 button > i + span)
         const iconClass = this.getItemIcon(item);
         const rarityClass = `rarity-${item.rarity || 'common'}`;
 
-        let statsHtml = '';
-        if (item.damage) statsHtml += `<span class="item-stat"><i class="fas fa-gavel"></i> ${item.damage}</span>`;
-        if (item.ac) statsHtml += `<span class="item-stat"><i class="fas fa-shield-alt"></i> CA ${item.ac}</span>`;
-        if (item.weight && item.weight !== '-') statsHtml += `<span class="item-stat"><i class="fas fa-weight-hanging"></i> ${item.weight}</span>`;
-
-        // Encode item ID to pass to handler
         return `
-            <div class="item-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
-                <div class="item-icon">
-                    <i class="${iconClass}"></i>
-                </div>
-                <div class="item-info">
-                    <h4 class="item-name">${item.name}</h4>
-                    <div class="item-meta">
-                        <span class="item-type">${this.formatType(item.subtype || item.type)}</span>
-                        ${statsHtml}
-                    </div>
-                </div>
-                <div class="item-cost">
-                    ${item.cost !== '-' ? item.cost : ''}
-                </div>
-            </div>
+            <button class="action-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
+                <i class="${iconClass}"></i>
+                <span>${item.name}</span>
+            </button>
         `;
     },
 
@@ -115,16 +99,14 @@ export const ItemsModule = {
 
         const modalWrapper = document.getElementById('modal-wrapper');
         const detailContainer = document.getElementById('detail-container');
-        const modalBody = document.getElementById('modal-body'); // Hide other wizards
+        const modalBody = document.getElementById('modal-body');
 
         if (modalWrapper && detailContainer) {
-            // Reset Modal
             modalWrapper.classList.remove('hidden');
-            modalWrapper.classList.add('active');
+            modalWrapper.classList.add('active'); // active usually triggers CSS transitions
 
-            // Hide other content
-            if (modalBody) modalBody.classList.add('hidden'); // Instead of hiding children, hide container if possible, or hide children
-            document.querySelectorAll('.wizard-container, .sheet-container').forEach(el => el.classList.add('hidden'));
+            // Surgical Hiding: Hide only the sibling container inside the modal
+            if (modalBody) modalBody.classList.add('hidden');
 
             detailContainer.classList.remove('hidden');
             detailContainer.innerHTML = this.renderDetailContent(item);
@@ -135,34 +117,34 @@ export const ItemsModule = {
         const iconClass = this.getItemIcon(item);
         const typeLabel = this.formatType(item.subtype || item.type);
 
-        // Properties Badge
-        const badges = (item.properties || []).map(p => `<span class="detail-badge property">${p}</span>`).join('');
-
-        // Main Stats
+        // Stats for the grid
         let statsGrid = '';
         if (item.damage) statsGrid += `<div class="detail-stat"><strong>Dano</strong><span>${item.damage}</span></div>`;
         if (item.ac) statsGrid += `<div class="detail-stat"><strong>CA</strong><span>${item.ac}</span></div>`;
         if (item.weight) statsGrid += `<div class="detail-stat"><strong>Peso</strong><span>${item.weight}</span></div>`;
         if (item.cost) statsGrid += `<div class="detail-stat"><strong>Preço</strong><span>${item.cost}</span></div>`;
-        if (item.rarity) statsGrid += `<div class="detail-stat"><strong>Raridade</strong><span class="rarity-${item.rarity}">${this.translateRarity(item.rarity)}</span></div>`;
+        if (item.rarity) statsGrid += `<div class="detail-stat"><strong>Raridade</strong><span class="rarity-text ${item.rarity}">${this.translateRarity(item.rarity)}</span></div>`;
+
+        // Tags
+        const badges = (item.properties || []).map(p => `<span class="detail-badge">${p}</span>`).join('');
 
         return `
             <div class="item-detail-view">
-                <div class="detail-header">
-                    <div class="detail-icon-large rarity-${item.rarity || 'common'}">
+                <div class="detail-top-section">
+                    <div class="detail-icon-large ${item.rarity || 'common'}">
                         <i class="${iconClass}"></i>
                     </div>
-                    <div class="detail-title-block">
+                    <div class="detail-header-info">
                         <h2>${item.name}</h2>
-                        <span class="detail-subtitle">${typeLabel}</span>
+                        <div class="detail-subtitle">${typeLabel}</div>
                     </div>
                 </div>
 
-                <div class="detail-stats-grid">
+                <div class="detail-stats-container">
                     ${statsGrid}
                 </div>
 
-                ${badges ? `<div class="detail-badges">${badges}</div>` : ''}
+                ${badges ? `<div class="detail-badges-container">${badges}</div>` : ''}
 
                 <div class="detail-divider"></div>
 
@@ -172,11 +154,29 @@ export const ItemsModule = {
                 </div>
 
                 <div class="detail-actions">
-                    <button class="medieval-btn" onclick="document.getElementById('modal-wrapper').classList.add('hidden')">Fechar</button>
-                     <button class="medieval-btn secondary" onclick="alert('Em breve: Adicionar ao Personagem')"><i class="fas fa-plus"></i> Pegar</button>
+                    <button class="medieval-btn" onclick="ItemsModule.closeModal()">Fechar</button>
+                    <!-- Future: <button class="medieval-btn secondary">Pegar</button> -->
                 </div>
             </div>
         `;
+    },
+
+    closeModal() {
+        const modalWrapper = document.getElementById('modal-wrapper');
+        const detailContainer = document.getElementById('detail-container');
+        const modalBody = document.getElementById('modal-body');
+
+        if (modalWrapper) {
+            modalWrapper.classList.add('hidden');
+            modalWrapper.classList.remove('active');
+
+            // Clean up item detail and restore normal modal body
+            if (detailContainer) {
+                detailContainer.innerHTML = '';
+                detailContainer.classList.add('hidden');
+            }
+            if (modalBody) modalBody.classList.remove('hidden');
+        }
     },
 
     translateRarity(r) {
