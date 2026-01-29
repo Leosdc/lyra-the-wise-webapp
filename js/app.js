@@ -82,11 +82,6 @@ const app = {
         window.calculateModifier = calculateModifier;
         window.formatModifier = formatModifier;
         window.ItemsModule = ItemsModule; // Allow onclick access
-
-        // Final layout check after all initial renders
-        setTimeout(() => {
-            NavigationModule.updateScrollIndicators();
-        }, 800);
     },
 
     showRandomTrivia() {
@@ -320,13 +315,6 @@ const app = {
             return;
         }
 
-        // Placeholder views that should show "Magia em Preparo"
-        const unfinished = ['grimorio', 'monstros', 'armadilhas', 'villain-gen', 'npc-gen'];
-        if (unfinished.includes(viewId)) {
-            this.handleQuickAction(viewId);
-            return;
-        }
-
         this.currentView = viewId;
         sessionStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
@@ -443,13 +431,47 @@ const app = {
     },
 
     openModal(id) {
-        NavigationModule.openModal(id);
+        const wrapper = document.getElementById('modal-wrapper');
+        const modalBody = document.getElementById('modal-body');
+        const detailContainer = document.getElementById('detail-container');
+
+        if (wrapper) {
+            wrapper.classList.add('active');
+            wrapper.classList.remove('hidden');
+            const content = wrapper.querySelector('.parchment');
+            if (content) content.scrollTop = 0;
+        }
+
+        // Restore modal body if it was hidden by Item Detail view
+        if (modalBody) modalBody.classList.remove('hidden');
+        if (detailContainer) {
+            detailContainer.innerHTML = '';
+            detailContainer.classList.add('hidden');
+        }
+
+        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
+        const target = document.getElementById(id);
+        if (target) target.classList.remove('hidden');
+        NavigationModule.updateScrollIndicators();
     },
 
     closeModal() {
-        NavigationModule.closeModal();
-    },
+        const wrapper = document.getElementById('modal-wrapper');
+        const modalBody = document.getElementById('modal-body');
+        const detailContainer = document.getElementById('detail-container');
 
+        if (wrapper) {
+            wrapper.classList.remove('active');
+            wrapper.classList.add('hidden');
+        }
+
+        // Cleanup: Always ensure modal-body is ready for next open
+        if (modalBody) modalBody.classList.remove('hidden');
+        if (detailContainer) {
+            detailContainer.innerHTML = '';
+            detailContainer.classList.add('hidden');
+        }
+    },
 
     closeAlert() {
         const alertModal = document.getElementById('alert-modal');
@@ -1080,8 +1102,8 @@ const app = {
         // Scroll
         window.addEventListener('scroll', () => NavigationModule.updateScrollIndicators());
         window.addEventListener('resize', () => NavigationModule.updateScrollIndicators());
-        document.getElementById('scroll-up')?.addEventListener('click', () => NavigationModule.scrollBy(-window.innerHeight * 0.7));
-        document.getElementById('scroll-down')?.addEventListener('click', () => NavigationModule.scrollBy(window.innerHeight * 0.7));
+        document.getElementById('scroll-up')?.addEventListener('click', () => window.scrollBy({ top: -window.innerHeight * 0.7, behavior: 'smooth' }));
+        document.getElementById('scroll-down')?.addEventListener('click', () => window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' }));
 
         // System Selector
         document.getElementById('system-selector')?.addEventListener('change', (e) => this.handleSystemChange(e.target.value));
@@ -1111,7 +1133,6 @@ const app = {
             const container = document.getElementById('system-selector-container');
             const wrapper = document.getElementById('system-selector-options-wrapper');
             const options = document.getElementById('system-selector-options');
-
             if (container?.classList.contains('open')) {
                 container.classList.remove('open');
                 wrapper?.classList.add('hidden');
@@ -1121,31 +1142,6 @@ const app = {
                 if (options) NavigationModule.updateDropdownScroll(options);
             }
         });
-
-        // --- Alpha Warning Logic ---
-        const closeAlpha = document.getElementById('close-alpha-warning');
-        if (closeAlpha) {
-            closeAlpha.addEventListener('click', () => {
-                document.getElementById('alpha-warning')?.classList.add('hidden');
-            });
-        }
-
-        // --- Changelog Logic ---
-        const changelogBtn = document.getElementById('changelog-btn');
-        if (changelogBtn) {
-            changelogBtn.addEventListener('click', () => {
-                NavigationModule.openModal('changelog-modal');
-                const badge = changelogBtn.querySelector('.notification-badge');
-                if (badge) badge.style.display = 'none';
-            });
-        }
-
-        const closeChangelog = document.getElementById('close-changelog');
-        if (closeChangelog) {
-            closeChangelog.addEventListener('click', () => {
-                NavigationModule.closeModal('changelog-modal');
-            });
-        }
 
         // Close dropdowns on global click
         document.addEventListener('click', () => {

@@ -983,9 +983,8 @@
     padding: 1rem;
     color: var(--ink);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    z-index: 20000;
+    z-index: 9998;
     animation: slideInLeft 0.5s ease-out;
-    display: flex;
 }
 
 /* Eldrin Theme Override */

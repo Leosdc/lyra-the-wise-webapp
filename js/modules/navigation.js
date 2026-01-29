@@ -19,15 +19,6 @@ export const NavigationModule = {
             targetView.classList.remove('hidden');
             void targetView.offsetWidth;
             targetView.classList.add('view-enter');
-
-            // Set active scroll container for the view
-            // Special case: Chat uses .chat-messages
-            if (viewId === 'chat') {
-                this.activeScrollContainer = targetView.querySelector('.chat-messages');
-            } else {
-                // Default to window scrolling for other views
-                this.activeScrollContainer = null;
-            }
         }
 
         if (viewId === 'fichas' && loaders.loadCharacters) await loaders.loadCharacters();
@@ -42,10 +33,7 @@ export const NavigationModule = {
 
         document.body.style.overflow = 'auto';
         this.updateScrollIndicators();
-        // Safety re-check after a brief delay for layout/transitions to settle
-        setTimeout(() => this.updateScrollIndicators(), 500);
     },
-
 
     // --- Menu ---
     toggleMenu(show) {
@@ -263,125 +251,80 @@ export const NavigationModule = {
         if (profVal) profVal.innerText = (prof >= 0 ? '+' : '') + prof;
     },
 
-    // --- Scroll Indicators ---
-    activeScrollContainer: null,
-
-    scrollBy(amount) {
-        if (this.activeScrollContainer) {
-            this.activeScrollContainer.scrollBy({ top: amount, behavior: 'smooth' });
-        } else {
-            window.scrollBy({ top: amount, behavior: 'smooth' });
-        }
-    },
-
     updateScrollIndicators() {
         const up = document.getElementById('scroll-up');
         const down = document.getElementById('scroll-down');
         if (!up || !down) return;
 
         let scrollPos, windowHeight, totalHeight;
-        const container = this.activeScrollContainer;
 
-        if (container && container !== document.documentElement) {
+        // Find the active scrollable container
+        // 1. Check for open modals
+        const modalWrapper = document.getElementById('modal-wrapper');
+        const isModalOpen = modalWrapper && !modalWrapper.classList.contains('hidden');
+
+        // Other overlays that might be open
+        const itemCreator = document.getElementById('item-creator-modal');
+        const isItemCreatorOpen = itemCreator && !itemCreator.classList.contains('hidden');
+
+        const shareModal = document.getElementById('share-item-modal');
+        const isShareModalOpen = shareModal && !shareModal.classList.contains('hidden');
+
+        const changelogModal = document.getElementById('changelog-modal');
+        const isChangelogOpen = changelogModal && !changelogModal.classList.contains('hidden');
+
+        let container = null;
+
+        if (isModalOpen) {
+            // Priority inside modal wrapper
+            container = modalWrapper.querySelector('.parchment-content, .settings-content, .wizard-step:not(.hidden)');
+            if (!container) container = modalWrapper.querySelector('.modal-content');
+        } else if (isItemCreatorOpen) {
+            container = itemCreator.querySelector('.parchment-content');
+        } else if (isShareModalOpen) {
+            container = shareModal.querySelector('.parchment-content');
+        } else if (isChangelogOpen) {
+            container = changelogModal.querySelector('.parchment-content');
+        } else {
+            // Check for active view in main content
+            const activeView = document.querySelector('.view:not(.hidden)');
+            if (activeView) {
+                // Special case for chat which has its own scrollable area
+                if (activeView.id === 'chat') {
+                    container = activeView.querySelector('.chat-messages');
+                } else {
+                    // General view scroll (usually body/html, but let's check)
+                    scrollPos = window.scrollY;
+                    windowHeight = window.innerHeight;
+                    totalHeight = document.documentElement.scrollHeight;
+                }
+            }
+        }
+
+        if (container) {
             scrollPos = container.scrollTop;
             windowHeight = container.clientHeight;
             totalHeight = container.scrollHeight;
-        } else {
-            scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+        } else if (scrollPos === undefined) {
+            // Fallback to global if nothing else matches
+            scrollPos = window.scrollY;
             windowHeight = window.innerHeight;
-            totalHeight = Math.max(
-                document.body.scrollHeight, document.documentElement.scrollHeight,
-                document.body.offsetHeight, document.documentElement.offsetHeight,
-                document.body.clientHeight, document.documentElement.clientHeight
-            );
+            totalHeight = document.documentElement.scrollHeight;
         }
 
-        const threshold = 20;
+        const threshold = 20; // Lower threshold to be more responsive
         const canScrollUp = scrollPos > threshold;
         const canScrollDown = scrollPos + windowHeight < totalHeight - threshold;
+
+        // Final check: if the container is not actually scrollable (height mismatch), hide both
         const isTrulyScrollable = totalHeight > windowHeight + 5;
 
         up.classList.toggle('hidden', !canScrollUp || !isTrulyScrollable);
         down.classList.toggle('hidden', !canScrollDown || !isTrulyScrollable);
 
-        // Adjust Z-Index based on whether we are in a modal context
-        // High enough to be over mystic-player (9500) and alpha-warning (9998)
-        const isModalContext = !!this.activeScrollContainer && this.activeScrollContainer !== document.documentElement;
-        const z = isModalContext ? "10001" : "10001";
+        const z = (isModalOpen || isItemCreatorOpen || isShareModalOpen || isChangelogOpen) ? "10001" : "9000";
         up.style.zIndex = z;
         down.style.zIndex = z;
-    },
-
-    // --- Unified Modal Control ---
-    openModal(id) {
-        const target = document.getElementById(id);
-        if (!target) return;
-
-        // 1. Handle background context (if it's inside the standard wrapper)
-        const wrapper = document.getElementById('modal-wrapper');
-        const modalBody = document.getElementById('modal-body');
-        const detailContainer = document.getElementById('detail-container');
-
-        // If the target is child of modal-wrapper or is one of the specialized overlays
-        const isStandardModal = wrapper && (wrapper.contains(target) || id === 'character-sheet' || id === 'creation-wizard' || id === 'settings-modal');
-
-        if (isStandardModal && wrapper) {
-            wrapper.classList.add('active');
-            wrapper.classList.remove('hidden');
-            if (modalBody) modalBody.classList.remove('hidden');
-            if (detailContainer) {
-                detailContainer.innerHTML = '';
-                detailContainer.classList.add('hidden');
-            }
-            // Reset scroll of the shared parchment if it exists
-            const content = wrapper.querySelector('.parchment');
-            if (content) content.scrollTop = 0;
-        }
-
-        // 2. Show the specific modal
-        // Hide others in the same group
-        document.querySelectorAll('.wizard-container, .sheet-container, .wizard-step').forEach(c => c.classList.add('hidden'));
-        target.classList.remove('hidden');
-
-        // 3. Set scroll target
-        // For standard modals, the scroll container is usually the shared .parchment (.modal-content)
-        // For others, we look inside or use the target itself.
-        let scrollContainer = target.querySelector('.parchment-content, .settings-content, .modal-content') || target;
-
-        if (isStandardModal && wrapper) {
-            const sharedContent = wrapper.querySelector('.parchment, .modal-content');
-            if (sharedContent) scrollContainer = sharedContent;
-        }
-
-        this.activeScrollContainer = scrollContainer;
-
-        // 4. Lifecycle properties
-        document.body.style.overflow = 'hidden';
-        if (scrollContainer && !scrollContainer.hasScrollListener) {
-            scrollContainer.addEventListener('scroll', () => this.updateScrollIndicators());
-            scrollContainer.hasScrollListener = true;
-        }
-
-        this.updateScrollIndicators();
-    },
-
-    closeModal(id = null) {
-        // If id provided, close specifically that. Otherwise close the standard wrapper.
-        if (id) {
-            const target = document.getElementById(id);
-            if (target) target.classList.add('hidden');
-        }
-
-        const wrapper = document.getElementById('modal-wrapper');
-        if (wrapper) {
-            wrapper.classList.remove('active');
-            wrapper.classList.add('hidden');
-        }
-
-        // Restore global state
-        this.activeScrollContainer = null;
-        document.body.style.overflow = 'auto';
-        this.updateScrollIndicators();
     },
 
 
