@@ -315,6 +315,13 @@ const app = {
             return;
         }
 
+        // Placeholder views that should show "Magia em Preparo"
+        const unfinished = ['grimorio', 'monstros', 'armadilhas', 'villain-gen', 'npc-gen'];
+        if (unfinished.includes(viewId)) {
+            this.handleQuickAction(viewId);
+            return;
+        }
+
         this.currentView = viewId;
         sessionStorage.setItem('lyra_current_view', viewId);
         NavigationModule.switchView(viewId, this.getNavigationLoaders());
@@ -1099,11 +1106,13 @@ const app = {
             const container = document.getElementById('system-selector-container');
             const wrapper = document.getElementById('system-selector-options-wrapper');
             const options = document.getElementById('system-selector-options');
+
             if (container?.classList.contains('open')) {
                 container.classList.remove('open');
                 wrapper?.classList.add('hidden');
             } else {
                 container?.classList.add('open');
+                wrapper?.classList.remove('hidden');
                 if (options) NavigationModule.updateDropdownScroll(options);
             }
         });

@@ -299,8 +299,9 @@ export const NavigationModule = {
         down.classList.toggle('hidden', !canScrollDown || !isTrulyScrollable);
 
         // Adjust Z-Index based on whether we are in a modal context
+        // High enough to be over mystic-player (9500) and alpha-warning (9998)
         const isModalContext = !!this.activeScrollContainer && this.activeScrollContainer !== document.documentElement;
-        const z = isModalContext ? "10001" : "9000";
+        const z = isModalContext ? "10001" : "10001";
         up.style.zIndex = z;
         down.style.zIndex = z;
     },
@@ -337,8 +338,15 @@ export const NavigationModule = {
         target.classList.remove('hidden');
 
         // 3. Set scroll target
-        // We look for the MOST specific scrollable container inside the target, or the target itself if it has overflow
-        const scrollContainer = target.querySelector('.parchment-content, .settings-content, .modal-content') || target;
+        // For standard modals, the scroll container is usually the shared .parchment (.modal-content)
+        // For others, we look inside or use the target itself.
+        let scrollContainer = target.querySelector('.parchment-content, .settings-content, .modal-content') || target;
+
+        if (isStandardModal && wrapper) {
+            const sharedContent = wrapper.querySelector('.parchment, .modal-content');
+            if (sharedContent) scrollContainer = sharedContent;
+        }
+
         this.activeScrollContainer = scrollContainer;
 
         // 4. Lifecycle properties
