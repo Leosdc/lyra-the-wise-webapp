@@ -6,14 +6,6 @@
     flex-direction: column;
     min-height: 500px;
     width: 100%;
-    /* Modalizing the Sheet */
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    z-index: 5000;
-    background: var(--parchment);
 }
 
 /* Helper Classes for JS Injection */
