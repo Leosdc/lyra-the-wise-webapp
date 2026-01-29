@@ -1,5 +1,7 @@
 import * as DataModule from '../data.js';
 import { NavigationModule } from './navigation.js';
+import { auth } from '../auth.js';
+import { SettingsModule } from './settings.js';
 
 export const ItemsModule = {
     cachedItems: [],
@@ -144,7 +146,7 @@ export const ItemsModule = {
             this.cachedItems = await DataModule.getGlobalItems(systemId);
         } else {
             // Personal Items
-            const user = JSON.parse(sessionStorage.getItem('lyra_user'));
+            const user = auth.currentUser;
             if (user) {
                 this.cachedItems = await DataModule.getUserItems(user.uid, user.email);
             } else {
@@ -248,7 +250,7 @@ export const ItemsModule = {
     },
 
     async handleCreateItem() {
-        const user = JSON.parse(sessionStorage.getItem('lyra_user'));
+        const user = auth.currentUser;
         if (!user) {
             alert("Você precisa estar logado para forjar itens.");
             return;
@@ -260,8 +262,11 @@ export const ItemsModule = {
         const description = document.getElementById('create-item-desc').value;
 
         try {
+            const nickname = SettingsModule.currentPrefs?.nickname || user.displayName || 'Aventureiro Misterioso';
+
             await DataModule.saveUserItem(user.uid, user.email, {
                 name, type, rarity, description,
+                createdByNickname: nickname,
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
             });
 
@@ -342,7 +347,10 @@ export const ItemsModule = {
                     </div>
                     <div class="detail-title-block">
                         <h2>${item.name}</h2>
-                        <span class="detail-subtitle">${typeLabel}</span>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span class="detail-subtitle">${typeLabel}</span>
+                            ${item.createdByNickname ? `<span class="detail-owner" style="font-size: 0.8rem; font-style: italic; opacity: 0.8;"><i class="fas fa-hammer" style="font-size: 0.7rem;"></i> Forjado por: ${item.createdByNickname}</span>` : ''}
+                        </div>
                     </div>
                 </div>
 

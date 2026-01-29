@@ -8,6 +8,7 @@ import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebase
  */
 
 export const SettingsModule = {
+    currentPrefs: {},
 
     async loadUserPreferences(user) {
         if (!user) return;
@@ -36,6 +37,7 @@ export const SettingsModule = {
             console.error("Erro ao carregar preferências:", error);
         }
 
+        this.currentPrefs = prefs;
         this.applyPreferences(prefs);
     },
 
@@ -97,6 +99,7 @@ export const SettingsModule = {
             // Clean legacy data if exists (just in case)
             localStorage.removeItem(`lyra_prefs_${user.uid}`);
 
+            this.currentPrefs = prefs;
             this.applyPreferences(prefs);
 
             if (closeModal) closeModal('settings-modal');

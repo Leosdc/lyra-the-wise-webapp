@@ -201,6 +201,7 @@ export const saveUserItem = async (userId, userEmail, itemData) => {
         ...itemData,
         userId,
         createdByEmail: userEmail,
+        createdByNickname: itemData.createdByNickname || '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         sharedWith: itemData.sharedWith || []
