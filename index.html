@@ -1229,11 +1229,12 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo</label>
-                        <select id="create-item-type" class="medieval-select" required>
+                        <select id="create-item-type" class="medieval-select" required
+                            onchange="ItemsModule.toggleCreatorFields(this.value)">
                             <option value="weapon">Arma</option>
                             <option value="armor">Armadura</option>
-                            <option value="wondrous">Magia</option>
-                            <option value="potion">Poção</option>
+                            <option value="wondrous">Item Mágico</option>
+                            <option value="potion">Poção / Consumível</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1247,10 +1248,40 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Peso</label>
+                        <input type="text" id="create-item-weight" class="medieval-input" placeholder="Ex: 2 kg">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço</label>
+                        <input type="text" id="create-item-cost" class="medieval-input" placeholder="Ex: 10 po">
+                    </div>
+                </div>
+
+                <div class="form-row stats-row-dynamic">
+                    <div class="form-group creator-field-weapon">
+                        <label>Dano / Ataque</label>
+                        <input type="text" id="create-item-damage" class="medieval-input"
+                            placeholder="Ex: 1d8 cortante">
+                    </div>
+                    <div class="form-group creator-field-armor hidden">
+                        <label>Classe de Armadura (CA)</label>
+                        <input type="text" id="create-item-ac" class="medieval-input" placeholder="Ex: 15 + DES">
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label>Descrição e Propriedades</label>
+                    <label>Propriedades / Tags (Separadas por vírgula)</label>
+                    <input type="text" id="create-item-props" class="medieval-input"
+                        placeholder="Ex: Pesada, Versátil, Mágica">
+                </div>
+
+                <div class="form-group">
+                    <label>Crônica do Item (Descrição)</label>
                     <textarea id="create-item-desc" class="medieval-textarea" rows="4"
-                        placeholder="Descreva o poder deste item..."></textarea>
+                        placeholder="Descreva a história e os efeitos deste item..."></textarea>
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="medieval-btn">Forjar Item</button>

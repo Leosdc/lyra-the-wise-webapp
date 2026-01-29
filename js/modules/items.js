@@ -59,7 +59,7 @@ export const ItemsModule = {
         const newBtn = document.getElementById('items-new-btn');
         if (newBtn) {
             newBtn.addEventListener('click', () => {
-                document.getElementById('item-creator-modal').classList.remove('hidden');
+                this.openCreatorModal();
             });
         }
 
@@ -200,6 +200,24 @@ export const ItemsModule = {
                         this.openShareModal(id);
                     });
                 });
+
+                container.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = e.target.closest('.item-card').dataset.id;
+                        this.openEditModal(id);
+                    });
+                });
+
+                container.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = e.target.closest('.item-card').dataset.id;
+                        if (confirm('Deseja realmente destruir esta relíquia? Esta ação não pode ser desfeita.')) {
+                            await this.handleDeleteItem(id);
+                        }
+                    });
+                });
             }
         }
     },
@@ -234,12 +252,14 @@ export const ItemsModule = {
             actionButtons = `
                 <div class="card-actions">
                     <button class="action-btn share-btn" title="Compartilhar"><i class="fas fa-share-nodes"></i></button>
+                    <button class="action-btn edit-btn" title="Editar"><i class="fas fa-pen-to-square"></i></button>
+                    <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash-can"></i></button>
                 </div>
             `;
         }
 
         return `
-            <div class="item-card-wrapper" style="position:relative;">
+            <div class="item-card item-card-wrapper" style="position:relative;" data-id="${item.id}">
                 ${actionButtons}
                 <button class="action-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
                     <i class="${iconClass}"></i>
@@ -247,6 +267,67 @@ export const ItemsModule = {
                 </button>
             </div>
         `;
+    },
+
+    openCreatorModal() {
+        this.editingItemId = null;
+        const modal = document.getElementById('item-creator-modal');
+        const form = document.getElementById('item-creator-form');
+        const titleEl = modal.querySelector('.modal-title');
+        const submitBtn = modal.querySelector('button[type="submit"]');
+
+        if (form) form.reset();
+
+        // Reset dynamic fields to default (weapon display)
+        this.toggleCreatorFields('weapon');
+
+        if (titleEl) {
+            const icon = this.currentSource === 'system' ? 'fas fa-gem' : 'fas fa-hammer';
+            const text = this.currentSource === 'system' ? 'Contribuição ao Sistema' : 'Forja de Relíquias';
+            titleEl.innerHTML = `<i class="${icon}"></i> ${text}`;
+        }
+
+        if (submitBtn) submitBtn.textContent = 'Forjar Item';
+
+        modal.classList.remove('hidden');
+    },
+
+    async openEditModal(itemId) {
+        const item = this.cachedItems.find(i => i.id === itemId);
+        if (!item) return;
+
+        this.editingItemId = itemId;
+
+        const modal = document.getElementById('item-creator-modal');
+        const form = document.getElementById('item-creator-form');
+        const titleEl = modal.querySelector('.modal-title');
+        const submitBtn = modal.querySelector('button[type="submit"]');
+
+        // Fill fields
+        document.getElementById('create-item-name').value = item.name || '';
+        document.getElementById('create-item-type').value = item.type || 'weapon';
+        document.getElementById('create-item-rarity').value = item.rarity || 'common';
+        document.getElementById('create-item-weight').value = item.weight || '';
+        document.getElementById('create-item-cost').value = item.cost || '';
+        document.getElementById('create-item-damage').value = item.damage || '';
+        document.getElementById('create-item-ac').value = item.ac || '';
+        document.getElementById('create-item-props').value = (item.properties || []).join(', ');
+        document.getElementById('create-item-desc').value = item.description || '';
+
+        this.toggleCreatorFields(item.type || 'weapon');
+
+        if (titleEl) titleEl.innerHTML = `<i class="fas fa-pen-fancy"></i> Editando Relíquia`;
+        if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
+
+        modal.classList.remove('hidden');
+    },
+
+    toggleCreatorFields(type) {
+        const weaponField = document.querySelector('.creator-field-weapon');
+        const armorField = document.querySelector('.creator-field-armor');
+
+        if (weaponField) weaponField.classList.toggle('hidden', type !== 'weapon');
+        if (armorField) armorField.classList.toggle('hidden', type !== 'armor');
     },
 
     async handleCreateItem() {
@@ -259,38 +340,77 @@ export const ItemsModule = {
         const name = document.getElementById('create-item-name').value;
         const type = document.getElementById('create-item-type').value;
         const rarity = document.getElementById('create-item-rarity').value;
+        const weight = document.getElementById('create-item-weight').value;
+        const cost = document.getElementById('create-item-cost').value;
+        const damage = document.getElementById('create-item-damage').value;
+        const ac = document.getElementById('create-item-ac').value;
+        const propsRaw = document.getElementById('create-item-props').value;
         const description = document.getElementById('create-item-desc').value;
+
+        // Parse properties
+        const properties = propsRaw ? propsRaw.split(',').map(p => p.trim()).filter(p => p) : [];
 
         try {
             const nickname = SettingsModule.currentPrefs?.nickname || user.displayName || 'Aventureiro Misterioso';
             const itemPayload = {
                 name, type, rarity, description,
+                weight, cost, damage, ac, properties,
                 createdByNickname: nickname,
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
             };
 
-            if (this.currentSource === 'system') {
+            if (this.editingItemId) {
+                // Contributing to the global database if we were editing a global one? 
+                // Actually editing is only for personal items for now
+                await DataModule.updateUserItem(this.editingItemId, itemPayload);
+                alert("As propriedades da relíquia foram alteradas com sucesso!");
+                this.editingItemId = null;
+            } else if (this.currentSource === 'system') {
                 // Contributing to the global database
                 await DataModule.saveGlobalItem(itemPayload);
                 alert("Item forjado com sucesso na Galeria do Sistema! Os deuses agradecem sua contribuição.");
             } else {
                 // Personal item
                 await DataModule.saveUserItem(user.uid, user.email, itemPayload);
+                alert("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.");
             }
 
             document.getElementById('item-creator-modal').classList.add('hidden');
             document.getElementById('item-creator-form').reset();
 
             // Refresh view
-            await this.render();
+            await this.init(this.currentSource); // Re-fetch items to include new one
         } catch (error) {
             console.error("Erro ao forjar item:", error);
-            if (error.message.includes("permissions")) {
+
+            const isPermissionError = error.code === 'permission-denied' ||
+                error.message?.toLowerCase().includes('permission') ||
+                error.message?.toLowerCase().includes('insufficient');
+
+            if (isPermissionError) {
                 const coll = this.currentSource === 'system' ? 'itens_database' : 'user_items';
-                alert(`Erro de Permissão: Você não tem autorização para escrever na coleção '${coll}'. Se você for um alpha tester, peça ao mestre para atualizar as Security Rules do Firebase.`);
+                alert(`🧙 ALERTA DE SEGURANÇA: \n\nSeu Firebase bloqueou a escrita na coleção '${coll}'.\n\nIsso acontece porque as Security Rules do seu banco de dados estão configuradas como 'Apenas Leitura' para esta coleção.\n\nPara corrigir, acesse seu Firebase Console e permita 'write' para usuários autenticados.`);
             } else {
                 alert("Erro ao forjar o item. Tente novamente.");
             }
+        }
+    },
+
+    async handleDeleteItem(itemId) {
+        try {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const success = await DataModule.deleteUserItem(itemId, user.uid);
+            if (success) {
+                // Refresh list
+                await this.init(this.currentSource);
+            } else {
+                alert("Você não tem permissão para destruir este item.");
+            }
+        } catch (error) {
+            console.error("Erro ao deletar item:", error);
+            alert("Erro ao destruir o item.");
         }
     },
 
@@ -340,16 +460,16 @@ export const ItemsModule = {
 
         // Compact stats grid
         let statsHtml = '';
-        if (item.damage) statsHtml += `<div class="detail-stat"><strong>Dano</strong><span>${item.damage}</span></div>`;
-        if (item.ac) statsHtml += `<div class="detail-stat"><strong>CA</strong><span>${item.ac}</span></div>`;
-        if (item.weight && item.weight !== '-') statsHtml += `<div class="detail-stat"><strong>Peso</strong><span>${item.weight}</span></div>`;
-        if (item.cost && item.cost !== '-') statsHtml += `<div class="detail-stat"><strong>Preço</strong><span>${item.cost}</span></div>`;
-        if (item.rarity) statsHtml += `<div class="detail-stat"><strong>Raridade</strong><span>${this.translateRarity(item.rarity)}</span></div>`;
+        if (item.damage) statsHtml += `< div class="detail-stat" ><strong>Dano</strong><span>${item.damage}</span></div > `;
+        if (item.ac) statsHtml += `< div class="detail-stat" ><strong>CA</strong><span>${item.ac}</span></div > `;
+        if (item.weight && item.weight !== '-') statsHtml += `< div class="detail-stat" ><strong>Peso</strong><span>${item.weight}</span></div > `;
+        if (item.cost && item.cost !== '-') statsHtml += `< div class="detail-stat" ><strong>Preço</strong><span>${item.cost}</span></div > `;
+        if (item.rarity) statsHtml += `< div class="detail-stat" ><strong>Raridade</strong><span>${this.translateRarity(item.rarity)}</span></div > `;
 
-        const badges = (item.properties || []).map(p => `<span class="detail-badge">${p}</span>`).join('');
+        const badges = (item.properties || []).map(p => `< span class="detail-badge" > ${p}</span > `).join('');
 
         return `
-            <div class="item-detail-view">
+            < div class="item-detail-view" >
                 <div class="detail-header">
                     <div class="detail-icon-large">
                         <i class="${iconClass}"></i>
@@ -380,8 +500,8 @@ export const ItemsModule = {
                         <i class="fas fa-hand-holding-magic"></i> Reivindicar Tesouro
                     </button>
                 </div>
-            </div>
-        `;
+            </div >
+    `;
     },
 
     closeModal() {

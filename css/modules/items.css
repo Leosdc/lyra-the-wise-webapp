@@ -400,7 +400,8 @@
     z-index: 10;
 }
 
-.item-card:hover .card-actions {
+.item-card:hover .card-actions,
+.item-card-wrapper:hover .card-actions {
     opacity: 1;
 }
 

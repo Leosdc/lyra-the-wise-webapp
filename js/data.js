@@ -220,6 +220,16 @@ export const saveGlobalItem = async (itemData) => {
     return docRef.id;
 };
 
+export const updateUserItem = async (itemId, itemData) => {
+    const docRef = doc(db, COLLECTIONS.USER_ITEMS, itemId);
+    const data = {
+        ...itemData,
+        updatedAt: new Date().toISOString()
+    };
+    await updateDoc(docRef, data);
+};
+
+
 export const getUserItems = async (userId, userEmail) => {
     try {
         // Query items created by the user
