@@ -1068,231 +1068,229 @@
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <!-- Custom Alert Modal -->
-        <div id="alert-modal" class="modal-overlay hidden">
-            <div class="medieval-modal alert-content">
-                <div class="lyra-corner top-left"></div>
-                <div class="lyra-corner top-right"></div>
-                <div class="alert-body">
-                    <i class="fa-solid fa-scroll alert-icon"></i>
-                    <h3 id="alert-title">Decreto Real</h3>
-                    <p id="alert-message"></p>
-                </div>
-                <div class="modal-footer">
-                    <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
-                </div>
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="medieval-modal alert-content">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-scroll alert-icon"></i>
+                <h3 id="alert-title">Decreto Real</h3>
+                <p id="alert-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
             </div>
         </div>
+    </div>
 
-        <!-- Custom Confirm Modal -->
-        <div id="confirm-modal" class="modal-overlay hidden">
-            <div class="medieval-modal confirm-box">
-                <div class="lyra-corner top-left"></div>
-                <div class="lyra-corner top-right"></div>
-                <div class="alert-body">
-                    <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
-                    <h3 id="confirm-title">Confirmar Exclusão</h3>
-                    <p id="confirm-message" class="confirm-text"></p>
-                </div>
-                <div class="confirm-actions">
-                    <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
-                    <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
-                </div>
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="medieval-modal confirm-box">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                <h3 id="confirm-title">Confirmar Exclusão</h3>
+                <p id="confirm-message" class="confirm-text"></p>
+            </div>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
+                <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
             </div>
         </div>
+    </div>
 
-        <!-- Scroll Indicators -->
-        <div id="scroll-up" class="scroll-indicator hidden">
-            <i class="fa-solid fa-chevron-up"></i>
-        </div>
-        <div id="scroll-down" class="scroll-indicator hidden">
-            <i class="fa-solid fa-chevron-down"></i>
-        </div>
+    <!-- Scroll Indicators -->
+    <div id="scroll-up" class="scroll-indicator hidden">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+    <div id="scroll-down" class="scroll-indicator hidden">
+        <i class="fa-solid fa-chevron-down"></i>
+    </div>
 
 
-        <!-- Mystic Music Player (Bottom-Left) -->
-        <div id="mystic-player" class="mystic-player-floating collapsed">
-            <audio id="lyra-bg-music" src="assets/music/lyra-theme.mp3" loop></audio>
+    <!-- Mystic Music Player (Bottom-Left) -->
+    <div id="mystic-player" class="mystic-player-floating collapsed">
+        <audio id="lyra-bg-music" src="assets/music/lyra-theme.mp3" loop></audio>
 
-            <div class="player-toggle">
-                <div class="player-orb">
-                    <i class="fas fa-compact-disc"></i>
-                    <div class="magic-pulse"></div>
-                </div>
-                <span class="player-now-playing">Whispers of the Stars</span>
+        <div class="player-toggle">
+            <div class="player-orb">
+                <i class="fas fa-compact-disc"></i>
+                <div class="magic-pulse"></div>
             </div>
+            <span class="player-now-playing">Whispers of the Stars</span>
+        </div>
 
-            <div class="player-interface parchment">
-                <div class="player-header">
-                    <strong>Melodia Arcana</strong>
-                    <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
-                </div>
-                <div class="player-body">
-                    <div class="track-name">"The Whisper of the Stars"</div>
-                    <div class="player-controls-row">
-                        <button id="btn-play-pause" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
-                        <div class="volume-container">
-                            <i class="fas fa-volume-low"></i>
-                            <input type="range" id="player-volume" min="0" max="1" step="0.1" value="0.5">
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div id="player-progress-bar" class="progress-bar"></div>
+        <div class="player-interface parchment">
+            <div class="player-header">
+                <strong>Melodia Arcana</strong>
+                <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="player-body">
+                <div class="track-name">"The Whisper of the Stars"</div>
+                <div class="player-controls-row">
+                    <button id="btn-play-pause" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
+                    <div class="volume-container">
+                        <i class="fas fa-volume-low"></i>
+                        <input type="range" id="player-volume" min="0" max="1" step="0.1" value="0.5">
                     </div>
                 </div>
+                <div class="progress-container">
+                    <div id="player-progress-bar" class="progress-bar"></div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Dice Modal -->
-        <div id="dice-modal" class="modal-overlay hidden">
-            <div class="dice-modal-content">
-                <button class="close-modal" onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
-                        class="fas fa-times"></i></button>
-                <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
-                    Torre de Dados</h2>
+    <!-- Dice Modal -->
+    <div id="dice-modal" class="modal-overlay hidden">
+        <div class="dice-modal-content">
+            <button class="close-modal" onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
+                Torre de Dados</h2>
 
-                <div class="dice-controls-header">
-                    <label for="dice-quantity">Quantidade:</label>
-                    <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1"
-                        max="50">
+            <div class="dice-controls-header">
+                <label for="dice-quantity">Quantidade:</label>
+                <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1" max="50">
+            </div>
+
+            <div class="dice-controls">
+                <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6"
+                        style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
+                <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
+                <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20" style="transform: scaleY(1.2);"></i>
+                    d8</button>
+                <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20"
+                        style="transform: rotate(45deg);"></i> d10</button>
+                <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
+                <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20" style="color: var(--crimson);"></i>
+                    d20</button>
+                <button class="dice-btn" data-sides="100"><i class="fas fa-percent"></i> d100</button>
+            </div>
+
+            <div class="dice-result-area">
+                <div id="dice-result-display" class="dice-display">
+                    <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
                 </div>
+                <div id="dice-history-list" class="dice-history"></div>
+            </div>
+        </div>
+    </div>
 
-                <div class="dice-controls">
-                    <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6"
-                            style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
-                    <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
-                    <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20"
-                            style="transform: scaleY(1.2);"></i>
-                        d8</button>
-                    <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20"
-                            style="transform: rotate(45deg);"></i> d10</button>
-                    <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
-                    <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20"
-                            style="color: var(--crimson);"></i>
-                        d20</button>
-                    <button class="dice-btn" data-sides="100"><i class="fas fa-percent"></i> d100</button>
+    <link rel="stylesheet" href="css/modules/dice.css">
+
+    <script src="js/app.js" type="module"></script>
+
+    <!-- Mystical Loading Overlay -->
+    <div id="mystic-loading" class="hidden">
+        <div class="mystic-spinner">
+            <div class="rune-layer outer"></div>
+            <div class="rune-layer"></div>
+            <div class="rune-layer inner"></div>
+        </div>
+        <div class="loading-text">Tecendo a Trama...</div>
+    </div>
+
+    <!-- Alpha Warning Popup -->
+    <div id="alpha-warning" class="alpha-warning-popup">
+        <div class="warning-content">
+            <button id="close-alpha-warning" class="close-modal small"><i class="fas fa-times"></i></button>
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <div class="warning-text">
+                <strong>Versão Alpha</strong>
+                <p>Gostaria de usar o website como alpha tester? Contribua com o projeto via Ko-fi:</p>
+                <div style="margin-top: 10px;">
+                    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+                    <script
+                        type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I'); kofiwidget2.draw();</script>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="dice-result-area">
-                    <div id="dice-result-display" class="dice-display">
-                        <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
+    <!-- Item Creator Modal -->
+    <div id="item-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-item-creator"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-hammer"></i> Forja de Itens</h2>
+            <form id="item-creator-form" class="parchment-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Item</label>
+                        <input type="text" id="create-item-name" class="medieval-input" required
+                            placeholder="Ex: Machado de Fogo">
                     </div>
-                    <div id="dice-history-list" class="dice-history"></div>
                 </div>
-            </div>
-        </div>
-
-        <link rel="stylesheet" href="css/modules/dice.css">
-
-        <script src="js/app.js" type="module"></script>
-
-        <!-- Mystical Loading Overlay -->
-        <div id="mystic-loading" class="hidden">
-            <div class="mystic-spinner">
-                <div class="rune-layer outer"></div>
-                <div class="rune-layer"></div>
-                <div class="rune-layer inner"></div>
-            </div>
-            <div class="loading-text">Tecendo a Trama...</div>
-        </div>
-
-        <!-- Alpha Warning Popup -->
-        <div id="alpha-warning" class="alpha-warning-popup">
-            <div class="warning-content">
-                <button id="close-alpha-warning" class="close-modal small"><i class="fas fa-times"></i></button>
-                <i class="fas fa-exclamation-triangle warning-icon"></i>
-                <div class="warning-text">
-                    <strong>Versão Alpha</strong>
-                    <p>Gostaria de usar o website como alpha tester? Contribua com o projeto via Ko-fi:</p>
-                    <div style="margin-top: 10px;">
-                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-                        <script
-                            type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I'); kofiwidget2.draw();</script>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Item Creator Modal -->
-        <div id="item-creator-modal" class="modal-overlay hidden">
-            <div class="modal-content medieval-modal wide">
-                <button class="close-modal" id="close-item-creator"><i class="fas fa-times"></i></button>
-                <h2 class="modal-title"><i class="fas fa-hammer"></i> Forja de Itens</h2>
-                <form id="item-creator-form" class="parchment-content">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nome do Item</label>
-                            <input type="text" id="create-item-name" class="medieval-input" required
-                                placeholder="Ex: Machado de Fogo">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo</label>
-                            <select id="create-item-type" class="medieval-select" required>
-                                <option value="weapon">Arma</option>
-                                <option value="armor">Armadura</option>
-                                <option value="wondrous">Magia</option>
-                                <option value="potion">Poção</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Raridade</label>
-                            <select id="create-item-rarity" class="medieval-select" required>
-                                <option value="common">Comum</option>
-                                <option value="uncommon">Incomum</option>
-                                <option value="rare">Raro</option>
-                                <option value="very_rare">Muito Raro</option>
-                                <option value="legendary">Lendário</option>
-                            </select>
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="create-item-type" class="medieval-select" required>
+                            <option value="weapon">Arma</option>
+                            <option value="armor">Armadura</option>
+                            <option value="wondrous">Magia</option>
+                            <option value="potion">Poção</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Descrição e Propriedades</label>
-                        <textarea id="create-item-desc" class="medieval-textarea" rows="4"
-                            placeholder="Descreva o poder deste item..."></textarea>
+                        <label>Raridade</label>
+                        <select id="create-item-rarity" class="medieval-select" required>
+                            <option value="common">Comum</option>
+                            <option value="uncommon">Incomum</option>
+                            <option value="rare">Raro</option>
+                            <option value="very_rare">Muito Raro</option>
+                            <option value="legendary">Lendário</option>
+                        </select>
                     </div>
-                    <div class="modal-actions">
-                        <button type="submit" class="medieval-btn">Forjar Item</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="form-group">
+                    <label>Descrição e Propriedades</label>
+                    <textarea id="create-item-desc" class="medieval-textarea" rows="4"
+                        placeholder="Descreva o poder deste item..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">Forjar Item</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Share Item Modal -->
-        <div id="share-item-modal" class="modal-overlay hidden">
-            <div class="modal-content medieval-modal small">
-                <button class="close-modal" id="close-share-modal"><i class="fas fa-times"></i></button>
-                <h2 class="modal-title"><i class="fas fa-share-nodes"></i> Compartilhar Item</h2>
-                <div class="parchment-content">
-                    <p>Informe o e-mail do destinatário para enviar esta relíquia:</p>
-                    <div class="form-group">
-                        <input type="email" id="share-target-email" class="medieval-input"
-                            placeholder="email@exemplo.com" required>
-                    </div>
-                    <div class="modal-actions">
-                        <button id="confirm-share-btn" class="medieval-btn">Enviar</button>
-                    </div>
+    <!-- Share Item Modal -->
+    <div id="share-item-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-share-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-share-nodes"></i> Compartilhar Item</h2>
+            <div class="parchment-content">
+                <p>Informe o e-mail do destinatário para enviar esta relíquia:</p>
+                <div class="form-group">
+                    <input type="email" id="share-target-email" class="medieval-input" placeholder="email@exemplo.com"
+                        required>
+                </div>
+                <div class="modal-actions">
+                    <button id="confirm-share-btn" class="medieval-btn">Enviar</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Changelog Modal -->
-        <div id="changelog-modal" class="modal-overlay hidden">
-            <div class="modal-content medieval-modal">
-                <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
-                <h2 class="modal-title text-center"><i class="fas fa-scroll"></i> Pergaminho de Atualizações</h2>
-                <div class="changelog-list parchment-content">
-                    <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
-                    <p style="text-align:center; opacity:0.7;">Desenrolando pergaminho...</p>
-                </div>
+    <!-- Changelog Modal -->
+    <div id="changelog-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal">
+            <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title text-center"><i class="fas fa-scroll"></i> Pergaminho de Atualizações</h2>
+            <div class="changelog-list parchment-content">
+                <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
+                <p style="text-align:center; opacity:0.7;">Desenrolando pergaminho...</p>
             </div>
         </div>
+    </div>
 
-        <!-- Datalists Globais -->
-        <datalist id="races-list"></datalist>
+    <!-- Datalists Globais -->
+    <datalist id="races-list"></datalist>
 </body>
 
 </html>
