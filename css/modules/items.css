@@ -395,7 +395,7 @@
     right: 10px;
     display: flex;
     gap: 5px;
-    opacity: 0;
+    opacity: 0.25;
     transition: 0.3s;
     z-index: 10;
 }

@@ -11,6 +11,8 @@ export const ItemsModule = {
     itemToShare: null,
 
     init() {
+        // Restore source from session or default to system
+        this.currentSource = sessionStorage.getItem('lyra_items_source') || 'system';
         this.bindEvents();
     },
 
@@ -23,6 +25,7 @@ export const ItemsModule = {
                 if (!card) return;
 
                 this.currentSource = card.dataset.source;
+                sessionStorage.setItem('lyra_items_source', this.currentSource); // Persist source
                 NavigationModule.switchView('itens', this.getNavigationContext());
             });
         }
@@ -374,25 +377,26 @@ export const ItemsModule = {
                 this.showForgeSuccess("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.", false);
             }
 
-            document.getElementById('item-creator-modal').classList.add('hidden');
             document.getElementById('item-creator-form').reset();
 
-            // Refresh view
-            await this.init(this.currentSource); // Re-fetch items to include new one
+            // Refresh data from database first, then render
+            const currentSystem = localStorage.getItem('lyra_current_system') || 'dnd5e';
+            await this.loadItemsFromFirebase(currentSystem);
+            await this.render();
         } catch (error) {
-            this.closeForge(); // Hide forge if error so user can see alert
             console.error("Erro ao forjar item:", error);
 
             const isPermissionError = error.code === 'permission-denied' ||
                 error.message?.toLowerCase().includes('permission') ||
                 error.message?.toLowerCase().includes('insufficient');
 
+            let errorMsg = "A essência se dissipou antes de tomar forma. Tente novamente.";
             if (isPermissionError) {
                 const coll = this.currentSource === 'system' ? 'itens_database' : 'user_items';
-                alert(`🧙 ALERTA DE SEGURANÇA: \n\nSeu Firebase bloqueou a escrita na coleção '${coll}'.\n\nIsso acontece porque as Security Rules do seu banco de dados estão configuradas como 'Apenas Leitura' para esta coleção.\n\nPara corrigir, acesse seu Firebase Console e permita 'write' para usuários autenticados.`);
-            } else {
-                alert("Erro ao forjar o item. Tente novamente.");
+                errorMsg = `Seu Firebase bloqueou a escrita na coleção '${coll}'. Verifique as Security Rules.`;
             }
+
+            this.showForgeError(errorMsg);
         }
     },
 
@@ -439,10 +443,16 @@ export const ItemsModule = {
         if (!overlay) return;
 
         const container = overlay.querySelector('.forge-container');
-        if (container) container.classList.remove('success');
+        if (container) {
+            container.classList.remove('success');
+            container.classList.remove('error');
+        }
 
         const successContent = overlay.querySelector('.forge-success-content');
         if (successContent) successContent.classList.add('hidden');
+
+        const errorContent = overlay.querySelector('.forge-error-content');
+        if (errorContent) errorContent.classList.add('hidden');
 
         const status = overlay.querySelector('.forge-status');
         if (status) status.classList.remove('hidden');
@@ -464,6 +474,20 @@ export const ItemsModule = {
 
         if (container) container.classList.add('success');
         if (successContent) successContent.classList.remove('hidden');
+    },
+
+    showForgeError(message) {
+        const overlay = document.getElementById('forge-overlay');
+        if (!overlay) return;
+
+        const container = overlay.querySelector('.forge-container');
+        const errorContent = overlay.querySelector('.forge-error-content');
+        const msgEl = errorContent?.querySelector('.error-msg');
+
+        if (msgEl) msgEl.innerText = message;
+
+        if (container) container.classList.add('error');
+        if (errorContent) errorContent.classList.remove('hidden');
     },
 
     closeForge() {
@@ -497,16 +521,16 @@ export const ItemsModule = {
 
         // Compact stats grid
         let statsHtml = '';
-        if (item.damage) statsHtml += `< div class="detail-stat" ><strong>Dano</strong><span>${item.damage}</span></div > `;
-        if (item.ac) statsHtml += `< div class="detail-stat" ><strong>CA</strong><span>${item.ac}</span></div > `;
-        if (item.weight && item.weight !== '-') statsHtml += `< div class="detail-stat" ><strong>Peso</strong><span>${item.weight}</span></div > `;
-        if (item.cost && item.cost !== '-') statsHtml += `< div class="detail-stat" ><strong>Preço</strong><span>${item.cost}</span></div > `;
-        if (item.rarity) statsHtml += `< div class="detail-stat" ><strong>Raridade</strong><span>${this.translateRarity(item.rarity)}</span></div > `;
+        if (item.damage) statsHtml += `<div class="detail-stat"><strong>Dano</strong><span>${item.damage}</span></div>`;
+        if (item.ac) statsHtml += `<div class="detail-stat"><strong>CA</strong><span>${item.ac}</span></div>`;
+        if (item.weight && item.weight !== '-') statsHtml += `<div class="detail-stat"><strong>Peso</strong><span>${item.weight}</span></div>`;
+        if (item.cost && item.cost !== '-') statsHtml += `<div class="detail-stat"><strong>Preço</strong><span>${item.cost}</span></div>`;
+        if (item.rarity) statsHtml += `<div class="detail-stat"><strong>Raridade</strong><span>${this.translateRarity(item.rarity)}</span></div>`;
 
-        const badges = (item.properties || []).map(p => `< span class="detail-badge" > ${p}</span > `).join('');
+        const badges = (item.properties || []).map(p => `<span class="detail-badge">${p}</span>`).join('');
 
         return `
-            < div class="item-detail-view" >
+            <div class="item-detail-view">
                 <div class="detail-header">
                     <div class="detail-icon-large">
                         <i class="${iconClass}"></i>
@@ -537,7 +561,7 @@ export const ItemsModule = {
                         <i class="fas fa-hand-holding-magic"></i> Reivindicar Tesouro
                     </button>
                 </div>
-            </div >
+            </div>
     `;
     },
 
