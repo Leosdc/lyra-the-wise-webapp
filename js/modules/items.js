@@ -263,25 +263,34 @@ export const ItemsModule = {
 
         try {
             const nickname = SettingsModule.currentPrefs?.nickname || user.displayName || 'Aventureiro Misterioso';
-
-            await DataModule.saveUserItem(user.uid, user.email, {
+            const itemPayload = {
                 name, type, rarity, description,
                 createdByNickname: nickname,
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
-            });
+            };
+
+            if (this.currentSource === 'system') {
+                // Contributing to the global database
+                await DataModule.saveGlobalItem(itemPayload);
+                alert("Item forjado com sucesso na Galeria do Sistema! Os deuses agradecem sua contribuição.");
+            } else {
+                // Personal item
+                await DataModule.saveUserItem(user.uid, user.email, itemPayload);
+            }
 
             document.getElementById('item-creator-modal').classList.add('hidden');
             document.getElementById('item-creator-form').reset();
 
-            // If already in personal view, refresh
-            if (this.currentSource === 'personal') {
-                await this.render();
-            } else {
-                alert("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.");
-            }
+            // Refresh view
+            await this.render();
         } catch (error) {
-            console.error(error);
-            alert("Erro ao forjar o item. Tente novamente.");
+            console.error("Erro ao forjar item:", error);
+            if (error.message.includes("permissions")) {
+                const coll = this.currentSource === 'system' ? 'itens_database' : 'user_items';
+                alert(`Erro de Permissão: Você não tem autorização para escrever na coleção '${coll}'. Se você for um alpha tester, peça ao mestre para atualizar as Security Rules do Firebase.`);
+            } else {
+                alert("Erro ao forjar o item. Tente novamente.");
+            }
         }
     },
 
