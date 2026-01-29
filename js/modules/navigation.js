@@ -42,6 +42,8 @@ export const NavigationModule = {
 
         document.body.style.overflow = 'auto';
         this.updateScrollIndicators();
+        // Safety re-check after a brief delay for layout/transitions to settle
+        setTimeout(() => this.updateScrollIndicators(), 500);
     },
 
 
@@ -285,9 +287,13 @@ export const NavigationModule = {
             windowHeight = container.clientHeight;
             totalHeight = container.scrollHeight;
         } else {
-            scrollPos = window.scrollY;
+            scrollPos = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
             windowHeight = window.innerHeight;
-            totalHeight = document.documentElement.scrollHeight;
+            totalHeight = Math.max(
+                document.body.scrollHeight, document.documentElement.scrollHeight,
+                document.body.offsetHeight, document.documentElement.offsetHeight,
+                document.body.clientHeight, document.documentElement.clientHeight
+            );
         }
 
         const threshold = 20;

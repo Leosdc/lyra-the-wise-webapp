@@ -82,6 +82,11 @@ const app = {
         window.calculateModifier = calculateModifier;
         window.formatModifier = formatModifier;
         window.ItemsModule = ItemsModule; // Allow onclick access
+
+        // Final layout check after all initial renders
+        setTimeout(() => {
+            NavigationModule.updateScrollIndicators();
+        }, 800);
     },
 
     showRandomTrivia() {
