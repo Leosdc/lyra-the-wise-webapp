@@ -1,4 +1,3 @@
-/* Character Sheet (Libram) */
 .sheet-container {
     padding: 1.5rem;
     color: var(--ink);
@@ -6,6 +5,10 @@
     flex-direction: column;
     min-height: 500px;
     width: 100%;
+    max-width: 1000px;
+    /* Constraint width */
+    margin: 0 auto;
+    /* Center if parent is wider */
 }
 
 /* Helper Classes for JS Injection */
