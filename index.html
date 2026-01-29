@@ -1289,45 +1289,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Alpha Warning Close
-            const alphaWarning = document.getElementById('alpha-warning');
-            const closeAlpha = document.getElementById('close-alpha-warning');
-            if (closeAlpha && alphaWarning) {
-                closeAlpha.addEventListener('click', () => {
-                    alphaWarning.classList.add('hidden');
-                });
-            }
-
-            // Changelog Logic
-            const changelogBtn = document.getElementById('changelog-btn');
-            const changelogModal = document.getElementById('changelog-modal');
-            const closeChangelog = document.getElementById('close-changelog');
-
-            if (changelogBtn && changelogModal) {
-                changelogBtn.addEventListener('click', () => {
-                    changelogModal.classList.remove('hidden');
-                    // Optional: Remove badge on click
-                    const badge = changelogBtn.querySelector('.notification-badge');
-                    if (badge) badge.style.display = 'none';
-                });
-            }
-
-            if (closeChangelog && changelogModal) {
-                closeChangelog.addEventListener('click', () => {
-                    changelogModal.classList.add('hidden');
-                });
-            }
-
-            // Close modal on outside click
-            window.addEventListener('click', (e) => {
-                if (e.target === changelogModal) {
-                    changelogModal.classList.add('hidden');
-                }
-            });
-        });
-    </script>
     <!-- Datalists Globais -->
     <datalist id="races-list"></datalist>
 </body>

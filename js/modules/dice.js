@@ -1,3 +1,4 @@
+import { NavigationModule } from './navigation.js';
 
 /**
  * Dice Module
@@ -23,19 +24,17 @@ export const DiceModule = {
     },
 
     openModal() {
-        const modal = document.getElementById('dice-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            // Clear previous result animation
-            const display = document.getElementById('dice-result-display');
-            if (display) display.innerHTML = '<span class="placeholder">Role os dados...</span>';
-        }
+        NavigationModule.openModal('dice-modal');
+        // Clear previous result animation
+        const display = document.getElementById('dice-result-display');
+        if (display) display.innerHTML = '<span class="placeholder">Role os dados...</span>';
     },
 
+
     closeModal() {
-        const modal = document.getElementById('dice-modal');
-        if (modal) modal.classList.add('hidden');
+        NavigationModule.closeModal('dice-modal');
     },
+
 
     roll(sides) {
         if (!sides) return;

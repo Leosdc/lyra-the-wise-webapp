@@ -57,14 +57,14 @@ export const ItemsModule = {
         const newBtn = document.getElementById('items-new-btn');
         if (newBtn) {
             newBtn.addEventListener('click', () => {
-                document.getElementById('item-creator-modal').classList.remove('hidden');
+                NavigationModule.openModal('item-creator-modal');
             });
         }
 
         const closeCreator = document.getElementById('close-item-creator');
         if (closeCreator) {
             closeCreator.addEventListener('click', () => {
-                document.getElementById('item-creator-modal').classList.add('hidden');
+                NavigationModule.closeModal('item-creator-modal');
             });
         }
 
@@ -265,7 +265,7 @@ export const ItemsModule = {
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
             });
 
-            document.getElementById('item-creator-modal').classList.add('hidden');
+            NavigationModule.closeModal('item-creator-modal');
             document.getElementById('item-creator-form').reset();
 
             // If already in personal view, refresh
@@ -282,7 +282,7 @@ export const ItemsModule = {
 
     openShareModal(itemId) {
         this.itemToShare = itemId;
-        document.getElementById('share-item-modal').classList.remove('hidden');
+        NavigationModule.openModal('share-item-modal');
     },
 
     async handleShareConfirm() {
@@ -292,7 +292,7 @@ export const ItemsModule = {
         try {
             await DataModule.shareItem(this.itemToShare, email);
             alert(`Item compartilhado com ${email}!`);
-            document.getElementById('share-item-modal').classList.add('hidden');
+            NavigationModule.closeModal('share-item-modal');
             document.getElementById('share-target-email').value = '';
             this.itemToShare = null;
         } catch (error) {
@@ -309,13 +309,7 @@ export const ItemsModule = {
         const modalBody = document.getElementById('modal-body');
 
         if (modalWrapper && detailContainer) {
-            modalWrapper.classList.remove('hidden');
-            modalWrapper.classList.add('active'); // active usually triggers CSS transitions
-
-            // Surgical Hiding: Hide only the sibling container inside the modal
-            if (modalBody) modalBody.classList.add('hidden');
-
-            detailContainer.classList.remove('hidden');
+            NavigationModule.openModal('detail-container');
             detailContainer.innerHTML = this.renderDetailContent(item);
         }
     },
@@ -368,22 +362,9 @@ export const ItemsModule = {
     },
 
     closeModal() {
-        const modalWrapper = document.getElementById('modal-wrapper');
-        const detailContainer = document.getElementById('detail-container');
-        const modalBody = document.getElementById('modal-body');
-
-        if (modalWrapper) {
-            modalWrapper.classList.add('hidden');
-            modalWrapper.classList.remove('active');
-
-            // Clean up item detail and restore normal modal body
-            if (detailContainer) {
-                detailContainer.innerHTML = '';
-                detailContainer.classList.add('hidden');
-            }
-            if (modalBody) modalBody.classList.remove('hidden');
-        }
+        NavigationModule.closeModal();
     },
+
 
     translateRarity(r) {
         const map = { common: 'Comum', uncommon: 'Incomum', rare: 'Raro', very_rare: 'Muito Raro', legendary: 'Lendário' };

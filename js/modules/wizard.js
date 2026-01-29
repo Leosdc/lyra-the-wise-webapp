@@ -2,6 +2,7 @@
 import { createCharacterWithLyra, createMonsterWithLyra, processSessionWithLyra } from '../ai.js';
 import { saveCharacter, saveMonster, saveSession, saveTrap } from '../data.js';
 import { SYSTEM_TEMPLATES } from '../constants.js';
+import { NavigationModule } from './navigation.js';
 
 /**
  * Wizard Module
@@ -20,7 +21,7 @@ export const WizardModule = {
 
         this.updateThemeText();
 
-        context.openModal('creation-wizard');
+        NavigationModule.openModal('creation-wizard');
         this.wizardStep = 0;
         this.updateWizardUI();
     },
@@ -64,7 +65,7 @@ export const WizardModule = {
         if (monCr) monCr.parentElement.classList.remove('hidden');
         const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
         if (monTitle) monTitle.innerText = "Origem da Criatura";
-        context.openModal('monster-wizard');
+        NavigationModule.openModal('monster-wizard');
     },
 
     showTrapCreator(context) {
@@ -74,13 +75,13 @@ export const WizardModule = {
         if (monCr) monCr.parentElement.classList.add('hidden');
         const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
         if (monTitle) monTitle.innerText = "Criação de Armadilha";
-        context.openModal('monster-wizard');
+        NavigationModule.openModal('monster-wizard');
     },
 
     showSessionEditor(context) {
         if (!context.checkAuth()) return;
         console.log("📝 Abrindo Diário de Sessão");
-        context.openModal('session-wizard');
+        NavigationModule.openModal('session-wizard');
     },
 
     // --- Navigation Logic ---
@@ -103,10 +104,16 @@ export const WizardModule = {
             this.updateWizardUI();
         } else if (wizardId === 'monster-wizard') {
             document.getElementById('mon-choice-step').classList.add('hidden');
-            document.getElementById('mon-form').classList.remove('hidden');
+            const form = document.getElementById('mon-form');
+            form.classList.remove('hidden');
+            // Update scroll focus to the form
+            NavigationModule.activeScrollContainer = form;
         } else if (wizardId === 'session-wizard') {
             document.getElementById('sess-choice-step').classList.add('hidden');
-            document.getElementById('sess-form').classList.remove('hidden');
+            const form = document.getElementById('sess-form');
+            form.classList.remove('hidden');
+            // Update scroll focus to the form
+            NavigationModule.activeScrollContainer = form;
         }
     },
 
