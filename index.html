@@ -1196,6 +1196,28 @@
         <div class="loading-text">Tecendo a Trama...</div>
     </div>
 
+    <!-- Cinematic Forge Overlay -->
+    <div id="forge-overlay" class="modal-overlay hidden">
+        <div class="forge-container">
+            <div class="forge-animation">
+                <i class="fas fa-anvil forge-anvil"></i>
+                <i class="fas fa-hammer forge-hammer"></i>
+                <div class="forge-glow"></div>
+                <div class="forge-sparks"></div>
+            </div>
+            <div class="forge-status">
+                <h2 class="forge-title">Invocando a Forja...</h2>
+                <p class="forge-msg">Molde sua relíquia com maestria.</p>
+            </div>
+            <div class="forge-success-content hidden">
+                <i class="fas fa-certificate success-star"></i>
+                <h3>Obra-Prima Forjada!</h3>
+                <p>O item foi imbuído com essência arcana.</p>
+                <button class="medieval-btn" onclick="ItemsModule.closeForge()">Concluir</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Alpha Warning Popup -->
     <div id="alpha-warning" class="alpha-warning-popup">
         <div class="warning-content">

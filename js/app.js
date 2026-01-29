@@ -375,6 +375,9 @@ const app = {
             NavigationModule.switchView(this.currentView, this.getNavigationLoaders());
             this.populateCharSwitcher();
         }
+
+        // Refresh dropdown UI to show correct 'selected' state
+        this.populateSystems();
     },
 
     selectCharacter(char) {

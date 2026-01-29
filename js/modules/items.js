@@ -359,20 +359,19 @@ export const ItemsModule = {
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
             };
 
+            // Show Forge Overlay
+            this.openForge();
+
             if (this.editingItemId) {
-                // Contributing to the global database if we were editing a global one? 
-                // Actually editing is only for personal items for now
                 await DataModule.updateUserItem(this.editingItemId, itemPayload);
-                alert("As propriedades da relíquia foram alteradas com sucesso!");
+                this.showForgeSuccess("As propriedades da relíquia foram alteradas!", true);
                 this.editingItemId = null;
             } else if (this.currentSource === 'system') {
-                // Contributing to the global database
                 await DataModule.saveGlobalItem(itemPayload);
-                alert("Item forjado com sucesso na Galeria do Sistema! Os deuses agradecem sua contribuição.");
+                this.showForgeSuccess("Item consagrado na Galeria do Sistema! Os deuses observam sua obra.", false);
             } else {
-                // Personal item
                 await DataModule.saveUserItem(user.uid, user.email, itemPayload);
-                alert("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.");
+                this.showForgeSuccess("Item forjado com sucesso! Você pode encontrá-lo em 'Meus Itens'.", false);
             }
 
             document.getElementById('item-creator-modal').classList.add('hidden');
@@ -381,6 +380,7 @@ export const ItemsModule = {
             // Refresh view
             await this.init(this.currentSource); // Re-fetch items to include new one
         } catch (error) {
+            this.closeForge(); // Hide forge if error so user can see alert
             console.error("Erro ao forjar item:", error);
 
             const isPermissionError = error.code === 'permission-denied' ||
@@ -432,6 +432,43 @@ export const ItemsModule = {
         } catch (error) {
             alert(error.message);
         }
+    },
+
+    openForge() {
+        const overlay = document.getElementById('forge-overlay');
+        if (!overlay) return;
+
+        const container = overlay.querySelector('.forge-container');
+        if (container) container.classList.remove('success');
+
+        const successContent = overlay.querySelector('.forge-success-content');
+        if (successContent) successContent.classList.add('hidden');
+
+        const status = overlay.querySelector('.forge-status');
+        if (status) status.classList.remove('hidden');
+
+        overlay.classList.remove('hidden');
+    },
+
+    showForgeSuccess(message, isEdit) {
+        const overlay = document.getElementById('forge-overlay');
+        if (!overlay) return;
+
+        const container = overlay.querySelector('.forge-container');
+        const successContent = overlay.querySelector('.forge-success-content');
+        const titleEl = successContent?.querySelector('h3');
+        const msgEl = successContent?.querySelector('p');
+
+        if (titleEl) titleEl.innerText = isEdit ? "Relíquia Reformulada!" : "Obra-Prima Forjada!";
+        if (msgEl) msgEl.innerText = message;
+
+        if (container) container.classList.add('success');
+        if (successContent) successContent.classList.remove('hidden');
+    },
+
+    closeForge() {
+        const overlay = document.getElementById('forge-overlay');
+        if (overlay) overlay.classList.add('hidden');
     },
 
     openItemDetail(itemId) {
