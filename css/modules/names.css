@@ -1,0 +1,200 @@
+/* =========================================
+   MODULE: NAME GENERATOR (NamesModule)
+   Aesthetic: Print 2 (Thematic, Readable, Premium)
+   ========================================= */
+
+.names-container {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.names-controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--dark-panel, rgba(0, 0, 0, 0.05));
+    border-radius: 12px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.names-controls-bar .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 180px;
+}
+
+.names-controls-bar .filter-group label {
+    font-family: var(--font-medieval);
+    font-size: 0.85rem;
+    color: var(--crimson, #8b0000);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Damien/Eldrin Theme Text Shadow Adjustment */
+.damien-theme .names-controls-bar .filter-group label,
+.eldrin-theme .names-controls-bar .filter-group label {
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    color: var(--gold);
+}
+
+.names-controls-bar .gender-group {
+    flex: 1.5;
+    min-width: 220px;
+}
+
+.names-controls-bar .radio-filters {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    height: 45px;
+    padding: 0 1rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    border: 1px inset rgba(0, 0, 0, 0.05);
+}
+
+.damien-theme .radio-filters,
+.eldrin-theme .radio-filters {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.names-controls-bar .radio-filters label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-dark, #2c1e16);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.damien-theme .radio-filters label,
+.eldrin-theme .radio-filters label {
+    color: var(--ink);
+}
+
+.names-controls-bar .radio-filters input[type="radio"] {
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+}
+
+#generate-names-btn {
+    height: 50px;
+    padding: 0 2rem;
+    font-size: 1rem;
+}
+
+/* Results Display */
+.names-display-box {
+    flex: 1;
+    min-height: 350px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--gold-dark);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.damien-theme .names-display-box,
+.eldrin-theme .names-display-box {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.names-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.2rem;
+}
+
+.name-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: #fdf6e3;
+    border: 2px solid var(--gold-dark);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.damien-theme .name-item,
+.eldrin-theme .name-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--gold);
+}
+
+.name-item:hover {
+    background: #fff;
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.name-item span {
+    font-family: var(--font-medieval);
+    font-size: 1.15rem;
+    color: var(--text-dark, #2c1e16);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.damien-theme .name-item span,
+.eldrin-theme .name-item span {
+    color: var(--ink);
+}
+
+.copy-name-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold-dark);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.copy-name-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    transform: scale(1.1);
+    color: var(--gold);
+}
+
+.copy-name-btn.copied {
+    color: #27ae60;
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 5px rgba(39, 174, 96, 0.3));
+}
+
+.empty-names-msg {
+    text-align: center;
+    margin-top: 6rem;
+    font-family: var(--font-medieval);
+    color: var(--text-dark, #2c1e16);
+    opacity: 0.4;
+    font-size: 1.4rem;
+    font-style: italic;
+}
+
+.damien-theme .empty-names-msg,
+.eldrin-theme .empty-names-msg {
+    color: var(--ink);
+}

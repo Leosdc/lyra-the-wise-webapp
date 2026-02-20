@@ -1,0 +1,359 @@
+/* GM Admin Portal Styles */
+
+.portal-card {
+    border-color: var(--crimson);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.portal-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px var(--gold);
+    transform: translateY(-5px);
+}
+
+.portal-card i {
+    animation: portal-icon-float 3s ease-in-out infinite;
+}
+
+.portal-card.pulse-crimson i {
+    color: var(--crimson);
+}
+
+.portal-card.pulse-gold i {
+    color: var(--gold);
+}
+
+.portal-card.pulse-blue i {
+    color: #3498db;
+}
+
+.portal-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    box-shadow: 0 0 20px var(--crimson);
+    opacity: 0;
+    pointer-events: none;
+    animation: portal-pulse-anim 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes portal-pulse-anim {
+    0% {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0;
+    }
+}
+
+.portal-pulse.pulse-gold {
+    box-shadow: 0 0 20px var(--gold);
+}
+
+.portal-pulse.pulse-blue {
+    box-shadow: 0 0 20px #3498db;
+}
+
+.portal-pulse.pulse-crimson {
+    box-shadow: 0 0 20px var(--crimson);
+}
+
+@keyframes portal-icon-float {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1.1);
+    }
+
+    50% {
+        transform: translateY(-5px) scale(1.2);
+        filter: drop-shadow(0 0 10px var(--crimson));
+    }
+}
+
+/* Portal View Layout */
+.portal-container {
+    max-width: 1400px;
+    margin: 0 auto 4rem;
+    min-height: 60vh;
+}
+
+.admin-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stat-bubble {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--gold);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.stat-bubble i {
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+}
+
+.stat-bubble span {
+    font-size: 2rem;
+    font-family: var(--font-medieval);
+    font-weight: 700;
+    color: var(--crimson);
+}
+
+.stat-bubble label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.stat-bubble.disabled span {
+    color: #666;
+}
+
+
+
+.admin-section h3 {
+    font-family: var(--font-medieval);
+    margin-bottom: 1.5rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.user-audit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.user-audit-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: 0.3s;
+}
+
+.user-audit-card:hover {
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.user-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 250px;
+    flex: 1.5;
+}
+
+.user-audit-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-audit-avatar.fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(44, 30, 22, 0.1);
+    font-size: 1.8rem;
+    color: var(--gold);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.user-email {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.user-id {
+    font-size: 0.7rem;
+    font-family: monospace;
+    opacity: 0.5;
+}
+
+.role-badge,
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.role-badge.gm {
+    background: var(--crimson);
+    color: #fff;
+}
+
+.role-badge.user {
+    background: #eee;
+    color: #666;
+}
+
+.status-badge.active {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.banned {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.ai-status-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-status-badge.active {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.ai-status-badge.disabled {
+    background: #f5f5f5;
+    color: #9e9e9e;
+}
+
+.user-meta {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 320px;
+    flex: 2;
+}
+
+.admin-tool-box {
+    background: rgba(44, 30, 22, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed var(--gold);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-tool-box h4 {
+    font-family: var(--font-medieval);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Horizontal Layout Updates */
+.admin-global-controls {
+    margin-bottom: 2rem;
+}
+
+.admin-tool-box.horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2rem;
+    gap: 2rem;
+}
+
+.admin-tool-box.horizontal h4 {
+    margin: 0;
+    white-space: nowrap;
+    min-width: 150px;
+    text-align: left;
+}
+
+.global-actions-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.admin-main-content {
+    width: 100%;
+}
+
+.admin-section.full-width {
+    width: 100%;
+}
+
+.medieval-btn.wide {
+    width: 100%;
+}
+
+.medieval-btn {
+    white-space: nowrap;
+}
+
+.admin-sidebar .medieval-btn {
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
+    letter-spacing: 0.5px;
+}
+
+.medieval-btn.active {
+    background: var(--gold) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px var(--gold);
+}
+
+/* Shared animations now handled in animations.css */
+
+@media (max-width: 900px) {
+    .admin-controls-grid {
+        grid-template-columns: 1fr;
+    }
+}

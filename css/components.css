@@ -1,0 +1,1547 @@
+/* Buttons */
+.medieval-btn {
+    background: linear-gradient(145deg, #2c1e16, #120b08);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.medieval-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.medieval-btn.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+}
+
+.medieval-btn.secondary {
+    background: transparent;
+    border-color: #888;
+    color: #888;
+}
+
+.medieval-btn.secondary:hover {
+    background: #888;
+    color: #fff;
+    box-shadow: none;
+}
+
+.medieval-btn.icon-only {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close Button (Circular Medieval Style - Standard) */
+.close-btn-medieval,
+.close-modal {
+    width: 40px;
+    height: 40px;
+    background: rgba(44, 30, 22, 0.1);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 1.2rem;
+    padding: 0;
+    line-height: 1;
+    z-index: 10006;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.close-btn-medieval:hover,
+.close-modal:hover {
+    background: var(--crimson);
+    color: #fff;
+    transform: rotate(360deg) scale(1.1);
+    box-shadow: 0 0 15px var(--crimson);
+    border-color: var(--gold-bright);
+}
+
+.close-btn-medieval.small,
+.close-modal.small {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+}
+
+/* Medieval Inputs */
+.medieval-input {
+    background-color: rgba(253, 246, 227, 0.95) !important;
+    color: #2c1e16 !important;
+    border: 1px solid var(--gold);
+    transition: all 0.3s ease;
+    font-size: 1.1rem !important;
+}
+
+.medieval-textarea,
+.medieval-select,
+.chronicle-editor textarea {
+    background-color: rgba(253, 246, 227, 0.95) !important;
+    color: #2c1e16 !important;
+    font-size: 1.1rem !important;
+    border: 1px solid var(--gold);
+    transition: all 0.3s ease;
+}
+
+.medieval-input:focus,
+.medieval-textarea:focus,
+.medieval-select:focus,
+.chronicle-editor textarea:focus {
+    background-color: #fff !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    border-color: var(--gold-bright);
+    outline: none;
+}
+
+.medieval-input::placeholder,
+.medieval-textarea::placeholder {
+    color: rgba(44, 30, 22, 0.6);
+    font-style: italic;
+}
+
+/* Seamless Inputs */
+.medieval-input.seamless {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    padding: 2px 5px !important;
+    color: inherit !important;
+    font-weight: inherit;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.medieval-input.seamless:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px dashed rgba(212, 175, 55, 0.5) !important;
+}
+
+.medieval-input.seamless:focus {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid var(--gold) !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    cursor: text;
+    color: #000 !important;
+}
+
+.medieval-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--input-bg) !important;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding: 10px 35px 10px 15px !important;
+    cursor: pointer;
+    font-family: var(--font-medieval);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    color: var(--ink) !important;
+    border: 2px solid var(--gold) !important;
+    box-shadow: var(--select-shadow) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.medieval-select:hover {
+    border-color: var(--gold-bright) !important;
+    box-shadow: var(--select-hover-glow) !important;
+    transform: translateY(-1px);
+}
+
+.medieval-select:focus {
+    background-color: var(--input-focus-bg) !important;
+    box-shadow: var(--select-focus-glow) !important;
+    outline: none;
+}
+
+.medieval-select option {
+    background-color: #1a150f;
+    color: var(--gold);
+    font-family: var(--font-body);
+    padding: 12px;
+}
+
+/* Character Sheet Specific Selects */
+.sheet-container .medieval-select {
+    font-size: 0.85rem;
+    padding: 5px 25px 5px 10px;
+}
+
+/* Empty State Gallery */
+.empty-state-card {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 6rem 2rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.empty-skull-icon {
+    font-size: 5rem;
+    color: var(--gold-dark);
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+    animation: floating 4s ease-in-out infinite;
+}
+
+.empty-text-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--gold);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    font-family: var(--font-medieval);
+}
+
+.empty-text-overlay i {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+    color: var(--gold-dark);
+    opacity: 0.7;
+}
+
+.empty-text-overlay p {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+@keyframes floating {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(-10deg);
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(10deg);
+    }
+}
+
+/* Custom Select Dropdown (RESTORED) */
+.custom-select-container {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: var(--font-medieval);
+    font-size: 0.85rem;
+    transition: 0.2s;
+}
+
+.custom-select-trigger span {
+    color: var(--ink);
+}
+
+.custom-select-trigger i {
+    color: var(--gold);
+}
+
+.custom-select-trigger:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-trigger i {
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+}
+
+.custom-select-container.open .custom-select-trigger i {
+    transform: rotate(180deg);
+}
+
+/* Fix for header visibility */
+.app-header .custom-select-trigger,
+.app-header .custom-select-trigger span {
+    color: var(--gold) !important;
+}
+
+.app-header .custom-select-trigger:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--gold-bright);
+}
+
+.custom-select-options-wrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    z-index: 5000;
+}
+
+.custom-select-options {
+    background: rgba(20, 15, 10, 0.98);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    animation: slideDown 0.2s ease;
+}
+
+.custom-select-option {
+    padding: 0.75rem 1rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.15s;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.custom-select-option:last-child {
+    border-bottom: none;
+}
+
+.custom-select-option:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--gold);
+}
+
+.custom-select-option.selected {
+    background: rgba(212, 175, 55, 0.3);
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.custom-select-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.custom-select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 3px;
+}
+
+/* Parchment Containers */
+.parchment {
+    background: url('https://www.transparenttextures.com/patterns/pizzelle.png'), var(--parchment);
+    color: var(--ink);
+    padding: 2rem;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d3c29a;
+}
+
+/* Scroll Container (Trivia - Design element) */
+.scroll-container {
+    perspective: 1500px;
+    margin: 1rem 0;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.scroll-paper {
+    position: relative;
+    border: 3px double var(--gold);
+    background: radial-gradient(circle at center, rgba(244, 228, 188, 0.98) 0%, rgba(220, 201, 155, 0.95) 100%);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    padding: 3rem 5rem;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+}
+
+/* Medieval Cards */
+.medieval-card {
+    background: rgba(20, 15, 10, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 4px;
+    padding: 2rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.medieval-card::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    pointer-events: none;
+}
+
+.medieval-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+    background: rgba(30, 25, 20, 0.95);
+}
+
+.medieval-card:hover::before {
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.card-title {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+/* Card with Token (Centered) */
+.medieval-card.has-token {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+.card-token {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.card-info {
+    flex: 1;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+    padding-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #666;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+/* Selection and Deletion States */
+.medieval-card.is-delete-mode {
+    border: 2px solid var(--crimson) !important;
+    animation: pulseRed 2s infinite;
+}
+
+.medieval-card.is-selected {
+    border-color: var(--gold-bright) !important;
+    box-shadow: 0 0 25px var(--gold-bright) !important;
+    transform: scale(1.02);
+}
+
+.medieval-card.is-selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--gold);
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.card-delete-btn {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: rgba(139, 0, 0, 0.8) !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 20 !important;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.medieval-card:hover .card-delete-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card-delete-btn:hover {
+    background: var(--crimson) !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px var(--crimson) !important;
+    transform: scale(1.1) rotate(10deg);
+}
+
+/* Modals */
+.medieval-modal {
+    background: var(--parchment);
+    color: var(--ink);
+    border: 3px double var(--gold);
+    border-radius: 8px;
+    padding: 2.5rem 2rem 2rem 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.medieval-modal.allow-overflow {
+    overflow: visible !important;
+}
+
+.medieval-modal.wide {
+    max-width: 800px;
+}
+
+.medieval-modal.medium {
+    max-width: 650px;
+    width: 90vw;
+    margin: 2rem auto;
+}
+
+.medieval-modal .medieval-textarea {
+    min-height: 180px;
+    /* Specific height for AI prompts */
+}
+
+.medieval-modal h2,
+.medieval-modal h3,
+.medieval-modal strong {
+    color: var(--ink);
+}
+
+.medieval-modal .modal-title {
+    color: var(--crimson) !important;
+    font-family: var(--font-fancy);
+    font-weight: 700;
+    padding-right: 60px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 15000;
+}
+
+/* Priority Creator Modals - Should stay above sheets but below alerts */
+#item-creator-modal,
+#spell-creator-modal,
+#monster-creator-modal,
+#share-item-modal,
+#changelog-modal,
+#item-creation-choice-modal,
+#spell-creation-choice-modal,
+#monster-creation-choice-modal {
+    z-index: 10005 !important;
+}
+
+#modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-wrapper .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+#modal-wrapper .modal-content {
+    position: relative;
+    max-width: 1100px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 5001;
+    animation: modalSlideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.1);
+    border: 3px double var(--gold);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Modal Content Typography - Tighter Spacing */
+#modal-wrapper .modal-content h2,
+#modal-wrapper .modal-content h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.1rem;
+    line-height: 1.2;
+}
+
+#modal-wrapper .modal-content h2:first-child,
+#modal-wrapper .modal-content h3:first-child {
+    margin-top: 0;
+}
+
+/* Remove top padding from first element after a title */
+#modal-wrapper .modal-content h2+*,
+#modal-wrapper .modal-content h3+* {
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+}
+
+#modal-wrapper .modal-content p {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+#modal-wrapper .modal-content .detail-box {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+
+/* Alert Modal (Priority Layering) */
+#alert-modal {
+    z-index: 20000 !important;
+}
+
+.close-modal,
+.close-alert {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+/* Alert Content (RESTORED) */
+.alert-content {
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    padding: 3rem;
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+    position: relative;
+    margin: auto;
+}
+
+.alert-body {
+    margin-bottom: 2rem;
+}
+
+.alert-icon {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+#alert-title {
+    font-family: var(--font-medieval);
+    color: var(--ink);
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+#alert-message {
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Confirmation Modal */
+#confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+}
+
+#confirm-modal .modal-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.confirm-box {
+    position: relative;
+    max-width: 450px !important;
+    text-align: center;
+    padding: 2.5rem !important;
+    background: var(--parchment);
+    border: 3px double var(--gold);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    animation: confirmPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-text {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 2rem;
+    line-height: 1.6;
+    color: var(--ink);
+    font-style: italic;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+/* Mystic Music Player */
+.mystic-player-floating {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    z-index: 800;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column-reverse;
+    pointer-events: none;
+    /* Fix: Allow clicks to pass through empty areas */
+}
+
+.player-orb {
+    width: 50px;
+    height: 50px;
+    background: var(--dark-charcoal);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+    z-index: 2;
+    pointer-events: auto;
+    /* Fix: Restore interactivity */
+}
+
+.player-orb:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+.player-orb i {
+    font-size: 1.4rem;
+}
+
+.mystic-player-floating.playing .player-orb i {
+    animation: rotate 4s linear infinite;
+}
+
+.player-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.player-now-playing {
+    font-family: var(--font-medieval);
+    font-size: 0.75rem;
+    color: var(--gold-bright);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: 0.3s;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.mystic-player-floating:hover .player-now-playing {
+    opacity: 1;
+}
+
+.magic-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mystic-player-floating.playing .magic-pulse {
+    animation: magicPulseShadow 2.5s infinite;
+}
+
+@keyframes magicPulseShadow {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+.player-interface {
+    width: 260px;
+    margin-bottom: 15px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+    transform-origin: bottom left;
+    pointer-events: auto;
+    /* Fix: Restore interactivity */
+}
+
+.mystic-player-floating.collapsed .player-interface {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    pointer-events: none;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.2);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
+.player-header strong {
+    font-family: var(--font-medieval);
+    font-size: 0.9rem;
+    color: var(--crimson);
+}
+
+.player-minimize {
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.track-name {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.player-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+/* Floating Player - Crimson Style (Original) */
+#btn-play-pause,
+#btn-play-pause-float {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--crimson);
+    color: white;
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#btn-play-pause:hover,
+#btn-play-pause-float:hover {
+    transform: scale(1.1);
+    background: #a93226;
+}
+
+/* Header Mini Player - Gold Style (Theme Aware) */
+#btn-play-pause-mini {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--gold-dark), var(--gold));
+    color: var(--ink);
+    border: 1px solid var(--gold-bright);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+#btn-play-pause-mini:hover {
+    transform: scale(1.1);
+    background: var(--gold-bright);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+.volume-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font-size: 0.8rem;
+}
+
+/* Floating Player Volume - Crimson */
+#player-volume,
+#player-volume-float {
+    width: 100%;
+    cursor: pointer;
+    height: 4px;
+    accent-color: var(--crimson);
+}
+
+/* Header Player Volume - Gold */
+#player-volume-mini {
+    width: 100%;
+    cursor: pointer;
+    height: 4px;
+    accent-color: var(--gold);
+}
+
+.download-link {
+    color: var(--gold);
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+
+.download-link:hover {
+    color: var(--gold-bright);
+    transform: translateY(-2px);
+}
+
+.progress-container {
+    height: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--sunlight));
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scroll Indicators */
+#scroll-up,
+#scroll-down {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--dark-panel);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    z-index: 800;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    animation: bounce 2s infinite;
+}
+
+
+#scroll-up {
+    top: 100px;
+}
+
+#scroll-down {
+    bottom: 20px;
+}
+
+#scroll-up.hidden,
+#scroll-down.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Fix Textarea Scrollbars in General */
+.medieval-textarea {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
+}
+
+/* Alpha Warning Popup */
+/* Alpha Warning Popup */
+.alpha-warning-popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: var(--parchment);
+    border: 2px solid var(--gold);
+    border-left: 5px solid var(--crimson);
+    border-radius: 6px;
+    padding: 1rem;
+    color: var(--ink);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    z-index: 9998;
+    animation: slideInLeft 0.5s ease-out;
+}
+
+/* Eldrin Theme Override */
+.eldrin-theme .alpha-warning-popup {
+    border-left-color: var(--eldrin-blue);
+    background: rgba(21, 67, 96, 0.95);
+    color: var(--gold-light);
+}
+
+.eldrin-theme .alpha-warning-popup .warning-content .warning-text p {
+    color: #ccc;
+}
+
+
+.alpha-warning-popup.hidden {
+    display: none;
+}
+
+.warning-content {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    position: relative;
+}
+
+.warning-icon {
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-top: 5px;
+}
+
+.warning-text strong {
+    color: var(--crimson);
+    display: block;
+    margin-bottom: 5px;
+    font-family: var(--font-medieval);
+}
+
+.warning-text p {
+    font-size: 0.85rem;
+    margin: 0;
+    color: var(--ink);
+    line-height: 1.4;
+}
+
+/* Eldrin Override for Inner Text */
+.eldrin-theme .warning-text strong {
+    color: var(--gold-bright);
+}
+
+.eldrin-theme .warning-text p {
+    color: #eee;
+}
+
+#close-alpha-warning {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Changelog List */
+.changelog-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.changelog-item {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.1);
+    padding-bottom: 1rem;
+}
+
+.changelog-item h3 {
+    font-family: var(--font-medieval);
+    color: var(--crimson);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.changelog-item ul {
+    list-style: none;
+    padding: 0;
+}
+
+.changelog-item li {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding-left: 0;
+    list-style: none;
+}
+
+.changelog-item li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.changelog-item li i {
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin-top: 4px;
+    /* Align with text baseline */
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Audio Settings Styles
+   ========================================================================== */
+
+/* Settings Subtitle */
+.settings-subtitle {
+    font-family: var(--font-medieval);
+    color: var(--ink);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.4);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Medieval Checkbox Group - Replaced by Setting Row */
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 0.2rem 0;
+    padding: 0.8rem;
+    border: 1px dashed rgba(212, 175, 55, 0.4);
+    border-radius: 4px;
+    background: rgba(44, 30, 22, 0.05);
+}
+
+.setting-label {
+    font-family: var(--font-medieval);
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 1rem;
+}
+
+/* Medieval Switch Toggle */
+.medieval-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    margin-left: 1rem;
+}
+
+.medieval-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--parchment);
+    border: 2px solid #888;
+    transition: .4s;
+    border-radius: 34px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #888;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+input:checked+.slider {
+    background-color: rgba(212, 175, 55, 0.2);
+    border-color: var(--gold);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+    background-color: var(--gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--gold);
+}
+
+.toggle-hint {
+    margin-left: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Card Actions & Buttons (Premium Component) */
+.card-actions {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%) translateX(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 200 !important;
+    pointer-events: none;
+}
+
+.item-card-wrapper:hover .card-actions,
+.spell-card:hover .card-actions,
+.monster-card:hover .card-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0);
+}
+
+.action-btn {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.8rem;
+}
+
+.action-btn:hover {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold-bright);
+    transform: scale(1.1);
+}
+
+.action-btn.share-btn {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.action-btn.share-btn:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+.action-btn.delete-btn:hover {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: white;
+}
+
+/* --- Mystic Spinners (Shared Components) --- */
+.mystic-spinner {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.mystic-spinner.small {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 1rem;
+}
+
+.rune-layer-wizard {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px dashed var(--gold);
+    border-radius: 50%;
+    animation: rotateRune 15s linear infinite;
+    opacity: 0.6;
+}
+
+.rune-layer-wizard.inner {
+    width: 70%;
+    height: 70%;
+    top: 15%;
+    left: 15%;
+    border: 4px solid var(--gold);
+    border-style: double;
+    animation-direction: reverse;
+    animation-duration: 8s;
+    opacity: 0.8;
+}
+
+.loading-text {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 1.8rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    animation: pulseGlow 2.5s infinite;
+}
+
+/* Mystic Spinner for Maintenance (250px variant) */
+.mystic-spinner-admin {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 4rem;
+    overflow: visible;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+}
+
+.mystic-spinner-admin>* {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.rune-layer-admin {
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.rune-layer-admin.layer-extra-outer {
+    top: 50%;
+    left: 50%;
+    width: 240px;
+    height: 240px;
+    margin-left: -120px;
+    margin-top: -120px;
+    border: 1px dashed rgba(212, 175, 55, 0.1);
+    animation: spin-cw-pure 40s linear infinite;
+}
+
+.rune-layer-admin.outer {
+    top: 50%;
+    left: 50%;
+    width: 190px;
+    height: 190px;
+    margin-left: -95px;
+    margin-top: -95px;
+    border: 3px double var(--gold);
+    opacity: 0.7;
+    animation: spin-cw-pure 20s linear infinite;
+}
+
+.rune-layer-admin.middle {
+    top: 50%;
+    left: 50%;
+    width: 130px;
+    height: 130px;
+    margin-left: -65px;
+    margin-top: -65px;
+    border: 2px dotted var(--gold-dark);
+    opacity: 0.8;
+    animation: spin-ccw-pure 12s linear infinite;
+}
+
+.rune-layer-admin.inner {
+    top: 50%;
+    left: 50%;
+    width: 75px;
+    height: 75px;
+    margin-left: -37.5px;
+    margin-top: -37.5px;
+    border: 2px solid var(--gold);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 80%);
+    animation: spin-cw-pure 7s linear infinite, glow-pulse-pure 4s infinite ease-in-out;
+}
+
+.spinner-core {
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    margin-top: -9px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 30px 10px var(--gold), 0 0 60px 20px rgba(212, 175, 55, 0.4);
+    z-index: 5;
+    animation: glow-pulse-pure 3s infinite alternate, spin-cw-pure 30s linear infinite;
+}
+
+.spinner-center-icon {
+    top: 50%;
+    left: 50%;
+    font-size: 2.8rem;
+    color: var(--gold);
+    z-index: 10;
+    text-shadow: 0 0 20px var(--gold-dark);
+    line-height: 1;
+    transform: translate(-50%, -50%);
+    animation: icon-float-pure 3s ease-in-out infinite;
+}

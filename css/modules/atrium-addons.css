@@ -1,0 +1,1605 @@
+/* Atrium Addons & UI Refinements - FINAL LAYOUT & SYMMETRY FIX */
+
+/* Universal Reset for Sidebars to prevent horizontal push-out */
+.stage-sidebar,
+.stage-sidebar *,
+.stage-sidebar *:before,
+.stage-sidebar *:after {
+    box-sizing: border-box !important;
+}
+
+/* 1. Standard Sidebar Container Padding - FIX: stretch cards and hide horizontal overflow */
+.sidebar-content,
+.sidebar-footer,
+.combat-footer-actions {
+    padding: 12px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: stretch !important;
+    /* Forces cards to fill width */
+    overflow-x: hidden !important;
+    /* No horizontal scroll */
+}
+
+/* 1.1 Combat Header Mini - Organization Fix */
+.combat-header-mini {
+    display: flex !important;
+    flex-direction: column !important;
+    /* Vertical stack to prevent overlap */
+    gap: 8px !important;
+    padding: 12px 16px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-bottom: 1px solid var(--gold-faded) !important;
+    align-items: stretch !important;
+}
+
+.combat-round-label {
+    font-family: var(--font-medieval) !important;
+    color: var(--gold-bright) !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.combat-status-badge {
+    background: rgba(212, 175, 55, 0.15) !important;
+    border: 1px solid var(--gold-faded) !important;
+    color: var(--white) !important;
+    padding: 6px 12px !important;
+    border-radius: 4px !important;
+    font-size: 0.8rem !important;
+    text-align: center !important;
+    font-weight: bold !important;
+    white-space: normal !important;
+    /* Allow names to wrap */
+    line-height: 1.2 !important;
+}
+
+/* 2. Allied Characters Block - PREMIUM REDESIGN */
+.allied-characters-block {
+    background: rgba(15, 10, 5, 0.4) !important;
+    border: 1px solid var(--gold-dark) !important;
+    border-radius: 12px;
+    margin: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Height for ~3 cards: each card ~75px + gaps */
+    height: 280px;
+    width: auto !important;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.allied-list-header {
+    background: linear-gradient(to right, rgba(40, 20, 10, 0.9), rgba(20, 10, 5, 0.8));
+    padding: 10px 14px;
+    font-family: var(--font-medieval);
+    color: var(--gold-bright);
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.allied-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.allied-list-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(10, 5, 5, 0.2);
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.allied-list-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.allied-scroll-arrow {
+    background: linear-gradient(to bottom, rgba(212, 175, 55, 0.2), transparent);
+    color: var(--gold);
+    text-align: center;
+    padding: 4px 0;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.2s;
+    z-index: 5;
+    position: absolute;
+    width: 100%;
+}
+
+.allied-scroll-arrow.up {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(15, 10, 5, 0.9), transparent);
+}
+
+.allied-scroll-arrow.down {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(15, 10, 5, 0.9), transparent);
+}
+
+.allied-scroll-arrow:hover {
+    color: var(--gold-bright);
+    background: rgba(212, 175, 55, 0.3);
+}
+
+.allied-scroll-arrow.hidden {
+    display: none;
+}
+
+/* Premium Character Card */
+.ally-card-premium {
+    background: rgba(30, 20, 10, 0.45);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.ally-card-premium:hover {
+    background: rgba(45, 30, 15, 0.6);
+    border-color: rgba(212, 175, 55, 0.4);
+    transform: translateY(-1px);
+}
+
+.ally-header-sml {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ally-name-sml {
+    font-family: var(--font-medieval) !important;
+    color: var(--gold-bright) !important;
+    font-weight: bold !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.5px;
+}
+
+.ally-ac-mini {
+    background: linear-gradient(135deg, #b8860b, #daa520) !important;
+    color: #1a0f0f !important;
+    padding: 2px 10px !important;
+    border-radius: 4px !important;
+    font-size: 0.8rem !important;
+    border: 1px solid var(--gold) !important;
+    font-family: var(--font-medieval) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    font-weight: bold;
+    text-shadow: none !important;
+    position: relative;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%);
+    /* Shield shape */
+    aspect-ratio: 1/1.2;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 35px;
+}
+
+.ally-ac-mini i {
+    color: #1a0f0f !important;
+    font-size: 0.7rem;
+    margin-bottom: -2px;
+}
+
+/* Health Bar System */
+.ally-hp-bar-container {
+    position: relative;
+    height: 14px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ally-hp-bar-fill {
+    height: 100%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.ally-hp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.65rem;
+    color: #fff;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    letter-spacing: 0.5px;
+}
+
+/* 3. Combat Cards & Initiative Badges */
+#sidebar-combat-list {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+}
+
+.combat-token-v2 {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid var(--gold-faded) !important;
+}
+
+/* Initiative Badge - High Visibility Fix */
+.token-initiative-badge {
+    color: var(--gold-bright) !important;
+    /* Brightest gold */
+    font-weight: bold !important;
+    font-family: var(--font-medieval) !important;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 1), 0 0 2px rgba(0, 0, 0, 1) !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid var(--gold-dark) !important;
+    min-width: 25px !important;
+    text-align: center !important;
+}
+
+.token-details-sml {
+    flex: 1 !important;
+    min-width: 0 !important;
+    /* Essential for text truncation */
+}
+
+.token-name-sml {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}
+
+/* Combat Action Buttons - High Visibility Fix */
+.token-actions {
+    display: flex !important;
+    gap: 6px !important;
+    margin-left: auto !important;
+}
+
+.combat-action-btn {
+    background: var(--gold-dark) !important;
+    border: 1px solid var(--gold) !important;
+    color: #000 !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4) !important;
+}
+
+.combat-action-btn:hover {
+    transform: scale(1.15) !important;
+    background: var(--gold) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.7) !important;
+}
+
+.combat-action-btn i {
+    font-size: 1rem !important;
+}
+
+.combat-action-btn.sword-btn {
+    background: #c62828 !important;
+    /* Blood red for attack */
+    color: #fff !important;
+    border-color: #ff5252 !important;
+}
+
+.combat-action-btn.sword-btn:hover {
+    background: #d32f2f !important;
+}
+
+/* ========================================
+   BUTTON STANDARDIZATION (LITERAL CLONE)
+   ======================================== */
+
+#btn-exit-atrium,
+#btn-end-session,
+#btn-sidebar-end-turn,
+#btn-confirm-start-combat {
+    background: transparent !important;
+    background-image: none !important;
+    border: 1px solid var(--gold) !important;
+    color: var(--gold) !important;
+
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 6.4px 16px !important;
+
+    font-family: var(--font-medieval) !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-size: 0.8rem !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+
+    margin: 6px 0 !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+/* Visibility Guard: Respect JS display:none for non-GMs */
+#btn-end-session[style*="display: none"] {
+    display: none !important;
+}
+
+#btn-exit-atrium:hover,
+#btn-end-session:hover,
+#btn-sidebar-end-turn:hover,
+#btn-confirm-start-combat:hover {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: var(--gold-bright) !important;
+    border-color: var(--gold-bright) !important;
+}
+
+#btn-sidebar-end-turn:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+/* 4. Structured Actions Forge - PREMIUM REDESIGN */
+.structured-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.structured-action-row {
+    background: rgba(40, 25, 10, 0.4);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.structured-action-row:hover {
+    border-color: var(--gold);
+    background: rgba(60, 40, 15, 0.5);
+}
+
+.action-row-main {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-row-main .act-name {
+    flex: 2;
+    min-width: 0;
+}
+
+.action-row-main .act-damage {
+    flex: 1;
+    min-width: 0;
+}
+
+.action-row-main .act-range {
+    flex: 1;
+    min-width: 0;
+}
+
+.remove-row-btn {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 0;
+}
+
+.remove-row-btn i {
+    font-size: 1rem;
+}
+
+.remove-row-btn:hover {
+    background: var(--crimson);
+    color: white;
+    border-color: #ff4d4d;
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
+}
+
+.remove-row-btn:active {
+    transform: scale(0.9);
+}
+
+/* ========================================
+   Action Modal (Execute Action) Premium Polish 
+   ======================================== */
+.action-item-premium {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+}
+
+.action-item-premium:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gold);
+}
+
+.action-item-premium.selected {
+    background: var(--gold-faded);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.action-info-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-name-bold {
+    font-weight: bold;
+    color: #5c1a1a;
+}
+
+.action-meta-tiny {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.modal-subtitle {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.targeting-section.action-details-flow {
+    margin-top: 20px;
+    animation: slideInUp 0.3s ease;
+}
+
+.modal-actions-centered {
+    margin-top: 25px;
+    gap: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Lyra Theme Overrides for Action Modal */
+.theme-lyra .modal-stage-content.parchment-mini {
+    color: #1a0f0f !important;
+}
+
+.theme-lyra .modal-stage-content.parchment-mini .medieval-title,
+.theme-lyra .modal-stage-content.parchment-mini .targeting-section-title {
+    color: #5c1a1a !important;
+}
+
+.theme-lyra .target-item-btn {
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #1a0f0f !important;
+}
+
+.theme-lyra .target-item-btn.selected {
+    background: var(--gold-faded) !important;
+    border-color: var(--gold) !important;
+}
+
+/* Contrast Fixes for Dark Themes (Damien) */
+.damien-theme .modal-stage-content.parchment-mini,
+.theme-damien .modal-stage-content.parchment-mini {
+    background: linear-gradient(135deg, #1a0b2e 0%, #11051b 100%) !important;
+    border-color: var(--gold) !important;
+    color: #e0e0e0 !important;
+    max-width: 550px;
+    border: 2px solid var(--gold);
+}
+
+/* Contrast Fixes for Dark Themes (Eldrin) */
+.eldrin-theme .modal-stage-content.parchment-mini,
+.theme-eldrin .modal-stage-content.parchment-mini {
+    background: linear-gradient(135deg, #154360 0%, #0e2f44 100%) !important;
+    border-color: var(--gold) !important;
+    color: #d6eaf8 !important;
+    max-width: 550px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+}
+
+/* Aged Gold for Titles & Headers (Damien) */
+.damien-theme .parchment-mini .medieval-title,
+.theme-damien .parchment-mini .medieval-title,
+.damien-theme .parchment-mini .targeting-section-title,
+.theme-damien .parchment-mini .targeting-section-title {
+    color: #c5a059 !important;
+    /* Aged Gold */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Vibrant Gold for Titles & Headers (Eldrin) */
+.eldrin-theme .parchment-mini .medieval-title,
+.theme-eldrin .parchment-mini .medieval-title,
+.eldrin-theme .parchment-mini .targeting-section-title,
+.theme-eldrin .parchment-mini .targeting-section-title {
+    color: #f1c40f !important;
+    /* Eldrin's Vibrant Gold */
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Bronze Subtitle (Damien) */
+.damien-theme .parchment-mini .modal-subtitle,
+.theme-damien .parchment-mini .modal-subtitle {
+    color: #8a6d3b !important;
+    opacity: 0.9;
+}
+
+/* Sky Blue Subtitle (Eldrin) */
+.eldrin-theme .parchment-mini .modal-subtitle,
+.theme-eldrin .parchment-mini .modal-subtitle {
+    color: #a9cce3 !important;
+    opacity: 0.9;
+}
+
+/* Target Buttons (Damien) */
+.damien-theme .target-item-btn,
+.theme-damien .target-item-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #c5a059 !important;
+    border-color: rgba(197, 160, 89, 0.3) !important;
+    padding: 8px;
+    font-size: 0.85rem;
+}
+
+/* Target Buttons (Eldrin) */
+.eldrin-theme .target-item-btn,
+.theme-eldrin .target-item-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #f1c40f !important;
+    border-color: rgba(241, 196, 15, 0.3) !important;
+    padding: 8px;
+    font-size: 0.85rem;
+}
+
+.damien-theme .action-name-bold,
+.eldrin-theme .action-name-bold,
+.theme-damien .action-name-bold,
+.theme-eldrin .action-name-bold {
+    color: #c5a059 !important;
+    /* Aged Gold */
+}
+
+.damien-theme .action-meta-tiny,
+.eldrin-theme .action-meta-tiny,
+.theme-damien .action-meta-tiny,
+.theme-eldrin .action-meta-tiny {
+    color: #8a6d3b !important;
+    /* Aged Gold (darker variant for meta) */
+}
+
+.damien-theme .target-item-btn:hover,
+.eldrin-theme .target-item-btn:hover,
+.theme-damien .target-item-btn:hover,
+.theme-eldrin .target-item-btn:hover {
+    background: rgba(197, 160, 89, 0.1) !important;
+    border-color: #c5a059 !important;
+}
+
+.damien-theme .target-item-btn.selected,
+.eldrin-theme .target-item-btn.selected,
+.theme-damien .target-item-btn.selected,
+.theme-eldrin .target-item-btn.selected {
+    background: rgba(197, 160, 89, 0.2) !important;
+    border-color: #e6c88b !important;
+    /* Lighter Gold */
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.4) !important;
+}
+
+.damien-theme .targeting-section-title,
+.theme-damien .targeting-section-title {
+    opacity: 1 !important;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.2) !important;
+}
+
+/* Lyra Theme Contrast Fix (Avoid yellow on parchment) */
+.lyra-theme .parchment-mini .targeting-section-title {
+    color: #800000 !important;
+    /* Deep Maroon for better contrast */
+    border-bottom-color: rgba(128, 0, 0, 0.2) !important;
+}
+
+.lyra-theme .parchment-mini .medieval-title {
+    color: #5c1a1a !important;
+}
+
+.lyra-theme .dice-btn-sml {
+    border-color: #5c1a1a !important;
+    color: #5c1a1a !important;
+}
+
+.lyra-theme .dice-btn-sml:hover {
+    background: rgba(92, 26, 26, 0.1) !important;
+}
+
+/* Forge List Action Preview */
+.card-actions-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 5px 0;
+}
+
+.action-tag-mini {
+    font-size: 0.65rem;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold-bright);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* New Rolling System Components (D&D 5e Style) */
+.roll-flow-container-v2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    margin-bottom: 10px;
+}
+
+.roll-step-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.step-label {
+    font-family: var(--font-medieval);
+    font-size: 0.7rem;
+    color: #800000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hit-roll-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dice-toggle-btn {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #5c1a1a;
+    color: #5c1a1a;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice-toggle-btn.active {
+    background: #5c1a1a !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px rgba(92, 26, 26, 0.3);
+}
+
+.dice-toggle-btn:hover {
+    border-color: #800000;
+    background: rgba(92, 26, 26, 0.1);
+}
+
+.dice-main-btn {
+    background: linear-gradient(135deg, #5c1a1a, #2a0a0a);
+    border: 2px solid #b8860b;
+    color: #fff;
+    font-family: var(--font-medieval);
+    font-weight: bold;
+    min-width: 65px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.dice-main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 10px rgba(184, 134, 11, 0.2);
+}
+
+.dice-main-btn:active {
+    transform: translateY(0);
+}
+
+.dice-main-btn span {
+    font-size: 1.2rem;
+    color: #ffd700;
+}
+
+.damage-roll-btn {
+    background: linear-gradient(135deg, #1a4a1a, #0a2a0a);
+    border: 1.5px solid #2e7d32;
+    color: #fff;
+    font-family: var(--font-medieval);
+    font-size: 0.85rem;
+    height: 40px;
+    width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.damage-roll-btn:hover:not(.disabled) {
+    background: #2e7d32;
+    color: #fff !important;
+    box-shadow: 0 0 12px rgba(46, 125, 50, 0.4);
+}
+
+.damage-roll-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #666;
+    color: #666;
+}
+
+.damage-roll-btn span {
+    font-size: 1.1rem;
+    color: #a5d6a7;
+    font-weight: bold;
+}
+
+.advantage-debug {
+    font-size: 0.6rem;
+    color: #666;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.hit-indicator {
+    font-family: var(--font-medieval);
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    text-align: center;
+    letter-spacing: 1px;
+    animation: slideInUp 0.2s ease;
+}
+
+.hit-indicator.is-hit {
+    background: rgba(46, 125, 50, 0.2);
+    color: #2e7d32;
+    border: 1px solid rgba(46, 125, 50, 0.4);
+}
+
+.hit-indicator.is-miss {
+    background: rgba(198, 40, 40, 0.2);
+    color: #c62828;
+    border: 1px solid rgba(198, 40, 40, 0.4);
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 5. Hero's Backpack (Mochila do Herói) - PREMIUM MODAL */
+.backpack-content {
+    background: #fdf6e3 url("https://www.transparenttextures.com/patterns/parchment.png") !important;
+    border: 3px double #8b4513 !important;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(139, 69, 19, 0.1) !important;
+    color: #2c1e16 !important;
+    max-width: 650px !important;
+    padding: 30px !important;
+    border-radius: 8px !important;
+    position: relative;
+}
+
+.backpack-content .modal-header {
+    border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+    margin-bottom: 20px;
+}
+
+.backpack-content .medieval-title {
+    color: #5c1a1a;
+    font-size: 1.8rem;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.backpack-coins {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(139, 69, 19, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(139, 69, 19, 0.15);
+    margin-bottom: 25px;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.coin-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-medieval);
+    font-weight: 800;
+}
+
+.coin-item i {
+    font-size: 1.2rem;
+}
+
+.coin-item.po {
+    color: #d4af37;
+}
+
+.coin-item.pp {
+    color: #a8a8a8;
+}
+
+.coin-item.pc {
+    color: #b87333;
+}
+
+.backpack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.backpack-item-card {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(139, 69, 19, 0.3) !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.backpack-item-card:hover {
+    transform: translateY(-5px);
+    border-color: #d4af37 !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+.backpack-item-card.equipped {
+    border: 2px solid #2e7d32 !important;
+    background: rgba(46, 125, 50, 0.05) !important;
+}
+
+.backpack-item-card .item-icon {
+    font-size: 2.22rem;
+    color: #5c1a1a;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.backpack-item-card .item-name {
+    font-family: var(--font-medieval);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #2c1e16;
+    margin-bottom: 8px;
+}
+
+.backpack-item-card .item-meta {
+    font-size: 0.75rem;
+    color: #6d4c41;
+    font-weight: 600;
+    display: flex;
+    gap: 8px;
+}
+
+.equipped-tag {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #2e7d32;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+/* 6. Roll Request (Chamado do Mestre) - PREMIUM REFINEMENT */
+.roll-interact-box {
+    background: #fdf6e3 url("https://www.transparenttextures.com/patterns/parchment.png") !important;
+    border: 4px solid #d4af37 !important;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.4) !important;
+    color: #2c1e16 !important;
+}
+
+.roll-instruction {
+    font-size: 1.35rem;
+    color: #eee !important;
+    font-family: var(--font-medieval);
+    font-weight: 500;
+    text-shadow: 1px 1px 2px #000;
+    margin-bottom: 20px;
+}
+
+.roll-instruction strong {
+    color: var(--gold) !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.roll-extra-info {
+    margin-top: 15px;
+    color: #ddd;
+    font-size: 1.1rem;
+}
+
+.roll-extra-info .gold-text {
+    color: var(--gold) !important;
+    font-weight: 900;
+    font-size: 1.4rem;
+    margin-left: 5px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.dice-interaction-area {
+    width: 140px;
+    height: 140px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    border: 2px solid var(--gold-faded);
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dice-interaction-area:hover {
+    transform: scale(1.1);
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gold);
+}
+
+.d20-visual {
+    font-size: 4.5rem;
+    color: var(--gold);
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+    transition: all 0.3s ease;
+}
+
+@keyframes pulse-gold {
+    from {
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+        transform: scale(1);
+    }
+
+    to {
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.9));
+        transform: scale(1.1);
+    }
+}
+
+.roll-extra-info {
+    font-family: var(--font-medieval);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #5d4037;
+}
+
+/* DC Selector Styles in GM Modal */
+.roll-dc-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.dc-value {
+    font-size: 2.5rem;
+    font-family: var(--font-medieval);
+    color: #d4af37;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    font-weight: 900;
+}
+
+.dc-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.dc-preset-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #ccc;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dc-preset-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: #d4af37;
+}
+
+.dc-preset-btn.selected {
+    background: #d4af37;
+    color: #000;
+    font-weight: bold;
+    border-color: #fff;
+}
+
+/* 7. Consolidated Results - SCROLL THEME */
+.roll-consolidated-card {
+    background-image: url("https://www.transparenttextures.com/patterns/parchment.png") !important;
+    background-color: #fdf6e3 !important;
+    border-left: 5px solid #8b4513;
+    padding: 15px;
+    border-radius: 4px;
+    color: #2c1e16;
+    margin: 10px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.roll-consolidated-card .card-header {
+    font-family: var(--font-medieval);
+    font-weight: bold;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    color: #5c1a1a;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+    font-family: var(--font-medieval);
+    font-size: 0.9rem;
+}
+
+.result-row.success .p-status {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.result-row.fail .p-status {
+    color: #c62828;
+}
+
+.result-row .p-roll {
+    font-weight: bold;
+    color: #8b4513;
+    text-align: center;
+}
+
+/* Global Premium Close Button */
+.close-btn-top {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 32px;
+    height: 32px;
+    background: #c62828;
+    /* Brighter red for visibility */
+    border: 2px solid #d4af37;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: all 0.2s;
+}
+
+.close-btn-top:hover {
+    transform: scale(1.1) rotate(90deg);
+    background: #8b0000;
+}
+
+/* Character Sheet Card Port for Backpack/Atrium */
+.sheet-card-v2 {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(139, 69, 19, 0.3) !important;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.sheet-card-v2:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-color: #d4af37 !important;
+}
+
+.card-v2-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.card-v2-icon {
+    font-size: 1.5rem;
+    color: #5c1a1a;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-v2-title-section {
+    flex: 1;
+    overflow: hidden;
+}
+
+.card-v2-title {
+    font-family: var(--font-medieval);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c1e16;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.card-v2-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-style: italic;
+    color: #6d4c41;
+}
+
+.card-v2-content {
+    padding: 1rem;
+    flex: 1;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-v2-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem 1.2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 0.5rem;
+}
+
+.card-v2-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-v2-stat strong {
+    color: #8b4513;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-family: var(--font-body);
+    letter-spacing: 0.5px;
+}
+
+.card-v2-stat span {
+    font-weight: 600;
+    font-family: var(--font-medieval);
+    font-size: 0.9rem;
+    color: #2c1e16;
+}
+
+.card-v2-desc {
+    max-height: 100px;
+    overflow-y: auto;
+    font-style: italic;
+    padding-top: 8px;
+    line-height: 1.5;
+    margin-top: 0.5rem;
+    color: #6d4c41;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.equipped-tag {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #2e7d32;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+/* Rarity Colors for Atrium */
+.rarity-common {
+    border-left: 5px solid #7f8c8d !important;
+}
+
+.rarity-uncommon {
+    border-left: 5px solid #2ecc71 !important;
+}
+
+.rarity-rare {
+    border-left: 5px solid #3498db !important;
+}
+
+.rarity-very_rare {
+    border-left: 5px solid #9b59b6 !important;
+}
+
+.rarity-legendary {
+    border-left: 5px solid #f1c40f !important;
+}
+
+
+/* NPC Deletion & Allied List Enhancements */
+.ally-meta-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-npc-btn {
+    color: #c62828;
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.delete-npc-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    color: #ff5252;
+}
+
+.npc-ally .ally-name-sml {
+    color: #5c1a1a;
+}
+
+/* =========================================
+   REFINED DETAIL VIEW & CHRONICLES
+   ========================================= */
+.chronicle-line {
+    margin-bottom: 0.75rem !important;
+    line-height: 1.7;
+    color: var(--ink);
+    font-size: 1.05rem;
+    display: block;
+}
+
+.text-block {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 1.25rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    margin-top: 1rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.detail-description h3 {
+    font-family: var(--font-medieval);
+    color: var(--crimson);
+    border-bottom: 2px solid var(--gold-dark);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Botões de Ação Crítica */
+.medieval-btn.crimson-btn {
+    background: linear-gradient(to bottom, #8a0000, #5a0000) !important;
+    border: 1px solid #ff4d4d !important;
+    color: #fff !important;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5) !important;
+}
+
+.medieval-btn.crimson-btn:hover {
+    background: linear-gradient(to bottom, #a00000, #700000) !important;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4) !important;
+}
+
+/* ULTIMATE CONTRAST FIX FOR DAMIEN THEME */
+body.damien-theme .roll-instruction strong {
+    color: #ffd700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7), 2px 2px 4px #000 !important;
+    font-weight: 900 !important;
+}
+
+body.damien-theme .roll-extra-info .gold-text {
+    color: #ffd700 !important;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 2px 2px 3px #000 !important;
+    font-weight: 900 !important;
+}
+
+/* Roll Request & Results Inline Cards */
+.roll-request-inline-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    white-space: normal !important;
+    text-align: left;
+    margin: 8px 0;
+}
+
+.roll-request-inline-card,
+.roll-consolidated-card {
+    background: var(--dark-panel);
+    background-image: url("https://www.transparenttextures.com/patterns/parchment.png");
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 6px 0;
+    font-family: var(--font-medieval) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid var(--gold);
+    width: 90%;
+    color: var(--ink);
+    white-space: normal !important;
+    /* Force reset for chat messages */
+}
+
+/* Specific background for light themes (Lyra) */
+.lyra-theme .roll-request-inline-card,
+.lyra-theme .roll-consolidated-card {
+    background: #fdf6e3 !important;
+    border: 1px solid #8b4513 !important;
+    border-left: 5px solid #5d4037 !important;
+}
+
+/* Damien (Purple/Bronze) Specific Card Styles */
+.damien-theme .roll-request-inline-card,
+.damien-theme .roll-consolidated-card {
+    background: rgba(30, 20, 45, 0.98) !important;
+    background-image: url("https://www.transparenttextures.com/patterns/black-paper.png") !important;
+    border: 1px solid var(--gold-dark) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 43, 226, 0.3) !important;
+}
+
+/* Eldrin (Blue/Gold) Specific Card Styles */
+.eldrin-theme .roll-request-inline-card,
+.eldrin-theme .roll-consolidated-card {
+    background: rgba(10, 31, 58, 0.98) !important;
+    background-image: url("https://www.transparenttextures.com/patterns/black-paper.png") !important;
+    border: 1px solid var(--gold) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(52, 152, 219, 0.3) !important;
+}
+
+.inline-card-header,
+.roll-consolidated-card .card-header {
+    font-weight: bold;
+    color: #5d4037 !important;
+    /* DARK BROWN for light themes */
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    /* Reduced from 8px */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.4);
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.damien-theme .inline-card-header,
+.damien-theme .roll-consolidated-card .card-header {
+    color: var(--gold-bright);
+    border-bottom-color: rgba(212, 175, 55, 0.3);
+}
+
+.inline-card-body {
+    color: #3b2b24 !important;
+    /* DARK BROWN for body on light themes */
+    font-size: 0.9rem;
+    /* Reduced from 1rem */
+    line-height: 1.2;
+    /* Reduced from 1.4 */
+}
+
+.damien-theme .inline-card-body,
+.eldrin-theme .inline-card-body {
+    color: #f0f0f0 !important;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* Reduced from 6px */
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    /* Reduced from 6px 10px */
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.result-row.success {
+    border-right: 3px solid #27ae60;
+}
+
+.result-row.fail {
+    border-right: 3px solid #c0392b;
+}
+
+/* Dark Theme Contrast Overrides */
+.eldrin-theme .p-name,
+.eldrin-theme .inline-card-body,
+.damien-theme .p-name,
+.damien-theme .inline-card-body {
+    color: #f0f0f0 !important;
+}
+
+.eldrin-theme .inline-card-header,
+.eldrin-theme .roll-consolidated-card .card-header,
+.damien-theme .inline-card-header,
+.damien-theme .roll-consolidated-card .card-header {
+    color: var(--gold-bright) !important;
+}
+
+.result-row .p-name {
+    color: #3b2b24 !important;
+    /* DARK BROWN names for light themes */
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.result-row .p-roll {
+    color: #8b4513 !important;
+    /* SADDLE BROWN for dice on light themes */
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.result-row .p-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.damien-theme .result-row .p-name,
+.eldrin-theme .result-row .p-name {
+    color: #ffffff !important;
+}
+
+.damien-theme .result-row .p-roll,
+.eldrin-theme .result-row .p-roll {
+    color: var(--gold-bright) !important;
+}
+
+.result-row.success .p-status {
+    color: #27ae60;
+    text-shadow: 0 0 5px rgba(39, 174, 96, 0.2);
+}
+
+.result-row.fail .p-status {
+    color: #c0392b;
+    text-shadow: 0 0 5px rgba(192, 57, 43, 0.2);
+}

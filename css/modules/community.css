@@ -1,0 +1,151 @@
+/* Community & Contacts Styles */
+
+/* Contacts Modal */
+.contacts-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-contact-row {
+    display: flex;
+    gap: 10px;
+}
+
+.contacts-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.contact-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--parchment);
+    border: 1px solid var(--gold);
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-name {
+    font-weight: bold;
+    color: var(--text-dark);
+    font-family: var(--font-medieval);
+}
+
+/* Chat Tabs */
+.chat-tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    /* Assuming var exists, else use gray */
+    font-family: var(--font-medieval);
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.chat-tab.active {
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+}
+
+.chat-tab:hover {
+    color: var(--gold-hover);
+}
+
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Ensure it fills parent */
+    flex: 1;
+    overflow: hidden;
+    /* Prevent double scrollbars */
+}
+
+.chat-panel.hidden {
+    display: none;
+}
+
+/* Global Chat Specifics */
+.community-chat .chat-message.mine {
+    align-self: flex-end;
+    background: rgba(100, 50, 150, 0.1);
+    /* Slight purple tint for self */
+    border-left: none;
+    border-right: 3px solid var(--gold);
+}
+
+.community-chat .msg-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 2px;
+}
+
+.community-chat .msg-author {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+
+/* Enhancements for Settings Nickname Feedback */
+.error-text {
+    color: #d32f2f;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.success-text {
+    color: #388e3c;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Community Notifications */
+.action-card.has-notification i {
+    animation: notify-pulse 1.5s infinite;
+    color: var(--gold-bright) !important;
+    text-shadow: 0 0 15px var(--gold);
+}
+
+@keyframes notify-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+        filter: drop-shadow(0 0 15px var(--gold));
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.action-card.has-notification .portal-pulse {
+    display: block !important;
+    background: var(--gold) !important;
+    opacity: 0.6;
+}

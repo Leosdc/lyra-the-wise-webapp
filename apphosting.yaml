@@ -1,0 +1,5 @@
+env:
+  - variable: NODE_ENV
+    value: production
+  - variable: FORCE_REBUILD_CACHE
+    value: "v5"

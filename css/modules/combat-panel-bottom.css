@@ -1,0 +1,215 @@
+/* ============================================
+   NOVO LAYOUT: BARRA INFERIOR COMPACTA
+   ============================================ */
+
+.combat-panel-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(10, 5, 5, 0.98), rgba(20, 10, 10, 0.95));
+    border-top: 3px solid var(--gold-dark);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 900;
+    max-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.combat-panel-bottom.hidden {
+    display: none;
+}
+
+.combat-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.combat-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.combat-round strong {
+    color: var(--gold-bright);
+    font-family: var(--font-medieval);
+}
+
+.combat-separator {
+    color: rgba(212, 175, 55, 0.3);
+}
+
+.combat-ready {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.medieval-btn.compact {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+}
+
+.combat-combatants-scroll {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+    align-items: center;
+}
+
+.combat-combatants-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.combat-combatants-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.combat-combatants-scroll::-webkit-scrollbar-thumb {
+    background: var(--gold-dark);
+    border-radius: 3px;
+}
+
+.combat-combatants-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+.combat-token {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, rgba(40, 20, 20, 0.8), rgba(60, 30, 30, 0.8));
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    min-width: 200px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.combat-token:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.combat-token.active-turn {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    background: linear-gradient(135deg, rgba(60, 40, 20, 0.9), rgba(80, 50, 30, 0.9));
+}
+
+.combat-token.defeated {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+
+.combat-token.player {
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.combat-token.player:hover {
+    border-color: rgba(76, 175, 80, 0.8);
+}
+
+.turn-indicator {
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold-bright);
+    font-size: 1.2rem;
+    animation: pulse-indicator 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-indicator {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.token-icon {
+    font-size: 2rem;
+    color: var(--gold);
+    min-width: 40px;
+    text-align: center;
+}
+
+.combat-token.player .token-icon {
+    color: rgba(76, 175, 80, 0.9);
+}
+
+.token-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.token-name {
+    font-family: var(--font-medieval);
+    font-size: 0.95rem;
+    color: var(--gold-bright);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.token-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.token-hp {
+    font-weight: 600;
+}
+
+.token-separator {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.token-ac {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.token-defeated {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .combat-panel-bottom {
+        max-height: 160px;
+    }
+
+    .combat-token {
+        min-width: 180px;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .token-icon {
+        font-size: 1.5rem;
+    }
+}

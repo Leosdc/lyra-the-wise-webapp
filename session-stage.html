@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atrium Arcano | Lyra the Wise</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Grenze+Gotisch:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Base Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/modules/session-stage.css">
+    <link rel="stylesheet" href="css/modules/atrium-addons.css">
+    <!-- Combat UI will be integrated into session-stage.css or a new sidebar-combat.css -->
+
+    <!-- CRITICAL: Load theme BEFORE rendering to prevent flash -->
+    <script>
+        // Apply theme from localStorage immediately
+        const theme = localStorage.getItem('lyra_theme') || 'lyra';
+        document.documentElement.classList.add(`theme-${theme}`);
+    </script>
+</head>
+
+<body class="session-stage-body">
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="medieval-spinner"></div>
+            <p id="loader-message">Invocando o Palco...</p>
+        </div>
+    </div>
+
+    <div class="stage-container">
+        <!-- Sidebar Esquerda: Ações Contextuais -->
+        <aside class="stage-sidebar left-sidebar hidden" id="actions-sidebar">
+            <div class="sidebar-header">
+                <h3 id="sidebar-role-title">Comandos do Mestre</h3>
+                <!-- Removed: Refresh button (useless) -->
+            </div>
+            <div class="sidebar-content">
+                <!-- Modo Narrativo: Vazio (como solicitado) -->
+                <div id="narrative-actions-container">
+                    <div id="contextual-actions">
+                        <!-- O conteúdo narrativo de resumo/atmosfera foi removido -->
+                    </div>
+                </div>
+
+                <!-- Modo Combate: Ordem de Iniciativa e Alvos -->
+                <div id="combat-actions-container" class="hidden">
+                    <div class="combat-header-mini">
+                        <span class="combat-round-label">⚔️ Rodada <strong id="sidebar-combat-round">1</strong></span>
+                        <div class="combat-status-badge" id="combat-turn-status">Aguardando...</div>
+                    </div>
+                    <div class="combat-list-vertical" id="sidebar-combat-list">
+                        <!-- Combatentes serão inseridos aqui -->
+                    </div>
+                    <div class="combat-footer-actions">
+                        <button class="medieval-btn gold-btn" id="btn-sidebar-end-turn" disabled>
+                            <i class="fas fa-forward"></i> Finalizar Turno
+                        </button>
+                        <button class="medieval-btn crimson-btn hidden" id="btn-sidebar-force-end-combat">
+                            <i class="fas fa-skull"></i> Finalizar Batalha
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer" style="flex-direction: column; gap: 10px;">
+                <button class="medieval-btn small" id="btn-exit-atrium" style="width: 100%;">
+                    <i class="fas fa-door-open"></i> Sair do Atrium (Fechar)
+                </button>
+                <button class="medieval-btn small gold-btn" id="btn-end-session" style="width: 100%;">
+                    <i class="fas fa-flag-checkered"></i> Concluir Capítulo
+                </button>
+            </div>
+        </aside>
+
+        <!-- Área Central: Quadro Narrativo -->
+        <main class="stage-main">
+            <div class="stage-header">
+                <div class="header-left">
+                    <h2 id="session-title">Carregando Sessão...</h2>
+                    <div class="session-meta">
+                        <span id="player-count"><i class="fas fa-users"></i> 0 Aventureiros</span>
+                        <span id="session-status"><i class="fas fa-circle-notch fa-spin"></i> Sincronizando...</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="medieval-btn gold-btn" id="btn-hero-actions">
+                        <i class="fas fa-suitcase"></i> MOCHILA DO HERÓI
+                    </button>
+                </div>
+            </div>
+
+            <div class="narrative-board">
+                <div class="narrative-content" id="narrative-text">
+                    <div class="welcome-msg">
+                        <i class="fas fa-wand-magic-sparkles fa-3x"></i>
+                        <p>O Palco está pronto. Aguardando a manifestação da história pelo Mestre...</p>
+                    </div>
+                </div>
+                <div class="narrative-overlay"></div>
+            </div>
+        </main>
+
+        <!-- Sidebar Direita: Chat Integrado -->
+        <aside class="stage-sidebar right-sidebar">
+            <div class="sidebar-header">
+                <h3>Chat da Sessão</h3>
+            </div>
+
+            <!-- Allied Characters Block (Players & NPCs) -->
+            <div class="allied-characters-block" id="allied-characters-container">
+                <div class="allied-list-header">
+                    <i class="fas fa-shield-halved"></i> Personagens Aliados
+                </div>
+                <div class="allied-list-content" id="allied-list">
+                    <!-- Allies will be rendered here -->
+                    <p class="empty-msg-sml">Nenhum aliado no palco...</p>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div id="session-messages" class="chat-messages"></div>
+                <div class="chat-input-area">
+                    <textarea id="chat-input" placeholder="Sussurre ou proclame sua ação..."></textarea>
+                    <button id="send-chat-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scroll Indicators (HIDDEN PER USER REQUEST) -->
+    <!-- <div id="scroll-up" class="scroll-indicator hidden"><i class="fas fa-chevron-up"></i></div>
+    <div id="scroll-down" class="scroll-indicator hidden"><i class="fas fa-chevron-down"></i></div> -->
+
+    <!-- Modals -->
+    <div id="modal-container"></div>
+
+    <!-- Firebase & Modules -->
+    <script type="module" src="js/modules/session-stage.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "lyra-the-wise",
+  "version": "2.8.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.19.2",
+    "firebase": "^10.7.1",
+    "firebase-admin": "^12.0.0",
+    "markdown-it": "^14.1.1",
+    "vite": "^5.4.21"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "acorn": "^8.15.0"
+  }
+}

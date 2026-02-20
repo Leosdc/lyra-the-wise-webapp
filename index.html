@@ -1,0 +1,3281 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyra the Wise - RPG WebApp</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/assets/tokens/lyra.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Grenze+Gotisch:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/modules/gm-panel.css">
+    <link rel="stylesheet" href="css/modules/presence.css">
+    <link rel="stylesheet" href="css/modules/sessions.css">
+    <link rel="stylesheet" href="css/modules/sessions-lobby.css">
+</head>
+
+<body class="medieval-theme cursor-sword-gold">
+
+    <div id="app-overlay"></div>
+
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo-container">
+                    <img src="/assets/Lyra_logo.png" alt="Lyra the Wise" class="header-logo">
+                </div>
+                <button id="home-btn" class="medieval-btn small icon-only" title="Início"><i
+                        class="fas fa-home"></i></button>
+                <div id="alpha-badge" class="alpha-badge hidden">
+                    <i class="fas fa-flask"></i> ALPHA TESTER
+                </div>
+                <div class="header-menu-container">
+                    <button id="menu-btn" class="medieval-btn small"><i class="fas fa-bars"></i> Menu</button>
+                    <div class="header-dropdown-content parchment">
+                        <div class="dropdown-sections">
+                            <div class="dropdown-column">
+                                <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
+                                <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i>
+                                    Personagens</button>
+                                <button class="nav-btn" data-view="monstros-selection"><i class="fas fa-dragon"></i>
+                                    Bestiário</button>
+                                <button class="nav-btn" data-view="villains-selection"><i class="fas fa-mask"></i>
+                                    Vilões</button>
+                                <button class="nav-btn" data-view="npcs-selection"><i class="fas fa-users-gear"></i>
+                                    NPCs</button>
+
+                            </div>
+                            <div class="dropdown-column">
+                                <h3><i class="fas fa-chess-board"></i> Mestre de Masmorras</h3>
+                                <button class="nav-btn" data-action="gm-screen"><i class="fas fa-desktop"></i> Painel do
+                                    Mestre</button>
+                                <button class="nav-btn" data-view="campaigns-selection"><i
+                                        class="fas fa-map-location-dot"></i>
+                                    Campanhas</button>
+                                <button class="nav-btn" data-view="encounters-selection"><i class="fas fa-shield"></i>
+                                    Encontros</button>
+                                <button class="nav-btn" data-view="armadilhas-selection"><i
+                                        class="fas fa-skull-crossbones"></i>
+                                    Armadilhas</button>
+                                <button class="nav-btn" data-view="puzzles-selection"><i
+                                        class="fas fa-puzzle-piece"></i>
+                                    Puzzles</button>
+                                <button class="nav-btn" data-view="treasures-selection"><i class="fas fa-coins"></i>
+                                    Tesouros</button>
+                            </div>
+                            <div class="dropdown-column">
+                                <h3><i class="fas fa-journal-whills"></i> Trama & Saber</h3>
+                                <button class="nav-btn" data-view="chat"><i class="fas fa-comment-dots"></i> Fale com
+                                    Lyra</button>
+                                <button class="nav-btn" data-view="sessoes"><i class="fas fa-scroll"></i>
+                                    Sessões</button>
+                                <button class="nav-btn" data-view="scenes-selection"><i class="fas fa-image"></i>
+                                    Cenas</button>
+                                <button class="nav-btn" data-view="plots-selection"><i
+                                        class="fas fa-wand-magic-sparkles"></i> Tramas</button>
+                                <button class="nav-btn" data-view="motivations-selection"><i
+                                        class="fas fa-heart-pulse"></i>
+                                    Motivações</button>
+                                <button class="nav-btn" data-view="rules-selection"><i class="fas fa-book-open"></i>
+                                    Regras</button>
+                                <button class="nav-btn" data-view="names"><i class="fas fa-list-ol"></i>
+                                    Nomes</button>
+                                <button class="nav-btn" data-action="dice-roller"><i class="fas fa-dice-d20"></i>
+                                    Dados</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="header-char-tracker" class="header-center hidden">
+                <div class="header-token-wrapper">
+                    <img id="header-token" src="/assets/tokens/lyra.png" alt="Token">
+                </div>
+                <div id="header-char-info" class="tracker-info">
+                    <div class="header-name-row">
+                        <span id="header-name">Nome do Herói</span>
+                        <span id="header-info" class="header-sub">Raça Classe (Nív 1)</span>
+                    </div>
+                    <div class="header-stats-row">
+                        <div class="header-hp-container" title="Pontos de Vida">
+                            <div id="header-hp-bar" class="header-hp-fill"></div>
+                            <span id="header-hp-text">10/10</span>
+                        </div>
+                        <div class="header-stat-badge" title="Iniciativa">
+                            <i class="fas fa-bolt"></i>
+                            <span class="label">INI</span>
+                            <span id="header-ini-val">+0</span>
+                        </div>
+                        <div class="header-stat-badge" title="Classe de Armadura">
+                            <i class="fas fa-shield-halved"></i>
+                            <span class="label">CA</span>
+                            <span id="header-ac-val">10</span>
+                        </div>
+                        <div class="header-stat-badge" title="Bônus de Proficiência">
+                            <i class="fas fa-scroll"></i>
+                            <span class="label">PROF</span>
+                            <span id="header-prof-val">+2</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="char-switcher-container">
+                    <button id="switch-char-btn" class="medieval-btn small"><i class="fas fa-exchange-alt"></i></button>
+                    <div id="char-switcher-dropdown" class="char-switcher-dropdown hidden">
+                        <div class="dropdown-header">
+                            <strong>Trocar Personagem</strong>
+                        </div>
+                        <div class="dropdown-scroll-wrapper">
+                            <i class="fas fa-chevron-up dropdown-scroll-arrow up hidden"></i>
+                            <div id="char-switcher-list" class="char-switcher-list">
+                                <!-- Populated by JS -->
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-scroll-arrow down hidden"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-controls">
+                <div class="custom-select-container" id="system-selector-container">
+                    <div class="custom-select-trigger" id="system-selector-trigger">
+                        <span id="system-selector-text">D&D 5ª Edição</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="custom-select-options-wrapper hidden" id="system-selector-options-wrapper">
+                        <i class="fas fa-chevron-up dropdown-scroll-arrow up hidden"></i>
+                        <div class="custom-select-options" id="system-selector-options">
+                            <!-- Options populated by JS -->
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-scroll-arrow down hidden"></i>
+                    </div>
+                    <input type="hidden" id="system-selector" value="dnd5e">
+                </div>
+
+                <div id="gm-mini-music" class="mini-music-control custom-select-trigger hidden"
+                    style="padding: 0 1rem; width: auto; gap: 15px; cursor: auto;">
+                    <button id="btn-play-pause-mini" title="Música Arcana">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="volume-container" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="range" id="player-volume-mini" min="0" max="1" step="0.1" value="0.5"
+                            style="width: 70px;">
+                    </div>
+                </div>
+
+                <div id="user-profile-actions" class="user-profile-actions hidden">
+                    <div class="notification-wrapper">
+                        <button id="changelog-btn" class="medieval-btn small icon-only" title="Novidades">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">!</span>
+                        </button>
+                    </div>
+                    <button id="settings-btn" class="medieval-btn small icon-only" title="Configurações"><i
+                            class="fas fa-cog"></i></button>
+                    <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav id="side-menu" class="side-menu hidden">
+        <div class="menu-overlay"></div>
+        <div class="menu-content parchment">
+            <button class="close-menu close-modal"><i class="fas fa-times"></i></button>
+
+            <div class="menu-section" data-section="creation">
+                <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
+                <div class="menu-grid">
+                    <button class="nav-btn" data-view="fichas"><i class="fas fa-user-shield"></i> Personagens</button>
+                    <button class="nav-btn" data-view="itens-selection"><i class="fas fa-gem"></i> Itens</button>
+                    <button class="nav-btn" data-view="grimorio"><i class="fas fa-book-journal-whills"></i>
+                        Grimório</button>
+                    <button class="nav-btn" data-view="monstros-selection"><i class="fas fa-dragon"></i>
+                        Bestiário</button>
+                    <button class="nav-btn" data-view="armadilhas-selection"><i class="fas fa-skull-crossbones"></i>
+                        Armadilhas</button>
+
+                    <button class="nav-btn" data-view="villains-selection"><i class="fas fa-mask"></i> Vilões</button>
+                    <button class="nav-btn" data-view="npcs-selection"><i class="fas fa-users-gear"></i> NPCs</button>
+                </div>
+            </div>
+
+            <div class="menu-section" data-section="mestre">
+                <h3><i class="fas fa-chess-board"></i> Mestre de Masmorras</h3>
+                <div class="menu-grid">
+                    <button class="nav-btn" data-action="gm-screen"><i class="fas fa-desktop"></i> Painel do
+                        Mestre</button>
+                    <button class="nav-btn" data-view="campaigns-selection"><i class="fas fa-map-location-dot"></i>
+                        Campanhas</button>
+                    <button class="nav-btn" data-view="encounters-selection"><i class="fas fa-shield"></i>
+                        Encontros</button>
+                    <button class="nav-btn" data-view="armadilhas-selection"><i class="fas fa-skull-crossbones"></i>
+                        Armadilhas</button>
+                    <button class="nav-btn" data-view="puzzles-selection"><i class="fas fa-puzzle-piece"></i>
+                        Puzzles</button>
+                    <button class="nav-btn" data-view="treasures-selection"><i class="fas fa-coins"></i>
+                        Tesouros</button>
+                </div>
+            </div>
+
+            <div class="menu-section" data-section="chronicles">
+                <h3><i class="fas fa-journal-whills"></i> Trama & Saber</h3>
+                <div class="menu-grid">
+                    <button class="nav-btn" data-view="chat"><i class="fas fa-comment-dots"></i> Fale com Lyra</button>
+                    <button class="nav-btn" data-view="sessoes"><i class="fas fa-scroll"></i> Sessões</button>
+                    <button class="nav-btn" data-view="scenes-selection"><i class="fas fa-image"></i> Cenas</button>
+                    <button class="nav-btn" data-view="plots-selection"><i class="fas fa-wand-magic-sparkles"></i>
+                        Tramas</button>
+                    <button class="nav-btn" data-view="motivations-selection"><i class="fas fa-heart-pulse"></i>
+                        Motivações</button>
+                    <button class="nav-btn" data-view="rules-selection"><i class="fas fa-book-open"></i> Regras</button>
+                    <button class="nav-btn" data-view="names"><i class="fas fa-list-ol"></i> Nomes</button>
+                    <button class="nav-btn" data-action="dice-roller"><i class="fas fa-dice-d20"></i> Dados</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <!-- Dashboard View -->
+        <section id="dashboard" class="view hidden">
+            <div class="hero-section">
+                <div class="hero-content-wrapper">
+                    <div id="hero-lyrics" class="lyrics-container">
+                        <p class="lyric-line prev"></p>
+                        <p class="lyric-line active">...</p>
+                        <p class="lyric-line next"></p>
+                    </div>
+
+                    <div class="hero-artwork">
+                        <img src="/assets/Lyra_the_wise.png" alt="Lyra" class="hero-lyra">
+                    </div>
+                    <div class="lyra-story">
+                        <div class="scroll-container">
+                            <div class="scroll-paper">
+                                <h3 class="scroll-title">Sabedoria Arcana</h3>
+                                <p id="rpg-trivia">Consultando os anais do multiverso...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <!-- Admin & Core (Pulsing) -->
+                    <button id="admin-portal-btn" class="action-card portal-card pulse-crimson hidden"
+                        data-view="portal">
+                        <i class="fas fa-dungeon"></i>
+                        <span>Portal do GM</span>
+                        <div class="portal-pulse pulse-crimson"></div>
+                    </button>
+                    <button class="action-card portal-card pulse-crimson" data-action="gm-screen">
+                        <i class="fas fa-desktop"></i>
+                        <span>Painel do Mestre</span>
+                        <div class="portal-pulse pulse-crimson"></div>
+                    </button>
+                    <button class="action-card portal-card pulse-gold" data-view="sessoes">
+                        <i class="fas fa-scroll"></i>
+                        <span>Sessões</span>
+                        <div class="portal-pulse pulse-gold"></div>
+                    </button>
+                    <button id="chat-portal-btn" class="action-card portal-card pulse-blue" data-view="chat">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>Fale com Lyra</span>
+                        <div class="portal-pulse pulse-blue"></div>
+                    </button>
+
+                    <!-- Criação Arcaica -->
+                    <button class="action-card" data-view="fichas">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Personagens</span>
+                    </button>
+                    <button class="action-card" data-view="itens-selection">
+                        <i class="fas fa-gem"></i>
+                        <span>Itens</span>
+                    </button>
+                    <button class="action-card" data-view="grimorio-selection">
+                        <i class="fas fa-book-journal-whills"></i>
+                        <span>Grimório</span>
+                    </button>
+                    <button class="action-card" data-view="monstros-selection">
+                        <i class="fas fa-dragon"></i>
+                        <span>Bestiário</span>
+                    </button>
+                    <button class="action-card" data-view="armadilhas-selection">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>Armadilhas</span>
+                    </button>
+                    <button class="action-card" data-view="villains-selection">
+                        <i class="fas fa-mask"></i>
+                        <span>Vilões</span>
+                    </button>
+                    <button class="action-card" data-view="npcs-selection">
+                        <i class="fas fa-users-gear"></i>
+                        <span>NPCs</span>
+                    </button>
+
+                    <!-- Mestre de Masmorras -->
+                    <button class="action-card" data-view="campaigns-selection">
+                        <i class="fas fa-map-location-dot"></i>
+                        <span>Campanhas</span>
+                    </button>
+                    <button class="action-card" data-view="encounters-selection">
+                        <i class="fas fa-shield"></i>
+                        <span>Encontros</span>
+                    </button>
+                    <button class="action-card" data-view="puzzles-selection">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Puzzles</span>
+                    </button>
+                    <button class="action-card" data-view="treasures-selection">
+                        <i class="fas fa-coins"></i>
+                        <span>Tesouros</span>
+                    </button>
+
+                    <!-- Trama & Saber -->
+                    <button class="action-card" data-view="community">
+                        <i class="fas fa-users"></i>
+                        <span>Comunidade</span>
+                    </button>
+                    <button class="action-card" data-view="scenes-selection">
+                        <i class="fas fa-image"></i>
+                        <span>Cenas</span>
+                    </button>
+                    <button class="action-card" data-view="plots-selection">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>Tramas</span>
+                    </button>
+                    <button class="action-card" data-view="motivations-selection">
+                        <i class="fas fa-heart-pulse"></i>
+                        <span>Motivações</span>
+                    </button>
+                    <button class="action-card" data-view="rules-selection">
+                        <i class="fas fa-book-open"></i>
+                        <span>Regras</span>
+                    </button>
+                    <button class="action-card" data-action="dice-roller">
+                        <i class="fas fa-dice-d20"></i>
+                        <span>Dados</span>
+                    </button>
+                    <button class="action-card" data-view="names">
+                        <i class="fas fa-list-ol"></i>
+                        <span>Nomes</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat View (Lyra Only) -->
+        <section id="chat" class="view hidden">
+            <div class="chat-container parchment">
+                <div class="chat-header">
+                    <h2><i class="fas fa-scroll"></i> Lyra (Arcana)</h2>
+                    <button id="chat-close-btn" class="chat-close-btn close-modal" title="Fechar Chat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Lyra Chat (Arcana) -->
+                <div id="lyra-chat-panel" class="chat-panel active">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Sua mensagem, viajante...">
+                        <button id="send-msg-btn" class="medieval-btn small">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community View (Standalone) -->
+        <section id="community" class="view hidden">
+            <div class="chat-container parchment community-layout">
+                <div class="community-main">
+                    <div class="chat-header">
+                        <h2><i class="fas fa-globe"></i> Guilda (Global)</h2>
+                        <button id="community-close-btn" class="chat-close-btn close-modal" title="Fechar">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div id="global-chat-messages" class="chat-messages community-chat">
+                        <p class="chat-notice">Buscando ecos do multiverso...</p>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="global-chat-input" placeholder="Diga algo à guilda...">
+                        <button id="send-global-msg" class="medieval-btn small">Gritar</button>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Online Users -->
+                <div class="community-sidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fas fa-circle-dot"></i> Viajantes</h3>
+                    </div>
+                    <div id="online-users-list" class="online-list">
+                        <!-- Mock Online Users + Contacts -->
+                        <div class="online-user">
+                            <div class="user-status online"></div>
+                            <span>Mestre dos Magos</span>
+                        </div>
+                        <div class="online-user">
+                            <div class="user-status online"></div>
+                            <span>Lyra (Bot)</span>
+                        </div>
+                        <!-- Valid Contacts loaded via JS -->
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Fichas View -->
+        <section id="fichas" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-user-shield"></i> Seus Personagens</h2>
+                <div class="header-actions">
+                    <button id="bulk-delete-fichas-btn" class="medieval-btn small secondary"><i
+                            class="fas fa-trash-can"></i>
+                        Excluir</button>
+                    <button id="show-wizard-btn" class="medieval-btn small"><i class="fas fa-plus"></i>
+                        Novo</button>
+                </div>
+            </div>
+            <div id="fichas-list" class="items-grid"></div>
+        </section>
+
+        <!-- Itens Selection View -->
+        <section id="itens-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-gem"></i> Biblioteca de Itens</h2>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Itens do Sistema</h3>
+                        <p>Acesse o catálogo completo de itens mágicos e equipamentos oficiais.</p>
+                    </div>
+                </div>
+
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Meus Itens Criados</h3>
+                        <p>Forge suas próprias relíquias e visualize o que foi compartilhado com você.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Itens View -->
+        <section id="itens" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-gem"></i> Galeria de Itens</h2>
+                <div class="header-actions">
+                    <button id="back-to-items-selection" class="medieval-btn small secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button id="items-new-btn" class="medieval-btn small">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Premium Redesigned Search & Filter Bar -->
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <span class="search-label-medieval">Pesquisar Arquivos</span>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="items-search" class="premium-search-input"
+                            placeholder="O que desejas encontrar?">
+                    </div>
+                </div>
+
+                <div class="category-nav-container">
+                    <div class="category-nav" id="items-category-nav">
+                        <button class="cat-btn active" data-type="all">Tudo</button>
+                        <button class="cat-btn" data-type="weapon">Armas</button>
+                        <button class="cat-btn" data-type="armor">Armaduras</button>
+                        <button class="cat-btn" data-type="wondrous">Magia</button>
+                        <button class="cat-btn" data-type="potion">Poções</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="items-grid" class="items-grid-layout">
+                <!-- Items populated by JS -->
+            </div>
+
+
+        </section>
+
+        <!-- Grimorio Selection View -->
+        <section id="grimorio-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-book-journal-whills"></i> Biblioteca Arcana</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Grimório do Sistema</h3>
+                        <p>Consulte os tomos antigos com todas as magias conhecidas.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon">
+                        <i class="fas fa-feather-alt"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Meu Grimório</h3>
+                        <p>Escreva seus próprios feitiços e rituais perdidos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grimorio View -->
+        <section id="grimorio" class="view hidden">
+            <div class="view-header">
+                <h2 id="grimoire-title"><i class="fas fa-book-journal-whills"></i> Grimório Místico</h2>
+                <div class="header-actions">
+                    <button id="back-to-spell-selection" class="medieval-btn small secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button id="spell-new-btn" class="medieval-btn small hidden">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
+                </div>
+            </div>
+
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <span class="search-label-medieval">Pesquisar Encantamentos</span>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="spell-search" class="premium-search-input"
+                            placeholder="Nome ou descrição...">
+                    </div>
+                </div>
+
+                <div class="filters-container">
+                    <select id="spell-level-filter" class="medieval-select small">
+                        <option value="all">Nível (Todos)</option>
+                        <option value="0">Truque</option>
+                        <option value="1">1º Nível</option>
+                        <option value="2">2º Nível</option>
+                        <option value="3">3º Nível</option>
+                        <option value="4">4º Nível</option>
+                        <option value="5">5º Nível</option>
+                        <option value="6">6º Nível</option>
+                        <option value="7">7º Nível</option>
+                        <option value="8">8º Nível</option>
+                        <option value="9">9º Nível</option>
+                    </select>
+
+                    <select id="spell-class-filter" class="medieval-select small">
+                        <option value="all">Classe (Todas)</option>
+                        <option value="Bardo">Bardo</option>
+                        <option value="Bruxo">Bruxo</option>
+                        <option value="Clérigo">Clérigo</option>
+                        <option value="Druida">Druida</option>
+                        <option value="Feiticeiro">Feiticeiro</option>
+                        <option value="Mago">Mago</option>
+                        <option value="Paladino">Paladino</option>
+                        <option value="Guarda">Guarda (Patrulheiro)</option>
+                    </select>
+
+                    <select id="spell-school-filter" class="medieval-select small">
+                        <option value="all">Escola (Todas)</option>
+                        <option value="abjuração">Abjuração</option>
+                        <option value="adivinhação">Adivinhação</option>
+                        <option value="conjuração">Conjuração</option>
+                        <option value="encantamento">Encantamento</option>
+                        <option value="evocação">Evocação</option>
+                        <option value="ilusão">Ilusão</option>
+                        <option value="necromancia">Necromancia</option>
+                        <option value="transmutação">Transmutação</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="spells-grid" class="items-grid">
+                <!-- Spells populated by JS -->
+            </div>
+        </section>
+
+        <!-- Monstros Selection View -->
+        <section id="monstros-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon">
+                        <i class="fas fa-skull"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Bestiário do Sistema</h3>
+                        <p>Consulte as estatísticas de monstros e criaturas lendárias.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="selection-info">
+                        <h3>Meus Monstros</h3>
+                        <p>Invoque suas próprias criações ou visualize monstros compartilhados.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monstros View -->
+        <section id="monstros" class="view hidden">
+            <div class="view-header">
+                <h2 id="monstros-title"><i class="fas fa-dragon"></i> Bestiário Arcano</h2>
+                <div class="header-actions">
+                    <button id="back-to-monstros-selection" class="medieval-btn small secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button id="monstros-new-btn" class="medieval-btn small hidden">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
+                </div>
+            </div>
+
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <span class="search-label-medieval">Pesquisar Criaturas</span>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="monstros-search" class="premium-search-input"
+                            placeholder="Nome ou descrição...">
+                    </div>
+                </div>
+
+                <div class="filters-container">
+                    <select id="monstros-filter-cr" class="medieval-select small">
+                        <option value="all">ND (Todos)</option>
+                        <option value="0">0</option>
+                        <option value="1/8">1/8</option>
+                        <option value="1/4">1/4</option>
+                        <option value="1/2">1/2</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10+">10+</option>
+                        <option value="20+">20+</option>
+                        <option value="30">30</option>
+                    </select>
+
+                    <select id="monstros-filter-type" class="medieval-select small">
+                        <option value="all">Tipo (Todos)</option>
+                        <option value="aberração">Aberração</option>
+                        <option value="besta">Besta</option>
+                        <option value="celestial">Celestial</option>
+                        <option value="constructo">Constructo</option>
+                        <option value="dragão">Dragão</option>
+                        <option value="elemental">Elemental</option>
+                        <option value="fada">Fada</option>
+                        <option value="ínfero">Ínfero</option>
+                        <option value="gigante">Gigante</option>
+                        <option value="humanoide">Humanoide</option>
+                        <option value="monstruosidade">Monstruosidade</option>
+                        <option value="gosma">Gosma</option>
+                        <option value="planta">Planta</option>
+                        <option value="morto-vivo">Morto-Vivo</option>
+                    </select>
+
+                    <select id="monstros-filter-size" class="medieval-select small">
+                        <option value="all">Tamanho (Todos)</option>
+                        <option value="Miúdo">Miúdo</option>
+                        <option value="Pequeno">Pequeno</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Grande">Grande</option>
+                        <option value="Enorme">Enorme</option>
+                        <option value="Imenso">Imenso</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="monstros-grid" class="items-grid-layout">
+                <!-- Monsters populated by JS -->
+            </div>
+        </section>
+
+        <!-- Armadilhas selection -->
+        <section id="armadilhas-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-skull-crossbones"></i> Biblioteca de Armadilhas</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-skull"></i></div>
+                    <div class="selection-info">
+                        <h3>Sistema</h3>
+                        <p>Armadilhas oficiais e perigos ambientais.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-hammer"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Armadilhas</h3>
+                        <p>Gerencie seus próprios mecanismos mortais.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="armadilhas" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-skull-crossbones"></i> Armadilhas</h2>
+                <div class="header-actions">
+                    <button id="back-to-armadilhas-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="armadilhas-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="armadilhas-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="armadilhas-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Sessoes View -->
+        <!-- Sessões - Tela de Seleção -->
+        <section id="sessoes" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-scroll"></i> Sessões</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-target="my-sessions">
+                    <div class="selection-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus Registros</h3>
+                        <p>Sessões que você participa ou criou.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-target="public-sessions">
+                    <div class="selection-icon"><i class="fas fa-globe"></i></div>
+                    <div class="selection-info">
+                        <h3>Sessões Públicas</h3>
+                        <p>Encontre aventuras abertas para participar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Meus Registros -->
+        <section id="my-sessions" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-book-open"></i> Meus Registros</h2>
+                <div class="header-actions">
+                    <button class="medieval-btn small secondary" onclick="app.goBack()">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            </div>
+            <div id="invites-list" class="invites-container"></div>
+            <div id="sessions-list" class="items-grid"></div>
+        </section>
+
+        <!-- Sessões Públicas -->
+        <section id="public-sessions" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-globe"></i> Sessões Públicas</h2>
+                <div class="header-actions">
+                    <button class="medieval-btn small" onclick="PublicSessionsModule.loadPublicSessions()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                    <button class="medieval-btn small secondary" onclick="app.goBack()">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            </div>
+            <!-- Filtros -->
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="public-sessions-search" class="premium-search-input"
+                            placeholder="Buscar por título...">
+                    </div>
+                </div>
+                <select id="filter-status" class="premium-select">
+                    <option value="">Todos os Status</option>
+                    <option value="preparing">Preparando</option>
+                    <option value="active">Em Andamento</option>
+                </select>
+            </div>
+            <div id="public-sessions-list" class="items-grid"></div>
+        </section>
+
+
+        <!-- Generic Template for Selection Views -->
+        <!-- Will be reused or duplicated for each module if needed for different icons/texts -->
+
+        <!-- NPCs Selection -->
+        <section id="npcs-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-user-friends"></i> Biblioteca de Personagens (NPCs)</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-users"></i></div>
+                    <div class="selection-info">
+                        <h3>Catálogo do Sistema</h3>
+                        <p>Consultar NPCs oficiais (Atualmente vazio).</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-id-card"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus NPCs</h3>
+                        <p>Gerencie seus próprios PdMs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="npcs" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-users-gear"></i> NPCs</h2>
+                <div class="header-actions">
+                    <button id="back-to-npcs-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="npcs-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="npcs-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="npcs-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Similar blocks for other modules... (I'll add them all now) -->
+        <!-- Vilões -->
+        <section id="villains-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-mask"></i> Covil de Vilões</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-skull"></i></div>
+                    <div class="selection-info">
+                        <h3>Sistema</h3>
+                        <p>Vilões clássicos.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-user-ninja"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus Vilões</h3>
+                        <p>Seus antagonistas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="villains" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-mask"></i> Vilões</h2>
+                <div class="header-actions">
+                    <button id="back-to-villains-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="villains-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="villains-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="villains-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Campanhas -->
+        <section id="campaigns-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-map"></i> Crônicas & Campanhas</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-book"></i></div>
+                    <div class="selection-info">
+                        <h3>Módulos</h3>
+                        <p>Módulos oficiais.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-scroll"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Campanhas</h3>
+                        <p>Suas histórias.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="campaigns" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-map-location-dot"></i> Campanhas</h2>
+                <div class="header-actions">
+                    <button id="back-to-campaigns-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="campaigns-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="campaigns-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="campaigns-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Encontros -->
+        <section id="encounters-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-shield"></i> Planejador de Encontros</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-shield"></i></div>
+                    <div class="selection-info">
+                        <h3>Padrão</h3>
+                        <p>Tabelas de encontro.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-crosshairs"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus Encontros</h3>
+                        <p>Seus desafios prontos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="encounters" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-shield"></i> Encontros</h2>
+                <div class="header-actions">
+                    <button id="back-to-encounters-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="encounters-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="encounters-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="encounters-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Puzzles -->
+        <section id="puzzles-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-puzzle-piece"></i> Enigmas & Puzzles</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-brain"></i></div>
+                    <div class="selection-info">
+                        <h3>Arquivos</h3>
+                        <p>Enigmas clássicos.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-key"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus Puzzles</h3>
+                        <p>Suas charadas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="puzzles" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-puzzle-piece"></i> Puzzles</h2>
+                <div class="header-actions">
+                    <button id="back-to-puzzles-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="puzzles-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="puzzles-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="puzzles-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Tesouros -->
+        <section id="treasures-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-coins"></i> Tesouros & Recompensas</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="selection-info">
+                        <h3>Tabelas</h3>
+                        <p>Tabelas de saque.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-coins"></i></div>
+                    <div class="selection-info">
+                        <h3>Meus Tesouros</h3>
+                        <p>Lotes e recompensas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="treasures" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-coins"></i> Tesouros</h2>
+                <div class="header-actions">
+                    <button id="back-to-treasures-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="treasures-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="treasures-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="treasures-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Cenas -->
+        <section id="scenes-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-image"></i> Descrição de Cenas</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-palette"></i></div>
+                    <div class="selection-info">
+                        <h3>Arquivo</h3>
+                        <p>Cenas prontas.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-pen-nib"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Cenas</h3>
+                        <p>Seus quadros narrativos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="scenes" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-image"></i> Cenas</h2>
+                <div class="header-actions">
+                    <button id="back-to-scenes-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="scenes-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="scenes-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="scenes-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Tramas -->
+        <section id="plots-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-magic"></i> Tramas & Arcos</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-book"></i></div>
+                    <div class="selection-info">
+                        <h3>Arquivo</h3>
+                        <p>Ideias de tramas.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-scroll"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Tramas</h3>
+                        <p>Seus fios narrativos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="plots" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-wand-magic-sparkles"></i> Tramas</h2>
+                <div class="header-actions">
+                    <button id="back-to-plots-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="plots-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="plots-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="plots-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Motivações -->
+        <section id="motivations-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-heartbeat"></i> Motivações & Desejos</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-fire"></i></div>
+                    <div class="selection-info">
+                        <h3>Arquivo</h3>
+                        <p>Motivos clássicos.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-heart"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Motivações</h3>
+                        <p>Seus gatilhos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="motivations" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-heart-pulse"></i> Motivações</h2>
+                <div class="header-actions">
+                    <button id="back-to-motivations-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="motivations-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i>
+                        Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="motivations-search"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="motivations-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Regras -->
+        <section id="rules-selection" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-book-open"></i> Regras & Homebrews</h2>
+            </div>
+            <div class="selection-grid">
+                <div class="selection-card" data-source="system">
+                    <div class="selection-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="selection-info">
+                        <h3>Sistema</h3>
+                        <p>Regras oficiais.</p>
+                    </div>
+                </div>
+                <div class="selection-card" data-source="personal">
+                    <div class="selection-icon"><i class="fas fa-feather-pointed"></i></div>
+                    <div class="selection-info">
+                        <h3>Minhas Regras</h3>
+                        <p>Suas mecânicas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="rules" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-book-open"></i> Regras</h2>
+                <div class="header-actions">
+                    <button id="back-to-rules-selection" class="medieval-btn small secondary"><i
+                            class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="rules-new-btn" class="medieval-btn small"><i class="fas fa-plus"></i> Novo</button>
+                </div>
+            </div>
+            <div class="items-controls-bar">
+                <div class="items-search-container">
+                    <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="rules-search-input"
+                            class="premium-search-input" placeholder="Pesquisar..."></div>
+                </div>
+            </div>
+            <div id="rules-grid" class="items-grid-layout"></div>
+        </section>
+
+        <!-- Nomes Section -->
+        <section id="names" class="view hidden">
+            <div class="view-header">
+                <h2><i class="fas fa-wand-magic-sparkles"></i> Gerador de Nomes</h2>
+            </div>
+            <div class="parchment names-container">
+                <div class="names-controls-bar">
+                    <div class="filter-group">
+                        <label>Raça</label>
+                        <select id="names-race-filter" class="medieval-select">
+                            <option value="">Qualquer Raça</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Classe (Opcional)</label>
+                        <select id="names-class-filter" class="medieval-select">
+                            <option value="">Qualquer Classe</option>
+                        </select>
+                    </div>
+                    <div class="filter-group gender-group">
+                        <label>Sexo</label>
+                        <div class="radio-filters">
+                            <label><input type="radio" name="names-gender" value="masculino"> <span>Masc</span></label>
+                            <label><input type="radio" name="names-gender" value="feminino"> <span>Fem</span></label>
+                            <label><input type="radio" name="names-gender" value="unissex" checked>
+                                <span>Ambos</span></label>
+                        </div>
+                    </div>
+                    <button id="generate-names-btn" class="medieval-btn gold-pulse">Gerar 10 Nomes</button>
+                </div>
+
+                <div id="names-display-box" class="names-display-box">
+                    <p class="empty-names-msg">Os deuses aguardam sua escolha...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Menu de Confirmação Customizado -->
+
+
+    <!-- Modals & Wizards -->
+    <div id="modal-wrapper" class="hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content parchment">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <div id="detail-container" class="hidden"></div> <!-- Added detail container -->
+
+            <!-- Community Contacts Modal Removed -->
+
+            <div id="modal-body">
+                <!-- Painel de Configurações Arcanas -->
+                <div id="settings-modal" class="wizard-container hidden">
+                    <h2 class="scroll-title">Ajustes do Perfil</h2>
+                    <div class="settings-content">
+                        <div class="form-group">
+                            <label>Apelido Arcano <span style="color: var(--gold); font-size: 1.2rem;">*</span></label>
+                            <input type="text" id="setting-nickname" class="medieval-input"
+                                placeholder="Seu nome de aventureiro">
+                            <small class="hint-text" style="display: block; margin-top: 5px;">Obrigatório para o chat
+                                global da comunidade.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp (Opcional)</label>
+                            <input type="text" id="setting-whatsapp" class="medieval-input"
+                                placeholder="Para contato entre guildas">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição do Aventureiro</label>
+                            <textarea id="setting-bio" class="medieval-textarea"
+                                placeholder="Conte sua lenda..."></textarea>
+                        </div>
+
+                        <h3 class="settings-subtitle">Configurações de Áudio</h3>
+                        <div class="form-group setting-row"
+                            style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; flex-direction: column;">
+                                <span class="setting-label">Reproduzir Música Automaticamente</span>
+                                <small class="hint-text toggle-hint" style="margin: 0; padding-top: 5px;">Se desativado,
+                                    a música não tocará ao iniciar.</small>
+                            </div>
+                            <label class="medieval-switch">
+                                <input type="checkbox" id="setting-autoplay" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Arsenal de Cursores</label>
+                            <div class="cursor-grid" id="cursor-selector">
+                                <!-- Swords -->
+                                <div class="cursor-option" data-cursor="sword-gold" title="Espada Dourada"><img
+                                        src="assets/cursors/sword_gold.png"></div>
+                                <div class="cursor-option" data-cursor="sword-silver" title="Espada de Prata"><img
+                                        src="assets/cursors/sword_silver.png"></div>
+                                <div class="cursor-option" data-cursor="sword-crimson" title="Lâmina Carmesim"><img
+                                        src="assets/cursors/sword_crimson.png"></div>
+                                <div class="cursor-option" data-cursor="sword-shadow" title="Espada Sombria"><img
+                                        src="assets/cursors/sword_shadow.png"></div>
+                                <div class="cursor-option" data-cursor="sword-emerald" title="Lâmina de Esmeralda">
+                                    <img src="assets/cursors/sword_emerald.png">
+                                </div>
+                                <!-- Staffs -->
+                                <div class="cursor-option" data-cursor="staff-crystal" title="Cajado de Cristal">
+                                    <img src="assets/cursors/staff_crystal.png">
+                                </div>
+                                <div class="cursor-option" data-cursor="staff-sunlight" title="Cajado Solar"><img
+                                        src="assets/cursors/staff_sunlight.png"></div>
+                                <div class="cursor-option" data-cursor="staff-lunar" title="Cajado Lunar"><img
+                                        src="assets/cursors/staff_lunar.png"></div>
+                                <div class="cursor-option" data-cursor="staff-shadow" title="Cajado Sombrio"><img
+                                        src="assets/cursors/staff_shadow.png"></div>
+                                <div class="cursor-option" data-cursor="staff-emerald" title="Cajado de Esmeralda">
+                                    <img src="assets/cursors/staff_emerald.png">
+                                </div>
+                                <!-- Potions -->
+                                <div class="cursor-option" data-cursor="potion-red" title="Poção de Vida"><img
+                                        src="assets/cursors/potion_red.png"></div>
+                                <div class="cursor-option" data-cursor="potion-blue" title="Poção de Mana"><img
+                                        src="assets/cursors/potion_blue.png"></div>
+                            </div>
+                        </div>
+                        <div class="settings-actions">
+                            <button id="save-settings-btn" class="medieval-btn">Consagrar Alterações</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wizard Steps (Characters) -->
+                <div id="creation-wizard" class="wizard-container hidden">
+                    <div id="char-choice-step" class="wizard-step" data-step="0">
+                        <h3>Como deseja criar, viajante?</h3>
+                        <div class="mode-choices">
+                            <button class="choice-card" data-mode="ai">
+                                <i class="fas fa-wand-magic-sparkles"></i>
+                                <h4>Com Lyra</h4>
+                                <p>A Magia tecerá os detalhes arcanos para você.</p>
+                            </button>
+                            <button class="choice-card" data-mode="manual">
+                                <i class="fas fa-feather-pointed"></i>
+                                <h4>Manualmente</h4>
+                                <p>Você mesmo escreve cada detalhe da sua história.</p>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="wizard-progress hidden">
+                        <div class="step-indicator active" data-step="1">1</div>
+                        <div class="step-indicator" data-step="2">2</div>
+                        <div class="step-indicator" data-step="3">3</div>
+                        <div class="step-indicator" data-step="4">4</div>
+                        <div class="step-indicator" data-step="5">5</div>
+                    </div>
+                    <!-- Steps content... same as before -->
+                    <div class="wizard-step" data-step="1">
+                        <h3>Origens</h3>
+                        <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
+                                placeholder="Ex: Valerius"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Raça</label>
+                                <select id="wiz-race" class="medieval-select" required>
+                                    <option value="">Carregando...</option> <!-- Will be populated by JS -->
+                                </select>
+                                <div id="wiz-subrace-container" class="hidden" style="margin-top: 5px;">
+                                    <select id="wiz-subrace" class="medieval-select small">
+                                        <option value="">Selecione Sub-raça</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Classe</label>
+                                <select id="wiz-class" class="medieval-select" required>
+                                    <option value="">Carregando...</option> <!-- Will be populated by JS -->
+                                </select>
+                                <div id="wiz-archetype-container" class="hidden" style="margin-top: 5px;">
+                                    <select id="wiz-archetype" class="medieval-select small">
+                                        <option value="">Selecione Arquétipo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Alinhamento</label>
+                                <select id="wiz-alignment" class="medieval-select">
+                                    <option value="Leal e Bom">Leal e Bom</option>
+                                    <option value="Neutro e Bom">Neutro e Bom</option>
+                                    <option value="Caótico e Bom">Caótico e Bom</option>
+                                    <option value="Leal e Neutro">Leal e Neutro</option>
+                                    <option value="Neutro">Neutro</option>
+                                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                                    <option value="Leal e Mau">Leal e Mau</option>
+                                    <option value="Neutro e Mau">Neutro e Mau</option>
+                                    <option value="Caótico e Mau">Caótico e Mau</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
+                                    value="9m"></div>
+                        </div>
+                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"
+                                placeholder="Ex: Acólito"></div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="2">
+                        <h3>Atributos</h3>
+                        <div class="attributes-grid">
+                            <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10" min="0"
+                                    max="25"></div>
+                            <div class="attr-input"><span>DES</span><input type="number" id="wiz-dex" value="10" min="0"
+                                    max="25"></div>
+                            <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10" min="0"
+                                    max="25"></div>
+                            <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10" min="0"
+                                    max="25"></div>
+                            <div class="attr-input"><span>SAB</span><input type="number" id="wiz-wis" value="10" min="0"
+                                    max="25"></div>
+                            <div class="attr-input"><span>CAR</span><input type="number" id="wiz-cha" value="10" min="0"
+                                    max="25"></div>
+                        </div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="3">
+                        <h3>Perícias</h3>
+                        <div class="skills-selection">
+                            <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
+                            <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
+                            <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
+                            <label><input type="checkbox" value="Atletismo"> Atletismo</label>
+                            <label><input type="checkbox" value="Atuação"> Atuação</label>
+                            <label><input type="checkbox" value="Blefar"> Blefar</label>
+                            <label><input type="checkbox" value="Furtividade"> Furtividade</label>
+                            <label><input type="checkbox" value="História"> História</label>
+                            <label><input type="checkbox" value="Intimidação"> Intimidação</label>
+                            <label><input type="checkbox" value="Intuição"> Intuição</label>
+                            <label><input type="checkbox" value="Investigação"> Investigação</label>
+                            <label><input type="checkbox" value="Medicina"> Medicina</label>
+                            <label><input type="checkbox" value="Natureza"> Natureza</label>
+                            <label><input type="checkbox" value="Percepção"> Percepção</label>
+                            <label><input type="checkbox" value="Persuasão"> Persuasão</label>
+                            <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
+                            <label><input type="checkbox" value="Religião"> Religião</label>
+                            <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
+                        </div>
+                    </div>
+                    <div class="wizard-step hidden" data-step="4">
+                        <h3>Crônicas e Personalidade</h3>
+                        <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
+                                class="medieval-textarea"
+                                placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                            </div>
+                            <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
+                        </div>
+                        <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
+                                class="medieval-textarea"
+                                placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                            </div>
+                            <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
+                                class="medieval-textarea"
+                                placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
+                        </div>
+                        <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
+                                class="medieval-textarea"
+                                placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo Arcano)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step hidden" data-step="5">
+                        <h3>Consagração</h3>
+                        <p id="wiz-final-msg">Lyra irá tecer a trama final do seu herói.</p>
+                    </div>
+
+                    <div class="wizard-nav">
+                        <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                        <button id="wiz-next" class="medieval-btn small">Próximo</button>
+                        <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
+                    </div>
+
+                    <!-- Lyra's Guidance (Inside Wizard) -->
+                    <div id="lyra-guidance" class="lyra-guidance-container hidden">
+                        <img src="assets/Lyra_the_wise.png" alt="Lyra guidance" class="guidance-portrait">
+                        <div class="guidance-bubble parchment">
+                            <p id="guidance-text">Em que posso ajudá-lo, viajante?</p>
+                            <div class="bubble-tail"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monster Wizard -->
+                <div id="monster-wizard" class="wizard-container hidden">
+                    <div id="mon-choice-step" class="wizard-step">
+                        <h3>Origem da Criatura</h3>
+                        <div class="mode-choices">
+                            <div class="choice-card" data-mode="ai">
+                                <i class="fas fa-dragon"></i>
+                                <h4>Invocar com Lyra</h4>
+                                <p>A Magia gerará as estatísticas e a descrição.</p>
+                            </div>
+                            <div class="choice-card" data-mode="manual">
+                                <i class="fas fa-hammer"></i>
+                                <h4>Forjar Manualmente</h4>
+                                <p>Preencha os detalhes da criatura você mesmo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="mon-form" class="hidden">
+                        <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
+                        <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
+                            <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
+                        </div>
+                        <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
+                                class="medieval-textarea"
+                                placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
+                        <div class="wizard-nav">
+                            <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Session Wizard -->
+                <div id="session-wizard" class="wizard-container hidden">
+                    <div class="wizard-step" data-step="0" id="sess-choice-step">
+                        <h3>Registro da Crônica</h3>
+                        <div class="mode-choices">
+                            <button class="choice-card" data-mode="ai">
+                                <i class="fas fa-magic"></i>
+                                <h4>Oráculo Lyra</h4>
+                                <p>O Oráculo tecerá a narrativa com base em suas escolhas.</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Base Context -->
+                    <div class="wizard-step hidden" data-step="1">
+                        <h3>Contexto da Saga</h3>
+                        <div class="form-group">
+                            <label>Título da Aventura</label>
+                            <input type="text" id="sess-title" placeholder="Ex: O Segredo do Templo Perdido">
+                        </div>
+                        <div class="form-group">
+                            <label>Gancho de Abertura</label>
+                            <textarea id="sess-hook" class="medieval-textarea"
+                                placeholder="Como a aventura começa?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Objetivo Principal</label>
+                            <textarea id="sess-goal" class="medieval-textarea"
+                                placeholder="O que os heróis precisam alcançar?"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: World & NPCs -->
+                    <div class="wizard-step hidden" data-step="2">
+                        <h3>Mundo e Personagens</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Localidades de Destaque</label>
+                                <textarea id="sess-locations" class="medieval-textarea"
+                                    placeholder="Onde a ação ocorre?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>NPCs Pivotais</label>
+                                <textarea id="sess-npcs" class="medieval-textarea"
+                                    placeholder="Quem são os aliados e informantes?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Threats & Combat -->
+                    <div class="wizard-step hidden" data-step="3">
+                        <h3>Perigos e Desafios</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Ameaças e Monstros</label>
+                                <textarea id="sess-threats" class="medieval-textarea"
+                                    placeholder="Quem ou o que se opõe aos heróis?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Encontros (3-5)</label>
+                                <textarea id="sess-encounters" class="medieval-textarea"
+                                    placeholder="Descreva os principais desafios planejados."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Spoils & Climax -->
+                    <div class="wizard-step hidden" data-step="4">
+                        <h3>Clímax e Recompensas</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>O Grande Clímax</label>
+                                <textarea id="sess-climax" class="medieval-textarea"
+                                    placeholder="Como será o confronto final?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Tesouros e Recompensas</label>
+                                <textarea id="sess-treasure" class="medieval-textarea"
+                                    placeholder="O que os heróis ganharão?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Atmosphere & Resolution -->
+                    <div class="wizard-step hidden" data-step="5">
+                        <h3>Finalização e Atmosfera</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Consequências e Resolução</label>
+                                <textarea id="sess-resolution" class="medieval-textarea"
+                                    placeholder="O que acontece após o clímax?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Ambiente e Atmosfera</label>
+                                <textarea id="sess-atmosphere" class="medieval-textarea"
+                                    placeholder="Cores, sons, cheiros predominantes..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Duração Pretendida (Linha do Tempo)</label>
+                                <select id="sess-timeline" class="medieval-select">
+                                    <option value="1" selected>Sessão Única (One-shot)</option>
+                                    <option value="3">Campanha Curta (3 sessões)</option>
+                                    <option value="5">Campanha Média (5 sessões)</option>
+                                    <option value="10">Campanha Épica (10 sessões)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Cadência Narrativa</label>
+                                <select id="sess-pacing" class="medieval-select">
+                                    <option value="short">Curta (Direta e Ágil)</option>
+                                    <option value="balanced" selected>Equilibrada (Misto)</option>
+                                    <option value="long">Longa (Imersiva e Detalhada)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-nav sess-nav hidden">
+                        <button id="sess-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                        <button id="sess-magic-fill" class="medieval-btn small secondary"
+                            title="O Oráculo preencherá as lacunas da sua narrativa.">
+                            <i class="fas fa-wand-magic-sparkles"></i> Preencher com Magia
+                        </button>
+                        <button id="sess-next" class="medieval-btn small">Próximo</button>
+                        <button id="sess-finish-btn" class="medieval-btn small hidden">Registrar Saga</button>
+                    </div>
+                </div>
+
+                <!-- Character Sheet -->
+                <div id="character-sheet" class="sheet-container hidden">
+                    <div id="sheet-inspection-banner" class="hidden"></div>
+                    <div class="sheet-header">
+                        <!-- Left: Token -->
+                        <div class="header-token-section">
+                            <div class="char-token-wrapper">
+                                <img id="sheet-token" src="assets/tokens/lyra.png" alt="Token" class="char-token">
+                                <input type="file" id="token-upload" accept="image/*" class="hidden">
+                                <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Center: Name & Dropdowns -->
+                        <div class="header-info-section">
+                            <div class="header-row-top">
+                                <h2 id="sheet-char-name" class="editable" data-field="bio.name">Nome do Herói</h2>
+                            </div>
+                            <div class="header-row-bottom" style="align-items: flex-start;">
+                                <div class="header-field-group">
+                                    <label>Alinhamento</label>
+                                    <span id="sheet-alignment-display"></span>
+                                </div>
+
+                                <!-- Race Column -->
+                                <div style="display: flex; flex-direction: column; flex: 1; gap: 5px;">
+                                    <div class="header-field-group" style="width: 100%; margin: 0;">
+                                        <label>Raça</label>
+                                        <span id="sheet-race-display"></span>
+                                    </div>
+                                    <div class="header-field-group" style="width: 100%; margin: 0;">
+                                        <label>Sub-raça</label>
+                                        <div id="sheet-subrace-display" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Class Column -->
+                                <div style="display: flex; flex-direction: column; flex: 1; gap: 5px;">
+                                    <div class="header-field-group" style="width: 100%; margin: 0;">
+                                        <label>Classe</label>
+                                        <span id="sheet-class-display"></span>
+                                    </div>
+                                    <div class="header-field-group" style="width: 100%; margin: 0;">
+                                        <label>Arquétipo</label>
+                                        <div id="sheet-archetype-display" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Level & Save -->
+                        <div class="header-meta-section">
+                            <div class="level-display">
+                                <label>Nível</label>
+                                <span id="sheet-level-val" class="level-value">1</span>
+                            </div>
+                            <button id="save-sheet-btn" class="medieval-btn small"><i class="fas fa-save"></i>
+                                Salvar</button>
+                        </div>
+                    </div>
+                    <div class="sheet-tabs">
+                        <button class="sheet-tab active" data-tab="geral">Principal</button>
+                        <button class="sheet-tab" data-tab="combate">Combate</button>
+                        <button class="sheet-tab" data-tab="magia">Grimório</button>
+                        <button class="sheet-tab" data-tab="inventario">Mochila</button>
+                        <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    </div>
+                    <div class="sheet-content">
+                        <!-- Aba Geral: Bio, Atributos, Resistências e Perícias -->
+                        <div id="sheet-geral" class="sheet-section">
+                            <div class="bio-grid">
+                                <div class="form-group"><label>Antecedente</label><span id="sheet-background"
+                                        class="editable" data-field="bio.background"></span></div>
+                                <div class="form-group"><label>XP</label><span id="sheet-xp" class="editable"
+                                        data-field="bio.xp"></span></div>
+                                <div class="form-group"><label>Nome do Jogador</label><span id="sheet-player-name"
+                                        class="editable" data-field="bio.playerName"></span></div>
+                            </div>
+                            <div class="stats-main-grid">
+                                <div class="attributes-column">
+                                    <div class="scores-grid" id="sheet-scores"></div>
+                                    <h4 class="section-title">Testes de Resistência</h4>
+                                    <div class="saves-list" id="sheet-saves"></div>
+                                </div>
+                                <div class="skills-column">
+                                    <div class="top-vitals-row">
+                                        <div class="vital-mini-box"><span>Proficiência</span><strong
+                                                id="sheet-prof"></strong></div>
+                                        <div class="vital-mini-box"><span>Percepção Passiva</span><strong
+                                                id="sheet-passive-percep"></strong></div>
+                                    </div>
+                                    <h4 class="section-title">Perícias</h4>
+                                    <div class="skills-list" id="sheet-skills"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba Combate: PV, CA, Iniciativa, Ataques, Death Saves -->
+                        <div id="sheet-combate" class="sheet-section hidden">
+                            <div class="combat-status-grid">
+                                <div class="vital-box large"><span>CA</span><strong id="sheet-ca" class="editable"
+                                        data-field="stats.ac">10</strong></div>
+                                <div class="vital-box large"><span>Iniciativa</span><strong id="sheet-inic"
+                                        class="editable" data-field="stats.initiative">0</strong></div>
+                                <div class="vital-box large"><span>Velocidade</span><strong id="sheet-speed"
+                                        class="editable" data-field="stats.speed">9m</strong></div>
+                                <div class="hp-container-main">
+                                    <div class="hp-box-full">
+                                        <span class="label">Pontos de Vida</span>
+                                        <div class="hp-controls">
+                                            <input type="number" id="sheet-hp-curr" class="hp-input"
+                                                data-field="stats.hp_current">
+                                            <span class="sep">/</span>
+                                            <input type="number" id="sheet-hp-max" class="hp-input"
+                                                data-field="stats.hp_max">
+                                        </div>
+                                    </div>
+                                    <div class="hp-temp">
+                                        <span>PV Temporários</span>
+                                        <input type="number" id="sheet-hp-temp" class="hp-input small"
+                                            data-field="stats.hp_temp">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="combat-details-grid">
+                                <div class="hit-dice-death-saves">
+                                    <div class="hit-dice-block">
+                                        <h4>Dados de Vida</h4>
+                                        <div class="hit-dice-row">
+                                            <input type="number" id="sheet-hd-curr" data-field="stats.hit_dice_current"
+                                                class="medieval-input" style="width: 60px; text-align: center;">
+                                            <span> de </span>
+                                            <span id="sheet-hd-total" class="editable"
+                                                data-field="stats.hit_dice_total">1d8</span>
+                                        </div>
+                                    </div>
+                                    <div class="death-saves-block">
+                                        <h4>Resistência à Morte</h4>
+                                        <div class="death-row successes">Sucessos
+                                            <input type="checkbox" id="death-s1" data-field="death_saves.successes"
+                                                value="1">
+                                            <input type="checkbox" id="death-s2" data-field="death_saves.successes"
+                                                value="2">
+                                            <input type="checkbox" id="death-s3" data-field="death_saves.successes"
+                                                value="3">
+                                        </div>
+                                        <div class="death-row failures">Falhas
+                                            <input type="checkbox" id="death-f1" data-field="death_saves.failures"
+                                                value="1">
+                                            <input type="checkbox" id="death-f2" data-field="death_saves.failures"
+                                                value="2">
+                                            <input type="checkbox" id="death-f3" data-field="death_saves.failures"
+                                                value="3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="attacks-section">
+                                    <h4 class="section-title">Ataques</h4>
+                                    <div id="attacks-body" class="attacks-list-v2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba Magia: Slots, Grimório, CD -->
+                        <div id="sheet-magia" class="sheet-section hidden">
+                            <div class="magic-header-stats">
+                                <div class="vital-box"><span>CD Salva.</span><strong id="sheet-spell-dc">8</strong>
+                                </div>
+                                <div class="vital-box"><span>Ataque Mág.</span><strong id="sheet-spell-atk">0</strong>
+                                </div>
+                                <div class="form-group spell-casting-container">
+                                    <h4 class="section-title spell-casting-title">Atributo
+                                        de Conjuração</h4>
+                                    <select id="sheet-spell-attr" data-field="spells.ability"
+                                        class="medieval-select spell-casting-select">
+                                        <option value="int">Inteligência</option>
+                                        <option value="wis">Sabedoria</option>
+                                        <option value="cha">Carisma</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="spell-slots-tracker" id="sheet-spell-slots"></div>
+                            <h4 class="section-title spellbook-title">Livro de Magias
+                            </h4>
+                            <div class="sheet-search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="sheet-spell-search" class="medieval-input"
+                                    placeholder="Buscar no Grande Grimório...">
+                                <div id="sheet-spell-results" class="search-results-overlay hidden"></div>
+                            </div>
+                            <div id="spells-body" class="spells-list-v2"></div>
+                        </div>
+
+                        <!-- Aba Inventário: Itens, Moedas, Carga -->
+                        <div id="sheet-inventario" class="sheet-section hidden">
+                            <div class="inventory-top-grid">
+                                <div class="coins-pouch">
+                                    <h4>Bolsa de Moedas</h4>
+                                    <div class="coins-grid">
+                                        <div class="coin-item pc"><span>PC</span><input type="number"
+                                                data-field="inventory.coins.pc"></div>
+                                        <div class="coin-item pp"><span>PP</span><input type="number"
+                                                data-field="inventory.coins.pp"></div>
+                                        <div class="coin-item pe"><span>PE</span><input type="number"
+                                                data-field="inventory.coins.pe"></div>
+                                        <div class="coin-item po"><span>PO</span><input type="number"
+                                                data-field="inventory.coins.po"></div>
+                                        <div class="coin-item pl"><span>PL</span><input type="number"
+                                                data-field="inventory.coins.pl"></div>
+                                    </div>
+                                </div>
+                                <div class="encumbrance-tracker">
+                                    <h4 class="section-title">Carga</h4>
+                                    <div class="weight-bar">
+                                        <div id="weight-progress" class="bar"></div><span id="weight-text">0 / 0
+                                            lbs</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="section-title">Equipamentos & Tesouros</h4>
+                            <div class="sheet-search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="sheet-item-search" class="medieval-input"
+                                    placeholder="Buscar nos Arquivos de Itens...">
+                                <div id="sheet-item-results" class="search-results-overlay hidden"></div>
+                            </div>
+                            <div id="inventory-body" class="inventory-list-v2"></div>
+                        </div>
+
+                        <!-- Aba História: Notas, Traços, Exaustão -->
+                        <div id="sheet-historia" class="sheet-section hidden">
+                            <div class="traits-full-grid">
+                                <div class="form-group">
+                                    <h4 class="section-title">Traços de Personalidade</h4><textarea
+                                        data-field="story.traits" class="medieval-textarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <h4 class="section-title">Ideais</h4><textarea data-field="story.ideals"
+                                        class="medieval-textarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <h4 class="section-title">Vínculos</h4><textarea data-field="story.bonds"
+                                        class="medieval-textarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <h4 class="section-title">Defeitos</h4><textarea data-field="story.flaws"
+                                        class="medieval-textarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <h4 class="section-title">Maneirismos</h4><textarea data-field="story.mannerisms"
+                                        class="medieval-textarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <h4 class="section-title">Talento de Interpretação</h4><textarea
+                                        data-field="story.talents" class="medieval-textarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="chronic-notes">
+                                <h4 class="section-title">Aparência</h4>
+                                <textarea data-field="story.appearance" class="medieval-textarea"
+                                    placeholder="Aparência física..."></textarea>
+
+                                <h4 class="section-title">História</h4>
+                                <textarea data-field="story.notes" class="medieval-textarea large"
+                                    placeholder="Suas crônicas escritas nas estrelas..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="modal-overlay hidden">
+        <div class="medieval-modal alert-content">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-scroll alert-icon"></i>
+                <h3 id="alert-title">Decreto Real</h3>
+                <p id="alert-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="medieval-btn" onclick="app.closeAlert()">Ciente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="medieval-modal confirm-box">
+            <div class="lyra-corner top-left"></div>
+            <div class="lyra-corner top-right"></div>
+            <div class="alert-body">
+                <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+                <h3 id="confirm-title">Confirmar Exclusão</h3>
+                <p id="confirm-message" class="confirm-text"></p>
+            </div>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-btn" class="medieval-btn secondary">Cancelar</button>
+                <button id="confirm-ok-btn" class="medieval-btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Mystic Music Player (Bottom-Left) -->
+    <div id="mystic-player" class="mystic-player-floating collapsed">
+        <div class="player-toggle" id="music-player-orb">
+            <div class="player-orb">
+                <i class="fas fa-compact-disc"></i>
+                <div class="magic-pulse"></div>
+            </div>
+            <span class="player-now-playing">Whispers of the Stars</span>
+        </div>
+
+        <div class="player-interface parchment">
+            <div class="player-header">
+                <strong>Melodia Arcana</strong>
+                <button class="player-minimize"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="player-body">
+                <div class="track-name">"The Whisper of the Stars"</div>
+                <div class="player-controls-row">
+                    <button id="btn-play-pause-float" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
+                    <div class="volume-container">
+                        <i class="fas fa-volume-low"></i>
+                        <input type="range" id="player-volume-float" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="player-progress-bar-float" class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community & Chat View -->
+    <section id="community" class="view hidden">
+        <div class="community-layout-container">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2><i class="fas fa-globe"></i> GUILDA (GLOBAL)</h2>
+                    <div style="flex:1"></div>
+                    <button id="manage-contacts-btn" class="medieval-btn small secondary" style="margin-right: 1rem;"><i
+                            class="fas fa-address-book"></i> Contatos</button>
+                    <button class="close-btn-medieval" id="community-close-btn"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="community-layout">
+                    <!-- Main Chat -->
+                    <div class="community-main">
+                        <div id="global-chat-messages" class="chat-messages">
+                            <!-- JS Injects messages -->
+                        </div>
+                        <div class="chat-input-area">
+                            <textarea id="global-chat-input" class="medieval-textarea"
+                                placeholder="Sua mensagem, viajante..."></textarea>
+                            <button id="send-global-msg" class="medieval-btn">ENVIAR</button>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="community-sidebar">
+                        <div class="sidebar-header">
+                            <h3><i class="fas fa-users"></i> VIAJANTES</h3>
+                        </div>
+                        <div id="online-users-list" class="online-list">
+                            <!-- Dynamic Content -->
+                        </div>
+                        <div class="sidebar-footer">
+                            <button id="sidebar-contacts-btn" class="medieval-btn small full-width"><i
+                                    class="fas fa-user-plus"></i> CONTATOS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacts Modal -->
+    <div id="contacts-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-contacts-btn"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-address-book"></i> Seus Aliados</h2>
+
+            <div class="parchment-content">
+                <div class="add-contact-row form-group">
+                    <label>Adicionar por Nickname</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="contact-nickname-input" class="medieval-input" placeholder="Ex: Gandalf">
+                        <button id="add-contact-confirm-btn" class="medieval-btn small"><i
+                                class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <hr class="medieval-separator">
+
+                <div id="contacts-list" class="contacts-list-container">
+                    <!-- Dynamic List -->
+                    <p class="empty-state">Nenhum aliado encontrado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Painel do Mestre: Seleção Inicial -->
+    <section id="gm-selection" class="view hidden">
+        <div class="view-header">
+            <h2><i class="fas fa-desktop"></i> Painel do Mestre</h2>
+            <button class="medieval-btn small secondary" onclick="app.switchView('dashboard')">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+        </div>
+        <div class="selection-grid">
+            <div class="selection-card" data-action="new-journey">
+                <div class="selection-icon">
+                    <i class="fas fa-wand-sparkles"></i>
+                </div>
+                <div class="selection-info">
+                    <h3>Nova Jornada</h3>
+                    <p>Abra os portões de uma nova aventura neste sistema.</p>
+                </div>
+            </div>
+
+            <div class="selection-card" data-target="my-sessions">
+                <div class="selection-icon">
+                    <i class="fas fa-book-journal-whills"></i>
+                </div>
+                <div class="selection-info">
+                    <h3>Meus Registros</h3>
+                    <p>Consulte os anais de sessões passadas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Painel do Mestre: Principal -->
+    <section id="gm-panel" class="view hidden">
+        <div class="view-header">
+            <h2><i class="fas fa-desktop"></i> Painel do Mestre</h2>
+            <div class="header-actions">
+                <button class="medieval-btn small secondary" onclick="app.switchView('gm-selection')">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+
+        <div class="gm-panel-container">
+            <!-- Sidebar Esquerda: Integração por Busca -->
+            <aside class="gm-sidebar" id="gm-sidebar-left">
+                <div class="gm-sidebar-content">
+                    <!-- Session Status & Prolong Section -->
+                    <div class="gm-search-section">
+                        <div class="mini-grid-header">Estado da Crônica</div>
+                        <div class="session-sidebar-info">
+                            <div class="gm-status-selector-container">
+                                <div class="gm-status-row">
+                                    <select id="gm-session-status-select" class="medieval-select small">
+                                        <option value="preparing">🟠 Preparando</option>
+                                        <option value="active">🟢 Em Andamento</option>
+                                        <option value="completed">📜 Concluída</option>
+                                        <option value="archived">🌑 Arquivada</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="session-stats-mini">
+                                <span><i class="fas fa-users"></i> <span id="active-player-count">0</span>
+                                    Jogadores</span>
+                            </div>
+
+                            <div class="gm-control-groups">
+                                <div class="control-group-row">
+                                    <button class="medieval-btn small" id="toggle-visibility-btn" title="Privacidade">
+                                        <i class="fas fa-eye-slash"></i> PRIVADO
+                                    </button>
+                                    <button class="medieval-btn small primary" id="save-gm-notes" title="Salvar Anais">
+                                        <i class="fas fa-save"></i> SALVAR
+                                    </button>
+                                </div>
+                                <div class="control-group-row">
+                                    <button class="medieval-btn small gold-pulse" id="btn-session-summary"
+                                        title="Resumo do Oráculo">
+                                        <i class="fas fa-magic"></i> RESUMO
+                                    </button>
+                                    <button class="medieval-btn small secondary" id="btn-prolong-session"
+                                        title="Expandir Cronologia">
+                                        <i class="fas fa-expand-arrows-alt"></i> EXPANDIR
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gm-search-section">
+                        <div class="mini-grid-header">Dados da Saga</div>
+                        <div id="gm-saga-data" class="saga-data-container">
+                            <!-- Saga items injected via JS -->
+                            <div class="saga-item empty">
+                                <i class="fas fa-feather-pointed"></i>
+                                <p>Nenhum dado vinculado ainda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end of gm-sidebar-content -->
+            </aside> <!-- end of gm-sidebar-left -->
+
+            <!-- Área Central: Sessão Ativa -->
+            <main class="gm-main-area">
+                <div id="no-active-session" class="gm-session-info">
+                    <i class="fas fa-scroll fa-3x" style="color: var(--gold); margin-bottom: 1rem;"></i>
+                    <h3>Nenhuma Temporada Ativa</h3>
+                    <p>Invoque uma nova jornada para começar a mestrear.</p>
+                    <div class="system-warning" style="margin: 1rem 0; color: var(--gold); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> A sessão será vinculada ao sistema: <strong
+                            id="active-system-display">D&D 5e</strong>
+                    </div>
+                    <button class="medieval-btn" onclick="GMPanelModule.createNewSession()">
+                        <i class="fas fa-wand-sparkles"></i> Iniciar Nova Sessão
+                    </button>
+                </div>
+
+                <div id="active-session-ui" class="gm-session-info hidden">
+                    <div class="session-header-flex">
+                        <h3 id="active-session-title">Título da Sessão</h3>
+                        <div class="header-actions">
+                            <button class="medieval-btn icon-only small" id="edit-session-btn" title="Editar Título">
+                                <i class="fas fa-pen-fancy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gm-story-central hidden" id="gm-story-container">
+                        <div class="medieval-subtitle"><i class="fas fa-scroll"></i> PRÓLOGO DA SAGA</div>
+                        <textarea class="gm-story-area" id="gm-story-input-central"
+                            placeholder="Nos tempos antigos, quando os deuses ainda caminhavam entre os mortais, Yggdrasil — a Árvore Mãe — sustentava toda a vida com sua magia primordial. Suas raízes tocavam os planos inferiores, seu tronco erguia-se através dos reinos mortais, e seus galhos alcançavam os céus divinos. A cidade de Eldoria floresceu à sua sombra, um farol de esperança e prosperidade.&#10;&#10;But a shadow fell..."></textarea>
+                    </div>
+
+                    <!-- Seção do Oráculo (Aparece após o Início) -->
+                    <div id="oracle-summary-section" class="oracle-wizard-container hidden">
+                        <div class="oracle-avatar-wrapper">
+                            <img id="oracle-avatar-img" src="assets/Lyra_the_wise.png" alt="Oráculo Lyra">
+                            <div class="avatar-glow"></div>
+                        </div>
+                        <div class="oracle-speech-bubble">
+                            <i class="fas fa-quote-left bubble-quote"></i>
+                            <p id="oracle-summary-text">O destino está sendo traçado... Preparem-se para os desafios que
+                                surgirão no Atrium.</p>
+                        </div>
+                    </div>
+
+                    <div id="session-summary-container" class="session-summary-container hidden"
+                        style="margin-top: 20px;">
+                        <div class="medieval-subtitle"><i class="fas fa-feather"></i> RESUMO DA CRÔNICA</div>
+                        <textarea id="session-summary-display" class="gm-summary-area" readonly
+                            placeholder="O Oráculo ainda não teceu o resumo desta saga..."></textarea>
+                    </div>
+
+                    <!-- Direct access to Atrium - mode is set at creation -->
+                    <div id="gm-session-start-options" class="gm-session-start-options">
+                        <button class="medieval-btn primary large" id="btn-enter-session">
+                            <i class="fas fa-door-open"></i> ADENTRAR ATRIUM
+                        </button>
+                    </div>
+
+                    <!-- Session Timeline Strip -->
+                    <div id="gm-timeline-summary" class="gm-timeline-summary hidden">
+                        <div class="medieval-subtitle"><i class="fas fa-hourglass-half"></i> CRONOLOGIA DA SAGA</div>
+                        <div class="timeline-track" id="gm-timeline-track">
+                            <!-- Timeline cards injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Sidebar Direita: Jogadores & Convites -->
+            <aside class="gm-sidebar" id="gm-sidebar-right">
+                <div class="gm-sidebar-header">
+                    <h3>Aventureiros</h3>
+                    <button class="medieval-btn icon-only" onclick="GMPanelModule.openInviteModal()"
+                        title="Convidar Jogador">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </div>
+                <div class="gm-sidebar-content">
+                    <ul class="player-list" id="gm-player-list">
+                        <!-- Jogadores injetados via JS -->
+                    </ul>
+
+                    <!-- Nova Área de Mapa -->
+                    <div class="gm-map-section">
+                        <div class="gm-sidebar-header">
+                            <h3>MAPA</h3>
+                            <button class="medieval-btn icon-only" title="Configurar Mapa">
+                                <i class="fas fa-map"></i>
+                            </button>
+                        </div>
+                        <div id="gm-map-container" class="gm-map-container">
+                            <div class="map-grid-overlay"></div>
+                            <div class="map-placeholder">
+                                <i class="fas fa-compass fa-spin"></i>
+                                <p>Em breve: Mapas Táticos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end of gm-sidebar-content -->
+            </aside> <!-- end of gm-sidebar-right -->
+        </div> <!-- end of gm-panel-container -->
+    </section> <!-- end of gm-panel view -->
+
+    <!-- GM Add Content Choice Modal -->
+    <div id="gm-add-content-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" onclick="GMPanelModule.closeAddMenu()"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-toolbox"></i> Arsenal do Mestre</h2>
+            <div class="parchment-content">
+                <p>O que desejas manifestar nesta jornada?</p>
+                <div class="selection-grid-mini">
+                    <div class="selection-card-mini" onclick="GMPanelModule.openCreator('npc')">
+                        <i class="fas fa-user-shield"></i>
+                        <span>NPC / Monstro</span>
+                    </div>
+                    <div class="selection-card-mini" onclick="GMPanelModule.openCreator('treasure')">
+                        <i class="fas fa-gem"></i>
+                        <span>Tesouro</span>
+                    </div>
+                    <div class="selection-card-mini" onclick="GMPanelModule.openCreator('item')">
+                        <i class="fas fa-sword"></i>
+                        <span>Item Mágico</span>
+                    </div>
+                    <div class="selection-card-mini" onclick="GMPanelModule.openCreator('encounter')">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>Encontro</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Metadata Modal (Edit Title) -->
+    <div id="gm-session-create-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" onclick="GMPanelModule.closeSessionCreateModal()"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-scroll"></i> Alterar Destino</h2>
+            <div class="parchment-content">
+                <p>Ajuste os anais desta jornada.</p>
+                <div class="form-group">
+                    <label>Título da Saga</label>
+                    <input type="text" id="gm-new-session-title" class="medieval-input"
+                        placeholder="Ex: A Queda de Phandalin">
+                </div>
+                <div class="modal-actions">
+                    <button class="medieval-btn primary" id="confirm-new-session-btn">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Session Selection Modal -->
+    <div id="gm-session-select-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small allow-overflow">
+            <button class="close-modal" onclick="GMPanelModule.closeSessionSelectModal()"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-scroll"></i> ESCOLHER CAPÍTULO</h2>
+
+            <div class="parchment-content">
+                <p>O Oráculo detectou múltiplas trilhas abertas. Qual desejas trilhar agora?</p>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Selecione o Destino</label>
+                    <div class="custom-select-container" id="gm-session-select-container">
+                        <div class="custom-select-trigger" id="gm-session-select-trigger">
+                            <span id="gm-session-select-text">Selecione um capítulo...</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options-wrapper hidden" id="gm-session-select-options-wrapper">
+                            <i class="fas fa-chevron-up dropdown-scroll-arrow up hidden"></i>
+                            <div class="custom-select-options" id="gm-session-select-options">
+                                <!-- Populated by JS -->
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-scroll-arrow down hidden"></i>
+                        </div>
+                        <input type="hidden" id="gm-session-select-value">
+                    </div>
+                </div>
+
+                <div class="modal-actions-centered" style="margin-top: 20px;">
+                    <button class="medieval-btn gold-pulse" id="gm-session-select-confirm">
+                        <i class="fas fa-check"></i> CONFIRMAR TRILHA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Detail Modal -->
+    <div id="gm-chapter-detail-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal">
+            <button class="close-modal"
+                onclick="document.getElementById('gm-chapter-detail-modal').classList.add('hidden')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 id="gm-chapter-detail-title" class="modal-title"><i class="fas fa-scroll"></i> Detalhes do Capítulo</h2>
+            <div id="gm-chapter-detail-content" class="parchment-content" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Prolong Session Modal -->
+    <div id="gm-prolong-session-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" onclick="GMPanelModule.closeProlongModal()"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-expand-arrows-alt"></i> Prolongar Jornada</h2>
+            <div class="parchment-content">
+                <p>O Oráculo pode tecer novos capítulos na sua história. Defina como a trama deve se expandir.</p>
+
+                <div class="form-group">
+                    <label>Quantidade de Capítulos (Sessões)</label>
+                    <input type="number" id="prolong-session-count" class="medieval-input" value="1" min="1" max="5">
+                </div>
+
+                <div class="form-group">
+                    <label>Onde os novos capítulos se encaixam?</label>
+                    <select id="prolong-session-position" class="medieval-select">
+                        <option value="end">No FIM da atual cronologia</option>
+                        <option value="start">No COMEÇO da atual cronologia</option>
+                        <option value="middle">No MEIO (entre capítulos)</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions-centered">
+                    <button class="medieval-btn gold-pulse" onclick="GMPanelModule.confirmProlongSession()">
+                        <i class="fas fa-wand-magic-sparkles"></i> TECER DESTINO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Modal -->
+    <div id="gm-invite-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" onclick="GMPanelModule.closeInviteModal()"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-ghost"></i> Convocar Viajante</h2>
+            <div class="parchment-content">
+                <p>O convite será enviado através do vácuo arcano.</p>
+                <div class="form-group">
+                    <label>Identidade Arcana (Nickname ou E-mail)</label>
+                    <input type="text" id="invite-email-input" class="medieval-input"
+                        placeholder="Ex: Gandalf ou heroi@reino.com">
+                </div>
+                <div class="modal-actions">
+                    <button class="medieval-btn gold-pulse" onclick="GMPanelModule.sendInvite()">Enviar
+                        Mensageiro</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Portal View -->
+    <section id="portal" class="view hidden">
+        <div class="view-header">
+            <h2><i class="fas fa-gears"></i> Portal Arcano do Mestre</h2>
+            <button class="medieval-btn small secondary" onclick="app.switchView('dashboard')">
+                <i class="fas fa-arrow-left"></i> Voltar ao Painel
+            </button>
+        </div>
+
+        <div class="portal-container parchment">
+            <div class="admin-stats-bar">
+                <div class="stat-bubble">
+                    <i class="fas fa-users"></i>
+                    <span id="admin-user-count">0</span>
+                    <label>Usuários</label>
+                </div>
+                <div class="stat-bubble">
+                    <i class="fas fa-user-shield"></i>
+                    <span id="admin-total-sheets">0</span>
+                    <label>Fichas</label>
+                </div>
+                <div class="stat-bubble">
+                    <i class="fas fa-gem"></i>
+                    <span id="admin-total-items">0</span>
+                    <label>Itens Criados</label>
+                </div>
+                <div class="stat-bubble">
+                    <i class="fas fa-brain"></i>
+                    <span id="admin-ai-status">Ativo</span>
+                    <label>Poder Arcano</label>
+                </div>
+            </div>
+
+            <!-- Global Commands (Moved Up & Horizontal) -->
+            <div class="admin-global-controls">
+                <div class="admin-tool-box horizontal">
+                    <h4>Comandos Globais</h4>
+                    <div class="global-actions-row">
+                        <button class="medieval-btn" id="admin-toggle-ai-btn">
+                            <i class="fas fa-power-off"></i> Alternar Fluxo Arcano
+                        </button>
+                        <button class="medieval-btn secondary" id="admin-toggle-maintenance-btn">
+                            <i class="fas fa-hammer"></i> Sistema em Manutenção
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-tool-box horizontal">
+                    <h4>Migração de Dados</h4>
+                    <div class="global-actions-row">
+                        <button class="medieval-btn" onclick="AdminModule.handleMigrateMonsters()">
+                            <i class="fas fa-file-import"></i> Migrar Monstros (D&D 5e)
+                        </button>
+                        <button class="medieval-btn secondary" onclick="AdminModule.handleMigrateSpells()">
+                            <i class="fas fa-magic"></i> Migrar Magias (D&D 5e)
+                        </button>
+                        <button class="medieval-btn" id="admin-migrate-rules-btn">
+                            <i class="fas fa-book-bookmark"></i> Migrar Regras (D&D 5e)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-main-content">
+                <div class="admin-section full-width">
+                    <h3><i class="fas fa-users-viewfinder"></i> Gestão de Habitantes</h3>
+                    <div class="user-audit-list" id="admin-users-list">
+                        <div class="loading-quill"><i class="fas fa-quill fa-spin"></i> Consultando registros...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dice Modal -->
+    <div id="dice-modal" class="modal-overlay hidden">
+        <div class="dice-modal-content">
+            <button class="close-modal" onclick="document.getElementById('dice-modal').classList.add('hidden')"><i
+                    class="fas fa-times"></i></button>
+            <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i>
+                Torre de Dados</h2>
+
+            <div class="dice-controls-header">
+                <label for="dice-quantity">Quantidade:</label>
+                <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1" max="50">
+            </div>
+
+            <div class="dice-controls">
+                <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6"
+                        style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
+                <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
+                <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20" style="transform: scaleY(1.2);"></i>
+                    d8</button>
+                <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20"
+                        style="transform: rotate(45deg);"></i> d10</button>
+                <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
+                <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20" style="color: var(--crimson);"></i>
+                    d20</button>
+                <button class="dice-btn" data-sides="100"><i class="fas fa-percent"></i> d100</button>
+            </div>
+
+            <div class="dice-result-area">
+                <div id="dice-result-display" class="dice-display">
+                    <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
+                </div>
+                <div id="dice-history-list" class="dice-history"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Mystical Loading Overlay -->
+    <div id="mystic-loading" class="hidden">
+        <div class="mystic-spinner">
+            <div class="rune-layer-wizard outer"></div>
+            <div class="rune-layer-wizard"></div>
+            <div class="rune-layer-wizard inner"></div>
+        </div>
+        <div class="loading-text">Tecendo a Trama...</div>
+    </div>
+
+    <!-- Cinematic Forge Overlay -->
+    <div id="forge-overlay" class="modal-overlay hidden">
+        <div class="forge-container">
+            <div class="forge-animation">
+                <!-- Mystical Weaving Style Forge -->
+                <div class="forge-spinner">
+                    <div class="forge-rune outer"></div>
+                    <div class="forge-rune middle"></div>
+                    <div class="forge-rune inner"></div>
+                    <i class="fas fa-fire-alt forge-center-icon"></i>
+                </div>
+                <div class="forge-glow"></div>
+                <div class="forge-sparks"></div>
+            </div>
+            <div class="forge-status">
+                <h2 class="forge-title">Forjando...</h2>
+                <p class="forge-msg">Tecendo a essência arcana na matéria.</p>
+            </div>
+            <div class="forge-success-content hidden">
+                <h3>Obra-Prima Forjada!</h3>
+                <p>O item foi imbuído com essência arcana.</p>
+                <button class="medieval-btn" onclick="ItemsModule.closeForge()">Concluir</button>
+            </div>
+            <div class="forge-error-content hidden">
+                <h3 style="color: #ef4444;">Falha na Forja!</h3>
+                <p class="error-msg">A essência se dissipou antes de tomar forma.</p>
+                <button class="medieval-btn secondary" onclick="ItemsModule.closeForge()">Tentar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARCANE INSCRIPTION OVERLAY (Spell Creation Animation) -->
+    <div id="inscription-overlay" class="modal-overlay hidden">
+        <div class="inscription-container">
+            <div class="inscription-animation">
+                <!-- Mystical Arcane Style -->
+                <div class="inscription-spinner">
+                    <div class="inscription-rune outer"></div>
+                    <div class="inscription-rune middle"></div>
+                    <div class="inscription-rune inner"></div>
+                    <i class="fas fa-quill inscription-center-icon"></i>
+                </div>
+                <div class="inscription-glow"></div>
+            </div>
+            <div class="inscription-status">
+                <h2 class="inscription-title">Inscrevendo...</h2>
+                <p class="inscription-msg">Canalizando a trama mágica em palavras.</p>
+            </div>
+            <div class="inscription-success-content hidden">
+                <h3 class="inscription-success-title">Sucesso Arcano!</h3>
+                <p class="inscription-success-msg">A magia foi gravada em seu grimório com perfeição.</p>
+                <button class="medieval-btn" onclick="SpellModule.closeInscription()">Concluir</button>
+            </div>
+            <div class="inscription-error-content hidden">
+                <h3 style="color: #ef4444;">Falha na Inscrição!</h3>
+                <p class="error-msg">A magia se desfez antes de completar o ritual.</p>
+                <button class="medieval-btn secondary" onclick="SpellModule.closeInscription()">Tentar
+                    Novamente</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CINEMATIC SUMMONING OVERLAY (Monster Creation Animation) -->
+    <div id="summoning-overlay" class="modal-overlay hidden">
+        <div class="summoning-container">
+            <div class="summoning-animation">
+                <div class="summoning-spinner">
+                    <div class="summoning-rune outer"></div>
+                    <div class="summoning-rune middle"></div>
+                    <div class="summoning-rune inner"></div>
+                    <i class="fas fa-dragon summoning-center-icon"></i>
+                </div>
+                <div class="summoning-glow"></div>
+            </div>
+            <div class="summoning-status">
+                <h2 class="summoning-title">Invocando...</h2>
+                <p class="summoning-msg">Manifestando a essência da criatura no plano material.</p>
+            </div>
+            <div class="summoning-success-content hidden">
+                <h3 class="summoning-success-title">Manifestação Concluída!</h3>
+                <p class="summoning-success-msg">A criatura agora habita os registros desta realidade.</p>
+                <button class="medieval-btn" onclick="MonsterModule.closeSummoning()">Concluir</button>
+            </div>
+            <div class="summoning-error-content hidden">
+                <h3 style="color: #ef4444;">Falha na Invocação!</h3>
+                <p class="error-msg">A essência se dissipou antes de atravessar o véu.</p>
+                <button class="medieval-btn secondary" onclick="MonsterModule.closeSummoning()">Tentar
+                    Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpha Warning Popup -->
+    <div id="alpha-warning" class="alpha-warning-popup">
+        <div class="warning-content">
+            <button id="close-alpha-warning" class="close-modal small"><i class="fas fa-times"></i></button>
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <div class="warning-text">
+                <strong>Versão Alpha</strong>
+                <p>Gostaria de usar o website como alpha tester? Contribua com o projeto via Ko-fi:</p>
+                <div style="margin-top: 10px;">
+                    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+                    <script
+                        type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'O4O41NAE7I'); kofiwidget2.draw();</script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Creation Choice Modal -->
+    <div id="item-creation-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content parchment" style="max-width: 600px;">
+            <button class="close-modal" id="close-choice-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-hammer"></i> MÉTODO DE FORJA
+            </h2>
+            <div class="mode-choices">
+                <button id="choice-manual" class="choice-card">
+                    <i class="fas fa-hammer"></i>
+                    <h4>MANUAL</h4>
+                    <p>Preencha os detalhes do item você mesmo.</p>
+                </button>
+                <button id="choice-ai" class="choice-card">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h4>INSPIRAÇÃO ARCANA</h4>
+                    <p>Deixe a magia moldar o item para você.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Creation Choice Modal -->
+    <div id="generic-creation-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content parchment" style="max-width: 600px;">
+            <button class="close-modal" id="close-generic-choice-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-scroll"></i> <span id="generic-choice-title">MÉTODO DE CRIAÇÃO</span>
+            </h2>
+            <div class="mode-choices">
+                <button id="generic-choice-manual" class="choice-card">
+                    <i class="fas fa-pen-fancy"></i>
+                    <h4>CRIAR MANUALMENTE</h4>
+                    <p>Preencha os detalhes você mesmo.</p>
+                </button>
+                <button id="generic-choice-ai" class="choice-card">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h4>INVOCAR MAGIA</h4>
+                    <p>Deixe a magia moldar a criação para você.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Item Prompt Modal -->
+    <div id="item-ai-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-ai-prompt"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-sparkles"></i> Inspiração de <span id="ai-persona-name">Lyra</span>
+            </h2>
+            <div class="parchment-content">
+                <p>Descreva brevemente o item que deseja. A Magia tecerá os detalhes e adicionará um toque especial.
+                </p>
+                <textarea id="ai-item-prompt" class="medieval-textarea" rows="5"
+                    placeholder="Ex: Uma espada feita de gelo eterno que brilha no escuro..."></textarea>
+                <div class="modal-actions">
+                    <button id="confirm-ai-generation-btn" class="medieval-btn">Invocar Criação</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Creator Modal -->
+    <div id="item-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-item-creator"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-hammer"></i> Forja de Itens</h2>
+            <form id="item-creator-form" class="parchment-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Item</label>
+                        <input type="text" id="create-item-name" class="medieval-input" required
+                            placeholder="Ex: Machado de Fogo">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="create-item-type" class="medieval-select" required
+                            onchange="ItemsModule.toggleCreatorFields(this.value)">
+                            <option value="weapon">Arma</option>
+                            <option value="armor">Armadura</option>
+                            <option value="wondrous">Item Mágico</option>
+                            <option value="potion">Poção / Consumível</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Raridade</label>
+                        <select id="create-item-rarity" class="medieval-select" required>
+                            <option value="common">Comum</option>
+                            <option value="uncommon">Incomum</option>
+                            <option value="rare">Raro</option>
+                            <option value="very_rare">Muito Raro</option>
+                            <option value="legendary">Lendário</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Peso</label>
+                        <input type="text" id="create-item-weight" class="medieval-input" placeholder="Ex: 2 kg">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço</label>
+                        <input type="text" id="create-item-cost" class="medieval-input" placeholder="Ex: 10 po">
+                    </div>
+                </div>
+
+                <div class="form-row stats-row-dynamic">
+                    <div class="form-group creator-field-weapon">
+                        <label>Dano / Ataque</label>
+                        <input type="text" id="create-item-damage" class="medieval-input"
+                            placeholder="Ex: 1d8 cortante">
+                    </div>
+                    <div class="form-group creator-field-armor hidden">
+                        <label>Classe de Armadura (CA)</label>
+                        <input type="text" id="create-item-ac" class="medieval-input" placeholder="Ex: 15 + DES">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Propriedades / Tags (Separadas por vírgula)</label>
+                    <input type="text" id="create-item-props" class="medieval-input"
+                        placeholder="Ex: Pesada, Versátil, Mágica">
+                </div>
+
+                <div class="form-group">
+                    <label>Crônica do Item (Descrição)</label>
+                    <textarea id="create-item-desc" class="medieval-textarea" rows="4"
+                        placeholder="Descreva a história e os efeitos deste item..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">Forjar Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Spell Creation Choice Modal -->
+    <div id="spell-creation-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content parchment" style="max-width: 600px;">
+            <button class="close-modal" id="close-spell-choice-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-scroll"></i> MÉTODO DE ESCRITA
+            </h2>
+            <div class="mode-choices">
+                <button id="spell-choice-manual" class="choice-card">
+                    <i class="fas fa-pen-nib"></i>
+                    <h4>MANUAL</h4>
+                    <p>Transcreva os glifos você mesmo.</p>
+                </button>
+                <button id="spell-choice-ai" class="choice-card">
+                    <i class="fas fa-hat-wizard"></i>
+                    <h4>INSPIRAÇÃO ARCANA</h4>
+                    <p>Deixe a magia fluir através de você.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Spell Prompt Modal -->
+    <div id="spell-ai-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal medium">
+            <button class="close-modal" id="close-spell-ai-prompt"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-wand-magic-sparkles"></i> Inspiração de <span
+                    id="spell-ai-persona">Lyra</span></h2>
+            <div class="parchment-content">
+                <p>Descreva o efeito mágico que deseja invocar. A Magia cuidará dos componentes e rituais.</p>
+                <textarea id="ai-spell-prompt" class="medieval-textarea" rows="8"
+                    placeholder="Ex: Uma bola de fogo que causa dano de frio e desacelera inimigos..."></textarea>
+                <div class="modal-actions">
+                    <button id="confirm-spell-generation-btn" class="medieval-btn">INVOCAR MAGIA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spell Creator Modal -->
+    <div id="spell-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-spell-creator"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-scroll"></i> Escrivaninha de Magias</h2>
+            <form id="spell-creator-form" class="parchment-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome da Magia</label>
+                        <input type="text" id="create-spell-name" class="medieval-input" required
+                            placeholder="Ex: Raio de Gelo">
+                    </div>
+                    <div class="form-group">
+                        <label>Nível</label>
+                        <select id="create-spell-level" class="medieval-select" required>
+                            <option value="0">Truque</option>
+                            <option value="1">1º Nível</option>
+                            <option value="2">2º Nível</option>
+                            <option value="3">3º Nível</option>
+                            <option value="4">4º Nível</option>
+                            <option value="5">5º Nível</option>
+                            <option value="6">6º Nível</option>
+                            <option value="7">7º Nível</option>
+                            <option value="8">8º Nível</option>
+                            <option value="9">9º Nível</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Escola</label>
+                        <select id="create-spell-school" class="medieval-select" required>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="Abjuração">Abjuração</option>
+                            <option value="Adivinhação">Adivinhação</option>
+                            <option value="Conjuração">Conjuração</option>
+                            <option value="Encantamento">Encantamento</option>
+                            <option value="Evocação">Evocação</option>
+                            <option value="Ilusão">Ilusão</option>
+                            <option value="Necromancia">Necromancia</option>
+                            <option value="Transmutação">Transmutação</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tempo de Conjuração</label>
+                        <input type="text" id="create-spell-time" class="medieval-input" placeholder="Ex: 1 ação">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Alcance</label>
+                        <input type="text" id="create-spell-range" class="medieval-input" placeholder="Ex: 9 metros">
+                    </div>
+                    <div class="form-group">
+                        <label>Duração</label>
+                        <input type="text" id="create-spell-duration" class="medieval-input"
+                            placeholder="Ex: Instantânea">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Componentes (V, S, M)</label>
+                    <input type="text" id="create-spell-components" class="medieval-input"
+                        placeholder="Ex: V, S, M (uma pena de coruja)">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Classes (Separe por vírgula)</label>
+                    <input type="text" id="create-spell-classes" class="medieval-input"
+                        placeholder="Ex: Mago, Feiticeiro">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Descrição</label>
+                    <textarea id="create-spell-desc" class="medieval-textarea" rows="6"
+                        placeholder="Descreva os efeitos da magia..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">Inscrever Magia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Item Modal -->
+    <div id="share-item-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-share-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-share-nodes"></i> Compartilhar Item</h2>
+            <div class="parchment-content">
+                <p>Informe o e-mail do destinatário para enviar esta relíquia:</p>
+                <div class="form-group">
+                    <input type="email" id="share-target-email" class="medieval-input" placeholder="email@exemplo.com"
+                        required>
+                </div>
+                <div class="modal-actions">
+                    <button id="confirm-share-btn" class="medieval-btn">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification & Changelog Modal -->
+    <div id="changelog-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal split-panel">
+            <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
+            <div class="notification-center-layout">
+                <!-- Left Panel: Static Changelog -->
+                <div class="notification-panel changelog-side">
+                    <h2 class="modal-title"><i class="fas fa-scroll"></i> Crônicas do Verso</h2>
+                    <div class="changelog-list parchment-content">
+                        <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
+                        <p style="text-align:center; opacity:0.7;">Desenrolando pergaminhos...</p>
+                    </div>
+                </div>
+                <!-- Right Panel: Dynamic Notifications -->
+                <div class="notification-panel system-side">
+                    <h2 class="modal-title"><i class="fas fa-bell"></i> Alertas da Guilda</h2>
+                    <div id="modal-notifications-list" class="notifications-list parchment-content">
+                        <p class="empty-state">O horizonte está calmo. Nenhuma nova mensagem dos corvos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Alpha Warning Close
+            const alphaWarning = document.getElementById('alpha-warning');
+            const closeAlpha = document.getElementById('close-alpha-warning');
+            if (closeAlpha && alphaWarning) {
+                closeAlpha.addEventListener('click', () => {
+                    alphaWarning.classList.add('hidden');
+                });
+            }
+
+            // Close modal on outside click
+            window.addEventListener('click', (e) => {
+                const changelogModal = document.getElementById('changelog-modal');
+                if (e.target === changelogModal) {
+                    changelogModal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+    <!-- Scroll Indicators -->
+    <div id="scroll-up" class="scroll-indicator hidden"><i class="fas fa-chevron-up"></i></div>
+    <div id="scroll-down" class="scroll-indicator hidden"><i class="fas fa-chevron-down"></i></div>
+
+    <!-- Datalists Globais -->
+    <datalist id="races-list"></datalist>
+
+    <!-- Maintenance Overlay -->
+    <div id="maintenance-overlay" class="modal-overlay hidden" style="z-index: 30000; background: rgba(0,0,0,0.95);">
+        <div class="maintenance-content text-center">
+            <div class="mystic-spinner-admin">
+                <div class="rune-layer-admin layer-extra-outer"></div>
+                <div class="rune-layer-admin outer"></div>
+                <div class="rune-layer-admin middle"></div>
+                <div class="rune-layer-admin inner"></div>
+                <div class="spinner-core"></div>
+                <i class="fas fa-hourglass-half spinner-center-icon"></i>
+            </div>
+            <h1 class="medieval-title" style="color: var(--gold); font-size: 2.5rem; text-align: center;">Códice em
+                Manutenção</h1>
+            <p class="parchment-text"
+                style="font-size: 1.2rem; max-width: 600px; margin: 1rem auto; text-align: center; color: #ddd;">
+                Os escribas estão polindo os pergaminhos e calibrando os oráculos.<br>
+                A Trama voltará a brilhar em breve.
+            </p>
+        </div>
+    </div>
+    <!-- Bestiary Modals -->
+    <!-- Creation Choice Modal -->
+
+    <!-- Monster Creator Modal (Manual Form) -->
+    <div id="monster-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-monster-creator">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="monster-creator-title"><i class="fas fa-hammer"></i> Bestiário Arcano</h2>
+            <form id="monster-creator-form" class="parchment-content">
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label>Nome da Criatura</label>
+                        <input type="text" id="create-monster-name" class="medieval-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ND (Nível de Desafio)</label>
+                        <input type="text" id="create-monster-cr" class="medieval-input" placeholder="0, 1/4, 2, 30...">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="create-monster-type" class="medieval-select">
+                            <option value="Aberração">Aberração</option>
+                            <option value="Besta">Besta</option>
+                            <option value="Celestial">Celestial</option>
+                            <option value="Constructo">Constructo</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Elemental">Elemental</option>
+                            <option value="Fada">Fada</option>
+                            <option value="Ínfero">Ínfero</option>
+                            <option value="Gigante">Gigante</option>
+                            <option value="Humanoide">Humanoide</option>
+                            <option value="Monstruosidade">Monstruosidade</option>
+                            <option value="Gosma">Gosma</option>
+                            <option value="Planta">Planta</option>
+                            <option value="Morto-Vivo">Morto-Vivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label>Tamanho</label>
+                        <select id="create-monster-size" class="medieval-select">
+                            <option value="Tiny">Miúdo (Tiny)</option>
+                            <option value="Small">Pequeno (Small)</option>
+                            <option value="Medium" selected>Médio (Medium)</option>
+                            <option value="Large">Grande (Large)</option>
+                            <option value="Huge">Enorme (Huge)</option>
+                            <option value="Gargantuan">Imenso (Gargantuan)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vida (PV)</label>
+                        <input type="text" id="create-monster-hp" class="medieval-input"
+                            placeholder="Ex: 45 (7d8 + 14)">
+                    </div>
+                    <div class="form-group">
+                        <label>Armadura (CA)</label>
+                        <input type="number" id="create-monster-ac" class="medieval-input" placeholder="10">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Ações & Habilidades</label>
+                    <textarea id="create-monster-description" class="medieval-textarea" rows="8"
+                        placeholder="Habilidades especiais, ataques e descrições..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Atributos</label>
+                    <div class="stats-grid-creator">
+                        <div class="stat-creator">
+                            <label>FOR</label>
+                            <input type="number" id="create-monster-for" class="medieval-input" value="10">
+                        </div>
+                        <div class="stat-creator">
+                            <label>DES</label>
+                            <input type="number" id="create-monster-des" class="medieval-input" value="10">
+                        </div>
+                        <div class="stat-creator">
+                            <label>CON</label>
+                            <input type="number" id="create-monster-con" class="medieval-input" value="10">
+                        </div>
+                        <div class="stat-creator">
+                            <label>INT</label>
+                            <input type="number" id="create-monster-int" class="medieval-input" value="10">
+                        </div>
+                        <div class="stat-creator">
+                            <label>SAB</label>
+                            <input type="number" id="create-monster-sab" class="medieval-input" value="10">
+                        </div>
+                        <div class="stat-creator">
+                            <label>CAR</label>
+                            <input type="number" id="create-monster-car" class="medieval-input" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">REGISTRAR NA CRIPTA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Monster Creation Choice Modal -->
+    <div id="monster-creation-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button id="close-monster-choice-modal" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-hammer"></i> MÉTODO DE FORJA</h2>
+            <div class="mode-choices">
+                <button id="monster-choice-manual" class="choice-card">
+                    <i class="fas fa-hammer"></i>
+                    <h4>MANUAL</h4>
+                    <p>Preencha os detalhes da criatura você mesmo.</p>
+                </button>
+                <button id="monster-choice-ai" class="choice-card">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h4>INSPIRAÇÃO ARCANA</h4>
+                    <p>Deixe a magia moldar a criatura para você.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monster AI Prompt Modal -->
+    <div id="monster-ai-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal medium">
+            <button id="close-monster-ai-prompt" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-wand-magic-sparkles"></i> Inspiração de <span
+                    id="monster-ai-persona-name">Lyra</span></h2>
+            <div class="parchment-content">
+                <p>Descreva o efeito mágico que deseja invocar. A Magia cuidará dos componentes e rituais.</p>
+                <textarea id="ai-monster-prompt" class="medieval-textarea" rows="8"
+                    placeholder="Ex: Um lobo das sombras com olhos flamejantes que caça nas noites sem lua..."></textarea>
+                <div class="modal-actions">
+                    <button id="confirm-monster-generation-btn" class="medieval-btn">INVOCAR MAGIA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Generic Choice Modal -->
+    <div id="generic-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-generic-choice-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-hammer"></i> MÉTODO DE FORJA</h2>
+            <div class="mode-choices">
+                <button class="choice-card" id="generic-choice-manual">
+                    <i class="fas fa-hammer"></i>
+                    <h4>MANUAL</h4>
+                    <p>Preencha os detalhes do item você mesmo.</p>
+                </button>
+                <button class="choice-card" id="generic-choice-ai">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h4>INSPIRAÇÃO ARCANA</h4>
+                    <p>Deixe a magia moldar o item para você.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic AI Prompt Modal -->
+    <div id="generic-ai-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal small">
+            <button class="close-modal" id="close-generic-ai-prompt"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-sparkles"></i> Inspiração de <span
+                    id="generic-ai-persona-name">Lyra</span>
+            </h2>
+            <div class="parchment-content">
+                <p id="generic-ai-prompt-description">Descreva brevemente o item que deseja. A Magia tecerá os
+                    detalhes
+                    e adicionará um toque especial.
+                </p>
+                <textarea id="generic-ai-prompt" class="medieval-textarea" rows="5"
+                    placeholder="Ex: Uma espada feita de gelo eterno que brilha no escuro..."></textarea>
+                <div class="modal-actions">
+                    <button id="confirm-generic-ai-btn" class="medieval-btn">Invocar Criação</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Creator Modal -->
+    <div id="generic-creator-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal wide">
+            <button class="close-modal" id="close-generic-creator"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-scroll" id="generic-creator-icon"></i> <span
+                    id="generic-creator-title">Criação Arcana</span></h2>
+            <form id="generic-creator-form" class="parchment-content">
+                <div class="form-group">
+                    <label>Nome / Título</label>
+                    <input type="text" id="generic-create-name" class="medieval-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição / Detalhes (Markdown aceito)</label>
+                    <textarea id="generic-create-desc" class="medieval-textarea" rows="12" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="medieval-btn">Salvar em Meus Anais</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <audio id="lyra-bg-music" src="/assets/music/lyra-theme.mp3" loop></audio>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+
+</html>

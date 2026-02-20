@@ -1,0 +1,367 @@
+/* Form & Wizard Styles */
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    font-family: var(--font-medieval);
+    color: #4a3423;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.form-group input,
+.form-group textarea,
+.attr-input input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    border-bottom: 2px solid rgba(44, 30, 22, 0.3);
+    padding: 0.8rem 1rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--ink);
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    background: rgba(255, 255, 255, 0.6);
+    border-bottom-color: var(--crimson);
+    outline: none;
+}
+
+/* Wizard Specifics */
+.wizard-progress {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.wizard-progress::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 2px;
+    background: rgba(44, 30, 22, 0.1);
+    z-index: 0;
+}
+
+.step-indicator {
+    width: 35px;
+    height: 35px;
+    border: 2px solid rgba(44, 30, 22, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-medieval);
+    background: var(--parchment);
+    color: rgba(44, 30, 22, 0.4);
+    z-index: 1;
+    transition: 0.4s;
+}
+
+.step-indicator.active {
+    background: var(--dark-charcoal);
+    color: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.step-indicator.complete {
+    background: var(--gold);
+    color: #000;
+    border-color: #000;
+}
+
+/* Creation Mode Choices (Standard Premium Pattern) */
+.mode-choices {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.mode-choices .choice-card {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+}
+
+@media (max-width: 600px) {
+    .mode-choices {
+        grid-template-columns: 1fr;
+    }
+}
+
+.choice-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid rgba(44, 30, 22, 0.1);
+    padding: 2.5rem 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.choice-card:hover {
+    background: rgba(244, 228, 188, 0.5);
+    border-color: var(--crimson);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.choice-card i {
+    font-size: 3rem;
+    color: var(--crimson);
+    margin-bottom: 1.5rem;
+    display: block;
+    transition: 0.3s;
+}
+
+.choice-card:hover i {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(139, 0, 0, 0.3));
+}
+
+.choice-card h4 {
+    font-family: var(--font-medieval);
+    margin-bottom: 0.8rem;
+    font-size: 1.5rem;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.choice-card p {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Lyra's Guidance System (Wizard) */
+.lyra-guidance-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    z-index: 30000;
+    pointer-events: none;
+    animation: guidanceReveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.lyra-guidance-container * {
+    pointer-events: auto;
+}
+
+@keyframes guidanceReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.guidance-portrait {
+    width: 80px;
+    height: 110px;
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    background: #000;
+    object-fit: cover;
+}
+
+.guidance-bubble {
+    width: 280px;
+    padding: 1.2rem !important;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    position: relative;
+    border: 3px double var(--gold) !important;
+    background: var(--parchment);
+}
+
+.guidance-bubble p {
+    margin: 0;
+    font-style: normal;
+    font-weight: 500;
+    color: #2c1e16;
+    font-family: var(--font-medieval);
+    font-size: 1.2rem;
+}
+
+.bubble-tail {
+    position: absolute;
+    left: -10px;
+    bottom: 20px;
+    width: 20px;
+    height: 20px;
+    background: inherit;
+    border-left: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+    transform: rotate(45deg);
+}
+
+/* Loading */
+#mystic-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 18, 18, 0.98);
+    z-index: 30000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(20px);
+}
+
+/* rotateRune moved to animations.css */
+
+@keyframes portalPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+}
+
+/* Runic Loading Effect for Primary Buttons */
+.medieval-btn:disabled {
+    cursor: not-allowed;
+    position: relative;
+    overflow: hidden;
+}
+
+.medieval-btn.primary:disabled {
+    background: linear-gradient(135deg, #1a0f0f, #3d250d) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    animation: runicPulse 2s infinite ease-in-out;
+}
+
+@keyframes runicPulse {
+    0% {
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.2), inset 0 0 5px rgba(212, 175, 55, 0.1);
+        text-shadow: 0 0 2px rgba(212, 175, 55, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 0 15px rgba(212, 175, 55, 0.3);
+        text-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.2), inset 0 0 5px rgba(212, 175, 55, 0.1);
+        text-shadow: 0 0 2px rgba(212, 175, 55, 0.3);
+    }
+}
+
+.medieval-btn:disabled i.fa-spin {
+    margin-right: 10px;
+    filter: drop-shadow(0 0 5px var(--gold));
+}
+
+/* rotateRune moved to animations.css */
+
+/* pulseGlow moved to animations.css */
+
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(44, 30, 22, 0.1);
+}
+
+
+.attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.attr-input {
+    background: rgba(44, 30, 22, 0.04);
+    border: 2px solid rgba(44, 30, 22, 0.1);
+    border-radius: 6px;
+    padding: 1.2rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.attr-input input {
+    width: 80px;
+    text-align: center;
+    font-size: 1.5rem;
+    background: transparent;
+    border: none !important;
+    border-bottom: 2px solid var(--gold) !important;
+    color: var(--ink);
+    font-family: var(--font-medieval);
+}
+
+.skills-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-top: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#session-detail-chronicles {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}

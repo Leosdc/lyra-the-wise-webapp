@@ -1,0 +1,357 @@
+/* Animations */
+@keyframes vignettePulse {
+    0% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0.9;
+        transform: scale(1.1);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes mysticFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+        filter: blur(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes mystic-line {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+
+    50% {
+        width: 100%;
+        left: 0;
+    }
+
+    100% {
+        width: 0%;
+        left: 100%;
+    }
+}
+
+@keyframes confirmPop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* pulseGlow moved to animations.css */
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(-0.5deg);
+    }
+
+    50% {
+        transform: rotate(0.5deg);
+    }
+}
+
+@keyframes magicPulseShadow {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@keyframes borderGlow {
+
+    0%,
+    100% {
+        border-color: var(--gold);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(241, 196, 15, 0.1);
+    }
+
+    50% {
+        border-color: var(--gold-bright);
+        box-shadow: 0 8px 32px rgba(241, 196, 15, 0.3), inset 0 0 25px rgba(241, 196, 15, 0.2);
+    }
+}
+
+/* Missing Animations Restored from Backup */
+
+@keyframes bounceMedieval {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0) translateX(-50%);
+    }
+
+    40% {
+        transform: translateY(-10px) translateX(-50%);
+    }
+
+    60% {
+        transform: translateY(-5px) translateX(-50%);
+    }
+}
+
+/* rotateRune moved to animations.css */
+
+@keyframes guidanceReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulseRed {
+    0% {
+        box-shadow: 0 0 5px rgba(192, 57, 43, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(192, 57, 43, 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(192, 57, 43, 0.3);
+    }
+}
+
+/* Shared Forge & Creation Animations */
+@keyframes forge-spin-cw {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes forge-spin-ccw {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes forge-heartbeat {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 1;
+    }
+}
+
+@keyframes forge-success-pop {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes forge-pulse-glow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
+}
+
+/* Helpers */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.error-text {
+    color: var(--crimson);
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Markdown Styling */
+.parchment-content h1,
+.parchment-content h2,
+.parchment-content h3 {
+    font-family: var(--font-medieval);
+    color: var(--crimson);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.1);
+    padding-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.parchment-content h1 {
+    font-size: 2rem;
+}
+
+.parchment-content h2 {
+    font-size: 1.8rem;
+}
+
+.parchment-content h3 {
+    font-size: 1.5rem;
+}
+
+.parchment-content blockquote {
+    border-left: 4px solid var(--gold);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    background: rgba(212, 175, 55, 0.05);
+    font-style: italic;
+    color: var(--ink);
+    opacity: 0.9;
+}
+
+.parchment-content code {
+    background: rgba(44, 30, 22, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: var(--crimson);
+    border: 1px solid rgba(44, 30, 22, 0.1);
+}
+
+.parchment-content ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.parchment-content li {
+    margin-bottom: 0.5rem;
+    list-style-type: square;
+    color: var(--ink);
+}
+
+.parchment-content strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+/* Empty State */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem;
+    opacity: 0.9;
+    font-size: 1.2rem;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin: 2rem;
+}

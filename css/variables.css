@@ -1,0 +1,54 @@
+:root {
+    --gold: #f1c40f;
+    --gold-bright: #ffdf00;
+    --gold-dark: #b8860b;
+    --gold-faded: rgba(212, 175, 55, 0.3);
+    --dark-charcoal: #121212;
+    --dark-panel: rgba(20, 20, 20, 0.85);
+    --msg-local-bg: rgba(30, 45, 60, 0.85);
+    /* Default Blue/Slate */
+    --parchment: #fdf6e3;
+    --ink: #2c1e16;
+    --crimson: #c0392b;
+    --emerald: #27ae60;
+    --shadow: #2c3e50;
+    --sunlight: #f39c12;
+    --lunar: #3498db;
+    --crystal: #ecf0f1;
+    --glass: rgba(255, 255, 255, 0.05);
+    --border-medieval: 2px solid var(--gold);
+    --header-tracker-bg: rgba(0, 0, 0, 0.3);
+    --header-tracker-border: rgba(212, 175, 55, 0.3);
+
+    /* Semantic Variables */
+    --spinner-inner: var(--crimson);
+    --spinner-outer: rgba(212, 175, 55, 0.2);
+
+    /* Global Structural Variables */
+    --input-bg: rgba(253, 246, 227, 0.95);
+    --input-border: var(--gold);
+    --input-focus-bg: #fff;
+    --input-focus-shadow: rgba(241, 196, 15, 0.4);
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    --hr-color: rgba(212, 175, 55, 0.3);
+    --card-border: var(--gold);
+    --scroll-btn-bg: var(--dark-panel);
+    --scroll-btn-color: var(--gold);
+    --text-shadow-glow: none;
+
+    /* Shadows & Glows */
+    --select-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.1);
+    --select-hover-glow: 0 0 20px rgba(212, 175, 55, 0.3);
+    --select-focus-glow: 0 0 25px rgba(212, 175, 55, 0.4);
+
+    /* Fonts */
+    --font-medieval: 'Montserrat', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-fancy: 'Grenze Gotisch', serif;
+
+    /* Missing Variables — Audit Fix */
+    --crimson-gold: #8b2020;
+    --gold-medieval: var(--gold-dark);
+    --text-dark: var(--ink);
+    --text-muted: rgba(44, 30, 22, 0.6);
+}

@@ -1,0 +1,165 @@
+/* Changelog & Notification Center Premium Redesign */
+
+.medieval-modal.split-panel {
+    max-width: 950px;
+    width: 95%;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.notification-center-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    min-height: 500px;
+    max-height: 80vh;
+}
+
+.notification-panel {
+    background: var(--parchment);
+    border: 3px double var(--gold-dark);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.notification-panel .modal-title {
+    font-size: 1.6rem !important;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--ink) !important;
+    border-bottom: 1px solid var(--hr-color);
+    padding-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+.notification-panel .parchment-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dark) transparent;
+}
+
+/* Specific Sides */
+.system-side {
+    background: var(--input-bg);
+}
+
+/* Notification Cards */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notif-card {
+    background: rgba(var(--crystal-rgb, 255, 255, 255), 0.1);
+    border: 1px solid var(--hr-color);
+    border-left: 4px solid var(--gold);
+    padding: 1rem;
+    border-radius: 4px;
+    animation: slideInNotif 0.3s ease-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notif-card.invite {
+    border-left-color: var(--crimson);
+}
+
+.notif-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.notif-header i {
+    color: var(--gold);
+}
+
+.notif-header strong {
+    font-family: var(--font-medieval);
+    font-size: 0.9rem;
+    color: var(--gold-dark);
+}
+
+.notif-body {
+    font-size: 0.95rem;
+    color: var(--ink);
+    opacity: 0.9;
+    margin-bottom: 12px;
+}
+
+.notif-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    opacity: 0.7;
+    padding: 2rem 1rem;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink);
+}
+
+/* Changelog Overrides */
+.changelog-header-thematic {
+    margin-bottom: 1.5rem;
+}
+
+.changelog-title {
+    font-size: 1.8rem !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+    .notification-center-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+        height: 90vh;
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    .medieval-modal.split-panel {
+        height: 95vh;
+    }
+
+    .notification-panel {
+        min-height: 400px;
+    }
+}
+
+@keyframes slideInNotif {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

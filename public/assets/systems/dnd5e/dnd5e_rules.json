@@ -1,0 +1,62 @@
+[
+    {
+        "id": "roll_mechanics",
+        "name": "Rolagens de Dado",
+        "description": "O jogo possui basicamente três rolagens de dado:\n\n### Atacar\n`d20 + modificador de atributo + proficiência (arma ou magia) + modificadores situacionais`  \nSe o total for igual ou maior que a **Classe de Armadura (CA)**, o ataque acerta.\n\n### Testes de Atributo\n`d20 + modificador de atributo + modificadores circunstanciais`  \nUsado quando o resultado de uma ação não é garantido.\n\n### Testes de Resistência\n`d20 + modificador de atributo + bônus de proficiência (se aplicável)`  \nUsado para resistir a efeitos externos, como magias ou armadilhas."
+    },
+    {
+        "id": "skills",
+        "name": "Perícias",
+        "description": "As perícias representam aspectos específicos de seus atributos. A ficha apresenta **18 perícias**:\n\n- **Força:** Atletismo\n- **Destreza:** Acrobacia, Prestidigitação, Furtividade\n- **Inteligência:** Arcanismo, História, Investigação, Natureza, Religião\n- **Sabedoria:** Lidar com Animais, Intuição, Medicina, Percepção, Sobrevivência\n- **Carisma:** Enganação, Intimidação, Performance, Persuasão\n\n> **Sabedoria** é usada para atenção e sentidos.\n> **Inteligência** é usada para investigação dedutiva e interpretação."
+    },
+    {
+        "id": "basic_mechanics",
+        "name": "Mecânicas Básicas",
+        "description": "### Vantagem e Desvantagem\nRole 2d20. Com **Vantagem**, use o maior resultado; com **Desvantagem**, use o menor.\n\n### Frações\nSempre arredonde para baixo em qualquer cálculo do sistema.\n\n### Inspiração\nConcedida pelo mestre por boa interpretação. Concede vantagem em uma rolagem. Não é cumulativa e pode ser doada a outro jogador.\n\n### Testes em Grupo\nSe pelo menos metade do grupo passar na CD, a ação coletiva tem sucesso.\n\n### Testes Passivos\n`10 + modificadores (+5 com vantagem / -5 com desvantagem)`. Usado quando o mestre quer determinar algo sem o jogador rolar dados (ex: Percepção Passiva).\n\n### Disputas\nAmbos rolam testes opostos. Em caso de empate, o estado atual das coisas se mantém."
+    },
+    {
+        "id": "combat_basics",
+        "name": "Combate: Básico",
+        "description": "### Iniciativa\nNo início de um combate, todos rolam `d20 + modificador de Destreza`. A ordem é do maior para o menor.\n\n### Turnos e Rodadas\nUma rodada dura 6 segundos. No seu turno, você pode se mover e realizar uma **Ação**.\n\n### Surpresa\nAquele que estiver surpreso não pode se mover ou agir no primeiro turno, e não pode usar reações até o fim desse turno.\n\n### Reações\nVocê tem no máximo 1 reação por rodada, que pode ser usada em resposta a um gatilho específico."
+    },
+    {
+        "id": "actions_in_combat",
+        "name": "Ações em Combate",
+        "description": "No seu turno, você pode realizar uma das seguintes ações principais:\n\n- **Atacar:** Realiza um ataque corpo-a-corpo ou à distância.\n- **Conjurar Magia:** Lança uma magia com tempo de conjuração de 1 ação.\n- **Correr:** Ganha movimento extra igual ao seu deslocamento atual.\n- **Desengajar:** Seu movimento não provoca ataques de oportunidade pelo resto do turno.\n- **Desviar:** Ataques contra você têm desvantagem e você tem vantagem em TR de Destreza.\n- **Ajudar:** Concede vantagem para o próximo teste de um aliado.\n- **Esconder-se:** Realiza um teste de Furtividade para não ser visto.\n- **Preparar:** Define um gatilho para realizar uma ação fora do seu turno.\n- **Procurar:** Realiza um teste de Percepção ou Investigação.\n- **Usar Objeto:** Interage com um objeto complexo."
+    },
+    {
+        "id": "movement",
+        "name": "Movimento",
+        "description": "### Divisão do Movimento\nVocê pode dividir seu movimento antes, entre e depois das suas ações.\n\n### Terreno Difícil\nCada metro de movimento em terreno difícil custa 1 metro adicional.\n\n### Ataques de Oportunidade\nOcorrem quando você sai do alcance de uma criatura sem desengajar.\n\n### Quedas\nSofre `1d6` de dano por cada 3 metros de queda (máximo 20d6) e cai no chão (caído).\n\n### Posição Caída\nLevantar-se custa metade do seu movimento total. Rastejar em terreno difícil custa movimento triplo."
+    },
+    {
+        "id": "magic_rules",
+        "name": "Regras de Magia",
+        "description": "### Classe de Dificuldade (CD)\n`8 + modificador de atributo de conjuração + bônus de proficiência`.\n\n### Bônus de Ataque Mágico\n`modificador de atributo de conjuração + bônus de proficiência`.\n\n### Concentração\nAo sofrer dano enquanto mantém uma magia, deve passar num TR de Constituição (CD 10 ou metade do dano, o que for maior).\n\n### Componentes\n- **Verbal (V):** Entonação mística.\n- **Somático (S):** Gestos precisos.\n- **Material (M):** Itens específicos ou um foco arcano.\n\n### Rituais\nAlgumas magias podem ser lançadas como rituais, levando 10 minutos extras mas sem gastar espaços de magia (slots)."
+    },
+    {
+        "id": "health_and_death",
+        "name": "Cura e Morte",
+        "description": "### 0 Pontos de Vida\nAo chegar a 0 PV, você cai inconsciente e deve realizar **Testes de Resistência contra a Morte** no início de cada turno.\n\n- **Sucesso:** 10 ou mais no d20. 3 sucessos estabilizam o personagem.\n- **Falha:** 9 ou menos. 3 falhas resultam em morte.\n- **1 Natural:** Conta como 2 falhas.\n- **20 Natural:** Recupera instantaneamente 1 PV e recupera a consciência.\n\n### Estabilização\nUm aliado pode usar uma ação e passar num teste de Sabedoria (Medicina) CD 10 para estabilizá-lo.\n\n### Dano Não-Letal\nAo reduzir uma criatura a 0 PV com um ataque corpo-a-corpo, você pode optar por deixá-la apenas inconsciente (estável)."
+    },
+    {
+        "id": "resting",
+        "name": "Descanso",
+        "description": "### Descanso Curto (Pelo menos 1 hora)\nPermite gastar **Dados de Vida** para recuperar PV. Role o dado e adicione seu modificador de Constituição.\n\n### Descanso Longo (Pelo menos 8 horas)\nRecupera todos os PV e recupera metade do total de Dados de Vida do personagem. Também recupera todos os espaços de magia ganhos."
+    },
+    {
+        "id": "conditions",
+        "name": "Condições",
+        "description": "Efeitos que alteram as capacidades de uma criatura:\n\n- **Agarrado:** Movimento 0.\n- **Atordoado:** Incapacitado, falha TR de FOR e DES, ataques contra têm vantagem.\n- **Caído:** Desvantagem em ataques. Ataques corpo-a-corpo contra têm vantagem; à distância têm desvantagem.\n- **Cego:** Falha testes que dependem de visão. Ataques contra têm vantagem; ataques da criatura têm desvantagem.\n- **Envenenado:** Desvantagem em rolagens de ataque e testes de atributo.\n- **Incapacitado:** Não pode realizar ações ou reações.\n- **Invisível:** Vantagem em ataques; ataques contra têm desvantagem. Não pode ser visto sem ajuda mágica.\n- **Paralisado:** Incapacitado. Falha TR de FOR e DES. Ataques de perto são críticos automáticos.\n- **Restringido:** Movimento 0. Desvantagem em ataques e TR de DES. Ataques contra têm vantagem."
+    },
+    {
+        "id": "exhaustion",
+        "name": "Exaustão",
+        "description": "Medida em 6 níveis acumulativos:\n\n1. Desvantagem em testes de atributo\n2. Deslocamento reduzido à metade\n3. Desvantagem em jogadas de ataque e TR\n4. Pontos de vida máximos reduzidos à metade\n5. Deslocamento reduzido a 0\n6. Morte\n\nUm descanso longo reduz o nível de exaustão em 1 (se o personagem ingerir comida e água)."
+    },
+    {
+        "id": "traps_mechanics",
+        "name": "Mecânicas de Armadilhas",
+        "description": "Armadilhas geralmente envolvem três aspectos principais:\n\n- **Perceber (INT/SAB):** Detectar a armadilha ou o mecanismo de gatilho.\n- **Investigar (INT):** Entender como a armadilha funciona e como desarmá-la.\n- **Desarmar (DES):** Usar ferramentas de ladrão para desativar o mecanismo.\n\n**Falhas:** Normalmente ativam a armadilha imediatamente.\n**Exemplo de Teto Esmagador:** CD 15 para encontrar, CD 15 para desarmar. Dano 1d10+4."
+    }
+]
