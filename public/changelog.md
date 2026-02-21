@@ -2,8 +2,23 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
  
- 
+## [3.2.0] - 2026-02-21
+### 🏰 Fortaleza Arcaica & Nuvem Soberana
+- **Migração para App Hosting**:
+    - Transição completa da infraestrutura para o **Firebase App Hosting**, garantindo builds atômicas e deploy contínuo via GitHub.
+- **Segurança Nível Cofre**:
+    - **Secret Manager**: Chaves sensíveis (Gemini API) agora residem em cofres protegidos, eliminando riscos de vazamento em código ou ambiente.
+    - **Blindagem de Entrada**: Integração do **DOMPurify** em todos os fluxos de chat e narrativa para sanitização total contra ataques XSS.
+    - **Protocolos de Defesa (CSP)**: Implementação de Content Security Policy rígida via **Helmet** para proteger o navegador dos viajantes.
+- **Otimização de Pulso & Sincronia**:
+    - **Parallel Fetching**: Consultas paralelas ao Firestore para carregar sessões de heróis, reduzindo a latência de carregamento.
+    - **Logging Centralizado**: Novo sistema de logs para diagnóstico rápido de pulso sem poluir o console de produção.
+- **Refinamento de Infraestrutura**:
+    - Dockerfile otimizado para a nova infraestrutura.
+    - Configurações centralizadas via `apphosting.yaml`.
+
 ## [3.1.0] - 2026-02-18
+
 ### ⚒️ Forja Global & Harmonia de Combate
 - **Geração Global de Conteúdo**:
     - Lançamento das ferramentas de criação instantânea de NPCs, Tramas e Masmorras via Oráculo Arcano.
