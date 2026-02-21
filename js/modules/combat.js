@@ -16,6 +16,21 @@ import {
     getDocs
 } from "firebase/firestore";
 import { getCharacter } from "../data.js";
+import { logger } from "../logger.js";
+
+/**
+ * @typedef {Object} CombatParticipant
+ * @property {string} id
+ * @property {string} name
+ * @property {'player'|'monster'} type
+ * @property {number} hp
+ * @property {number} maxHp
+ * @property {number} ac
+ * @property {number} dexterity
+ * @property {number} initiative - valor final (roll + mod)
+ * @property {number} initiativeRoll - valor do dado
+ * @property {number} dexMod - modificador de destreza
+ */
 
 const CombatModule = {
     sessionId: null,
@@ -26,7 +41,7 @@ const CombatModule = {
 
     async startCombat(sessionId, sessionData) {
         this.sessionId = sessionId;
-        console.log("⚔️ Combat: Iniciando combate...");
+        logger.info("⚔️ Combat: Iniciando combate...");
 
         // 1. Get AI combat narrative if in oracle mode
         if (sessionData.mode === 'oracle') {
@@ -72,13 +87,11 @@ const CombatModule = {
         // 6. Start first turn
         await this.startTurn(0);
 
-        console.log("✅ Combat: Combate iniciado", participants);
+        logger.info("✅ Combat: Combate iniciado", participants);
         return participants;
     },
 
     async getPlayers() {
-        const players = [];
-
         try {
             const q = query(
                 collection(db, "session_invites"),
@@ -87,30 +100,31 @@ const CombatModule = {
 
             const snapshot = await getDocs(q);
 
-            for (const inviteDoc of snapshot.docs) {
-                const invite = inviteDoc.data();
-
-                if (invite.characterId) {
+            const promises = snapshot.docs
+                .map(doc => doc.data())
+                .filter(invite => invite.characterId)
+                .map(async (invite) => {
                     const char = await getCharacter(invite.characterId);
-                    if (char) {
-                        players.push({
-                            id: invite.characterId,
-                            name: char.bio?.name || 'Desconhecido',
-                            type: 'player',
-                            hp: char.stats?.hp || 10,
-                            maxHp: char.stats?.maxHp || 10,
-                            ac: char.stats?.ac || 10,
-                            dexterity: char.stats?.dexterity || 10,
-                            characterData: char
-                        });
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Erro ao coletar jogadores:", error);
-        }
+                    if (!char) return null;
+                    return {
+                        id: invite.characterId,
+                        name: char.bio?.name || 'Desconhecido',
+                        type: 'player',
+                        hp: char.stats?.hp || 10,
+                        maxHp: char.stats?.maxHp || 10,
+                        ac: char.stats?.ac || 10,
+                        dexterity: char.stats?.dexterity || 10,
+                        characterData: char
+                    };
+                });
 
-        return players;
+            const results = await Promise.all(promises);
+            return results.filter(p => p !== null);
+
+        } catch (error) {
+            logger.error("Erro ao coletar jogadores:", error);
+            return [];
+        }
     },
 
     calculateInitiative(players, monsters) {
@@ -168,7 +182,7 @@ const CombatModule = {
         const current = this.turnOrder[index];
 
         if (!current) {
-            console.error("Turno inválido:", index);
+            logger.error("Turno inválido:", index);
             return;
         }
 
@@ -185,7 +199,7 @@ const CombatModule = {
             `HP: ${current.hp}/${current.maxHp} | CA: ${current.ac}`
         );
 
-        console.log(`⚔️ Turno ${index}: ${current.name}`);
+        logger.info(`⚔️ Turno ${index}: ${current.name}`);
     },
 
     async nextTurn() {
@@ -220,7 +234,7 @@ const CombatModule = {
         this.round = 1;
 
         await this.sendCombatMessage("⚔️ **Combate Encerrado!**");
-        console.log("✅ Combat: Combate encerrado");
+        logger.info("✅ Combat: Combate encerrado");
     },
 
     async sendCombatMessage(text) {
@@ -299,18 +313,26 @@ Retorne um array JSON com os monstros.`;
             if (jsonMatch) {
                 const monsters = JSON.parse(jsonMatch[0]);
 
+                // Validar que é array e que cada monstro tem os campos mínimos
+                if (!Array.isArray(monsters)) throw new Error('Schema inválido: esperado array');
+                const validMonsters = monsters.filter(m =>
+                    m && typeof m.name === 'string' && typeof m.hp === 'number' && typeof m.ac === 'number'
+                );
+
+                if (validMonsters.length === 0) throw new Error('Nenhum monstro válido no retorno da IA');
+
                 // Save monsters to session
                 const sessionRef = doc(db, "sessoes", this.sessionId);
                 await updateDoc(sessionRef, {
-                    linked_monsters: monsters,
-                    ai_generated_monsters: monsters
+                    linked_monsters: validMonsters,
+                    ai_generated_monsters: validMonsters
                 });
 
-                await this.sendCombatMessage(`🔮 O Oráculo invocou ${monsters.length} adversários!`);
-                return monsters;
+                await this.sendCombatMessage(`🔮 O Oráculo invocou ${validMonsters.length} adversários!`);
+                return validMonsters;
             }
         } catch (error) {
-            console.error("Erro ao parsear monstros da IA:", error);
+            logger.error("Erro ao parsear monstros da IA:", error);
         }
 
         // Fallback: create generic monsters
@@ -336,5 +358,5 @@ Retorne um array JSON com os monstros.`;
     }
 };
 
-window.CombatModule = CombatModule;
+
 export default CombatModule;

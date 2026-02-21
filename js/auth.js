@@ -9,17 +9,15 @@ import firebaseConfig from "./firebase-config.js";
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize App Check
-// Use self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; in console for local testing if needed
-// or it will auto-detect localhost
-if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+// Initialize App Check ONLY in production. Localhost bypasses App Check 
+// to avoid the 403 Forbidden error and "Pending promise was never set" auth bug.
+let appCheck;
+if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    appCheck = initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+        isTokenAutoRefreshEnabled: true
+    });
 }
-
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider('6Lf7U1IsAAAAAHyTM7DQn89EaOd2eOQg1g20M_Nc'),
-    isTokenAutoRefreshEnabled: true
-});
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -52,8 +50,9 @@ export const initAuth = (onUserChanged) => {
 
 export const getToken = async () => {
     try {
-        const { getToken } = await import("firebase/app-check");
-        const result = await getToken(appCheck);
+        if (!appCheck) return null; // Bypass for localhost
+        const { getToken: getFirebaseAppCheckToken } = await import("firebase/app-check");
+        const result = await getFirebaseAppCheckToken(appCheck);
         return result.token;
     } catch (error) {
         console.error("Erro ao obter App Check token:", error);

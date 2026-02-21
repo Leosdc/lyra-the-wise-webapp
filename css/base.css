@@ -44,8 +44,8 @@ h4,
     background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
         url('/assets/backgrounds/lyra-bg.png');
     background-size: cover;
-    background-attachment: scroll;
-    /* Fixed causa flickering severo em iOS/Safari */
+    background-attachment: fixed;
+    /* Changed from scroll to fixed to prevent stretching on long pages (like item gallery) */
     min-height: 100vh;
     background-position: center;
     overflow-x: hidden;
@@ -61,5 +61,6 @@ h4,
     background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
     pointer-events: none;
     z-index: 1;
+    will-change: opacity;
     animation: vignettePulse 10s infinite alternate ease-in-out;
 }

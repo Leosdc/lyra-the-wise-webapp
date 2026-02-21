@@ -1,3 +1,4 @@
+import { calculateModifier } from '../modules/utils.js';
 
 /**
  * D&D 5e System Module
@@ -9,7 +10,7 @@ export const DND5eSystem = {
 
     // Modifiers Table
     getModifier(score) {
-        return Math.floor((score - 10) / 2);
+        return calculateModifier(score);
     },
 
     formatModifier(mod) {

@@ -475,18 +475,20 @@ export const SpellModule = {
         const p = modal.querySelector('p');
 
         if (title) title.innerHTML = `<i class="fas fa-share-nodes"></i> Compartilhar Magia`;
-        if (p) p.innerText = "Informe o e-mail do destinatário para partilhar este conhecimento arcano:";
+        if (p) p.innerText = "Informe o Apelido Arcano do mago para partilhar este conhecimento:";
 
         modal.classList.remove('hidden');
     },
 
     async handleShareConfirm() {
-        const email = document.getElementById('share-target-email').value;
-        if (!email) return;
+        // We reuse the 'share-target-email' input ID for now, just changing the label
+        const nickname = document.getElementById('share-target-email').value;
+        if (!nickname) return;
 
         try {
-            await DataModule.shareSpell(this.spellToShare, email);
-            window.app.showAlert(`O pergaminho foi enviado para ${email}!`, "Partilha Concluída");
+            // shareSpell was updated to expect a nickname
+            await DataModule.shareSpell(this.spellToShare, nickname);
+            window.app.showAlert(`O pergaminho foi enviado para o mago ${nickname}!`, "Partilha Concluída");
             document.getElementById('share-item-modal').classList.add('hidden');
             document.getElementById('share-target-email').value = '';
             this.spellToShare = null;

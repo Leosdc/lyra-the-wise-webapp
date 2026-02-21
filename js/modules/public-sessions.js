@@ -11,8 +11,11 @@ import {
     getDocs,
     orderBy,
     limit,
+
     increment
 } from 'firebase/firestore';
+import DOMPurify from 'dompurify';
+import { logger } from '../logger.js';
 
 const nicknameCache = new Map();
 
@@ -53,17 +56,16 @@ export const PublicSessionsModule = {
                 return;
             }
 
-            const sessions = [];
-            for (const doc of snapshot.docs) {
+            const sessions = await Promise.all(snapshot.docs.map(async (doc) => {
                 const data = doc.data();
                 const nickname = data.masterNickname || await this.getNickname(data.userId);
-                sessions.push({ id: doc.id, ...data, masterNickname: nickname });
-            }
+                return { id: doc.id, ...data, masterNickname: nickname };
+            }));
 
             container.innerHTML = sessions.map(session => this.renderPublicSessionCard(session)).join('');
 
         } catch (error) {
-            console.error('Erro ao carregar sessões públicas:', error);
+            logger.error('Erro ao carregar sessões públicas:', error);
             container.innerHTML = '<div class="empty-msg">Erro ao carregar sessões públicas.</div>';
         }
     },
@@ -93,13 +95,13 @@ export const PublicSessionsModule = {
         return `
             <div class="session-card" data-session-id="${session.id}">
                 <div class="session-card-header">
-                    <h3 class="session-title">${session.title || 'Sessão sem título'}</h3>
+                    <h3 class="session-title">${DOMPurify.sanitize(session.title || 'Sessão sem título')}</h3>
                     <div class="session-badges">
                         ${modeBadge}
                         ${statusBadge}
                     </div>
                 </div>
-                <p class="session-summary">${session.summary || 'Sem descrição disponível.'}</p>
+                <p class="session-summary">${DOMPurify.sanitize(session.summary || 'Sem descrição disponível.')}</p>
                 <div class="session-meta">
                     <div class="session-meta-item">
                         <i class="fas fa-users"></i>
@@ -186,7 +188,7 @@ export const PublicSessionsModule = {
             }
 
         } catch (error) {
-            console.error("Erro ao carregar detalhes:", error);
+            logger.error("Erro ao carregar detalhes:", error);
             window.app.showAlert("Não foi possível carregar os detalhes da sessão.");
         } finally {
             window.app.toggleLoading(false);
@@ -267,7 +269,7 @@ document.addEventListener('click', async (e) => {
                 window.app.switchView('my-sessions');
 
             } catch (error) {
-                console.error("Erro ao entrar na sessão:", error);
+                logger.error("Erro ao entrar na sessão:", error);
                 window.app.showAlert("Erro ao processar entrada: " + error.message);
             } finally {
                 window.app.toggleLoading(false);
@@ -282,7 +284,7 @@ document.addEventListener('click', async (e) => {
                 window.app.showAlert("Sua solicitação foi enviada ao mestre. Você será notificado quando for aceito.", "Solicitação Enviada");
 
             } catch (error) {
-                console.error("Erro ao solicitar acesso:", error);
+                logger.error("Erro ao solicitar acesso:", error);
                 window.app.showAlert("Não foi possível enviar a solicitação: " + error.message);
             } finally {
                 window.app.toggleLoading(false);
@@ -301,5 +303,5 @@ document.addEventListener('click', async (e) => {
     }
 });
 
-window.PublicSessionsModule = PublicSessionsModule;
+// window.PublicSessionsModule = PublicSessionsModule;
 export default PublicSessionsModule;

@@ -365,3 +365,46 @@
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
+
+/* Attribute Generation Tips */
+.pointer-icon {
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 1.2rem;
+    color: var(--crimson);
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+.pointer-icon:hover {
+    color: var(--gold);
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 5px var(--gold));
+}
+
+.tips-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-family: var(--font-body);
+}
+
+.tips-table th,
+.tips-table td {
+    padding: 10px;
+    border: 1px solid rgba(44, 30, 22, 0.2);
+    text-align: center;
+}
+
+.tips-table th {
+    background: rgba(44, 30, 22, 0.05);
+    font-family: var(--font-medieval);
+    color: var(--crimson);
+}
+
+.tips-highlight {
+    background: rgba(212, 175, 55, 0.1);
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 4px;
+}

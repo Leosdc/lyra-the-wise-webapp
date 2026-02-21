@@ -4,7 +4,7 @@
  */
 
 const isDev = import.meta.env.DEV;
-const SILENCE_ALL = false; // Set to true to suppress all debug/info logs during review
+const SILENCE_ALL = true; // Set to true to suppress all debug/info logs during review
 
 export const logger = {
     /**

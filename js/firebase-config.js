@@ -1,13 +1,13 @@
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyBdymlRGmshBOgIKMWomn07Lf6SyAalR3E",
-    authDomain: "lyra-the-wise.firebaseapp.com",
-    projectId: "lyra-the-wise",
-    storageBucket: "lyra-the-wise.firebasestorage.app",
-    messagingSenderId: "870870220835",
-    appId: "1:870870220835:web:ccad45d2fa25caaf613196",
-    measurementId: "G-KLCQTRYGVL"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 export default firebaseConfig;

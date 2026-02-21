@@ -313,11 +313,11 @@ const CombatUI = {
             const isSelected = state.attack && state.attack.name === a.name;
             // Find global index in flat attacks array
             const globalIndex = attacks.indexOf(a);
-            // Safe JSON for attribute
-            const safeActionJson = JSON.stringify(a).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            // Use base64 encoding to completely avoid quote issues in HTML attributes
+            const safeActionB64 = btoa(unescape(encodeURIComponent(JSON.stringify(a))));
             return `
                                         <div class="action-item-premium attack-item-btn ${isSelected ? 'selected' : ''}" 
-                                             onclick="CombatUI.selectAttack(${globalIndex}, '${safeActionJson}')"
+                                             onclick="CombatUI.selectAttack(${globalIndex}, '${safeActionB64}', true)"
                                              title="${escapeHTML(a.desc || 'Sem descrição.')}">
                                             <div class="action-info-main">
                                                 <span class="action-name-bold">${escapeHTML(a.name)}</span>
@@ -408,14 +408,18 @@ const CombatUI = {
         this.renderTargetingPanel();
     },
 
-    selectAttack(index, attack) {
+    selectAttack(index, attackPayload, isBase64 = false) {
         this.localRollState.attackIndex = index;
 
-        // Robust parsing if received as string
-        let attackObj = attack;
-        if (typeof attack === 'string') {
+        // Robust parsing
+        let attackObj = attackPayload;
+        if (typeof attackPayload === 'string') {
             try {
-                attackObj = JSON.parse(attack);
+                if (isBase64) {
+                    attackObj = JSON.parse(decodeURIComponent(escape(atob(attackPayload))));
+                } else {
+                    attackObj = JSON.parse(attackPayload);
+                }
             } catch (err) {
                 logger.error("Erro ao processar ação de combate:", err);
             }
@@ -427,6 +431,13 @@ const CombatUI = {
         }
 
         this.localRollState.attack = attackObj;
+
+        // Auto-resolve non-targeted defensive/utility actions
+        if (attackObj.category === "Outros") {
+            this.executeImmediateAction(attackObj);
+            return;
+        }
+
         this.renderTargetingPanel();
     },
 
@@ -584,8 +595,75 @@ const CombatUI = {
         }
     },
 
-    async executeTargetedAttack(targetId, targetName, attackName) {
-        // Obsolete - functionality merged into finalizeCombatAction
+    async executeImmediateAction(attackObj) {
+        const attacker = this.combatState.turnOrder[this.combatState.activeTurnIndex || 0];
+        if (!attacker) return;
+
+        // Roll d20 + Modifier
+        const d20 = Math.floor(Math.random() * 20) + 1;
+        let modifier = 0;
+        let modType = "";
+
+        if (attackObj.name === "Esquivar" || attackObj.name === "Fugir") {
+            modifier = attacker.dexMod || 0;
+            modType = "DEX";
+        } else if (attackObj.name === "Defender") {
+            // Placeholder for CON/STR or just base AC influence.
+            // Using a flat +2 for now or a stat if available
+            modifier = Math.floor(((attacker.hp / attacker.maxHp) * 5)); // Just a simple flavor mod, or 0
+            modType = "Constituição";
+        }
+
+        const total = d20 + modifier;
+        const modString = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+
+        let actionVerb = "prepara uma ação";
+        let icon = "🛡️";
+        if (attackObj.name === "Defender") { actionVerb = "assume uma postura defensiva"; icon = "🛡️"; }
+        if (attackObj.name === "Esquivar") { actionVerb = "tenta se esquivar"; icon = "💨"; }
+        if (attackObj.name === "Fugir") { actionVerb = "tenta fugir do combate"; icon = "🏃"; }
+
+        let msg = `${icon} **${attacker.name}** ${actionVerb} (**${attackObj.name}**)!`;
+        msg += `\n🎲 Rolagem: **${total}** (d20: ${d20} ${modString} ${modType})`;
+
+        // Send to chat
+        if (window.StageModule) {
+            await window.StageModule.addSystemMessage(msg);
+        }
+
+        // Execute backend logic (self-targeted)
+        if (window.CombatEngine) {
+            // Mapeia o tipo da ação de "ataque" para um tipo interno específico
+            let actionType = 'defend';
+            if (attackObj.name === "Esquivar") actionType = 'dodge';
+            if (attackObj.name === "Fugir") actionType = 'flee';
+
+            if (attacker.type === 'player' && attacker.playerId) {
+                const actionData = {
+                    type: actionType,
+                    target: attacker.id, // Self
+                    targetName: attacker.name,
+                    details: attackObj,
+                    rollResults: { hit: total, total: total, d20: d20, damage: null }
+                };
+                await window.CombatEngine.registerAction(attacker.playerId, actionData);
+            } else {
+                await window.CombatEngine.executeManualMonsterAttack(
+                    this.currentAttackerId,
+                    attacker.id, // Self
+                    attackObj.name,
+                    { hit: total, damage: null }
+                );
+            }
+        }
+
+        // Close Modal
+        const modal = document.getElementById('combat-action-modal');
+        if (modal) modal.remove();
+
+        // Remove targeting panel if it somehow exists
+        const panel = document.getElementById('targeting-panel');
+        if (panel) panel.remove();
     },
 
     updateEndTurnButton(combatState) {

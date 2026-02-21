@@ -668,16 +668,18 @@
     max-width: 85%;
 }
 
-/* Lyra Theme Legibility: Local messages need dark text because the background is light */
-.lyra-theme .local-msg:not(.gm-msg) .msg-text,
+/* Lyra Theme Legibility: Local messages have a dark brown background, so text must be light */
+.lyra-theme .local-msg:not(.gm-msg) .msg-text {
+    color: #fcfcfc !important;
+}
+
 .lyra-theme .local-msg:not(.gm-msg) .msg-sender {
-    color: #1a0f0f !important;
-    text-shadow: none !important;
+    color: var(--gold-bright) !important;
 }
 
 .lyra-theme .local-msg:not(.gm-msg) .msg-time {
-    color: rgba(0, 0, 0, 0.5);
-    background: rgba(0, 0, 0, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .chat-msg.system-msg {

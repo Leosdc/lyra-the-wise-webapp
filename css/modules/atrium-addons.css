@@ -571,20 +571,20 @@
 }
 
 /* Aged Gold for Titles & Headers (Damien) */
-.damien-theme .parchment-mini .medieval-title,
-.theme-damien .parchment-mini .medieval-title,
-.damien-theme .parchment-mini .targeting-section-title,
-.theme-damien .parchment-mini .targeting-section-title {
+body.damien-theme .modal-stage-content.parchment-mini .medieval-title,
+body.theme-damien .modal-stage-content.parchment-mini .medieval-title,
+body.damien-theme .modal-stage-content.parchment-mini .targeting-section-title,
+body.theme-damien .modal-stage-content.parchment-mini .targeting-section-title {
     color: #c5a059 !important;
     /* Aged Gold */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Vibrant Gold for Titles & Headers (Eldrin) */
-.eldrin-theme .parchment-mini .medieval-title,
-.theme-eldrin .parchment-mini .medieval-title,
-.eldrin-theme .parchment-mini .targeting-section-title,
-.theme-eldrin .parchment-mini .targeting-section-title {
+body.eldrin-theme .modal-stage-content.parchment-mini .medieval-title,
+body.theme-eldrin .modal-stage-content.parchment-mini .medieval-title,
+body.eldrin-theme .modal-stage-content.parchment-mini .targeting-section-title,
+body.theme-eldrin .modal-stage-content.parchment-mini .targeting-section-title {
     color: #f1c40f !important;
     /* Eldrin's Vibrant Gold */
     text-shadow: 0 0 10px rgba(241, 196, 15, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5) !important;
@@ -605,8 +605,8 @@
 }
 
 /* Target Buttons (Damien) */
-.damien-theme .target-item-btn,
-.theme-damien .target-item-btn {
+body.damien-theme .target-item-btn,
+body.theme-damien .target-item-btn {
     background: rgba(255, 255, 255, 0.05) !important;
     color: #c5a059 !important;
     border-color: rgba(197, 160, 89, 0.3) !important;
@@ -615,8 +615,8 @@
 }
 
 /* Target Buttons (Eldrin) */
-.eldrin-theme .target-item-btn,
-.theme-eldrin .target-item-btn {
+body.eldrin-theme .target-item-btn,
+body.theme-eldrin .target-item-btn {
     background: rgba(255, 255, 255, 0.05) !important;
     color: #f1c40f !important;
     border-color: rgba(241, 196, 15, 0.3) !important;
@@ -624,20 +624,21 @@
     font-size: 0.85rem;
 }
 
-.damien-theme .action-name-bold,
-.eldrin-theme .action-name-bold,
-.theme-damien .action-name-bold,
-.theme-eldrin .action-name-bold {
+body.damien-theme .action-name-bold,
+body.eldrin-theme .action-name-bold,
+body.theme-damien .action-name-bold,
+body.theme-eldrin .action-name-bold {
     color: #c5a059 !important;
     /* Aged Gold */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.damien-theme .action-meta-tiny,
-.eldrin-theme .action-meta-tiny,
-.theme-damien .action-meta-tiny,
-.theme-eldrin .action-meta-tiny {
-    color: #8a6d3b !important;
-    /* Aged Gold (darker variant for meta) */
+body.damien-theme .action-meta-tiny,
+body.eldrin-theme .action-meta-tiny,
+body.theme-damien .action-meta-tiny,
+body.theme-eldrin .action-meta-tiny {
+    color: #a88d5b !important;
+    /* Aged Gold (lighter variant for meta reading against dark bg) */
 }
 
 .damien-theme .target-item-btn:hover,
@@ -662,6 +663,16 @@
 .theme-damien .targeting-section-title {
     opacity: 1 !important;
     border-bottom: 1px solid rgba(197, 160, 89, 0.2) !important;
+    color: #c5a059 !important;
+    /* Aged Gold */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+body.damien-theme .action-item-premium.selected,
+body.theme-damien .action-item-premium.selected {
+    background: rgba(197, 160, 89, 0.2) !important;
+    border-color: #c5a059 !important;
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.3) !important;
 }
 
 /* Lyra Theme Contrast Fix (Avoid yellow on parchment) */

@@ -1,8 +1,4 @@
-
-/**
- * Changelog Loader Module
- * Fetches changelog.md and renders it into the modal.
- */
+import DOMPurify from 'dompurify';
 
 export const ChangelogModule = {
 
@@ -16,7 +12,7 @@ export const ChangelogModule = {
 
             const container = document.querySelector('.changelog-list');
             if (container) {
-                container.innerHTML = html;
+                container.innerHTML = DOMPurify.sanitize(html);
             }
         } catch (error) {
             console.error("Erro no Changelog:", error);

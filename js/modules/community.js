@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import {
     checkNicknameAvailability,
     setNickname,
@@ -10,6 +11,7 @@ import {
 
 const CommunityModule = {
     user: null, // Will be set by app.js
+    _lastMessageTime: null,
 
     unsubscribeChat: null,
     unsubscribeOnline: null,
@@ -150,7 +152,7 @@ const CommunityModule = {
                     <span class="msg-author">${msg.username}</span>
                     <span class="msg-time">${msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</span>
                 </div>
-                <div class="msg-content">${msg.text}</div>
+                <div class="msg-content">${DOMPurify.sanitize(msg.text)}</div>
             </div>
         `).join('');
 
@@ -173,9 +175,15 @@ const CommunityModule = {
     async handleSendMessage() {
         const input = document.getElementById('global-chat-input');
         const message = input.value.trim();
-
-        // Debounce / Rate Limit
         if (!message) return;
+
+        // Rate limiting: máximo 1 mensagem por segundo
+        const now = Date.now();
+        if (this._lastMessageTime && (now - this._lastMessageTime) < 1000) {
+            console.warn('[Community] Rate limit: aguarde antes de enviar outra mensagem.');
+            return;
+        }
+        this._lastMessageTime = now;
 
         input.value = '';
         try {

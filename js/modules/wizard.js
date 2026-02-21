@@ -1,7 +1,7 @@
 
 import { createCharacterWithLyra, createMonsterWithLyra, processSessionWithLyra } from '../ai.js';
 import { saveCharacter, saveUserMonster, saveSession, saveTrap, getSystemData } from '../data.js';
-import { SYSTEM_TEMPLATES, RACES, CLASSES, SUBRACES, ARCHETYPES } from '../constants.js';
+import { SYSTEM_TEMPLATES, RACES, CLASSES, SUBRACES, ARCHETYPES, BACKGROUNDS } from '../constants.js';
 import { logger } from '../logger.js';
 
 /**
@@ -33,8 +33,9 @@ export const WizardModule = {
     async loadSystemData(context) {
         const raceSelect = document.getElementById('wiz-race');
         const classSelect = document.getElementById('wiz-class');
+        const bgSelect = document.getElementById('wiz-background');
 
-        if (!raceSelect || !classSelect) return;
+        if (!raceSelect || !classSelect || !bgSelect) return;
 
         // Prevent reloading if already loaded with full data
         if (raceSelect.options.length > 30) return;
@@ -78,6 +79,15 @@ export const WizardModule = {
                 option.value = name;
                 option.innerText = name;
                 classSelect.appendChild(option);
+            });
+
+            // Populate Backgrounds
+            bgSelect.innerHTML = '<option value="">Selecione Antecedente...</option>';
+            BACKGROUNDS.forEach(bg => {
+                const option = document.createElement('option');
+                option.value = bg;
+                option.innerText = bg;
+                bgSelect.appendChild(option);
             });
 
             // Listeners for Sub-options
@@ -828,6 +838,33 @@ export const WizardModule = {
                 container.classList.add('hidden');
             }
         });
+
+        // Attribute Generation Tips Modal Handlers
+        const openTipsBtn = document.getElementById('open-attr-tips');
+        const tipsModal = document.getElementById('attribute-tips-modal');
+        const closeTipsBtn = document.getElementById('close-attr-tips');
+
+        if (openTipsBtn && tipsModal) {
+            openTipsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                tipsModal.classList.remove('hidden');
+            });
+        }
+
+        if (closeTipsBtn && tipsModal) {
+            closeTipsBtn.addEventListener('click', () => {
+                tipsModal.classList.add('hidden');
+            });
+        }
+
+        // Close on backdrop click
+        tipsModal?.addEventListener('click', (e) => {
+            if (e.target === tipsModal) tipsModal.classList.add('hidden');
+        });
+    },
+
+    closeModal(id) {
+        document.getElementById(id)?.classList.add('hidden');
     }
 };
 

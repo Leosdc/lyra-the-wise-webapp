@@ -62,7 +62,13 @@ export const NamesModule = {
         try {
             const idToken = await user.getIdToken();
             const newNames = await generateNames(race, clazz, gender, idToken);
-            this.names = newNames;
+
+            // Validação de segurança: garantir que é array de strings
+            if (!Array.isArray(newNames) || newNames.some(n => typeof n !== 'string')) {
+                throw new Error('O Oráculo retornou dados inesperados. Tente novamente.');
+            }
+
+            this.names = newNames.map(n => n.trim()).filter(n => n.length > 0);
             this.updateView();
         } catch (e) {
             window.app.showAlert(e.message);
@@ -119,4 +125,4 @@ export const NamesModule = {
     }
 };
 
-window.NamesModule = NamesModule;
+// window.NamesModule = NamesModule;

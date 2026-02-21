@@ -101,6 +101,18 @@ export const SUPPORTED_SYSTEMS = [
     { id: "13thage", name: "13th Age" }
 ];
 
+/**
+ * @typedef {Object} Character
+ * @property {Object} bio - Informações biográficas
+ * @property {string} bio.name
+ * @property {string} bio.class
+ * @property {number} bio.level
+ * @property {Object} attributes - Atributos D&D (str, dex, con, int, wis, cha)
+ * @property {Object} stats - Estatísticas de combate (hp_current, hp_max, ac, etc.)
+ * @property {Object} inventory - Inventário e moedas
+ * @property {Object} spells - Magias e slots
+ */
+
 export const SYSTEM_TEMPLATES = {
     "dnd5e": {
         bio: {
@@ -233,4 +245,9 @@ export const ARCHETYPES = {
     "Lançador de Runas": ["Caminho da Runa Escarlate", "Caminho da Runa Gélida"],
     "Sangue de Dragão": ["Herança de Fogo", "Herança de Gelo"]
 };
+
+export const BACKGROUNDS = [
+    "Acólito", "Andarilho", "Artesão", "Artista", "Charlatão", "Criminoso", "Eremita", "Escriba", "Fazendeiro", "Guarda", "Guia", "Marinheiro", "Mercador", "Nobre", "Sábio", "Soldado"
+];
+
 

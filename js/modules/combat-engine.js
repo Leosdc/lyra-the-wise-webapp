@@ -330,11 +330,89 @@ const CombatEngine = {
                     await this.sendCombatMessage(`<i class="fas fa-skull"></i> **${escapeHTML(target.name)}** foi derrotado!`, 'system');
                 }
             } else {
-                // Mesmo sem dano (ex: buff, cura, ou falha), enviar feedback visual
+                // Defensive Actions / Utilities
                 const activeParticipant = this.combatState.turnOrder[this.combatState.activeTurnIndex];
-                const rollStr = actionData.rollResults?.total ? ` (Rolagem: **${escapeHTML(String(actionData.rollResults.total))}**)` : '';
-                this.sendCombatMessage(`${escapeHTML(activeParticipant.name)} executou **${escapeHTML(actionData.name)}**${rollStr}.`);
-                console.warn("⚠️ [Debug] Dano NÃO aplicado - condições não atendidas");
+                const actionType = actionData.type || 'unknown';
+                const d20Roll = actionData.rollResults?.d20 || 0;
+                const totalRoll = actionData.rollResults?.total || 0;
+
+                if (['defend', 'dodge', 'flee'].includes(actionType)) {
+                    // Specific logic for defensive actions
+                    let outcomeMsg = "";
+                    if (actionType === 'dodge') {
+                        // Dodge: if total roll is >= 12, recover some HP
+                        if (totalRoll >= 12) {
+                            // Lógica do Dado de Vida
+                            const stats = activeParticipant.characterData?.stats || {};
+                            const bio = activeParticipant.characterData?.bio || {};
+                            const hdStr = stats.hit_dice_total || bio.hitDie || "1d4"; // Fallback para 1d4
+
+                            // Extrair o tamanho do dado (ex: "1d8" -> 8)
+                            const match = hdStr.toString().match(/d(\d+)/i);
+                            const dieSize = match ? parseInt(match[1]) : 4;
+
+                            const healAmount = Math.floor(Math.random() * dieSize) + 1; // 1d(dieSize)
+
+                            // Apply heal safely
+                            const maxHp = activeParticipant.maxHp || 10;
+                            const newHp = Math.min((activeParticipant.hp || 0) + healAmount, maxHp);
+                            activeParticipant.hp = newHp;
+
+                            // 🛡️ [Atomic Sync] Persist healing to Firestore (akin to applyDamage)
+                            const updates = {
+                                combatState: this.combatState,
+                                updatedAt: serverTimestamp()
+                            };
+
+                            if (activeParticipant.type === 'player' && activeParticipant.characterId) {
+                                this.syncCharacterHP(activeParticipant.characterId, newHp).catch(e =>
+                                    console.warn("[Combat] Erro no sync da ficha:", e)
+                                );
+                            } else if (['monster', 'npc'].includes(activeParticipant.type)) {
+                                try {
+                                    const sessionRef = doc(db, "sessoes", this.sessionId);
+                                    const snap = await getDoc(sessionRef);
+                                    if (snap.exists()) {
+                                        const npcsUpdates = this.getNPCSyncUpdates(snap.data(), activeParticipant.id, newHp);
+                                        Object.assign(updates, npcsUpdates);
+                                    }
+                                } catch (err) {
+                                    console.warn("[Combat] Erro no sync do monstro:", err);
+                                }
+                            }
+
+                            try {
+                                const sessionRef = doc(db, "sessoes", this.sessionId);
+                                await updateDoc(sessionRef, updates);
+                            } catch (e) {
+                                console.warn(`⚠️ [Combat] Falha leve ao sincronizar combatState no dodge (jogador sem permissão):`, e);
+                            }
+
+                            outcomeMsg = `✨ **Sucesso!** Usou o fôlego (Dado de Vida d${dieSize}) e recuperou **${healAmount} HP** com uma evasão ágil.`;
+                        } else {
+                            outcomeMsg = `⚠️ **Falha na esquiva!** A manobra não foi rápida o suficiente.`;
+                        }
+                    } else if (actionType === 'defend') {
+                        if (totalRoll >= 10) {
+                            outcomeMsg = `🛡️ **Sucesso!** Assumiu uma postura defensiva sólida (CA efetiva aumentada).`;
+                        } else {
+                            outcomeMsg = `⚠️ **Postura Instável!** A defesa foi comprometida.`;
+                        }
+                    } else if (actionType === 'flee') {
+                        if (totalRoll >= 15) {
+                            outcomeMsg = `🏃 **Sucesso!** Conseguiu recuar rapidamente para um ponto seguro!`;
+                        } else {
+                            outcomeMsg = `⚠️ **Interceptado!** Não obteve sucesso em se afastar do perigo.`;
+                        }
+                    }
+
+                    this.sendCombatMessage(`${escapeHTML(activeParticipant.name)}: ${outcomeMsg}`);
+                } else {
+                    // Generic fallback for other actions without damage
+                    const actionName = actionData.name || actionData.details?.name || 'Ação';
+                    const rollStr = actionData.rollResults?.total ? ` (Rolagem: **${escapeHTML(String(actionData.rollResults.total))}**)` : '';
+                    this.sendCombatMessage(`${escapeHTML(activeParticipant.name)} utilizou **${escapeHTML(actionName)}**${rollStr}.`);
+                }
             }
 
             if (isComplete) {
@@ -674,7 +752,7 @@ const CombatEngine = {
 
         const message = winner === 'players'
             ? '🏆 **VITÓRIA!** Os heróis triunfaram sobre seus adversários!'
-            : '💀 **DERROTA...** Os heróis caíram em combate...';
+            : '💀 **DERROTA...** Fim da jornada. O mestre decide o que vai fazer agora.';
 
         await this.sendCombatMessage(message, 'system');
 

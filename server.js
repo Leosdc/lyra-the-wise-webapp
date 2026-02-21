@@ -1,7 +1,12 @@
 const express = require('express');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const helmet = require('helmet');
 const admin = require('firebase-admin');
+
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 // Inicializar Firebase Admin (usará credenciais padrão no Cloud Run)
 // v1.1 - Forçando rebuild seguro
@@ -10,6 +15,63 @@ if (admin.apps.length === 0) {
 }
 
 const app = express();
+
+// Segurança Reforçada (10/10) - Helmet & CSP
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            "default-src": ["'self'"],
+            "script-src": [
+                "'self'",
+                "https://apis.google.com",
+                "https://www.gstatic.com",
+                "https://www.google.com/recaptcha/",
+                "https://cdn.jsdelivr.net",
+                "https://www.gstatic.com/recaptcha/",
+                "'unsafe-inline'" // Vite inline scripts if any
+            ],
+            "connect-src": [
+                "'self'",
+                "https://firestore.googleapis.com",
+                "https://identitytoolkit.googleapis.com",
+                "https://securetoken.googleapis.com",
+                "https://firebasestorage.googleapis.com",
+                "https://*.firebaseio.com",
+                "https://*.googleapis.com",
+                "https://*.google-analytics.com",
+                "https://google-analytics.com"
+            ],
+            "style-src": [
+                "'self'",
+                "'unsafe-inline'",
+                "https://fonts.googleapis.com",
+                "https://cdnjs.cloudflare.com",
+                "https://www.gstatic.com"
+            ],
+            "font-src": [
+                "'self'",
+                "https://fonts.gstatic.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            "img-src": [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://*.googleusercontent.com",
+                "https://firebasestorage.googleapis.com",
+                "https://www.gstatic.com"
+            ],
+            "frame-src": [
+                "https://www.google.com/recaptcha/",
+                "https://recaptcha.google.com/"
+            ],
+            "upgrade-insecure-requests": []
+        }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
 const port = process.env.PORT || 8080;
 const distPath = path.join(__dirname, 'dist');
 
@@ -78,7 +140,7 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.0-flash",
             systemInstruction: systemInstruction || "Você é Lyra, a Guardiã do Eco."
         });
 

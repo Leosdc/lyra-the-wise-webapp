@@ -10,6 +10,8 @@ import {
     arrayUnion
 } from "firebase/firestore";
 import { escapeHTML } from "./utils.js";
+import DOMPurify from 'dompurify';
+import { logger } from '../logger.js';
 
 const ContentParser = {
 
@@ -19,22 +21,6 @@ const ContentParser = {
 
         // REMOVED: Combat extraction now handled by OracleModule.displayOracleMessage()
         // This avoids duplicate combat initiation
-        // const combat = this.extractCombat(text);
-
-        // Save to session if found
-        if (items.length > 0) {
-            this.saveSessionItems(sessionId, items);
-        }
-
-        if (npcs.length > 0) {
-            this.saveSessionNPCs(sessionId, npcs);
-        }
-
-        // REMOVED: Combat triggering (now in Oracle)
-        // if (combat.monsters.length > 0) {
-        //     console.log(`⚔️ Content Parser: Combate detectado! Monstros: ${combat.monsters.join(', ')}`);
-        //     this.triggerCombat(sessionId, combat.monsters);
-        // }
 
         return { items, npcs };
     },
@@ -78,36 +64,7 @@ const ContentParser = {
         return npcs;
     },
 
-    extractCombat(text) {
-        // Regex: [COMBAT: Monster1, Monster2, Monster3]
-        const regex = /\[COMBAT:\s*([^\]]+)\]/g;
-        const monsters = [];
 
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-            // Split by comma and trim each monster name
-            const monsterNames = match[1].split(',').map(m => m.trim());
-            monsters.push(...monsterNames);
-        }
-
-        return { monsters };
-    },
-
-    async triggerCombat(sessionId, monsters) {
-        try {
-            console.log(`⚔️ Iniciando combate automático com: ${monsters.join(', ')}`);
-
-            // Import CombatEngine dynamically
-            const { default: CombatEngine } = await import('./combat-engine.js');
-
-            // Initialize combat with detected monsters
-            await CombatEngine.initCombat(sessionId, monsters);
-
-            console.log(`✅ Combate iniciado automaticamente pela IA`);
-        } catch (error) {
-            console.error("❌ Erro ao iniciar combate automático:", error);
-        }
-    },
 
     async saveSessionItems(sessionId, items) {
         try {
@@ -119,9 +76,11 @@ const ContentParser = {
                 });
             }
 
-            console.log(`📦 Content Parser: ${items.length} itens salvos na sessão`);
+
+
+            logger.info(`📦 Content Parser: ${items.length} itens salvos na sessão`);
         } catch (error) {
-            console.error("Erro ao salvar itens da sessão:", error);
+            logger.error("Erro ao salvar itens da sessão:", error);
         }
     },
 
@@ -135,16 +94,25 @@ const ContentParser = {
                 });
             }
 
-            console.log(`👥 Content Parser: ${npcs.length} NPCs salvos na sessão`);
+
+
+            logger.info(`👥 Content Parser: ${npcs.length} NPCs salvos na sessão`);
         } catch (error) {
-            console.error("Erro ao salvar NPCs da sessão:", error);
+            logger.error("Erro ao salvar NPCs da sessão:", error);
         }
     },
 
     decorateText(text, knownNames = []) {
         if (!text) return "";
 
-        let decorated = escapeHTML(text);
+        // 0. Protect legitimate <i> tags (like FontAwesome icons) before escaping HTML
+        const iconPlaceholders = [];
+        let rawText = text.replace(/<i\s+class=['"][^'"]+['"]\s*><\/i>/gi, (match) => {
+            iconPlaceholders.push(match);
+            return `__ICON_PLACEHOLDER_${iconPlaceholders.length - 1}__`;
+        });
+
+        let decorated = escapeHTML(rawText);
 
         // 1. First, protect ANY existing tags [TAG: ...] to avoid double-processing or mangling commands
         const placeholders = [];
@@ -205,9 +173,17 @@ const ContentParser = {
         // Italic: *text* -> <em>text</em> (single asterisks, not part of **)
         decorated = decorated.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-        return decorated;
+        // 5. Restore icon placeholders
+        iconPlaceholders.forEach((tag, i) => {
+            decorated = decorated.replace(`__ICON_PLACEHOLDER_${i}__`, tag);
+        });
+
+        return DOMPurify.sanitize(decorated, {
+            ALLOWED_TAGS: ['strong', 'em', 'span', 'i', 'br'],
+            ALLOWED_ATTR: ['class', 'data-name', 'data-desc', 'data-props', 'data-race', 'data-details', 'title']
+        });
     }
 };
 
-window.ContentParser = ContentParser;
+// window.ContentParser = ContentParser;
 export default ContentParser;

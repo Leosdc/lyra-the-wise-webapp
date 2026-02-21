@@ -558,16 +558,23 @@ export const ItemsModule = {
 
     openShareModal(itemId) {
         this.itemToShare = itemId;
-        document.getElementById('share-item-modal').classList.remove('hidden');
+        const modal = document.getElementById('share-item-modal');
+        const title = modal.querySelector('.modal-title');
+        const p = modal.querySelector('p');
+
+        if (title) title.innerHTML = `<i class="fas fa-share-nodes"></i> Compartilhar Item`;
+        if (p) p.innerText = "Informe o Apelido Arcano do destinatário para partilhar este item:";
+
+        modal.classList.remove('hidden');
     },
 
     async handleShareConfirm() {
-        const email = document.getElementById('share-target-email').value;
-        if (!email) return;
+        const nickname = document.getElementById('share-target-email').value;
+        if (!nickname) return;
 
         try {
-            await DataModule.shareItem(this.itemToShare, email);
-            window.app.showAlert(`O pergaminho foi enviado para ${email}!`, "Partilha Concluída");
+            await DataModule.shareItem(this.itemToShare, nickname);
+            window.app.showAlert(`O item foi enviado para ${nickname}!`, "Partilha Concluída");
             document.getElementById('share-item-modal').classList.add('hidden');
             document.getElementById('share-target-email').value = '';
             this.itemToShare = null;

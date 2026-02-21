@@ -1,6 +1,6 @@
 import { logger } from './logger.js';
 import { debounce } from './modules/utils.js';
-const AI_PROXY_URL = "https://script.google.com/macros/s/AKfycbyR6nKjJObX69rAfYp1oIhXrHBxWihfxddmTxoWLXq6ik3ZIWdq6w3aajF-dc5q0d6k9w/exec";
+const AI_PROXY_URL = "/api/ai";
 
 const SHARED_LORE = `
 ### LORE: A TRÍADE DO ECO ETERNO
@@ -53,10 +53,22 @@ const callProxy = async (payload) => {
 
     try {
         isAiBusy = true;
-        logger.debug("📡 Invocando Proxy Arcano...", payload.action);
+        logger.debug("📡 Invocando Proxy Arcano...", payload.message?.substring(0, 50));
+
+        const { getToken } = await import('./auth.js');
+        const appCheckToken = await getToken();
+
         const response = await fetch(AI_PROXY_URL, {
             method: 'POST',
-            body: JSON.stringify(payload)
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Firebase-AppCheck': appCheckToken || ''
+            },
+            body: JSON.stringify({
+                message: payload.message || "",
+                history: payload.history || [],
+                systemInstruction: payload.systemInstruction || ""
+            })
         });
 
         if (!response.ok) {
@@ -81,7 +93,7 @@ const callProxy = async (payload) => {
 };
 
 export const callGeminiAPI = async (message, idToken) => {
-    const data = await callProxy({ action: 'callGemini', idToken, message, history: [] });
+    const data = await callProxy({ message, history: [] });
     return data.response;
 };
 
@@ -218,8 +230,8 @@ export const sendMessageToLyra = async (message, idToken, history = [], context 
         : `Continue a conversa de forma natural. Responda diretamente ao comentário do usuário.`;
 
 
-    let finalMessage = `--- DADOS DE APOIO ---\n${context}\n\n--- SUA ESSÊNCIA ---\n${identity}\n\n--- DIÁLOGO ATUAL ---\nMensagem do Usuário: "${message}"\n\n--- INSTRUÇÃO ---\n${systemInstruction}`;
-    const data = await callProxy({ action: 'callGemini', idToken, message: finalMessage, history: safeHistory });
+    let finalMessage = `--- DADOS DE APOIO ---\n${context}\n\n--- SUA ESSÊNCIA ---\n${identity}\n\n--- DIÁLOGO ATUAL ---\nMensagem do Usuário: "${message}"`;
+    const data = await callProxy({ message: finalMessage, systemInstruction: systemInstruction, history: safeHistory });
     return data.response;
 };
 
@@ -232,7 +244,7 @@ export const createMonsterWithLyra = async (monsterData, idToken) => {
 
     const userPrompt = `Gere um monstro baseado nisto: ${JSON.stringify(monsterData)}`;
 
-    const data = await callProxy({ action: 'callGeminiMonster', idToken, monsterData });
+    const data = await callProxy({ message: userPrompt, systemInstruction: systemPrompt });
 
     try {
         return safeParseJSON(data.response);
@@ -251,7 +263,7 @@ export const createCharacterWithLyra = async (charData, idToken) => {
 
     const userPrompt = `Complete este herói: ${JSON.stringify(charData)}`;
 
-    const data = await callProxy({ action: 'callGeminiCharacter', idToken, charData });
+    const data = await callProxy({ message: userPrompt, systemInstruction: systemPrompt });
 
     try {
         return safeParseJSON(data.response);
@@ -269,7 +281,7 @@ export const processSessionWithLyra = async (sessionData, idToken) => {
 
     const userPrompt = `Processe esta crônica: ${JSON.stringify(sessionData)}`;
 
-    const data = await callProxy({ action: 'callGeminiSession', idToken, sessionData });
+    const data = await callProxy({ message: userPrompt, systemInstruction: systemPrompt });
 
     return data.response;
 };

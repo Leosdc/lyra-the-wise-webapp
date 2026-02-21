@@ -121,7 +121,7 @@ const LootModule = {
         try {
             const character = await getCharacter(playerId);
             if (!character) {
-                console.error("Personagem não encontrado:", playerId);
+                logger.error("Personagem não encontrado:", playerId);
                 return;
             }
 
@@ -136,9 +136,11 @@ const LootModule = {
 
             await updateCharacter(playerId, character);
 
-            console.log(`📦 Item "${item.name}" adicionado a ${character.bio?.name}`);
+
+
+            logger.info(`📦 Item "${item.name}" adicionado a ${character.bio?.name}`);
         } catch (error) {
-            console.error("Erro ao adicionar item ao jogador:", error);
+            logger.error("Erro ao adicionar item ao jogador:", error);
         }
     },
 
@@ -164,10 +166,12 @@ const LootModule = {
 
             await updateCharacter(playerId, character);
 
-            console.log(`✅ Item "${item.name}" clonado para inventário permanente`);
+
+
+            logger.info(`✅ Item "${item.name}" clonado para inventário permanente`);
             return true;
         } catch (error) {
-            console.error("Erro ao clonar item:", error);
+            logger.error("Erro ao clonar item:", error);
             return false;
         }
     },
@@ -184,12 +188,14 @@ const LootModule = {
 
             await updateCharacter(playerId, character);
 
-            console.log(`🗑️ Itens temporários removidos de ${character.bio?.name}`);
+
+
+            logger.info(`🗑️ Itens temporários removidos de ${character.bio?.name}`);
         } catch (error) {
-            console.error("Erro ao remover itens temporários:", error);
+            logger.error("Erro ao remover itens temporários:", error);
         }
     }
 };
 
-window.LootModule = LootModule;
+// window.LootModule = LootModule;
 export default LootModule;

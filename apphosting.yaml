@@ -2,4 +2,26 @@ env:
   - variable: NODE_ENV
     value: production
   - variable: FORCE_REBUILD_CACHE
-    value: "v5"
+    value: "v6"
+  
+  # Frontend Keys (Public)
+  - variable: VITE_FIREBASE_API_KEY
+    value: "AIzaSyBdymlRGmshBOgIKMWomn07Lf6SyAalR3E"
+  - variable: VITE_FIREBASE_AUTH_DOMAIN
+    value: "lyra-the-wise.firebaseapp.com"
+  - variable: VITE_FIREBASE_PROJECT_ID
+    value: "lyra-the-wise"
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: "lyra-the-wise.firebasestorage.app"
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "870870220835"
+  - variable: VITE_FIREBASE_APP_ID
+    value: "1:870870220835:web:ccad45d2fa25caaf613196"
+  - variable: VITE_FIREBASE_MEASUREMENT_ID
+    value: "G-KLCQTRYGVL"
+  - variable: VITE_RECAPTCHA_SITE_KEY
+    value: "6Lf7U1IsAAAAAHyTM7DQn89EaOd2eOQg1g20M_Nc"
+
+  # Backend Secret (Private)
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY

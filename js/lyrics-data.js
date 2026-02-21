@@ -89,7 +89,7 @@ export const DAMIEN_LYRICS = [
     { time: 213.46, text: "Pois cada mundo que você constrói, eu já estou lá" },
     { time: 219.36, text: "E quando sentir sua história sair dos trilhos" },
     { time: 225.16, text: "Isso não é um erro..." },
-    { time: 230.10, text: "Sou eu." }
+    { time: 229.18, text: "Sou eu." }
 ];
 
 

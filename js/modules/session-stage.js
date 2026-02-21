@@ -103,7 +103,8 @@ const StageModule = {
             try {
                 if (user) {
                     this.user = user;
-                    logger.info("StageModule: Alma sincronizada:", user.email);
+                    // Safely log the synchronization without exposing sensitive user data
+                    logger.info("StageModule: Alma sincronizada com sucesso no Atrium.");
 
                     // Show loader during initialization
                     this.toggleLoading(true, "Sincronizando com o Atrium Arcano...");
@@ -1437,6 +1438,21 @@ const StageModule = {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
         if (!text) return;
+
+        // --- COMMAND INTERCEPTOR ---
+        if (text.startsWith('/')) {
+            const parts = text.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = text.slice(cmd.length).trim();
+
+            if (cmd === '/r' || cmd === '/roll') {
+                input.value = '';
+                this.rollDice(args || '1d20');
+                return; // Stop standard chat processing
+            }
+            // Add other future commands here
+        }
+        // ---------------------------
 
         try {
             const chatRef = collection(db, COLLECTIONS.SESSIONS, this.sessionId, COLLECTIONS.MESSAGES);

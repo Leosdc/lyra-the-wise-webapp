@@ -581,10 +581,34 @@ export const getUserSpells = async (userId, userEmail) => {
     }
 };
 
-export const shareSpell = async (spellId, targetEmail) => {
-    // Validar email
-    if (!targetEmail || typeof targetEmail !== 'string' || !targetEmail.trim()) {
-        throw new Error("Email inválido.");
+export const shareSpell = async (spellId, targetNickname) => {
+    // Validar apelido
+    if (!targetNickname || typeof targetNickname !== 'string' || !targetNickname.trim()) {
+        throw new Error("Apelido Arcano inválido.");
+    }
+
+    const nicknameToSearch = targetNickname.trim();
+    let targetEmail = null;
+
+    // Buscar email associado ao apelido arcano
+    try {
+        const qUsers = query(
+            collection(db, COLLECTIONS.USERS),
+            where("apelido", "==", nicknameToSearch)
+        );
+        const usersSnap = await getDocs(qUsers);
+
+        if (usersSnap.empty) {
+            throw new Error(`Nenhum mago conhecido como "${nicknameToSearch}" foi encontrado. Verifique se o apelido está correto (maiúsculas e minúsculas).`);
+        }
+
+        targetEmail = usersSnap.docs[0].data().email;
+        if (!targetEmail) throw new Error("O mago não possui um e-mail válido no grimório.");
+
+    } catch (e) {
+        if (e.message.includes('Nenhum mago')) throw e;
+        console.error("Erro ao buscar apelido:", e);
+        throw new Error("Falha na comunicação arcana ao buscar o apelido.");
     }
 
     const docRef = doc(db, COLLECTIONS.USER_SPELLS, spellId);
@@ -595,10 +619,8 @@ export const shareSpell = async (spellId, targetEmail) => {
     const data = docSnap.data();
     const sharedWith = Array.isArray(data.sharedWith) ? data.sharedWith : [];
 
-    const emailToShare = targetEmail.trim().toLowerCase();
-
-    if (!sharedWith.includes(emailToShare)) {
-        sharedWith.push(emailToShare);
+    if (!sharedWith.includes(targetEmail)) {
+        sharedWith.push(targetEmail);
         await updateDoc(docRef, { sharedWith });
     }
     return true;
@@ -676,10 +698,34 @@ export const getUserItems = async (userId, userEmail) => {
     }
 };
 
-export const shareItem = async (itemId, targetEmail) => {
-    // Validar email
-    if (!targetEmail || typeof targetEmail !== 'string' || !targetEmail.trim()) {
-        throw new Error("Email inválido.");
+export const shareItem = async (itemId, targetNickname) => {
+    // Validar apelido
+    if (!targetNickname || typeof targetNickname !== 'string' || !targetNickname.trim()) {
+        throw new Error("Apelido Arcano inválido.");
+    }
+
+    const nicknameToSearch = targetNickname.trim();
+    let targetEmail = null;
+
+    // Buscar email associado ao apelido arcano
+    try {
+        const qUsers = query(
+            collection(db, COLLECTIONS.USERS),
+            where("apelido", "==", nicknameToSearch)
+        );
+        const usersSnap = await getDocs(qUsers);
+
+        if (usersSnap.empty) {
+            throw new Error(`Nenhum artesão ou aventureiro conhecido como "${nicknameToSearch}" foi encontrado. Verifique se o apelido está correto.`);
+        }
+
+        targetEmail = usersSnap.docs[0].data().email;
+        if (!targetEmail) throw new Error("O usuário não possui um e-mail válido no registro.");
+
+    } catch (e) {
+        if (e.message.includes('Nenhum artesão')) throw e;
+        console.error("Erro ao buscar apelido:", e);
+        throw new Error("Falha na rede de contatos ao buscar o apelido.");
     }
 
     const docRef = doc(db, COLLECTIONS.USER_ITEMS, itemId);
@@ -690,10 +736,8 @@ export const shareItem = async (itemId, targetEmail) => {
     const data = docSnap.data();
     const sharedWith = Array.isArray(data.sharedWith) ? data.sharedWith : [];
 
-    const emailToShare = targetEmail.trim().toLowerCase();
-
-    if (!sharedWith.includes(emailToShare)) {
-        sharedWith.push(emailToShare);
+    if (!sharedWith.includes(targetEmail)) {
+        sharedWith.push(targetEmail);
         await updateDoc(docRef, { sharedWith });
     }
     return true;

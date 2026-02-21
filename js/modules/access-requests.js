@@ -4,6 +4,7 @@
  */
 
 import { db } from '../auth.js';
+import { logger } from '../logger.js';
 import {
     collection,
     addDoc,
@@ -43,10 +44,10 @@ export const AccessRequestsModule = {
             };
 
             const docRef = await addDoc(collection(db, 'session_access_requests'), requestData);
-            console.log("✅ Solicitação de acesso enviada:", docRef.id);
+            logger.info("✅ Solicitação de acesso enviada:", docRef.id);
             return docRef.id;
         } catch (error) {
-            console.error("❌ Erro ao criar solicitação de acesso:", error);
+            logger.error("❌ Erro ao criar solicitação de acesso:", error);
             throw error;
         }
     },
@@ -125,10 +126,10 @@ export const AccessRequestsModule = {
                 currentPlayers: increment(1)
             });
 
-            console.log("✅ Solicitação aceita, convite criado e contador incrementado:", requestId);
+            logger.info("✅ Solicitação aceita, convite criado e contador incrementado:", requestId);
             return true;
         } catch (error) {
-            console.error("❌ Erro ao aceitar solicitação:", error);
+            logger.error("❌ Erro ao aceitar solicitação:", error);
             throw error;
         }
     },
@@ -143,10 +144,10 @@ export const AccessRequestsModule = {
                 status: 'rejected',
                 respondedAt: serverTimestamp()
             });
-            console.log("❌ Solicitação rejeitada:", requestId);
+            logger.info("❌ Solicitação rejeitada:", requestId);
             return true;
         } catch (error) {
-            console.error("❌ Erro ao rejeitar solicitação:", error);
+            logger.error("❌ Erro ao rejeitar solicitação:", error);
             throw error;
         }
     }

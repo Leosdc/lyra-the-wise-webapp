@@ -2,12 +2,10 @@
 @keyframes vignettePulse {
     0% {
         opacity: 0.4;
-        transform: scale(1);
     }
 
     100% {
         opacity: 0.9;
-        transform: scale(1.1);
     }
 }
 

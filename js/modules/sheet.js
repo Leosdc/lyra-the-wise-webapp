@@ -1,6 +1,6 @@
 
 import { updateCharacter, getGlobalItems, getSpells, getUserItems, getUserSpells, getSystemData } from '../data.js';
-import { RACES, CLASSES, ALIGNMENTS, SUBRACES, ARCHETYPES } from '../constants.js';
+import { RACES, CLASSES, ALIGNMENTS, SUBRACES, ARCHETYPES, BACKGROUNDS } from '../constants.js';
 import { DND5eSystem } from '../systems/dnd5e.js';
 import { escapeHTML, parseMarkdown } from './utils.js';
 import { logger } from '../logger.js';
@@ -257,7 +257,16 @@ export const SheetModule = {
 
         for (const [id, data] of Object.entries(bioMap)) {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+            if (!el) continue;
+
+            if (id === 'sheet-background') {
+                const currentBG = b.background || "Acólito";
+                const displayOpts = BACKGROUNDS.includes(currentBG) ? BACKGROUNDS : [currentBG, ...BACKGROUNDS];
+                const uniqueOpts = [...new Set(displayOpts)];
+                el.innerHTML = mkSelect(currentBG, 'bio.background', uniqueOpts, 'Antecedente', 'seamless');
+            } else {
+                el.innerHTML = mkInput(data.v, data.f, 'text', data.t);
+            }
         }
 
         const alignEl = document.getElementById('sheet-alignment');
@@ -954,6 +963,11 @@ export const SheetModule = {
             <div class="sheet-card-v2 list-item-v2" data-index="${i}" data-list="spells.list">
                 <div class="card-v2-header">
                     <div class="card-v2-icon">${iconHtml}</div>
+                    <div class="card-v2-title-section">
+                        <span class="card-v2-title">${escapeHTML(sp.name || 'Magia Desconhecida')}</span>
+                        <span class="card-v2-subtitle">${escapeHTML(sp.level || 'Truque')} • ${escapeHTML(sp.school || 'Evocação')}</span>
+                    </div>
+                </div>
                 <div class="card-v2-content">
                     <div class="card-v2-stats">
                         <div class="card-v2-stat"><strong>Alcance</strong> <span>${escapeHTML(sp.range || '-')}</span></div>

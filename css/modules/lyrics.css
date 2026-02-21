@@ -8,8 +8,6 @@
     align-items: center;
     text-align: center;
     position: relative;
-    /* Visual Debugging - remove later if needed, but helps visualize the "blue box" area */
-    /* border: 1px dashed rgba(255, 255, 255, 0.1); */
 }
 
 /* Typography for Lyrics */

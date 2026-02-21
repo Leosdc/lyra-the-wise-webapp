@@ -33,8 +33,8 @@
                 <div class="logo-container">
                     <img src="/assets/Lyra_logo.png" alt="Lyra the Wise" class="header-logo">
                 </div>
-                <button id="home-btn" class="medieval-btn small icon-only" title="Início"><i
-                        class="fas fa-home"></i></button>
+                <button id="home-btn" class="medieval-btn small icon-only" title="Início"
+                    aria-label="Voltar ao Início"><i class="fas fa-home" aria-hidden="true"></i></button>
                 <div id="alpha-badge" class="alpha-badge hidden">
                     <i class="fas fa-flask"></i> ALPHA TESTER
                 </div>
@@ -129,7 +129,8 @@
                     </div>
                 </div>
                 <div class="char-switcher-container">
-                    <button id="switch-char-btn" class="medieval-btn small"><i class="fas fa-exchange-alt"></i></button>
+                    <button id="switch-char-btn" class="medieval-btn small" aria-label="Trocar Personagem"><i
+                            class="fas fa-exchange-alt" aria-hidden="true"></i></button>
                     <div id="char-switcher-dropdown" class="char-switcher-dropdown hidden">
                         <div class="dropdown-header">
                             <strong>Trocar Personagem</strong>
@@ -163,8 +164,8 @@
 
                 <div id="gm-mini-music" class="mini-music-control custom-select-trigger hidden"
                     style="padding: 0 1rem; width: auto; gap: 15px; cursor: auto;">
-                    <button id="btn-play-pause-mini" title="Música Arcana">
-                        <i class="fas fa-play"></i>
+                    <button id="btn-play-pause-mini" title="Música Arcana" aria-label="Play/Pause Música">
+                        <i class="fas fa-play" aria-hidden="true"></i>
                     </button>
                     <div class="volume-container" style="display: flex; align-items: center; gap: 8px;">
                         <input type="range" id="player-volume-mini" min="0" max="1" step="0.1" value="0.5"
@@ -174,13 +175,14 @@
 
                 <div id="user-profile-actions" class="user-profile-actions hidden">
                     <div class="notification-wrapper">
-                        <button id="changelog-btn" class="medieval-btn small icon-only" title="Novidades">
-                            <i class="fas fa-bell"></i>
-                            <span class="notification-badge">!</span>
+                        <button id="changelog-btn" class="medieval-btn small icon-only" title="Novidades"
+                            aria-label="Ver Novidades">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            <span class="notification-badge" aria-hidden="true">!</span>
                         </button>
                     </div>
-                    <button id="settings-btn" class="medieval-btn small icon-only" title="Configurações"><i
-                            class="fas fa-cog"></i></button>
+                    <button id="settings-btn" class="medieval-btn small icon-only" title="Configurações"
+                        aria-label="Configurações"><i class="fas fa-cog" aria-hidden="true"></i></button>
                     <button id="login-btn" class="medieval-btn small"><i class="fas fa-key"></i> Entrar</button>
                 </div>
             </div>
@@ -190,7 +192,8 @@
     <nav id="side-menu" class="side-menu hidden">
         <div class="menu-overlay"></div>
         <div class="menu-content parchment">
-            <button class="close-menu close-modal"><i class="fas fa-times"></i></button>
+            <button class="close-menu close-modal" aria-label="Fechar Menu"><i class="fas fa-times"
+                    aria-hidden="true"></i></button>
 
             <div class="menu-section" data-section="creation">
                 <h3><i class="fas fa-hammer"></i> Criação Arcaica</h3>
@@ -1442,11 +1445,15 @@
                             <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
                                     value="9m"></div>
                         </div>
-                        <div class="form-group"><label>Antecedente</label><input type="text" id="wiz-background"
-                                placeholder="Ex: Acólito"></div>
+                        <div class="form-group"><label>Antecedente</label>
+                            <select id="wiz-background" class="medieval-select">
+                                <option value="">Selecione Antecedente...</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="wizard-step hidden" data-step="2">
-                        <h3>Atributos</h3>
+                        <h3>Atributos <i class="fas fa-book-open pointer-icon" id="open-attr-tips"
+                                title="Dicas de Geração"></i></h3>
                         <div class="attributes-grid">
                             <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10" min="0"
                                     max="25"></div>
@@ -3270,6 +3277,86 @@
                     <button type="submit" class="medieval-btn">Salvar em Meus Anais</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Attribute Generation Tips Modal -->
+    <div id="attribute-tips-modal" class="modal-overlay hidden">
+        <div class="modal-content medieval-modal medium">
+            <button id="close-attr-tips" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title"><i class="fas fa-book-open"></i> MÉTODOS DE GERAÇÃO</h2>
+            <div class="parchment-content scrollable-content" style="max-height: 70vh; overflow-y: auto;">
+                <section>
+                    <h4>1. Conjunto Padrão (Standard Array)</h4>
+                    <p>É o método mais rápido e equilibrado. Ideal para iniciantes.</p>
+                    <p><strong>Valores:</strong> 15, 14, 13, 12, 10 e 8.</p>
+                    <p><em>Vantagem:</em> Garante um personagem equilibrado com uma força clara (+2) e uma fraqueza
+                        (-1).</p>
+                </section>
+
+                <hr class="medieval-hr">
+
+                <section>
+                    <h4>2. Geração Aleatória (Rolling Stats)</h4>
+                    <p>O método clássico "na sorte".</p>
+                    <p><strong>A Regra:</strong> Jogue <span class="tips-highlight">4d6</span>, descarte o menor valor e
+                        some os outros três. Repita 6 vezes.</p>
+                    <p><em>Risco:</em> Pode gerar heróis lendários ou personagens tragicamente comuns.</p>
+                </section>
+
+                <hr class="medieval-hr">
+
+                <section>
+                    <h4>3. Compra de Pontos (Point Buy)</h4>
+                    <p>Estratégico e equilibrado. Você tem <span class="tips-highlight">27 pontos</span> para gastar.
+                    </p>
+                    <p>Todos os atributos começam em 8 (custo 0). Limite máximo de compra: 15.</p>
+
+                    <table class="tips-table">
+                        <thead>
+                            <tr>
+                                <th>Valor</th>
+                                <th>Custo</th>
+                                <th>Valor</th>
+                                <th>Custo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>8</td>
+                                <td>0 pts</td>
+                                <td>12</td>
+                                <td>4 pts</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>1 pt</td>
+                                <td>13</td>
+                                <td>5 pts</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>2 pts</td>
+                                <td>14</td>
+                                <td>7 pts</td>
+                            </tr>
+                            <tr>
+                                <td>11</td>
+                                <td>3 pts</td>
+                                <td>15</td>
+                                <td>9 pts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <div class="tip-box"
+                    style="background: rgba(44, 30, 22, 0.05); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <p>💡 <strong>Lembrete Importante:</strong> Após definir os valores, some os bônus da sua
+                        <strong>Raça</strong>!
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
