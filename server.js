@@ -32,6 +32,7 @@ app.use(helmet({
                 "'unsafe-inline'" // Vite inline scripts if any
 
             ],
+            "script-src-attr": ["'unsafe-inline'"], // Permite onclick em botõeslegados
             "connect-src": [
                 "'self'",
                 "https://firestore.googleapis.com",
@@ -65,7 +66,8 @@ app.use(helmet({
                 "https://firebasestorage.googleapis.com",
                 "https://www.gstatic.com",
                 "https://*.ko-fi.com", // Ko-fi images
-                "https://ko-fi.com"
+                "https://ko-fi.com",
+                "https://www.transparenttextures.com" // Texturas dos pergaminhos
 
             ],
             "frame-src": [
