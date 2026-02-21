@@ -28,7 +28,9 @@ app.use(helmet({
                 "https://www.google.com/recaptcha/",
                 "https://cdn.jsdelivr.net",
                 "https://www.gstatic.com/recaptcha/",
+                "https://storage.ko-fi.com", // Ko-fi widget scripts
                 "'unsafe-inline'" // Vite inline scripts if any
+
             ],
             "connect-src": [
                 "'self'",
@@ -39,7 +41,9 @@ app.use(helmet({
                 "https://*.firebaseio.com",
                 "https://*.googleapis.com",
                 "https://*.google-analytics.com",
-                "https://google-analytics.com"
+                "https://google-analytics.com",
+                "https://ko-fi.com" // Ko-fi connection for widgets
+
             ],
             "style-src": [
                 "'self'",
@@ -59,11 +63,16 @@ app.use(helmet({
                 "data:",
                 "https://*.googleusercontent.com",
                 "https://firebasestorage.googleapis.com",
-                "https://www.gstatic.com"
+                "https://www.gstatic.com",
+                "https://*.ko-fi.com", // Ko-fi images
+                "https://ko-fi.com"
+
             ],
             "frame-src": [
                 "https://www.google.com/recaptcha/",
-                "https://recaptcha.google.com/"
+                "https://recaptcha.google.com/",
+                "https://ko-fi.com" // Ko-fi overlay/iframe
+
             ],
             "upgrade-insecure-requests": []
         }

@@ -318,7 +318,7 @@ export const SheetModule = {
                     <div class="save-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : s.t}">
                         <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="saves" data-field="${s.id}" ${context.isInspection ? 'disabled' : ''}></i>
                         <span>${s.l}</span>
-                        <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
+                        <span class="save-value">${val >= 0 ? `+${val}` : val}</span>
                     </div>
                 `;
             }).join('');
@@ -360,7 +360,7 @@ export const SheetModule = {
                     <div class="skill-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : sk.t}">
                         <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" style="font-size: 0.5rem; color: ${isProf || isExpert ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf || isExpert ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="skills" data-field="${sk.id}" ${context.isInspection ? 'disabled' : ''}></i>
                         <span>${sk.l}</span>
-                        <span style="margin-left: auto;">${val >= 0 ? `+${val}` : val}</span>
+                        <span class="skill-value">${val >= 0 ? `+${val}` : val}</span>
                     </div>
                 `;
             }).join('');

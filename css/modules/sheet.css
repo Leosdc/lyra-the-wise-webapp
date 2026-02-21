@@ -27,7 +27,17 @@
     background: transparent !important;
     border: none !important;
     color: inherit !important;
+    appearance: none !important;
+    -moz-appearance: textfield !important;
 }
+
+
+.sheet-level-input::-webkit-outer-spin-button,
+.sheet-level-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
 
 .full-width {
     width: 100% !important;
@@ -479,6 +489,33 @@ select.header-input-box {
     background: rgba(255, 255, 255, 0.3);
     min-height: 60px;
 }
+
+/* Perfect centering for numbers: hide default browser arrows */
+.sheet-container input[type=number]::-webkit-inner-spin-button,
+.sheet-container input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+
+.sheet-container input[type=number] {
+    appearance: none;
+    -moz-appearance: textfield;
+}
+
+
+
+.save-value,
+.skill-value {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--crimson);
+    margin-top: 2px;
+}
+
 
 /* Combat Stats */
 .vital-stats {
