@@ -147,11 +147,12 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
             });
         }
 
-        console.log(`📡 Invocando Gemini. Key detectada (Len: ${apiKey.length}).`);
+        const modelName = "gemini-2.0-flash";
+        console.log(`📡 Invocando Gemini (${modelName}). Key detectada (Len: ${apiKey.length}).`);
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash",
+            model: modelName,
             systemInstruction: systemInstruction || "Você é Lyra, a Guardiã do Eco."
         });
 
@@ -171,10 +172,14 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
         res.json({ response: responseText });
 
     } catch (error) {
-        console.error("❌ ERRO NO ORÁCULO:", error.message);
+        console.error("❌ ERRO NO ORÁCULO DE LYRA:");
+        console.error("Mensagem:", error.message);
+        if (error.stack) console.error("Stack:", error.stack);
+
         res.status(500).json({
             error: "Falha na conexão com as estrelas.",
-            details: error.message
+            details: error.message,
+            code: error.status || "UNKNOWN_ERROR"
         });
     }
 });

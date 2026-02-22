@@ -4,6 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Lyra the Wise: O WebApp definitivo para mestres e jogadores de RPG. Crie personagens, gerencie campanhas e interaja com IAs treinadas em sistemas de RPG.">
+    <meta name="keywords"
+        content="RPG, RPG de mesa, mestre de RPG, gerador de personagens, bestiário RPG, Lyra the Wise, mestre assistente AI">
+    <meta name="author" content="Lyra the Wise Team">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lyrathewise.lat/">
+    <meta property="og:title" content="Lyra the Wise - RPG WebApp">
+    <meta property="og:description"
+        content="A plataforma completa para gestão e criação de campanhas de RPG de mesa com auxílio de IA.">
+    <meta property="og:image" content="https://lyrathewise.lat/assets/tokens/lyra.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://lyrathewise.lat/">
+    <meta property="twitter:title" content="Lyra the Wise - RPG WebApp">
+    <meta property="twitter:description"
+        content="A plataforma completa para gestão e criação de campanhas de RPG de mesa com auxílio de IA.">
+    <meta property="twitter:image" content="https://lyrathewise.lat/assets/tokens/lyra.png">
+
     <title>Lyra the Wise - RPG WebApp</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/assets/tokens/lyra.png" type="image/png">
@@ -295,74 +317,14 @@
                         <div class="portal-pulse pulse-blue"></div>
                     </button>
 
-                    <!-- Criação Arcaica -->
-                    <button class="action-card" data-view="fichas">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Personagens</span>
-                    </button>
-                    <button class="action-card" data-view="itens-selection">
-                        <i class="fas fa-gem"></i>
-                        <span>Itens</span>
-                    </button>
-                    <button class="action-card" data-view="grimorio-selection">
-                        <i class="fas fa-book-journal-whills"></i>
-                        <span>Grimório</span>
-                    </button>
-                    <button class="action-card" data-view="monstros-selection">
-                        <i class="fas fa-dragon"></i>
-                        <span>Bestiário</span>
-                    </button>
-                    <button class="action-card" data-view="armadilhas-selection">
-                        <i class="fas fa-skull-crossbones"></i>
-                        <span>Armadilhas</span>
-                    </button>
-                    <button class="action-card" data-view="villains-selection">
-                        <i class="fas fa-mask"></i>
-                        <span>Vilões</span>
-                    </button>
-                    <button class="action-card" data-view="npcs-selection">
-                        <i class="fas fa-users-gear"></i>
-                        <span>NPCs</span>
-                    </button>
-
-                    <!-- Mestre de Masmorras -->
-                    <button class="action-card" data-view="campaigns-selection">
-                        <i class="fas fa-map-location-dot"></i>
-                        <span>Campanhas</span>
-                    </button>
-                    <button class="action-card" data-view="encounters-selection">
-                        <i class="fas fa-shield"></i>
-                        <span>Encontros</span>
-                    </button>
-                    <button class="action-card" data-view="puzzles-selection">
-                        <i class="fas fa-puzzle-piece"></i>
-                        <span>Puzzles</span>
-                    </button>
-                    <button class="action-card" data-view="treasures-selection">
-                        <i class="fas fa-coins"></i>
-                        <span>Tesouros</span>
-                    </button>
-
-                    <!-- Trama & Saber -->
+                    <!-- Priority Actions -->
                     <button class="action-card" data-view="community">
                         <i class="fas fa-users"></i>
                         <span>Comunidade</span>
                     </button>
-                    <button class="action-card" data-view="scenes-selection">
-                        <i class="fas fa-image"></i>
-                        <span>Cenas</span>
-                    </button>
-                    <button class="action-card" data-view="plots-selection">
-                        <i class="fas fa-wand-magic-sparkles"></i>
-                        <span>Tramas</span>
-                    </button>
-                    <button class="action-card" data-view="motivations-selection">
-                        <i class="fas fa-heart-pulse"></i>
-                        <span>Motivações</span>
-                    </button>
-                    <button class="action-card" data-view="rules-selection">
-                        <i class="fas fa-book-open"></i>
-                        <span>Regras</span>
+                    <button class="action-card" data-view="fichas">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Personagens</span>
                     </button>
                     <button class="action-card" data-action="dice-roller">
                         <i class="fas fa-dice-d20"></i>
@@ -371,6 +333,64 @@
                     <button class="action-card" data-view="names">
                         <i class="fas fa-list-ol"></i>
                         <span>Nomes</span>
+                    </button>
+
+                    <!-- Alphabetical Order -->
+                    <button class="action-card" data-view="armadilhas-selection">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>Armadilhas</span>
+                    </button>
+                    <button class="action-card" data-view="monstros-selection">
+                        <i class="fas fa-dragon"></i>
+                        <span>Bestiário</span>
+                    </button>
+                    <button class="action-card" data-view="campaigns-selection">
+                        <i class="fas fa-map-location-dot"></i>
+                        <span>Campanhas</span>
+                    </button>
+                    <button class="action-card" data-view="scenes-selection">
+                        <i class="fas fa-image"></i>
+                        <span>Cenas</span>
+                    </button>
+                    <button class="action-card" data-view="encounters-selection">
+                        <i class="fas fa-shield"></i>
+                        <span>Encontros</span>
+                    </button>
+                    <button class="action-card" data-view="grimorio-selection" id="grimorio-portal-btn">
+                        <i class="fas fa-book-journal-whills"></i>
+                        <span>Grimório</span>
+                    </button>
+                    <button class="action-card" data-view="itens-selection">
+                        <i class="fas fa-gem"></i>
+                        <span>Itens</span>
+                    </button>
+                    <button class="action-card" data-view="motivations-selection">
+                        <i class="fas fa-heart-pulse"></i>
+                        <span>Motivações</span>
+                    </button>
+                    <button class="action-card" data-view="npcs-selection">
+                        <i class="fas fa-users-gear"></i>
+                        <span>NPCs</span>
+                    </button>
+                    <button class="action-card" data-view="puzzles-selection">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Puzzles</span>
+                    </button>
+                    <button class="action-card" data-view="rules-selection">
+                        <i class="fas fa-book-open"></i>
+                        <span>Regras</span>
+                    </button>
+                    <button class="action-card" data-view="treasures-selection">
+                        <i class="fas fa-coins"></i>
+                        <span>Tesouros</span>
+                    </button>
+                    <button class="action-card" data-view="plots-selection">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>Tramas</span>
+                    </button>
+                    <button class="action-card" data-view="villains-selection">
+                        <i class="fas fa-mask"></i>
+                        <span>Vilões</span>
                     </button>
                 </div>
             </div>
@@ -1843,16 +1863,6 @@
 
                             <div class="combat-details-grid">
                                 <div class="hit-dice-death-saves">
-                                    <div class="hit-dice-block">
-                                        <h4>Dados de Vida</h4>
-                                        <div class="hit-dice-row">
-                                            <input type="number" id="sheet-hd-curr" data-field="stats.hit_dice_current"
-                                                class="medieval-input" style="width: 60px; text-align: center;">
-                                            <span> de </span>
-                                            <span id="sheet-hd-total" class="editable"
-                                                data-field="stats.hit_dice_total">1d8</span>
-                                        </div>
-                                    </div>
                                     <div class="death-saves-block">
                                         <h4>Resistência à Morte</h4>
                                         <div class="death-row successes">Sucessos
@@ -1870,6 +1880,16 @@
                                                 value="2">
                                             <input type="checkbox" id="death-f3" data-field="death_saves.failures"
                                                 value="3">
+                                        </div>
+                                    </div>
+                                    <div class="hit-dice-block">
+                                        <h4>Dados de Vida</h4>
+                                        <div class="hit-dice-row">
+                                            <input type="number" id="sheet-hd-curr" data-field="stats.hit_dice_current"
+                                                class="medieval-input" style="width: 60px; text-align: center;">
+                                            <span> de </span>
+                                            <span id="sheet-hd-total" class="editable"
+                                                data-field="stats.hit_dice_total">1d8</span>
                                         </div>
                                     </div>
                                 </div>
@@ -3183,7 +3203,7 @@
 
     <!-- Monster Creation Choice Modal -->
     <div id="monster-creation-choice-modal" class="modal-overlay hidden">
-        <div class="modal-content medieval-modal small">
+        <div class="modal-content medieval-modal medium">
             <button id="close-monster-choice-modal" class="close-modal"><i class="fas fa-times"></i></button>
             <h2 class="modal-title"><i class="fas fa-hammer"></i> MÉTODO DE FORJA</h2>
             <div class="mode-choices">
@@ -3219,7 +3239,7 @@
     </div>
     <!-- Generic Choice Modal -->
     <div id="generic-choice-modal" class="modal-overlay hidden">
-        <div class="modal-content medieval-modal small">
+        <div class="modal-content medieval-modal medium">
             <button class="close-modal" id="close-generic-choice-modal"><i class="fas fa-times"></i></button>
             <h2 class="modal-title"><i class="fas fa-hammer"></i> MÉTODO DE FORJA</h2>
             <div class="mode-choices">

@@ -72,8 +72,17 @@ const callProxy = async (payload) => {
         });
 
         if (!response.ok) {
-            logger.error("❌ Erro de Conexão com o Proxy:", response.status, response.statusText);
-            throw new Error(`Erro na conexão (${response.status})`);
+            let errorMsg = `Erro na conexão (${response.status})`;
+            try {
+                const errorData = await response.json();
+                if (errorData.details) {
+                    logger.error("❌ Detalhes do Erro no Servidor:", errorData.details);
+                    errorMsg = errorData.error || errorMsg;
+                }
+            } catch (e) {
+                logger.error("❌ Erro de Conexão com o Proxy:", response.status, response.statusText);
+            }
+            throw new Error(errorMsg);
         }
 
         const data = await response.json();

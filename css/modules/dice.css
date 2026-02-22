@@ -37,6 +37,14 @@
     /* Color handled by theme globals for inputs */
     font-weight: bold;
     padding: 0.2rem;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.dice-controls-header input::-webkit-outer-spin-button,
+.dice-controls-header input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .dice-controls {

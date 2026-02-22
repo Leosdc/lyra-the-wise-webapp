@@ -658,6 +658,29 @@ select.header-input-box {
     margin-bottom: 0.2rem;
 }
 
+/* Hit Dice & Death Saves Side-by-Side */
+.hit-dice-death-saves {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.death-saves-block,
+.hit-dice-block {
+    min-width: 200px;
+}
+
+.death-saves-block h4,
+.hit-dice-block h4 {
+    font-family: var(--font-medieval);
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
 /* Death Saves */
 .death-saves {
     padding: 0.5rem;
