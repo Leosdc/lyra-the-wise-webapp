@@ -1605,7 +1605,7 @@ const app = {
         });
 
         // Modal Close
-        document.querySelectorAll('.close-modal, .modal-backdrop').forEach(el => el.addEventListener('click', () => this.closeModal()));
+        document.querySelectorAll('#modal-wrapper .close-modal, #modal-wrapper .modal-backdrop').forEach(el => el.addEventListener('click', () => this.closeModal()));
         document.querySelectorAll('.close-alert, #alert-ok-btn').forEach(el => el.addEventListener('click', () => document.getElementById('alert-modal').classList.add('hidden')));
 
         // Auth
