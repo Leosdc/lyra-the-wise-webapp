@@ -81,9 +81,13 @@ export const GMPanelModule = {
         const confirmMetadataBtn = document.getElementById('confirm-new-session-btn');
         if (confirmMetadataBtn) confirmMetadataBtn.addEventListener('click', () => this.confirmMetadataUpdate());
 
-        // Enter Atrium Button
+        // Enter Atrium Button (Unified Start/Enter)
         const enterBtn = document.getElementById('btn-enter-session');
-        if (enterBtn) enterBtn.addEventListener('click', () => this.handleAtriumEntry());
+        if (enterBtn) {
+            enterBtn.addEventListener('click', () => {
+                this.openSessionSelectModal('enter');
+            });
+        }
 
         // Custom Select Trigger
         document.getElementById('gm-session-select-trigger')?.addEventListener('click', () => {
@@ -113,13 +117,8 @@ export const GMPanelModule = {
             sessionList.addEventListener('scroll', () => window.NavigationModule.updateDropdownScroll(sessionList));
         }
 
-        // Status Selector & Enter Atrium
+        // Status Selector
         document.getElementById('gm-session-status-select')?.addEventListener('change', (e) => this.updateSessionStatus(e.target.value));
-        document.getElementById('btn-enter-atrium')?.addEventListener('click', () => {
-            if (this.activeSession) {
-                this.openSessionSelectModal('enter');
-            }
-        });
     },
 
     // --- Status & Story ---
@@ -364,7 +363,14 @@ export const GMPanelModule = {
 
         this.unsubscribeSession = onSnapshot(q, async (snapshot) => {
             if (!snapshot.empty) {
-                const sessionData = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                // Se uma sessão específica já foi selecionada (ex: clique no card),
+                // encontrar essa sessão no snapshot em vez de sempre pegar a primeira.
+                let targetDoc = snapshot.docs[0];
+                if (this.activeSession?.id) {
+                    const found = snapshot.docs.find(d => d.id === this.activeSession.id);
+                    if (found) targetDoc = found;
+                }
+                const sessionData = { id: targetDoc.id, ...targetDoc.data() };
                 this.activeSession = sessionData;
 
                 // Ensure GM is a participant (Idempotent)
@@ -442,6 +448,12 @@ export const GMPanelModule = {
                 };
                 avatarImg.src = avatars[theme] || avatars['lyra'];
             }
+
+            // Fix text if available
+            const oracleText = document.getElementById('oracle-summary-text');
+            if (oracleText && session.summary) {
+                oracleText.innerText = session.summary;
+            }
         }
 
         if (session.started) {
@@ -468,7 +480,7 @@ export const GMPanelModule = {
     },
 
     showStoryArea(storyContent = "") {
-        document.getElementById('gm-session-start-options').classList.add('hidden');
+        document.getElementById('gm-session-start-options').classList.remove('hidden'); // KEEP BUTTON VISIBLE
         document.getElementById('gm-story-container').classList.remove('hidden');
         const storyArea = document.getElementById('gm-story-input-central');
         if (storyArea) {
@@ -513,6 +525,20 @@ export const GMPanelModule = {
 
             track.appendChild(card);
         });
+    },
+
+    openChoiceModal() {
+        const modal = document.getElementById('gm-session-create-modal');
+        if (modal) modal.classList.add('hidden'); // Close create modal if open
+
+        window.app.showChoiceModal(
+            "Mestrear com auxílio do Oráculo (IA) ou seguir sua própria trilha (Manual)?",
+            [
+                { text: "Modo Oráculo (IA)", action: () => this.startSessionAI(), primary: true },
+                { text: "Modo Manual", action: () => this.startSessionManual() }
+            ],
+            "assets/tokens/lyra.png"
+        );
     },
 
     renderSagaData(session) {
