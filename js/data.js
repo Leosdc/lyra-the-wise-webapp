@@ -791,6 +791,10 @@ export const ensureUserProfile = async (user) => {
     }
 };
 
+export const deleteUserProfile = async (userId) => {
+    await deleteDoc(doc(db, COLLECTIONS.USERS, userId));
+};
+
 export const createUserProfile = async (user) => {
     const profile = await getUserProfile(user.uid);
     if (!profile) {

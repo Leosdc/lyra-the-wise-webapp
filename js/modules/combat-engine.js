@@ -1,6 +1,10 @@
 /**
- * Combat Engine - Motor de Turnos Inteligente
- * Sistema revolucionário de combate com integração total de IA e fichas
+ * Combat Engine — Barrel (Motor de Turnos Inteligente)
+ * Turn management, initiative, round processing, combat state.
+ *
+ * Sub-module:
+ *  - combat-damage.js → applyDamage, syncCharacterHP, getNPCSyncUpdates,
+ *                        executeManualMonsterAttack, getManualAttackPrompt
  */
 
 import { db } from "../auth.js";
@@ -21,6 +25,8 @@ import { logger } from "../logger.js";
 import CombatOracle from "./combat-oracle.js";
 import { callGeminiAPI } from "../ai.js";
 import { escapeHTML } from "./utils.js";
+
+import { createDamageMixin } from './combat-damage.js';
 
 const CombatEngine = {
     sessionId: null,
@@ -49,7 +55,6 @@ const CombatEngine = {
             const combinedMonsters = [...monsters];
             allies.forEach(a => {
                 const baseId = a.id;
-                // Verificar se já existe (com ou sem sufixo _n)
                 const exists = combinedMonsters.some(m => m.id === baseId || m.id.startsWith(`${baseId}_`));
                 if (!exists) {
                     combinedMonsters.push(a);
@@ -124,14 +129,11 @@ const CombatEngine = {
                 const invite = inviteDoc.data();
 
                 if (invite.characterId) {
-                    // Buscar DADOS COMPLETOS da ficha
                     const char = await getCharacter(invite.characterId);
 
                     if (char) {
-                        // Tentar resolver Player ID (UID real)
                         let resolvedPlayerId = invite.uid || inviteDoc.id;
 
-                        // Fallback: Se não tem UID mas tem email, tentar buscar perfil
                         if (!invite.uid && invite.email) {
                             try {
                                 const { query, collection, where, getDocs } = await import("firebase/firestore");
@@ -146,7 +148,7 @@ const CombatEngine = {
                             }
                         }
 
-                        // Mapeamento robusto de HP e AC (Igual ao Presence/CombatUI)
+                        // Mapeamento robusto de HP e AC
                         const getVal = (paths, fallback = 10) => {
                             for (const path of paths) {
                                 let val = char;
@@ -173,7 +175,6 @@ const CombatEngine = {
                             maxHp: maxHp,
                             ac: ac,
                             dexterity: char.stats?.dexterity || char.abilities?.dex?.value || 10,
-                            // DADOS COMPLETOS DA FICHA
                             characterData: {
                                 bio: char.bio || {},
                                 stats: char.stats || {},
@@ -182,7 +183,7 @@ const CombatEngine = {
                                 inventory: char.inventory || { items: [] },
                                 background: char.background || {}
                             },
-                            actions: char.combat?.attacks || [] // 🛡️ [Mapping] Map attacks to actions for UI consistency
+                            actions: char.combat?.attacks || []
                         });
                     }
                 }
@@ -200,7 +201,6 @@ const CombatEngine = {
     calculateInitiative(players, monsters) {
         const all = [];
 
-        // Jogadores: DEX modifier + d20
         for (const player of players) {
             const dexMod = Math.floor((player.dexterity - 10) / 2);
             const roll = Math.floor(Math.random() * 20) + 1;
@@ -212,9 +212,7 @@ const CombatEngine = {
             });
         }
 
-        // Monstros: mesma lógica
         for (const monster of monsters) {
-            // Suportar múltiplas estruturas de monstros
             const dex = monster.stats?.dexterity || monster.secoes?.Atributos?.Destreza || monster.dexterity || 10;
             const hp = monster.hp || monster.stats?.hp || monster.stats?.maxHp || 10;
             const ac = monster.ac || monster.stats?.ac || monster.secoes?.CA || 10;
@@ -236,12 +234,10 @@ const CombatEngine = {
             });
         }
 
-        // Ordenar por iniciativa (maior primeiro)
         all.sort((a, b) => {
             if (b.initiative !== a.initiative) {
                 return b.initiative - a.initiative;
             }
-            // Desempate: maior DEX vence
             return b.dexterity - a.dexterity;
         });
 
@@ -276,17 +272,14 @@ const CombatEngine = {
             throw new Error("Combate não inicializado");
         }
 
-        // Validar completude da ação
         const isComplete = this.isActionComplete(actionData);
 
-        // Verificar se é o turno do jogador
         const activeParticipant = this.combatState.turnOrder[this.combatState.activeTurnIndex];
         if (activeParticipant.playerId !== playerId) {
             console.warn("⚠️ Não é o seu turno!");
             return { error: "Não é o seu turno" };
         }
 
-        // Registrar ação
         this.combatState.playerActions[playerId] = {
             hasActed: true,
             isComplete: isComplete,
@@ -294,11 +287,9 @@ const CombatEngine = {
             timestamp: new Date().toISOString()
         };
 
-        // Salvar e avançar turno
         try {
             await this.saveCombatState();
 
-            // APLICAÇÃO AUTOMÁTICA DE DANO (Se houver resultado de rolagem)
             console.log("🔍 [Debug] Verificando aplicação de dano:", {
                 hasDamage: !!actionData.rollResults?.damage,
                 damage: actionData.rollResults?.damage,
@@ -309,11 +300,9 @@ const CombatEngine = {
             if (actionData.rollResults?.damage && actionData.target) {
                 console.log(`💥 [Debug] Aplicando ${actionData.rollResults.damage} de dano em ${actionData.target}`);
 
-                // 🛡️ [Bugfix] Generate visual feedback for the player
                 const activeParticipant = this.combatState.turnOrder[this.combatState.activeTurnIndex];
                 const targetParticipant = this.combatState.turnOrder.find(p => p.id === actionData.target);
 
-                // Robust property access for action name and results
                 const actionName = actionData.name || actionData.details?.name || actionData.details?.label || 'Ação';
                 const hitRoll = actionData.rollResults?.hit || actionData.rollResults?.attack || actionData.rollResults?.total || '?';
                 const damage = actionData.rollResults?.damage || 0;
@@ -323,42 +312,34 @@ const CombatEngine = {
 
                 await this.applyDamage(actionData.target, damage);
 
-                // Re-verificar se o alvo morreu após o dano para atualizar CombatState localmente
                 const target = this.combatState.turnOrder.find(p => p.id === actionData.target);
                 if (target && target.hp <= 0) {
                     logger.info(`💀 [Combat] Alvo ${target.name} foi derrotado!`);
                     await this.sendCombatMessage(`<i class="fas fa-skull"></i> **${escapeHTML(target.name)}** foi derrotado!`, 'system');
                 }
             } else {
-                // Defensive Actions / Utilities
                 const activeParticipant = this.combatState.turnOrder[this.combatState.activeTurnIndex];
                 const actionType = actionData.type || 'unknown';
                 const d20Roll = actionData.rollResults?.d20 || 0;
                 const totalRoll = actionData.rollResults?.total || 0;
 
                 if (['defend', 'dodge', 'flee'].includes(actionType)) {
-                    // Specific logic for defensive actions
                     let outcomeMsg = "";
                     if (actionType === 'dodge') {
-                        // Dodge: if total roll is >= 12, recover some HP
                         if (totalRoll >= 12) {
-                            // Lógica do Dado de Vida
                             const stats = activeParticipant.characterData?.stats || {};
                             const bio = activeParticipant.characterData?.bio || {};
-                            const hdStr = stats.hit_dice_total || bio.hitDie || "1d4"; // Fallback para 1d4
+                            const hdStr = stats.hit_dice_total || bio.hitDie || "1d4";
 
-                            // Extrair o tamanho do dado (ex: "1d8" -> 8)
                             const match = hdStr.toString().match(/d(\d+)/i);
                             const dieSize = match ? parseInt(match[1]) : 4;
 
-                            const healAmount = Math.floor(Math.random() * dieSize) + 1; // 1d(dieSize)
+                            const healAmount = Math.floor(Math.random() * dieSize) + 1;
 
-                            // Apply heal safely
                             const maxHp = activeParticipant.maxHp || 10;
                             const newHp = Math.min((activeParticipant.hp || 0) + healAmount, maxHp);
                             activeParticipant.hp = newHp;
 
-                            // 🛡️ [Atomic Sync] Persist healing to Firestore (akin to applyDamage)
                             const updates = {
                                 combatState: this.combatState,
                                 updatedAt: serverTimestamp()
@@ -408,7 +389,6 @@ const CombatEngine = {
 
                     this.sendCombatMessage(`${escapeHTML(activeParticipant.name)}: ${outcomeMsg}`);
                 } else {
-                    // Generic fallback for other actions without damage
                     const actionName = actionData.name || actionData.details?.name || 'Ação';
                     const rollStr = actionData.rollResults?.total ? ` (Rolagem: **${escapeHTML(String(actionData.rollResults.total))}**)` : '';
                     this.sendCombatMessage(`${escapeHTML(activeParticipant.name)} utilizou **${escapeHTML(actionName)}**${rollStr}.`);
@@ -431,7 +411,6 @@ const CombatEngine = {
     async nextTurn() {
         if (!this.combatState || this.combatState.phase === 'ended') return;
 
-        // 🛡️ [Bugfix] Check if combat should end before advancing
         const autoEnd = this.checkCombatEnd();
         if (autoEnd) {
             console.log("🏁 [Combat] Vitória/Derrota detectada no avanço de turno.");
@@ -447,7 +426,6 @@ const CombatEngine = {
         this.isAdvancing = true;
 
         try {
-            // Limpar qualquer timeout de turno de monstro pendente
             if (this.monsterTurnTimeout) {
                 clearTimeout(this.monsterTurnTimeout);
                 this.monsterTurnTimeout = null;
@@ -459,16 +437,13 @@ const CombatEngine = {
             let safetyCounter = 0;
             const total = this.combatState.turnOrder.length;
 
-            // Loop para encontrar o próximo vivo, evitando recursão descontrolada
             while (!found && safetyCounter < total) {
                 nextIndex = (nextIndex + 1) % total;
 
-                // Início de nova rodada
                 if (nextIndex === 0 && originalIndex !== 0) {
                     this.combatState.round++;
                     await this.sendCombatMessage(`\n🔄 **INÍCIO DA RODADA ${this.combatState.round}**`, 'system');
 
-                    // Resetar ações
                     const players = this.combatState.turnOrder.filter(p => p.type === 'player');
                     this.combatState.playerActions = this.initializePlayerActions(players);
                 }
@@ -493,7 +468,6 @@ const CombatEngine = {
 
             await this.saveCombatState();
 
-            // FLOW AUTOMÁTICO: O Mestre agora escolhe tudo manualmente via painel
             if (window.StageModule?.isGM) {
                 if (currentActor.type === 'monster' || currentActor.type === 'npc') {
                     console.log(`🎭 Turno de ${currentActor.name}. Aguardando ação manual do Mestre.`);
@@ -515,14 +489,12 @@ const CombatEngine = {
         try {
             const result = await CombatOracle.executeMonsterTurn(this.combatState, monster);
 
-            // Aplicar dano se houver
             if (result && result.damage && result.targetId) {
                 await this.applyDamage(result.targetId, result.damage);
             }
 
             console.log(`✅ [Combat] Turno do monstro ${monster.name} processado. Aguardando finalização manual pelo Mestre.`);
 
-            // O turno NÃO avança mais sozinho. O mestre deve clicar em "Finalizar Turno".
             if (this.monsterTurnTimeout) {
                 clearTimeout(this.monsterTurnTimeout);
                 this.monsterTurnTimeout = null;
@@ -542,23 +514,15 @@ const CombatEngine = {
 
         switch (actionData.type) {
             case 'attack':
-                // Precisa de alvo e arma (ou detalhes da UI)
                 return !!(actionData.target && (actionData.weapon || actionData.unarmed || actionData.details));
-
             case 'spell':
-                // Precisa de alvo e magia (ou detalhes da UI)
                 return !!(actionData.target && (actionData.spell || actionData.details));
-
             case 'item':
-                // Precisa de item (alvo é opcional)
                 return !!actionData.item;
-
             case 'flee':
             case 'defend':
             case 'dodge':
-                // Não precisa de detalhes adicionais
                 return true;
-
             default:
                 return false;
         }
@@ -605,23 +569,18 @@ const CombatEngine = {
         await this.saveCombatState();
 
         try {
-            // 1. Coletar todas as ações
             const actions = this.collectAllActions();
 
-            // 2. Enviar para Combat Oracle para narrativa
             const { default: CombatOracle } = await import('./combat-oracle.js');
             const results = await CombatOracle.narrateRound(this.combatState, actions);
 
-            // 3. Aplicar resultados (dano, HP, etc)
             await this.applyResults(results);
 
-            // 4. Verificar condições de vitória
             const combatEnded = this.checkCombatEnd();
 
             if (combatEnded) {
                 await this.endCombat(combatEnded.winner);
             } else {
-                // 5. Preparar próxima rodada
                 await this.startNextRound();
             }
 
@@ -669,7 +628,6 @@ const CombatEngine = {
             }
         }
 
-        // Salvar histórico da rodada
         this.combatState.roundHistory.push({
             round: this.combatState.round,
             narrative: results.narrative,
@@ -688,9 +646,7 @@ const CombatEngine = {
 
         const turnOrder = this.combatState.turnOrder || [];
 
-        // Aliados + Jogadores
         const playersAlive = turnOrder.filter(p => (p.type === 'player' || p.type === 'ally' || p.type === 'npc') && p.hp > 0);
-        // Monstros (Inimigos)
         const monstersAlive = turnOrder.filter(p => p.type === 'monster' && p.hp > 0);
 
         if (monstersAlive.length === 0) {
@@ -711,7 +667,6 @@ const CombatEngine = {
         this.combatState.round++;
         this.combatState.phase = "action";
 
-        // Resetar ações dos jogadores
         for (const playerId in this.combatState.playerActions) {
             this.combatState.playerActions[playerId] = {
                 hasActed: false,
@@ -722,11 +677,6 @@ const CombatEngine = {
         }
 
         await this.saveCombatState();
-
-        // await this.sendCombatMessage(
-        //     `\n🔄 **RODADA ${this.combatState.round}**\n\nAguardando ações dos jogadores...`,
-        //     'system'
-        // );
 
         console.log(`✅ Rodada ${this.combatState.round} iniciada`);
     },
@@ -743,11 +693,10 @@ const CombatEngine = {
 
         await this.saveCombatState();
 
-        // Atualizar sessão
         const sessionRef = doc(db, "sessoes", this.sessionId);
         await updateDoc(sessionRef, {
             combatActive: false,
-            linked_monsters: [] // 🧹 Limpa monstros para evitar que retornem no próximo combate
+            linked_monsters: []
         });
 
         const message = winner === 'players'
@@ -756,12 +705,10 @@ const CombatEngine = {
 
         await this.sendCombatMessage(message, 'system');
 
-        // Notificar Combat Oracle para narrativa de encerramento
         if (this.sessionData && this.sessionData.mode === 'oracle') {
             const { default: CombatOracle } = await import('./combat-oracle.js');
             await CombatOracle.narrateCombatEnd(this.combatState, winner);
         } else if (!this.sessionData && this.sessionId) {
-            // Fallback: Tentar recuperar dados da sessão se estiverem nulos
             try {
                 const snap = await getDoc(doc(db, "sessoes", this.sessionId));
                 if (snap.exists() && snap.data().mode === 'oracle') {
@@ -783,7 +730,6 @@ const CombatEngine = {
 
             const sessionRef = doc(db, "sessoes", this.sessionId);
 
-            // 🛡️ [Bugfix] Don't force combatActive: true if combat is ended
             const isActive = this.combatState.phase !== 'ended';
 
             await updateDoc(sessionRef, {
@@ -793,197 +739,6 @@ const CombatEngine = {
             });
         } catch (e) {
             console.error("❌ [Combat] Falha ao salvar estado de combate:", e);
-        }
-    },
-
-    /**
-     * Aplica dano a um participante e sincroniza, se necessário
-     */
-    async applyDamage(targetId, damage) {
-        if (!damage || damage <= 0) return;
-
-        let target = this.combatState.turnOrder.find(p => p.id === targetId);
-
-        if (!target) {
-            console.log(`🔍 [Combat] Buscando alvo por substring de nome: ${targetId}`);
-            target = this.combatState.turnOrder.find(p =>
-                p.name.toLowerCase().includes(targetId.toLowerCase()) ||
-                targetId.toLowerCase().includes(p.name.toLowerCase())
-            );
-        }
-
-        if (!target) {
-            console.warn(`⚠️ [Combat] Alvo ${targetId} não encontrado para aplicação de dano.`);
-            return;
-        }
-
-        console.log(`💥 [Combat] Aplicando ${damage} de dano em ${target.name}`);
-
-        // 🛡️ [Robustness] Fetch fresh HP from sheet if it's a character to avoid stale data
-        let currentHp = target.hp;
-        if (target.type === 'player' && target.characterId) {
-            try {
-                // Manual fetch to ensure we have the absolute latest value before subtraction
-                const charRef = doc(db, "fichas", target.characterId);
-                const charSnap = await getDoc(charRef);
-                if (charSnap.exists()) {
-                    const data = charSnap.data();
-                    const getVal = (paths) => {
-                        for (const path of paths) {
-                            const val = path.split('.').reduce((obj, key) => obj?.[key], data);
-                            if (val !== undefined && val !== null) return val;
-                        }
-                        return null;
-                    };
-                    const freshHp = getVal(['stats.hp_current', 'attributes.HP.current', 'combat.hp.current', 'stats.hp', 'hp', 'attributes.Vida.atual', 'vida_atual']);
-                    if (freshHp !== null) {
-                        console.log(`✅ [Combat] HP de ${target.name} atualizado da ficha: ${target.hp} -> ${freshHp}`);
-                        currentHp = freshHp;
-                    }
-                }
-            } catch (err) {
-                console.warn(`[Combat] Erro ao buscar HP atualizado para ${target.name}`, err);
-            }
-        } else if (target.type === 'monster' || target.type === 'npc') {
-            // 🛡️ [Robustness] Fetch fresh HP from session for monsters/NPCs
-            try {
-                const sessionRef = doc(db, "sessoes", this.sessionId);
-                const snap = await getDoc(sessionRef);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const baseId = target.id.includes('_') ? target.id.substring(0, target.id.lastIndexOf('_')) : target.id;
-
-                    // Check all lists for the most recent HP
-                    let freshHp = null;
-                    const findHp = (list) => list?.find(it => it.id === target.id || it.id === baseId)?.hp;
-
-                    freshHp = findHp(data.linked_monsters) ?? findHp(data.allies) ?? findHp(data.sessionNPCs);
-
-                    if (freshHp !== null && freshHp !== undefined) {
-                        console.log(`✅ [Combat] HP de monstro ${target.name} atualizado da sessão: ${target.hp} -> ${freshHp}`);
-                        currentHp = freshHp;
-                    }
-                }
-            } catch (err) {
-                console.warn(`[Combat] Erro ao buscar HP atualizado para monstro ${target.name}`, err);
-            }
-        }
-
-        const damageAmount = Number(damage) || 0;
-        const initialHp = Number(currentHp) || 0;
-        target.hp = Math.max(0, initialHp - damageAmount);
-
-        console.log(`⚖️ [Combat] Cálculo de dano: ${initialHp} - ${damageAmount} = ${target.hp}`);
-
-        // 🛡️ [Atomic Sync] Consolidate all session updates into one write
-        const updates = {
-            combatState: this.combatState,
-            updatedAt: serverTimestamp()
-        };
-
-        // If it's a character, sync with the character sheet (separate write, as it's a different collection)
-        if (target.type === 'player' && target.characterId) {
-            await this.syncCharacterHP(target.characterId, target.hp);
-        } else if (target.type === 'monster' || target.type === 'npc') {
-            // Se for monstro ou NPC, ler a sessão novamente para garantir que não perdemos atualizações de outros campos
-            try {
-                const sessionRef = doc(db, "sessoes", this.sessionId);
-                const snap = await getDoc(sessionRef);
-                if (snap.exists()) {
-                    const sessionUpdates = this.getNPCSyncUpdates(snap.data(), target.id, target.hp);
-                    Object.assign(updates, sessionUpdates);
-                }
-            } catch (err) {
-                console.warn("[Combat] Erro ao consolidar atualizações de monstro", err);
-            }
-        }
-
-        const sessionRef = doc(db, "sessoes", this.sessionId);
-        try {
-            await updateDoc(sessionRef, updates);
-            console.log(`💾 [Combat] Estado e HP de ${target.name} sincronizados atomicamente.`);
-        } catch (e) {
-            console.warn(`⚠️ [Combat] Falha ao sincronizar HP de ${target.name} na sessão (Provável falta de permissão):`, e);
-            // Non-blocking: Player acts locally, GM's client will likely commit the state on turn change
-        }
-
-        // Verificar fim do combate se alguém morreu
-        if (target.hp <= 0) {
-            console.log(`💀 [Combat] ${target.name} chegou a 0 HP. Verificando fim do combate...`);
-            const endResult = this.checkCombatEnd();
-            if (endResult) {
-                await this.endCombat(endResult.winner);
-            }
-        }
-    },
-
-    /**
-     * Calcula os campos de atualização para sincronizar HP de um NPC/Monstro
-     * @returns {Object} Updates object for updateDoc
-     */
-    getNPCSyncUpdates(sessionData, entityId, newHP) {
-        const updates = {};
-        const baseId = entityId.includes('_') ? entityId.substring(0, entityId.lastIndexOf('_')) : entityId;
-
-        // 1. linked_monsters
-        if (sessionData.linked_monsters) {
-            const list = [...sessionData.linked_monsters];
-            const idx = list.findIndex(m => m.id === entityId);
-            if (idx !== -1) {
-                list[idx].hp = newHP;
-                updates.linked_monsters = list;
-            }
-        }
-
-        // 2. allies
-        if (sessionData.allies) {
-            const list = [...sessionData.allies];
-            const idx = list.findIndex(a => a.id === entityId || a.id === baseId);
-            if (idx !== -1) {
-                list[idx].hp = newHP;
-                updates.allies = list;
-            }
-        }
-
-        // 3. sessionNPCs
-        if (sessionData.sessionNPCs) {
-            const list = [...sessionData.sessionNPCs];
-            const idx = list.findIndex(n => n.id === entityId || n.id === baseId);
-            if (idx !== -1) {
-                list[idx].hp = newHP;
-                updates.sessionNPCs = list;
-            }
-        }
-
-        return updates;
-    },
-
-    /**
-     * Sincroniza HP de um NPC/Monstro com a sessão no Firestore
-     */
-    /**
-     * Sincroniza HP com a ficha no Firestore
-     */
-    async syncCharacterHP(characterId, newHP) {
-        try {
-            const { db } = await import('../auth.js');
-            const { doc, updateDoc, serverTimestamp } = await import("firebase/firestore");
-
-            const charRef = doc(db, "fichas", characterId);
-
-            // Atualização ROBUSTA em todos os caminhos possíveis
-            await updateDoc(charRef, {
-                "combat.hp.current": newHP,
-                "stats.hp": newHP,
-                "stats.hp_current": newHP,
-                "attributes.HP.current": newHP,
-                "attributes.Vida.atual": newHP,
-                updatedAt: serverTimestamp()
-            });
-
-            console.log(`💾 [Combat] Ficha ${characterId} sincronizada com HP: ${newHP}`);
-        } catch (e) {
-            console.error("❌ [Combat] Erro ao sincronizar HP com a ficha:", e);
         }
     },
 
@@ -1050,7 +805,6 @@ const CombatEngine = {
             this.calculateAverageLevel(players)
         );
 
-        // Salvar monstros na sessão
         const sessionRef = doc(db, "sessoes", this.sessionId);
         await updateDoc(sessionRef, {
             linked_monsters: monsters,
@@ -1071,96 +825,11 @@ const CombatEngine = {
     calculateAverageLevel(players) {
         const levels = players.map(p => p.characterData?.bio?.level || 1);
         return Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
-    },
-
-    /**
-     * Executa ataque manual de um monstro (Direcionado pelo Mestre)
-     */
-    async executeManualMonsterAttack(monsterId, targetId, attackName = "Ataque", rolls = null) {
-        console.log(`⚔️ CombatEngine: Ataque manual solicitado. Monstro: ${monsterId} -> Alvo: ${targetId} com ${attackName}`);
-
-        const monster = this.combatState.turnOrder.find(p => p.id === monsterId);
-        const target = this.combatState.turnOrder.find(p => p.id === targetId);
-
-        if (!monster || !target) return;
-
-        try {
-            let result;
-
-            // 🛡️ [Performance] Remove slow AI narration for monster attacks as requested
-            // determine hit based on rolls or decision
-            const ac = target.ac || 10;
-            const hit = rolls && rolls.hit !== undefined ? (rolls.hit >= ac || rolls.hit === 20) : (Math.random() > 0.5);
-            const damageValue = rolls && rolls.damage !== undefined ? rolls.damage : (hit ? 5 : 0);
-
-            result = {
-                hit: hit,
-                damage: damageValue,
-                narrative: null // No AI narrative to speed up combat
-            };
-
-            if (result.hit && result.damage) {
-                await this.applyDamage(targetId, result.damage);
-            }
-
-            // REMOVED Redundant summary to avoid duplicate chat messages
-            // Finalized result is sent as structured system message below
-
-            // Adicionar mensagem estruturada de sistema para o chat (Acerto/Dano)
-            let systemMsg = `⚔️ **${escapeHTML(monster.name)}** ataca **${escapeHTML(target.name)}** com **${escapeHTML(attackName)}**!\n`;
-            systemMsg += `Acerto: **${result.hit ? 'ACERTOU' : 'ERROU'}**\n`;
-            if (result.hit && result.damage > 0) {
-                systemMsg += `Dano: **${escapeHTML(String(result.damage))}**`;
-            }
-
-            await addDoc(collection(db, "sessoes", this.sessionId, "session_messages"), {
-                text: systemMsg,
-                senderId: "system",
-                senderNickname: "Sistema de Combate",
-                role: "system",
-                type: "system",
-                chapterIndex: Number(window.StageModule?.currentChapterIdx || 0),
-                timestamp: serverTimestamp()
-            });
-
-            await this.saveCombatState();
-
-            // Avançar turno após o ataque
-            setTimeout(async () => {
-                await this.nextTurn();
-            }, 3000);
-
-        } catch (e) {
-            console.error("Erro no ataque manual:", e);
-        }
-    },
-
-    // Helper para o prompt legado
-    getManualAttackPrompt(monster, target, attackName) {
-        return `Você é o Mestre Arcano. É o turno de **${monster.name}**.
-Ele ataca **${target.name}** utilizando **${attackName}**.
-
-DADOS DO MONSTRO:
-HP: ${monster.hp} | CA: ${monster.ac}
-Ações: ${monster.monsterData?.actions || ""}
-
-DADOS DO ALVO:
-Nombre: ${target.name} | CA: ${target.ac}
-
-**TAREFA:**
-1. Narre o ataque de forma épica em PRIMEIRA PESSOA.
-2. Determine se acertou (baseado na CA ${target.ac}) e o dano (baseado no texto da ação).
-3. Se o texto da ação não for claro sobre bônus de acerto, use +4. Se não for claro sobre dano, use 2d6+2.
-
-**FORMATO (JSON):**
-{
-  "narrative": "...",
-  "hit": true/false,
-  "damage": número
-}
-APENAS JSON.`;
     }
 };
+
+// ── Mix in damage sub-module methods ──
+Object.assign(CombatEngine, createDamageMixin(CombatEngine));
 
 window.CombatEngine = CombatEngine;
 export default CombatEngine;

@@ -1,0 +1,1075 @@
+﻿/* =========================================
+   SIDEBAR COMBAT (VERTICAL)
+   ========================================= */
+.combat-header-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--gold-dark);
+}
+
+.combat-round-label {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 0.9rem;
+}
+
+.combat-status-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    color: var(--gold-bright);
+    text-transform: uppercase;
+}
+
+.combat-list-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.combat-token-v2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(40, 20, 20, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.combat-token-v2:hover {
+    border-color: var(--gold);
+    background: rgba(40, 20, 20, 0.6);
+}
+
+.combat-token-v2.active-turn {
+    border-color: var(--gold-bright);
+    background: rgba(212, 175, 55, 0.1);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.combat-token-v2.active-turn::before {
+    content: 'â–¶';
+    position: absolute;
+    left: -15px;
+    color: var(--gold-bright);
+    animation: bounceRight 1.5s infinite;
+}
+
+@keyframes bounceRight {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+}
+
+.token-icon-sml {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--gold-dark);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.combat-token-v2.monster .token-icon-sml {
+    color: #f44336;
+    border-color: #f44336;
+}
+
+.combat-token-v2.player .token-icon-sml {
+    color: #4caf50;
+    border-color: #4caf50;
+}
+
+.combat-token-v2.npc .token-icon-sml {
+    color: #2196f3;
+    border-color: #2196f3;
+}
+
+.token-details-sml {
+    flex: 1;
+    min-width: 0;
+}
+
+.token-name-sml {
+    font-family: var(--font-medieval);
+    font-size: 0.85rem;
+    color: var(--gold-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.token-hp-bar-sml {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 4px 0;
+}
+
+.hp-fill-sml {
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.3s ease;
+}
+
+.token-meta-sml {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    justify-content: space-between;
+}
+
+.combat-footer-actions {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.combat-token-v2.defeated {
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: default;
+}
+
+.modal-actions-centered {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.char-select-card {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #2c1e16;
+}
+
+.char-select-card:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gold);
+    transform: translateY(-5px);
+}
+
+.char-select-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    margin-bottom: 0.5rem;
+}
+
+/* Contrast Fix for Lyra Theme / Parchment Modals */
+.modal-stage-content .char-select-card h4 {
+    color: #2c1e16 !important;
+    /* Dark ink */
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+}
+
+.modal-stage-content .char-select-card p {
+    color: #5d4037 !important;
+    /* Dark brown */
+    font-weight: 600 !important;
+}
+
+.modal-stage-content .char-grid+p,
+.modal-stage-content>p {
+    color: #2c1e16 !important;
+    opacity: 0.9 !important;
+}
+
+/* Theme-specific Modal Contrast Fixes */
+.damien-theme .modal-stage-content h2,
+.damien-theme .modal-stage-content h3,
+.damien-theme .modal-stage-content h4 {
+    color: var(--gold-bright) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.damien-theme .modal-stage-content p,
+.damien-theme .modal-stage-content .char-grid+p,
+.damien-theme .modal-stage-content>p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    opacity: 1 !important;
+}
+
+.eldrin-theme .modal-stage-content h2,
+.eldrin-theme .modal-stage-content h3,
+.eldrin-theme .modal-stage-content h4 {
+    color: var(--gold-bright) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.eldrin-theme .modal-stage-content p,
+.eldrin-theme .modal-stage-content .char-grid+p,
+.eldrin-theme .modal-stage-content>p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    opacity: 1 !important;
+}
+
+/* Exit Session Button Contrast */
+.damien-theme #btn-exit-session,
+.eldrin-theme #btn-exit-session {
+    background: rgba(0, 0, 0, 0.6) !important;
+    color: var(--gold-bright) !important;
+    border: 2px solid var(--gold) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.damien-theme #btn-exit-session:hover,
+.eldrin-theme #btn-exit-session:hover {
+    background: var(--gold) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px var(--gold) !important;
+}
+
+/* Oracle Waiting State */
+.oracle-waiting-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+    min-height: 200px;
+}
+
+.oracle-waiting-state i {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* Narrative Parchment Flow - Premium Intro */
+.narrative-parchment-flow {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.2rem 2.5rem;
+    background: rgba(20, 10, 5, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(212, 175, 55, 0.05);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+.parchment-header {
+    text-align: center;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    padding-bottom: 0.8rem;
+}
+
+.chapter-marker {
+    font-family: var(--font-medieval);
+    color: var(--gold-dark);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    display: block;
+    margin-bottom: 0.3rem;
+    opacity: 0.8;
+}
+
+.chapter-title {
+    font-family: var(--font-medieval);
+    color: var(--gold-bright);
+    font-size: 2rem;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 1);
+    letter-spacing: 2px;
+}
+
+.parchment-body {
+    font-family: var(--font-body);
+    font-size: 1.4rem;
+    line-height: 1.9;
+    color: #e8e8e8;
+    text-align: justify;
+    font-style: italic;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    padding: 10px 0;
+}
+
+.parchment-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed rgba(212, 175, 55, 0.2);
+    text-align: center;
+}
+
+.companion-label {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1.2rem;
+    opacity: 0.7;
+}
+
+.narrative-divider-mystic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    color: var(--gold);
+    font-family: var(--font-medieval);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    opacity: 0.5;
+}
+
+.narrative-divider-mystic i {
+    font-size: 1.2rem;
+    opacity: 0.3;
+}
+
+/* GM Input Group (Textarea + Send Button) */
+.gm-input-group {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.gm-input-group textarea {
+    flex: 1;
+    resize: none;
+    min-height: 80px;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+    color: #eee;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.gm-input-group #btn-gm-send-story:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, var(--gold), #b8860b);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+/* GM Dashboard - Context Panel */
+.gm-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-bottom: 20px;
+}
+
+.gm-section {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s;
+}
+
+.gm-section-title {
+    font-family: var(--font-medieval);
+    font-size: 0.95rem;
+    color: var(--gold);
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+}
+
+.toggle-icon {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+}
+
+.gm-context-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.4;
+    margin: 0;
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+    border-left: 2px solid var(--gold-dark);
+}
+
+.atmosphere-text {
+    color: #e0e0aa;
+    /* Slight yellowish tint */
+}
+
+/* Collapsible Logic */
+.collapsible .gm-section-content {
+    display: none;
+    margin-top: 10px;
+}
+
+.collapsible.active .gm-section-content {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.collapsible .gm-section-title {
+    cursor: pointer;
+}
+
+.collapsible.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.gm-encounter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+.gm-encounter-list li {
+    font-size: 0.85rem;
+    padding: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ddd;
+}
+
+.gm-encounter-list li:last-child {
+    border-bottom: none;
+}
+
+.gm-actions-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Red Box Fixes - Spacing Refinements */
+.stage-header {
+    margin-bottom: 0 !important;
+    /* Remove bottom margin to reduce gap */
+    padding-bottom: 10px;
+}
+
+/* GM Narrative Panel Spacing */
+.stage-main {
+    padding: 0 10px !important;
+}
+
+.gm-narrative-panel {
+    /* Ensure it doesn't overlap content visually */
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid var(--gold-dim);
+    padding: 15px;
+    margin-top: auto;
+    /* Push to bottom if flex container allows */
+}
+
+/* =========================================
+   PREMIUM FORGE (NPC/Monster Creator)
+   ========================================= */
+
+.modal-stage-content.premium-forge {
+    max-width: 950px !important;
+    background: linear-gradient(135deg, #120808, #2a150c) !important;
+    border: 3px double var(--gold) !important;
+    padding: 0 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #eee !important;
+}
+
+.close-btn-top {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--gold-dark);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s;
+}
+
+.close-btn-top:hover {
+    color: var(--gold-bright);
+    transform: rotate(90deg);
+}
+
+.forge-header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    text-align: center;
+}
+
+.medieval-title-gold {
+    margin: 0;
+    color: #ffdf00;
+    /* Force bright gold */
+    font-family: var(--font-medieval);
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 3px #000, 0 0 15px rgba(212, 175, 55, 0.6);
+    font-weight: 700;
+}
+
+
+
+.forge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+.forge-column {
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.creation-side {
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.inventory-side {
+    background: rgba(30, 20, 15, 0.3);
+}
+
+.field-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.mystic-label {
+    display: block;
+    font-family: var(--font-medieval);
+    font-size: 0.75rem;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.medieval-input-v2,
+.medieval-textarea-v2 {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 4px;
+    padding: 12px;
+    color: #e0e0e0;
+    font-family: var(--font-body);
+    transition: all 0.3s;
+}
+
+.medieval-input-v2:focus,
+.medieval-textarea-v2:focus {
+    outline: none;
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    background: rgba(20, 10, 5, 0.7) !important;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.forge-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mystic-msg {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.forge-actions button {
+    width: 100%;
+    padding: 10px 1px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-sizing: border-box;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-family: var(--font-medieval);
+}
+
+.purple-glow-btn {
+    background: linear-gradient(135deg, #4b0082, #8a2be2) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+}
+
+.evoke-btn-gold {
+    background: linear-gradient(135deg, #8b4513, #d4af37) !important;
+    color: #1a0a00 !important;
+    font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.side-title {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    padding-bottom: 10px;
+}
+
+.forge-list-scrollable {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.empty-msg-thematic {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 50px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.monster-card-prep {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.monster-card-prep:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--gold);
+    transform: translateX(5px);
+}
+
+.card-header h4 {
+    margin: 0;
+    color: var(--white);
+    font-size: 1rem;
+}
+
+.card-meta {
+    font-size: 0.8rem;
+    color: var(--gold-dark);
+}
+
+.card-qty-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.card-qty-control button {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.card-qty-control button:hover {
+    background: var(--gold);
+    color: black;
+}
+
+.card-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.forge-footer-action {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    justify-content: center;
+}
+
+.start-battle-btn {
+    background: linear-gradient(135deg, #510000, #b22222) !important;
+    color: white !important;
+    min-width: 250px;
+    box-shadow: 0 0 20px rgba(178, 34, 34, 0.3);
+}
+
+.finish-npc-btn {
+    background: linear-gradient(135deg, #0b3d0b, #228b22) !important;
+    color: white !important;
+    min-width: 250px;
+}
+
+/* =========================================
+   TARGETING SYSTEM (Combat)
+   ========================================= */
+
+.targeting-panel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 5, 5, 0.95);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    z-index: 100;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.targeting-section-title {
+    font-family: var(--font-medieval);
+    color: var(--gold);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.targeting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.target-item-btn,
+.attack-item-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #ddd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.target-item-btn:hover,
+.attack-item-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gold);
+}
+
+.target-item-btn.selected,
+.attack-item-btn.selected {
+    background: var(--gold);
+    color: black;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Theme Overrides - Damien */
+.damien-theme {
+    --msg-local-bg: rgba(45, 25, 15, 0.85);
+    /* Deep sepia/blood for Damien */
+}
+
+/* .lyra-theme {
+    --msg-local-bg: rgba(230, 240, 255, 0.9);
+} */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Final Sidebar Refinements */
+#btn-end-session {
+    background: linear-gradient(135deg, var(--gold-dark), #8a6d3b) !important;
+    border: 1px solid var(--gold) !important;
+    color: #1a0f0f !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
+    text-shadow: none !important;
+    transition: all 0.2s;
+    margin-top: 5px;
+    width: 100%;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.8rem !important;
+    min-height: 25px;
+}
+
+#btn-end-session:hover {
+    transform: scale(1.02);
+    background: linear-gradient(135deg, var(--gold), #b8860b) !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* Theme Aesthetic Refinements */
+.lyra-theme .medieval-title-gold,
+.lyra-theme .empty-msg-thematic,
+.lyra-theme .side-title,
+.lyra-theme .mystic-label {
+    color: #ffff00 !important;
+    /* AMALELÃƒO - PURE YELLOW */
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.5), 1px 1px 2px #000 !important;
+}
+
+.eldrin-theme ::placeholder,
+.eldrin-theme .medieval-input-v2::placeholder,
+.eldrin-theme .medieval-textarea-v2::placeholder,
+.eldrin-theme #gm-narrative-input::placeholder {
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+}
+
+.eldrin-theme .medieval-input-v2,
+.eldrin-theme .medieval-textarea-v2,
+.eldrin-theme #gm-narrative-input {
+    color: #ffffff !important;
+}
+
+/* Final Sidebar Refinements */
+#btn-end-session {
+    background: linear-gradient(135deg, var(--gold-dark), #8a6d3b) !important;
+    border: 1px solid var(--gold) !important;
+    color: #1a0f0f !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
+    text-shadow: none !important;
+    transition: all 0.2s;
+    margin-top: 5px;
+    width: 100%;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.8rem !important;
+    min-height: 25px;
+}
+
+#btn-end-session:hover {
+    transform: scale(1.02);
+    background: linear-gradient(135deg, var(--gold), #b8860b) !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* =========================================
+   ULTIMATE OVERRIDES FOR LYRA PREMIUM MODAL
+   ========================================= */
+/* Specificity brute-force: targeting heading and text with multiple ways */
+.lyra-theme .premium-roll-request h2.medieval-title-gold,
+.premium-roll-request .lyra-theme .medieval-title-gold,
+body.lyra-theme .premium-roll-request .medieval-title-gold {
+    color: #ffffff !important;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.9), 2px 2px 4px #000 !important;
+    font-size: 2.2rem !important;
+    letter-spacing: 2px !important;
+    display: block !important;
+}
+
+.lyra-theme .premium-roll-request p.mystic-msg,
+.premium-roll-request .lyra-theme .mystic-msg,
+body.lyra-theme .premium-roll-request .mystic-msg {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px #000 !important;
+    opacity: 1 !important;
+    font-size: 1.1rem !important;
+}
+
+.lyra-theme .premium-roll-request .roll-category-title {
+    color: #ffcc00 !important;
+    text-shadow: 1px 1px 2px #000 !important;
+}
+
+.lyra-theme .premium-roll-request .roll-option-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e0e0e0 !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+}
+
+.lyra-theme .premium-roll-request .roll-option-btn.selected {
+    background: #ffcc00 !important;
+    color: #000000 !important;
+    /* Pure black for visibility */
+    font-weight: 900 !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6) !important;
+}
+
+.lyra-theme .premium-roll-request .roll-tab {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.lyra-theme .premium-roll-request .roll-tab.active {
+    background: rgba(255, 204, 0, 0.3) !important;
+    color: #ffcc00 !important;
+    border-color: rgba(255, 204, 0, 0.5) !important;
+}
+
+/* ==========================================================================
+   INTERACTIVE ROLL MODAL
+   ========================================================================== */
+.roll-interact-box {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.dice-interaction-area {
+    margin: 25px auto;
+    width: 140px;
+    height: 140px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    border: 2px solid var(--gold-faded);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.dice-interaction-area:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--gold);
+    transform: scale(1.08);
+}
+
+.d20-visual {
+    font-size: 3.8rem;
+    color: var(--gold);
+    margin-bottom: 2px;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+    transition: transform 0.3s ease;
+}
+
+
+
+.dice-interaction-area.rolling .d20-visual {
+    animation: d20-chaos 0.2s infinite alternate;
+}
+
+@keyframes d20-chaos {
+    0% {
+        transform: rotate(-10deg) scale(1);
+    }
+
+    100% {
+        transform: rotate(10deg) scale(1.1);
+    }
+}
+
+.roll-result-final {
+    font-size: 4.5rem;
+    color: var(--gold);
+    font-family: var(--font-medieval);
+    text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(212, 175, 55, 0.5);
+    animation: result-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes result-pop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.text-center {
+    text-align: center;
+}
+
+.gold-text {
+    color: var(--gold);
+    font-weight: bold;
+}

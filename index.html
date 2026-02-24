@@ -2522,17 +2522,12 @@
                 <div class="stat-bubble">
                     <i class="fas fa-users"></i>
                     <span id="admin-user-count">0</span>
-                    <label>Usuários</label>
+                    <label>Inscritos</label>
                 </div>
                 <div class="stat-bubble">
-                    <i class="fas fa-user-shield"></i>
-                    <span id="admin-total-sheets">0</span>
-                    <label>Fichas</label>
-                </div>
-                <div class="stat-bubble">
-                    <i class="fas fa-gem"></i>
-                    <span id="admin-total-items">0</span>
-                    <label>Itens Criados</label>
+                    <i class="fas fa-user-check"></i>
+                    <span id="admin-active-users">0</span>
+                    <label>Usuários Online</label>
                 </div>
                 <div class="stat-bubble">
                     <i class="fas fa-brain"></i>
@@ -2556,16 +2551,10 @@
                 </div>
 
                 <div class="admin-tool-box horizontal">
-                    <h4>Migração de Dados</h4>
+                    <h4>Ferramentas de Gestão</h4>
                     <div class="global-actions-row">
-                        <button class="medieval-btn" onclick="AdminModule.handleMigrateMonsters()">
-                            <i class="fas fa-file-import"></i> Migrar Monstros (D&D 5e)
-                        </button>
-                        <button class="medieval-btn secondary" onclick="AdminModule.handleMigrateSpells()">
-                            <i class="fas fa-magic"></i> Migrar Magias (D&D 5e)
-                        </button>
-                        <button class="medieval-btn" id="admin-migrate-rules-btn">
-                            <i class="fas fa-book-bookmark"></i> Migrar Regras (D&D 5e)
+                        <button class="medieval-btn gold-pulse" onclick="window.open('audit.html', '_blank')">
+                            <i class="fas fa-database"></i> Auditoria de Banco
                         </button>
                     </div>
                 </div>
