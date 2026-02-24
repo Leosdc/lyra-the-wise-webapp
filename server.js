@@ -3,6 +3,7 @@ const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const helmet = require('helmet');
 const admin = require('firebase-admin');
+const rateLimit = require('express-rate-limit');
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -97,15 +98,37 @@ app.use((req, res, next) => {
 
 app.use(express.static(distPath));
 
-// Middleware de Segurança (App Check / reCAPTCHA)
+// Rate Limiting — 30 requests por minuto por IP para endpoints de API
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Muitas petições em pouco tempo. Aguarde a Trama se estabilizar.' }
+});
+app.use('/api/', apiLimiter);
+
+// Middleware de Segurança (App Check / reCAPTCHA + ID Token)
 const verifySecurity = async (req, res, next) => {
     const appCheckToken = req.header("X-Firebase-AppCheck");
-    const recaptchaToken = req.header("X-ReCaptcha-Token"); // Opcional
+    const recaptchaToken = req.header("X-ReCaptcha-Token");
+    const idToken = req.header("Authorization")?.replace('Bearer ', '');
 
     // Ignorar verificação em desenvolvimento
     if (process.env.NODE_ENV === 'development') return next();
 
-    // 1. Tentar App Check (Recomendado)
+    // 1. Verificar identidade do usuário via ID Token
+    if (idToken) {
+        try {
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            req.user = decodedToken; // Disponibiliza dados do usuário para o handler
+        } catch (err) {
+            console.warn("Aviso ID Token:", err.message);
+            return res.status(401).json({ error: "Token de identidade inválido." });
+        }
+    }
+
+    // 2. Tentar App Check (Recomendado)
     if (appCheckToken) {
         try {
             await admin.appCheck().verifyToken(appCheckToken);
@@ -115,7 +138,7 @@ const verifySecurity = async (req, res, next) => {
         }
     }
 
-    // 2. Fallback: Verificação manual com RECAPTCHA_SECRET
+    // 3. Fallback: Verificação manual com RECAPTCHA_SECRET
     if (recaptchaToken && process.env.RECAPTCHA_SECRET) {
         try {
             const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`, {
@@ -176,9 +199,9 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
         console.error("Mensagem:", error.message);
         if (error.stack) console.error("Stack:", error.stack);
 
+        // SECURITY: Não expor error.message ao cliente em produção
         res.status(500).json({
             error: "Falha na conexão com as estrelas.",
-            details: error.message,
             code: error.status || "UNKNOWN_ERROR"
         });
     }

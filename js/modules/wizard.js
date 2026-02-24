@@ -581,8 +581,12 @@ export const WizardModule = {
                 const gaps = await generateSessionGaps(sessionData, idToken);
                 if (gaps) {
                     Object.keys(gaps).forEach(key => {
-                        if (!sessionData[key] || sessionData[key].trim() === "") {
-                            sessionData[key] = gaps[key];
+                        const currentVal = sessionData[key];
+                        const gapVal = gaps[key];
+                        // Defensive: AI pode retornar arrays/objetos em vez de strings
+                        const currentStr = (typeof currentVal === 'string') ? currentVal.trim() : '';
+                        if (!currentStr) {
+                            sessionData[key] = (typeof gapVal === 'string') ? gapVal : JSON.stringify(gapVal);
                         }
                     });
                 }

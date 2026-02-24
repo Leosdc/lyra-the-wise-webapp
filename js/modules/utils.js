@@ -1,4 +1,6 @@
 
+import DOMPurify from 'dompurify';
+
 /**
  * Utility Functions for Lyra the Wise
  */
@@ -78,12 +80,11 @@ export function deepClone(obj) {
 
 export function parseMarkdown(text) {
     if (!text) return '';
-    // SECURITY: Currently using escapeHTML() which is safe for simple text.
-    // If accepting raw HTML in the future, MUST use a sanitizer like DOMPurify.
+    // SECURITY: escapeHTML() first, then format. DOMPurify as final safety net.
     let html = escapeHTML(text); // Sanitize first
 
     // Blockquotes
-    html = html.replace(/^\s*>\s+(.*)/gim, '<blockquote>$1</blockquote>');
+    html = html.replace(/^\s*&gt;\s+(.*)/gim, '<blockquote>$1</blockquote>');
 
     // Headers
     html = html.replace(/^###\s+(.*)/gim, '<h3>$1</h3>');
@@ -111,6 +112,12 @@ export function parseMarkdown(text) {
 
     // Clean up empty lines or double breaks
     html = html.replace(/<br><br>/g, '<br>');
+
+    // SECURITY: DOMPurify como camada final de proteção
+    html = DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'strong', 'em', 'code', 'blockquote', 'ul', 'li', 'br', 'p'],
+        ALLOWED_ATTR: []
+    });
 
     return html;
 }
