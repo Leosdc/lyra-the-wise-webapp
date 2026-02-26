@@ -44,8 +44,8 @@ app.use(helmet({
                 "https://*.googleapis.com",
                 "https://*.google-analytics.com",
                 "https://google-analytics.com",
-                "https://ko-fi.com" // Ko-fi connection for widgets
-
+                "https://ko-fi.com", // Ko-fi connection for widgets
+                "https://apis.google.com" // Google Sign-In API calls
             ],
             "style-src": [
                 "'self'",
