@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import firebaseConfig from "./firebase-config.js";
@@ -24,10 +24,16 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
+// Handle redirect result on page load (fires after Google redirects back)
+getRedirectResult(auth).catch((error) => {
+    console.error("Erro no redirect login:", error);
+});
+
 export const login = async () => {
     try {
-        const result = await signInWithPopup(auth, provider);
-        return result.user;
+        // Using signInWithRedirect instead of signInWithPopup to avoid
+        // conflict with App Check's reCAPTCHA v3 invisible iframe.
+        await signInWithRedirect(auth, provider);
     } catch (error) {
         console.error("Erro no login:", error);
         throw error;
