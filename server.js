@@ -74,8 +74,10 @@ app.use(helmet({
             "frame-src": [
                 "https://www.google.com/recaptcha/",
                 "https://recaptcha.google.com/",
-                "https://ko-fi.com" // Ko-fi overlay/iframe
-
+                "https://ko-fi.com", // Ko-fi overlay/iframe
+                "https://lyra-the-wise.firebaseapp.com", // Firebase Auth popup
+                "https://*.firebaseapp.com",
+                "https://apis.google.com" // Google Sign-In iframe
             ],
             "upgrade-insecure-requests": []
         }
