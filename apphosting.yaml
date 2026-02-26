@@ -8,7 +8,7 @@ env:
   - variable: VITE_FIREBASE_API_KEY
     value: "AIzaSyBdymlRGmshBOgIKMWomn07Lf6SyAalR3E"
   - variable: VITE_FIREBASE_AUTH_DOMAIN
-    value: "lyra-the-wise.firebaseapp.com"
+    value: "lyrathewise.lat"
   - variable: VITE_FIREBASE_PROJECT_ID
     value: "lyra-the-wise"
   - variable: VITE_FIREBASE_STORAGE_BUCKET

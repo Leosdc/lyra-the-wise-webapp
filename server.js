@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const https = require('https');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const helmet = require('helmet');
 const admin = require('firebase-admin');
@@ -16,6 +17,38 @@ if (admin.apps.length === 0) {
 }
 
 const app = express();
+
+// ── Reverse Proxy: Firebase Auth Handler ──
+// Serve /__/auth/* from the same origin to avoid third-party cookie
+// restrictions in Chrome that break signInWithPopup cross-origin.
+const FIREBASE_HOSTING = 'lyra-the-wise.firebaseapp.com';
+
+app.all('/__/*', (req, res) => {
+    const options = {
+        hostname: FIREBASE_HOSTING,
+        path: req.originalUrl,
+        method: req.method,
+        headers: {
+            ...req.headers,
+            host: FIREBASE_HOSTING,
+        },
+    };
+
+    const proxyReq = https.request(options, (proxyRes) => {
+        // Copy headers but remove x-frame-options to allow popup
+        const headers = { ...proxyRes.headers };
+        delete headers['x-frame-options'];
+        res.writeHead(proxyRes.statusCode, headers);
+        proxyRes.pipe(res, { end: true });
+    });
+
+    proxyReq.on('error', (err) => {
+        console.error('Auth proxy error:', err.message);
+        res.status(502).send('Auth proxy error');
+    });
+
+    req.pipe(proxyReq, { end: true });
+});
 
 // Segurança Reforçada (10/10) - Helmet & CSP
 app.use(helmet({
