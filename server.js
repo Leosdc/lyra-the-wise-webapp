@@ -105,6 +105,7 @@ app.use(helmet({
 
             ],
             "frame-src": [
+                "'self'",
                 "https://www.google.com/recaptcha/",
                 "https://recaptcha.google.com/",
                 "https://ko-fi.com", // Ko-fi overlay/iframe
@@ -116,7 +117,7 @@ app.use(helmet({
         }
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginOpenerPolicy: false, // Desabilitado para permitir que o popup de auth fale com a janela principal
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
