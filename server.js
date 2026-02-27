@@ -155,18 +155,20 @@ const verifySecurity = async (req, res, next) => {
     // Ignorar verificação em desenvolvimento
     if (process.env.NODE_ENV === 'development') return next();
 
-    // 1. Verificar identidade do usuário via ID Token
+    // 1. Verificar identidade do usuário via ID Token (Prioritário)
     if (idToken) {
         try {
             const decodedToken = await admin.auth().verifyIdToken(idToken);
             req.user = decodedToken; // Disponibiliza dados do usuário para o handler
+            return next(); // Se o token é válido, permitimos o acesso (Mobile fallback)
         } catch (err) {
             console.warn("Aviso ID Token:", err.message);
+            // Se o token existe mas é inválido, paramos aqui
             return res.status(401).json({ error: "Token de identidade inválido." });
         }
     }
 
-    // 2. Tentar App Check (Recomendado)
+    // 2. Tentar App Check (Recomendado para Web)
     if (appCheckToken) {
         try {
             await admin.appCheck().verifyToken(appCheckToken);
@@ -176,7 +178,7 @@ const verifySecurity = async (req, res, next) => {
         }
     }
 
-    // 3. Fallback: Verificação manual com RECAPTCHA_SECRET
+    // 3. Fallback: Verificação manual com RECAPTCHA_SECRET (Web Legado)
     if (recaptchaToken && process.env.RECAPTCHA_SECRET) {
         try {
             const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`, {
