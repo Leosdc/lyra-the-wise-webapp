@@ -438,6 +438,7 @@ const app = {
     },
 
     switchView(viewId) {
+        NavigationModule.toggleMenu(false);
         if (viewId === 'dashboard') {
             // Dashboard is always accessible
         } else if (!this.user) {
