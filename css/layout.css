@@ -301,6 +301,20 @@
     color: var(--gold-bright);
 }
 
+/* GM Panel Header Simplification */
+.gm-panel-active .header-center .tracker-info {
+    display: none !important;
+}
+
+.gm-panel-active .header-center {
+    justify-content: center;
+    flex: 1;
+}
+
+.gm-panel-active .header-token-wrapper {
+    margin: 0 auto;
+}
+
 /* Character Switcher Dropdown */
 .char-switcher-container {
     position: relative;

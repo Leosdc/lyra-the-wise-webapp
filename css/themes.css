@@ -729,3 +729,23 @@ body.damien-theme .wizard-progress::before,
 body.eldrin-theme .wizard-progress::before {
     background: rgba(255, 255, 255, 0.3);
 }
+
+/* Eldrin Theme Music Player Fix */
+.eldrin-theme #gm-mini-music {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--gold) !important;
+    color: #fff !important;
+}
+
+.eldrin-theme #gm-mini-music button {
+    color: var(--gold) !important;
+}
+
+.eldrin-theme #gm-mini-music .music-name-mini {
+    color: #fff !important;
+    text-shadow: 0 0 5px var(--gold);
+}
+
+.eldrin-theme #gm-mini-music input[type="range"] {
+    accent-color: var(--gold);
+}

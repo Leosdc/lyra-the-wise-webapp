@@ -90,15 +90,21 @@ const RollRequestModule = {
                                 <div class="roll-panel" id="panel-skills" style="display: none;">
                                     <div class="roll-buttons-flex">
                                         <button class="roll-option-btn type-btn" data-val="Acrobacia">Acrobacia</button>
+                                        <button class="roll-option-btn type-btn" data-val="Adestrar Animais">Adestrar Animais</button>
                                         <button class="roll-option-btn type-btn" data-val="Arcanismo">Arcanismo</button>
                                         <button class="roll-option-btn type-btn" data-val="Atletismo">Atletismo</button>
+                                        <button class="roll-option-btn type-btn" data-val="Atuação">Atuação</button>
+                                        <button class="roll-option-btn type-btn" data-val="Enganação">Enganação</button>
                                         <button class="roll-option-btn type-btn" data-val="Furtividade">Furtividade</button>
                                         <button class="roll-option-btn type-btn" data-val="História">História</button>
+                                        <button class="roll-option-btn type-btn" data-val="Intimidação">Intimidação</button>
                                         <button class="roll-option-btn type-btn" data-val="Intuição">Intuição</button>
                                         <button class="roll-option-btn type-btn" data-val="Investigação">Investigação</button>
+                                        <button class="roll-option-btn type-btn" data-val="Medicina">Medicina</button>
                                         <button class="roll-option-btn type-btn" data-val="Natureza">Natureza</button>
                                         <button class="roll-option-btn type-btn" data-val="Percepção">Percepção</button>
                                         <button class="roll-option-btn type-btn" data-val="Persuasão">Persuasão</button>
+                                        <button class="roll-option-btn type-btn" data-val="Prestidigitação">Prestidigitação</button>
                                         <button class="roll-option-btn type-btn" data-val="Religião">Religião</button>
                                         <button class="roll-option-btn type-btn" data-val="Sobrevivência">Sobrevivência</button>
                                     </div>
@@ -118,6 +124,16 @@ const RollRequestModule = {
                                     <button class="dc-preset-btn" data-dc="15">Difícil (15)</button>
                                     <button class="dc-preset-btn" data-dc="20">Épico (20)</button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Roll Mode (Advantage/Disadvantage) -->
+                        <div class="roll-category-group">
+                            <div class="roll-category-title"><i class="fas fa-balance-scale"></i> Modo de Rolagem</div>
+                            <div class="roll-buttons-flex" id="roll-mode-selection">
+                                <button class="roll-option-btn selected" data-mode="normal">Normal</button>
+                                <button class="roll-option-btn" data-mode="advantage">Vantagem</button>
+                                <button class="roll-option-btn" data-mode="disadvantage">Desvantagem</button>
                             </div>
                         </div>
                     </div>
@@ -145,6 +161,7 @@ const RollRequestModule = {
         let selectedTargetName = 'Todos';
         let selectedType = null;
         let selectedDC = 12;
+        let selectedRollMode = 'normal';
 
         // --- Bind Events ---
 
@@ -192,6 +209,15 @@ const RollRequestModule = {
             });
         });
 
+        // Roll Mode Selection
+        modal.querySelectorAll('#roll-mode-selection .roll-option-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.querySelectorAll('#roll-mode-selection .roll-option-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedRollMode = btn.dataset.mode;
+            });
+        });
+
         // Confirm
         modal.querySelector('#confirm-roll-req').addEventListener('click', async () => {
             if (!selectedType) {
@@ -215,6 +241,7 @@ const RollRequestModule = {
             await this.sendRequestFromData({
                 skill: selectedType,
                 dc: selectedDC,
+                rollMode: selectedRollMode,
                 players: playersToSend
             });
 
@@ -244,6 +271,7 @@ const RollRequestModule = {
             type: 'roll_request',
             skill: data.skill,
             dc: data.dc || 12,
+            rollMode: data.rollMode || 'normal',
             players: data.players, // Array of {uid, name}
             status: 'pending',
             results: {},
@@ -318,12 +346,14 @@ const RollRequestModule = {
                     </div>
                     <div class="modal-body text-center">
                         <p class="roll-instruction">O Mestre solicita um teste de <strong>${request.skill}</strong>!</p>
+                        <p class="roll-mode-badge">${request.rollMode === 'advantage' ? '<span class="gold-text">Vantagem</span>' : (request.rollMode === 'disadvantage' ? '<span class="crimson-text">Desvantagem</span>' : 'Normal')}</p>
                         <div class="dice-interaction-area" id="trigger-player-roll">
                             <div class="d20-visual">
                                 <i class="fas fa-dice-d20"></i>
                             </div>
                         </div>
                         <p class="roll-extra-info">Dificuldade Alvo: <span class="gold-text">${request.dc}</span></p>
+                        <div id="roll-breakdown-output" class="roll-breakdown-mini" style="margin-top: 15px; min-height: 1.2rem;"></div>
                     </div>
                 </div>
             </div>
@@ -349,18 +379,74 @@ const RollRequestModule = {
 
                 // Simular delay de rolagem visual
                 setTimeout(async () => {
-                    const roll = Math.floor(Math.random() * 20) + 1;
-                    // Buscar bônus do personagem se disponível
+                    const r1 = Math.floor(Math.random() * 20) + 1;
+                    const r2 = Math.floor(Math.random() * 20) + 1;
+
+                    let roll = r1;
+                    if (request.rollMode === 'advantage') roll = Math.max(r1, r2);
+                    if (request.rollMode === 'disadvantage') roll = Math.min(r1, r2);
+
+                    // Buscar bônus do personagem
                     let bonus = 0;
                     if (window.StageModule?.characterData) {
-                        const charsData = window.StageModule.characterData;
-                        // Futuramente: extrair bônus real dos dados do Atrium
-                        bonus = 0;
+                        const char = window.StageModule.characterData;
+                        const skill = request.skill;
+
+                        // Mapping
+                        const attrMap = {
+                            'Força': 'str', 'Destreza': 'dex', 'Constituição': 'con',
+                            'Inteligência': 'int', 'Sabedoria': 'wis', 'Carisma': 'cha'
+                        };
+
+                        const skillMap = {
+                            'Acrobacia': 'acrobacia', 'Adestrar Animais': 'adestrar_animais', 'Arcanismo': 'arcanismo',
+                            'Atletismo': 'atletismo', 'Atuação': 'atuacao', 'Enganação': 'enganacao',
+                            'Furtividade': 'furtividade', 'História': 'historia', 'Intimidação': 'intimidacao',
+                            'Intuição': 'intuicao', 'Investigação': 'investigacao', 'Medicina': 'medicina',
+                            'Natureza': 'natureza', 'Percepção': 'percepcao', 'Persuasão': 'persuasao',
+                            'Prestidigitação': 'prestidigitacao', 'Religião': 'religiao', 'Sobrevivência': 'sobrevivencia'
+                        };
+
+                        const skillToAttr = {
+                            'acrobacia': 'dex', 'adestrar_animais': 'wis', 'arcanismo': 'int', 'atletismo': 'str',
+                            'atuacao': 'cha', 'enganacao': 'cha', 'furtividade': 'dex', 'historia': 'int',
+                            'intimidacao': 'cha', 'intuicao': 'wis', 'investigacao': 'int', 'medicina': 'wis',
+                            'natureza': 'int', 'percepcao': 'wis', 'persuasao': 'cha', 'prestidigitacao': 'dex',
+                            'religiao': 'int', 'sobrevivencia': 'wis'
+                        };
+
+                        if (attrMap[skill]) {
+                            const attrCode = attrMap[skill];
+                            const score = parseInt(char.attributes?.[attrCode] || 10);
+                            bonus = Math.floor((score - 10) / 2);
+
+                            // Check if it's a Saving Throw (requested from Atributos panel often means Save in this context)
+                            // or if it's just a raw check. Original UI has "Atributos" and "Perícias".
+                            // For simplicity, we use raw attribute mod for "Atributos" tab selections.
+                        } else if (skillMap[skill]) {
+                            const skCode = skillMap[skill];
+                            const attrCode = skillToAttr[skCode];
+                            const score = parseInt(char.attributes?.[attrCode] || 10);
+                            const attrMod = Math.floor((score - 10) / 2);
+
+                            const isProf = (char.proficiencies_choice?.skills || []).includes(skCode);
+                            const isExpert = (char.proficiencies_choice?.expertise || []).includes(skCode);
+
+                            const level = parseInt(char.bio?.level || 1);
+                            const profBonus = Math.ceil(1 + (level / 4));
+
+                            bonus = attrMod + (isProf ? profBonus : 0) + (isExpert ? profBonus : 0);
+                        }
                     }
 
                     const total = roll + bonus;
+                    const rollDetail = request.rollMode !== 'normal' ? `(${r1}, ${r2} -> ${roll})` : `(${roll})`;
                     area.innerHTML = `<div class="roll-result-final pulse-glow">${total}</div>`;
-                    logger.debug(`RollRequest: Resultado calculado: ${total} (Dado: ${roll} + Bônus: ${bonus})`);
+
+                    const breakdownEl = document.getElementById('roll-breakdown-output');
+                    if (breakdownEl) {
+                        breakdownEl.innerHTML = `${rollDetail} + ${bonus}`;
+                    }
 
                     try {
                         await this.sendRollResult(request.id, total);
@@ -370,7 +456,7 @@ const RollRequestModule = {
 
                     setTimeout(() => {
                         if (this.modalElement) this.modalElement.remove();
-                    }, 2000);
+                    }, 3000);
                 }, 1000);
             };
         } else {
@@ -427,7 +513,8 @@ const RollRequestModule = {
         }
 
         // Build consolidated message
-        let html = `<div class="roll-consolidated-card"><div class="card-header"><i class="fas fa-scroll"></i> Resultados: ${escapeHTML(request.skill)} (CD ${escapeHTML(String(request.dc))})</div><div class="results-list">`;
+        const modeLabel = request.rollMode === 'advantage' ? ' (Vantagem)' : (request.rollMode === 'disadvantage' ? ' (Desvantagem)' : '');
+        let html = `<div class="roll-consolidated-card"><div class="card-header"><i class="fas fa-scroll"></i> Resultados: ${escapeHTML(request.skill)}${modeLabel} (CD ${escapeHTML(String(request.dc))})</div><div class="results-list">`;
 
         request.players.forEach(p => {
             const charName = p.characterName || p.name || 'Herói';
