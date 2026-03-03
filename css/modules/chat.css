@@ -5,16 +5,21 @@
     height: 75vh;
     display: flex;
     flex-direction: column;
-    padding: 0 !important;
+    padding: 0;
+    /* Override generic padding safely */
     overflow: hidden;
     border: 3px double var(--gold);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    background: var(--parchment);
+    position: relative;
+    border-radius: 8px;
 }
 
 .chat-header {
     background: rgba(0, 0, 0, 0.03);
-    padding: 1.5rem 2.5rem;
+    padding: 1rem 2.5rem;
     border-bottom: 2px solid rgba(44, 30, 22, 0.1);
+    flex-shrink: 0;
 }
 
 .chat-header h2 {
@@ -54,6 +59,27 @@
     backdrop-filter: blur(2px);
 }
 
+/* Fix for Community Chat Messages - different from AI Chat */
+.community-main .msg {
+    max-width: 90%;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+}
+
+.community-main .msg.user {
+    align-self: flex-end;
+    border-right: 4px solid var(--gold);
+    background: rgba(44, 30, 22, 0.3);
+}
+
+.community-main .msg:not(.user) {
+    align-self: flex-start;
+    border-left: 4px solid var(--gold-dark);
+}
+
 .chat-avatar {
     width: 48px;
     height: 48px;
@@ -66,26 +92,26 @@
 .msg-content {
     line-height: 1.7;
     font-size: 1.05rem;
-    text-align: justify;
-    hyphens: auto;
+    text-align: left;
+    color: var(--ink);
 }
 
 .msg.user {
     align-self: flex-end;
-    background: rgba(44, 30, 22, 0.05);
-    text-align: right;
+    background: rgba(44, 30, 22, 0.15);
 }
 
 .msg-header {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.4rem;
 }
 
 .msg-author {
     font-weight: 700;
     font-size: 0.95rem;
+    color: var(--gold);
 }
 
 .msg-time {
@@ -95,22 +121,21 @@
 
 /* Community specific input area */
 .community-main .chat-input-area {
-    padding: 1.5rem 2.5rem;
-    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
     display: flex;
     gap: 1rem;
     align-items: center;
     border-top: 1px solid rgba(255, 215, 0, 0.2);
 }
 
-/* Default/AI Chat input area - Restore original spacing */
-.chat-input-area {
-    padding: 1rem;
+/* Default/AI Chat input area */
+.chat-container .chat-input-area {
+    padding: 1.5rem 2rem;
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: center;
-    background: transparent;
-    border-top: none;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 /* Generic Chat Input (AI/Default) */
@@ -161,10 +186,27 @@
 
 
 .chat-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    z-index: 10;
+    background: var(--crimson);
+    color: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+    position: relative;
+    /* Not absolute anymore to stay in header */
+    top: auto;
+    right: auto;
+}
+
+.chat-close-btn:hover {
+    background: #a93226;
+    transform: scale(1.1);
 }
 
 .community-layout {
@@ -172,6 +214,8 @@
     flex-direction: row;
     padding: 0;
     max-width: 1000px;
+    flex: 1;
+    overflow: hidden;
 }
 
 .community-main {
@@ -179,6 +223,7 @@
     display: flex;
     flex-direction: column;
     border-right: 2px solid rgba(0, 0, 0, 0.1);
+    height: 100%;
 }
 
 .community-sidebar {

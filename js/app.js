@@ -40,6 +40,7 @@ import CommunityModule from './modules/community.js';
 import { ContentModule } from './modules/content_modules.js';
 import { GMPanelModule } from './modules/gm-panel.js';
 import { PublicSessionsModule } from './modules/public-sessions.js';
+import { ChatUIModule } from './modules/chat_ui.js';
 
 // Sub-module mixins
 import { createThemeMixin } from './core/app-theme.js';
@@ -78,14 +79,15 @@ const app = {
         });
         this.populateSystems();
         this.showRandomTrivia();
-        this.bindEvents();
         this.initMusicPlayer();
+        NavigationModule.init();
 
         LyricsModule.init();
+        SheetModule.init();
         ItemsModule.init();
         AdminModule.init();
-        WizardModule.initGuidanceListeners();
-        ChangelogModule.loadChangelog();
+        WizardModule.init(this.getWizardContext());
+        ChangelogModule.init();
         this.populateDataLists();
         DiceModule.init();
         SpellModule.init();
@@ -93,6 +95,9 @@ const app = {
         ContentModule.init();
         NamesModule.init();
         GMPanelModule.init();
+        ChatUIModule.init(this);
+
+        this.bindEvents(); // Bind events after all modules inject their HTML
 
         // Changelog Notification
         const storedVersion = localStorage.getItem('lyraAppVersion');
@@ -234,7 +239,7 @@ const app = {
     // --- Context & Dependency Injection ---
     getWizardContext() {
         return {
-            user: this.user,
+            get user() { return app.user; },
             currentSystem: this.currentSystem,
             checkAuth: () => this.checkAuth(),
             openModal: (id) => this.openModal(id),
@@ -258,7 +263,7 @@ const app = {
             updateScrollIndicators: () => NavigationModule.updateScrollIndicators(),
             openModal: (id) => this.openModal(id),
             closeModal: (id) => this.closeModal(id),
-            user: this.user,
+            get user() { return app.user; },
             isInspection: this.isInspection
         };
     },
@@ -468,13 +473,22 @@ const app = {
         } else if (viewId === 'gm-panel') {
             GMPanelModule.loadPanel(this.user, this.currentSystem);
         } else if (viewId === 'my-sessions') {
-            this.loadSessions();
+            // If we came from player-sessions, it was already loaded with 'player'
+            // Otherwise default to 'gm' (from GM selection)
+            if (this.lastSessionRole !== 'player') {
+                this.loadSessions('gm');
+            }
+            this.lastSessionRole = null; // Reset
+        } else if (viewId === 'sessoes') {
+            // Selection view, no data load needed here anymore
         } else if (viewId === 'public-sessions') {
             PublicSessionsModule.loadPublicSessions();
         } else if (ContentModule.configs[viewId]) {
             ContentModule.switchToModule(viewId);
         } else if (viewId === 'names') {
             NamesModule.render();
+        } else if (viewId === 'chat') {
+            ChatUIModule.updatePersonaName();
         }
 
         if (this.updateMusicPlayerVisibility) {
@@ -632,8 +646,20 @@ const app = {
             NavigationModule.switchView('community', this.getNavigationLoaders());
         });
 
-        // GLOBAL CLICK DELEGATE (Cards)
+        // GLOBAL CLICK DELEGATE (Cards + data-action)
         document.addEventListener('click', (e) => {
+            // Handle data-action attributes (from index.html)
+            const actionEl = e.target.closest('[data-action]');
+            if (actionEl) {
+                switch (actionEl.dataset.action) {
+                    case 'app-go-back': this.goBack(); return;
+                    case 'app-close-alert': this.closeAlert(); return;
+                    case 'app-refresh-public-sessions':
+                        if (window.PublicSessionsModule) window.PublicSessionsModule.loadPublicSessions();
+                        return;
+                }
+            }
+
             const deleteBtn = e.target.closest('.card-delete-btn');
             const card = e.target.closest('.medieval-card');
 
@@ -671,6 +697,12 @@ const app = {
             const selectionCard = e.target.closest('.selection-card');
             if (selectionCard) {
                 const target = selectionCard.dataset.target;
+                if (target === 'player-sessions') {
+                    this.lastSessionRole = 'player';
+                    this.loadSessions('player');
+                    this.switchView('my-sessions');
+                    return;
+                }
                 if (target === 'my-sessions' || target === 'public-sessions') {
                     this.switchView(target);
                 }
@@ -715,24 +747,10 @@ const app = {
         });
         document.querySelectorAll('.close-menu, .menu-overlay').forEach(el => el.addEventListener('click', () => NavigationModule.toggleMenu(false)));
 
-        // Wizard Controls
-        document.getElementById('wiz-next')?.addEventListener('click', () => WizardModule.updateWizardStep(1));
-        document.getElementById('wiz-prev')?.addEventListener('click', () => WizardModule.updateWizardStep(-1));
-        document.getElementById('wiz-finish')?.addEventListener('click', () => WizardModule.handleWizardFinish(this.getWizardContext()));
-
-        document.getElementById('mon-finish-btn')?.addEventListener('click', () => WizardModule.handleMonsterFinish(this.getWizardContext()));
-        document.getElementById('sess-finish-btn')?.addEventListener('click', () => WizardModule.handleSessionFinish(this.getWizardContext()));
-        document.getElementById('sess-next')?.addEventListener('click', () => WizardModule.updateWizardStep(1));
-        document.getElementById('sess-magic-fill')?.addEventListener('click', () => WizardModule.fillSessionBlanksWithAI(this.getWizardContext()));
-        document.getElementById('sess-prev')?.addEventListener('click', () => WizardModule.updateWizardStep(-1));
-
         // Wizard Entry Points
         document.getElementById('show-wizard-btn')?.addEventListener('click', () => WizardModule.showCreationWizard(this.getWizardContext()));
         document.getElementById('show-monster-btn')?.addEventListener('click', () => WizardModule.showMonsterCreator(this.getWizardContext()));
         document.getElementById('show-trap-btn')?.addEventListener('click', () => WizardModule.showTrapCreator(this.getWizardContext()));
-
-        // Wizard Choice Cards
-        document.querySelectorAll('.choice-card').forEach(card => card.addEventListener('click', (e) => WizardModule.handleChoiceClick(e.currentTarget)));
 
         document.getElementById('settings-btn')?.addEventListener('click', () => {
             if (this.checkAuth()) this.openModal('settings-modal');
@@ -870,9 +888,7 @@ const app = {
             }
         });
 
-        // Chat
-        document.getElementById('send-msg-btn')?.addEventListener('click', () => this.handleSendMessage());
-        document.getElementById('chat-input')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
+        // Chat events are now handled by ChatUIModule
 
         // Bulk Delete Actions
         document.getElementById('bulk-delete-fichas-btn')?.addEventListener('click', () => this.toggleDeleteMode('character'));

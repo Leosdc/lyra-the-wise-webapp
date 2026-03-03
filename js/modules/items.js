@@ -17,12 +17,196 @@ export const ItemsModule = {
     init() {
         if (this.isInitialized) return;
 
+        this.injectHTML();
         this.currentSource = sessionStorage.getItem('lyra_items_source') || 'system';
         this.bindEvents();
         this.isInitialized = true;
     },
 
+    injectHTML() {
+        if (document.getElementById('item-creator-modal')) return;
+
+        const modalHtml = `
+            <!-- Forge Overlay -->
+            <div id="forge-overlay" class="modal-overlay hidden">
+                <div class="forge-container">
+                    <div class="forge-animation">
+                        <div class="forge-spinner">
+                            <div class="forge-rune outer"></div>
+                            <div class="forge-rune middle"></div>
+                            <div class="forge-rune inner"></div>
+                            <i class="fas fa-fire-alt forge-center-icon"></i>
+                        </div>
+                        <div class="forge-glow"></div>
+                        <div class="forge-sparks"></div>
+                    </div>
+                    <div class="forge-status">
+                        <h2 class="forge-title">Forjando...</h2>
+                        <p class="forge-msg">Tecendo a essência arcana na matéria.</p>
+                    </div>
+                    <div class="forge-success-content hidden">
+                        <h3>Obra-Prima Forjada!</h3>
+                        <p>O item foi imbuído com essência arcana.</p>
+                        <button class="medieval-btn" data-action="items-close-forge">Concluir</button>
+                    </div>
+                    <div class="forge-error-content hidden">
+                        <h3 style="color: #ef4444;">Falha na Forja!</h3>
+                        <p class="error-msg">A essência se dissipou antes de tomar forma.</p>
+                        <button class="medieval-btn secondary" data-action="items-close-forge">Tentar Novamente</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Creation Choice Modal -->
+            <div id="item-creation-choice-modal" class="modal-overlay hidden">
+                <div class="modal-content parchment" style="max-width: 600px;">
+                    <button class="close-modal" id="close-choice-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title" style="text-align: center; margin-bottom: 2rem;">
+                        <i class="fas fa-hammer"></i> MÉTODO DE FORJA
+                    </h2>
+                    <div class="mode-choices">
+                        <button id="choice-manual" class="choice-card">
+                            <i class="fas fa-hammer"></i>
+                            <h4>MANUAL</h4>
+                            <p>Preencha os detalhes do item você mesmo.</p>
+                        </button>
+                        <button id="choice-ai" class="choice-card">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <h4>INSPIRAÇÃO ARCANA</h4>
+                            <p>Deixe a magia moldar o item para você.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Item Prompt Modal -->
+            <div id="item-ai-prompt-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" id="close-ai-prompt"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-sparkles"></i> Inspiração de <span id="ai-persona-name">Lyra</span></h2>
+                    <div class="parchment-content">
+                        <p>Descreva brevemente o item que deseja. A Magia tecerá os detalhes e adicionará um toque especial.</p>
+                        <textarea id="ai-item-prompt" class="medieval-textarea" rows="5" placeholder="Ex: Uma espada feita de gelo eterno que brilha no escuro..."></textarea>
+                        <div class="modal-actions">
+                            <button id="confirm-ai-generation-btn" class="medieval-btn">Invocar Criação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Creator Modal -->
+            <div id="item-creator-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal wide">
+                    <button class="close-modal" id="close-item-creator"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-hammer"></i> Forja de Itens</h2>
+                    <form id="item-creator-form" class="parchment-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome do Item</label>
+                                <input type="text" id="create-item-name" class="medieval-input" required placeholder="Ex: Machado de Fogo">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select id="create-item-type" class="medieval-select" required data-action-change="items-toggle-fields">
+                                    <option value="weapon">Arma</option>
+                                    <option value="armor">Armadura</option>
+                                    <option value="wondrous">Item Mágico</option>
+                                    <option value="potion">Poção / Consumível</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Raridade</label>
+                                <select id="create-item-rarity" class="medieval-select" required>
+                                    <option value="common">Comum</option>
+                                    <option value="uncommon">Incomum</option>
+                                    <option value="rare">Raro</option>
+                                    <option value="very_rare">Muito Raro</option>
+                                    <option value="legendary">Lendário</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Peso</label>
+                                <input type="text" id="create-item-weight" class="medieval-input" placeholder="Ex: 2 kg">
+                            </div>
+                            <div class="form-group">
+                                <label>Preço</label>
+                                <input type="text" id="create-item-cost" class="medieval-input" placeholder="Ex: 10 po">
+                            </div>
+                        </div>
+
+                        <div class="form-row stats-row-dynamic">
+                            <div class="form-group creator-field-weapon">
+                                <label>Dano / Ataque</label>
+                                <input type="text" id="create-item-damage" class="medieval-input" placeholder="Ex: 1d8 cortante">
+                            </div>
+                            <div class="form-group creator-field-armor hidden">
+                                <label>Classe de Armadura (CA)</label>
+                                <input type="text" id="create-item-ac" class="medieval-input" placeholder="Ex: 15 + DES">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Propriedades / Tags (Separadas por vírgula)</label>
+                            <input type="text" id="create-item-props" class="medieval-input" placeholder="Ex: Pesada, Versátil, Mágica">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Crônica do Item (Descrição)</label>
+                            <textarea id="create-item-desc" class="medieval-textarea" rows="4" placeholder="Descreva a história e os efeitos deste item..."></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="medieval-btn">Forjar Item</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Share Item Modal -->
+            <div id="share-item-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" id="close-share-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-share-nodes"></i> Compartilhar Item</h2>
+                    <div class="parchment-content">
+                        <p>Informe o e-mail do destinatário para enviar esta relíquia:</p>
+                        <div class="form-group">
+                            <input type="email" id="share-target-email" class="medieval-input" placeholder="email@exemplo.com"
+                                required>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="confirm-share-btn" class="medieval-btn">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+
     bindEvents() {
+        // Delegated handler for items data-action clicks
+        document.addEventListener('click', (e) => {
+            const actionEl = e.target.closest('[data-action]');
+            if (!actionEl) return;
+
+            switch (actionEl.dataset.action) {
+                case 'items-close-forge': this.closeForge(); break;
+                case 'items-view-detail': {
+                    const id = actionEl.dataset.itemId;
+                    if (id) this.openItemDetail(id);
+                    break;
+                }
+            }
+        });
+
+        // Type select change handler (replaces onchange inline)
+        document.getElementById('create-item-type')?.addEventListener('change', (e) => {
+            this.toggleCreatorFields(e.target.value);
+        });
         // Selection Panel
         const selectionView = document.getElementById('itens-selection');
         if (selectionView) {
@@ -316,7 +500,7 @@ export const ItemsModule = {
         return `
             <div class="item-card item-card-wrapper" style="position:relative;" data-id="${item.id}">
                 ${actionButtons}
-                <button class="gallery-card ${rarityClass}" onclick="ItemsModule.openItemDetail('${item.id}')">
+                <button class="gallery-card ${rarityClass}" data-action="items-view-detail" data-item-id="${item.id}">
                     <i class="${iconClass}"></i>
                     <span>${safeName}</span>
                 </button>
@@ -701,10 +885,10 @@ export const ItemsModule = {
                         <i class="${iconClass}"></i>
                     </div>
                     <div class="detail-title-block">
-                        <h2>${item.name}</h2>
+                        <h2>${sanitizeHTML(item.name)}</h2>
                         <div style="display: flex; flex-direction: column; gap: 4px;">
                             <span class="detail-subtitle">${typeLabel}</span>
-                            ${item.createdByNickname ? `<span class="detail-owner" style="font-size: 0.8rem; font-style: italic; opacity: 0.8;"><i class="fas fa-hammer" style="font-size: 0.7rem;"></i> Forjado por: ${item.createdByNickname}</span>` : ''}
+                            ${item.createdByNickname ? `<span class="detail-owner" style="font-size: 0.8rem; font-style: italic; opacity: 0.8;"><i class="fas fa-hammer" style="font-size: 0.7rem;"></i> Forjado por: ${sanitizeHTML(item.createdByNickname)}</span>` : ''}
                         </div>
                     </div>
                 </div>

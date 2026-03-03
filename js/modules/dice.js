@@ -7,16 +7,60 @@ export const DiceModule = {
     history: [],
 
     init() {
+        this.injectHTML();
         this.bindEvents();
     },
 
+    injectHTML() {
+        if (document.getElementById('dice-modal')) return;
+
+        const modalHtml = `
+            <!-- Dice Modal -->
+            <div id="dice-modal" class="modal-overlay hidden">
+                <div class="dice-modal-content">
+                    <button class="close-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="medieval-font" style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-dice"></i> Torre de Dados</h2>
+                    
+                    <div class="dice-controls-header">
+                        <label for="dice-quantity">Quantidade:</label>
+                        <input type="number" id="dice-quantity" class="medieval-input small-input" value="1" min="1" max="50">
+                    </div>
+
+                    <div class="dice-controls">
+                        <button class="dice-btn" data-sides="4"><i class="fas fa-dice-d6" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></i> d4</button>
+                        <button class="dice-btn" data-sides="6"><i class="fas fa-dice-d6"></i> d6</button>
+                        <button class="dice-btn" data-sides="8"><i class="fas fa-dice-d20" style="transform: scaleY(1.2);"></i> d8</button>
+                        <button class="dice-btn" data-sides="10"><i class="fas fa-dice-d20" style="transform: rotate(45deg);"></i> d10</button>
+                        <button class="dice-btn" data-sides="12"><i class="fas fa-dice-d20"></i> d12</button>
+                        <button class="dice-btn" data-sides="20"><i class="fas fa-dice-d20" style="color: var(--crimson);"></i> d20</button>
+                        <button class="dice-btn" data-sides="100"><img src="/assets/icons/dices/d100.png" class="dice-icon-img" alt="d100"> d100</button>
+                    </div>
+
+                    <div class="dice-result-area">
+                        <div id="dice-result-display" class="dice-display">
+                            <span class="placeholder" style="font-size: 1.2rem; opacity: 0.7;">Role os dados...</span>
+                        </div>
+                        <div id="dice-history-list" class="dice-history"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+
     bindEvents() {
-        // Bind logic for dice buttons inside the modal
+        // Global delegate for dice buttons and close button
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.dice-btn');
             if (btn) {
                 const sides = parseInt(btn.dataset.sides);
                 this.roll(sides);
+                return;
+            }
+
+            const closeBtn = e.target.closest('#dice-modal .close-modal');
+            if (closeBtn) {
+                this.closeModal();
             }
         });
     },

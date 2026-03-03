@@ -2,6 +2,7 @@
 import * as DataModule from '../data.js';
 import { NavigationModule } from './navigation.js';
 import { spellsData } from '../../public/assets/systems/dnd5e/spells_data.js';
+import { sanitizeHTML as escapeHTML } from './utils.js';
 import { db } from '../auth.js';
 import { collection, doc, writeBatch } from "firebase/firestore";
 
@@ -16,6 +17,7 @@ export const AdminModule = {
     unsubscribeOnline: null,
 
     async init() {
+        this.injectHTML();
         this.bindEvents();
 
         // Subscribe to online users globally for stats
@@ -26,7 +28,122 @@ export const AdminModule = {
         });
     },
 
+    injectHTML() {
+        if (document.getElementById('portal')) return;
+
+        const portalHtml = `
+            <!-- Admin Portal View -->
+            <section id="portal" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas fa-gears"></i> Portal Arcano do Mestre</h2>
+                    <button class="medieval-btn small secondary" data-action="admin-back">
+                        <i class="fas fa-arrow-left"></i> Voltar ao Painel
+                    </button>
+                </div>
+
+                <div class="portal-container parchment">
+                    <div class="admin-stats-bar">
+                        <div class="stat-bubble">
+                            <i class="fas fa-users"></i>
+                            <span id="admin-user-count">0</span>
+                            <label>Inscritos</label>
+                        </div>
+                        <div class="stat-bubble">
+                            <i class="fas fa-user-check"></i>
+                            <span id="admin-active-users">0</span>
+                            <label>Usuários Online</label>
+                        </div>
+                        <div class="stat-bubble">
+                            <i class="fas fa-brain"></i>
+                            <span id="admin-ai-status">Ativo</span>
+                            <label>Poder Arcano</label>
+                        </div>
+                    </div>
+
+                    <!-- Global Commands -->
+                    <div class="admin-global-controls">
+                        <div class="admin-tool-box horizontal">
+                            <h4>Comandos Globais</h4>
+                            <div class="global-actions-row">
+                                <button class="medieval-btn" id="admin-toggle-ai-btn">
+                                    <i class="fas fa-power-off"></i> Alternar Fluxo Arcano
+                                </button>
+                                <button class="medieval-btn secondary" id="admin-toggle-maintenance-btn">
+                                    <i class="fas fa-hammer"></i> Sistema em Manutenção
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="admin-tool-box horizontal">
+                            <h4>Ferramentas de Gestão</h4>
+                            <div class="global-actions-row">
+                                <a href="audit.html" target="_blank" rel="noopener noreferrer" class="medieval-btn gold-pulse" style="text-decoration:none;">
+                                    <i class="fas fa-database"></i> Auditoria de Banco
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-main-content">
+                        <div class="admin-section full-width">
+                            <h3><i class="fas fa-users-viewfinder"></i> Gestão de Habitantes</h3>
+                            <div class="user-audit-list" id="admin-users-list">
+                                <div class="loading-quill"><i class="fas fa-quill fa-spin"></i> Consultando registros...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.insertAdjacentHTML('beforeend', portalHtml);
+        } else {
+            document.body.insertAdjacentHTML('beforeend', portalHtml);
+        }
+    },
+
     bindEvents() {
+        // Delegated handler for all admin data-action clicks
+        document.addEventListener('click', (e) => {
+            const actionEl = e.target.closest('[data-action]');
+            if (!actionEl) return;
+
+            const action = actionEl.dataset.action;
+            switch (action) {
+                case 'admin-back': window.app.switchView('dashboard'); break;
+                case 'admin-toggle-ai': {
+                    const uid = actionEl.dataset.uid;
+                    const current = actionEl.dataset.current === 'true';
+                    this.toggleUserAI(uid, current);
+                    break;
+                }
+                case 'admin-toggle-alpha': {
+                    const uid = actionEl.dataset.uid;
+                    const current = actionEl.dataset.current === 'true';
+                    this.toggleUserAlpha(uid, current);
+                    break;
+                }
+                case 'admin-toggle-role': {
+                    const uid = actionEl.dataset.uid;
+                    const role = actionEl.dataset.role;
+                    this.toggleUserRole(uid, role);
+                    break;
+                }
+                case 'admin-toggle-status': {
+                    const uid = actionEl.dataset.uid;
+                    const status = actionEl.dataset.status;
+                    this.toggleUserStatus(uid, status);
+                    break;
+                }
+                case 'admin-delete-user': {
+                    const uid = actionEl.dataset.uid;
+                    this.deleteUser(uid);
+                    break;
+                }
+            }
+        });
+
         const toggleAiBtn = document.getElementById('admin-toggle-ai-btn');
         if (toggleAiBtn) {
             toggleAiBtn.addEventListener('click', () => this.handleToggleAI());
@@ -101,8 +218,8 @@ export const AdminModule = {
                         <div class="user-main-info">
                             ${avatarHtml}
                             <div class="user-details">
-                                <span class="user-name">${user.nickname || user.displayName || 'Anônimo'}</span>
-                                <span class="user-email">${user.email}</span>
+                                <span class="user-name">${escapeHTML(user.nickname || user.displayName || 'Anônimo')}</span>
+                                <span class="user-email">${escapeHTML(user.email)}</span>
                             </div>
                         </div>
                         <div class="user-badges">
@@ -118,15 +235,15 @@ export const AdminModule = {
                         <div class="user-id-box">UID: ${user.id}</div>
                         <div class="user-actions-beautified">
                             <!-- Feature Toggles -->
-                            <button class="action-btn ${user.aiEnabled !== false ? '' : 'active'}" onclick="AdminModule.toggleUserAI('${user.id}', ${user.aiEnabled !== false})" title="Alternar Oráculo">
+                            <button class="action-btn ${user.aiEnabled !== false ? '' : 'active'}" data-action="admin-toggle-ai" data-uid="${user.id}" data-current="${user.aiEnabled !== false}" title="Alternar Oráculo">
                                 <i class="fas fa-brain"></i>
                             </button>
-                            <button class="action-btn ${user.alphaTester ? 'active-alpha' : ''}" onclick="AdminModule.toggleUserAlpha('${user.id}', ${user.alphaTester || false})" title="Acesso Alpha">
+                            <button class="action-btn ${user.alphaTester ? 'active-alpha' : ''}" data-action="admin-toggle-alpha" data-uid="${user.id}" data-current="${user.alphaTester || false}" title="Acesso Alpha">
                                 <i class="fas fa-flask"></i>
                             </button>
                             
                             <!-- Hierarchy -->
-                            <button class="action-btn promote ${user.role === 'gm' ? 'demote' : ''}" onclick="AdminModule.toggleUserRole('${user.id}', '${user.role}')" title="${user.role === 'gm' ? 'Rebaixar' : 'Promover'}">
+                            <button class="action-btn promote ${user.role === 'gm' ? 'demote' : ''}" data-action="admin-toggle-role" data-uid="${user.id}" data-role="${user.role}" title="${user.role === 'gm' ? 'Rebaixar' : 'Promover'}">
                                 <i class="fas ${user.role === 'gm' ? 'fa-angle-down' : 'fa-crown'}"></i>
                                 <span>${user.role === 'gm' ? 'Rebaixar' : 'Promover'}</span>
                             </button>
@@ -134,10 +251,10 @@ export const AdminModule = {
                             <div class="action-divider"></div>
 
                             <!-- Danger Zone -->
-                            <button class="action-btn ban ${user.status === 'banned' ? 'unban' : ''}" onclick="AdminModule.toggleUserStatus('${user.id}', '${user.status}')" title="${user.status === 'banned' ? 'Desbanir' : 'Banir'}">
+                            <button class="action-btn ban ${user.status === 'banned' ? 'unban' : ''}" data-action="admin-toggle-status" data-uid="${user.id}" data-status="${user.status}" title="${user.status === 'banned' ? 'Desbanir' : 'Banir'}">
                                 <i class="fas ${user.status === 'banned' ? 'fa-hand-holding-heart' : 'fa-gavel'}"></i>
                             </button>
-                            <button class="action-btn delete" onclick="AdminModule.deleteUser('${user.id}')" title="Expurgar">
+                            <button class="action-btn delete" data-action="admin-delete-user" data-uid="${user.id}" title="Expurgar">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>

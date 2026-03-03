@@ -66,7 +66,7 @@ export function createLoadersMixin(ctx) {
             container.innerHTML = items.length ? items.map(c => NavigationModule.renderCard(c, 'trap')).join('') : '<p class="empty-state">Nenhuma armadilha.</p>';
         },
 
-        async loadSessions() {
+        async loadSessions(roleFilter = 'all') {
             if (!ctx.user) return;
             const container = document.getElementById('sessions-list');
 
@@ -77,7 +77,7 @@ export function createLoadersMixin(ctx) {
                 titleEl.innerHTML = `<i class="fas fa-feather-pointed"></i> Diários de Sessão (${systemName})`;
             }
 
-            const items = await getSessions(ctx.user.uid, ctx.user.email, ctx.currentSystem);
+            const items = await getSessions(ctx.user.uid, ctx.user.email, ctx.currentSystem, roleFilter);
 
             const { PublicSessionsModule } = await import('../modules/public-sessions.js');
             const hydratedItems = [];

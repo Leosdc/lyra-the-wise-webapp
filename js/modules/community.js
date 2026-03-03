@@ -19,6 +19,7 @@ const CommunityModule = {
 
     init(user) {
         this.user = user;
+        this.injectHTML();
         this.bindEvents();
 
         // Init chat immediately to receive background notifications
@@ -26,19 +27,72 @@ const CommunityModule = {
         this.initOnlineList();
     },
 
+    injectHTML() {
+        if (document.getElementById('community')) return;
+
+        const communityHtml = `
+            <!-- Community & Chat View -->
+            <section id="community" class="view hidden">
+                <div class="community-layout-container">
+                    <div class="chat-container">
+                        <button class="close-btn-medieval" id="community-close-btn-alt"><i class="fas fa-times"></i></button>
+                        <div class="chat-header">
+                            <h2><i class="fas fa-globe"></i> GUILDA (GLOBAL)</h2>
+                        </div>
+
+                        <div class="community-layout">
+                            <!-- Main Chat -->
+                            <div class="community-main">
+                                <div id="global-chat-messages" class="chat-messages">
+                                    <!-- JS Injects messages -->
+                                </div>
+                                <div class="chat-input-area">
+                                    <textarea id="global-chat-input" class="medieval-textarea" placeholder="Sua mensagem, viajante..."></textarea>
+                                    <button id="send-global-msg" class="medieval-btn">ENVIAR</button>
+                                </div>
+                            </div>
+
+                            <!-- Sidebar -->
+                            <div class="community-sidebar">
+                                <div class="sidebar-header">
+                                    <h3><i class="fas fa-users"></i> VIAJANTES</h3>
+                                </div>
+                                <div id="online-users-list" class="online-list">
+                                    <!-- Dynamic Content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.insertAdjacentHTML('beforeend', communityHtml);
+        } else {
+            document.body.insertAdjacentHTML('beforeend', communityHtml);
+        }
+    },
+
     bindEvents() {
-        document.getElementById('community-close-btn')?.addEventListener('click', () => {
-            if (window.app && window.app.switchView) {
-                window.app.switchView('dashboard');
-            } else {
-                document.getElementById('community').classList.add('hidden');
-            }
+        const closeBtns = ['community-close-btn', 'community-close-btn-alt'];
+        closeBtns.forEach(id => {
+            document.getElementById(id)?.addEventListener('click', () => {
+                if (window.app && window.app.switchView) {
+                    window.app.switchView('dashboard');
+                } else {
+                    document.getElementById('community').classList.add('hidden');
+                }
+            });
         });
 
         // Chat
         document.getElementById('send-global-msg')?.addEventListener('click', () => this.handleSendMessage());
         document.getElementById('global-chat-input')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleSendMessage();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.handleSendMessage();
+            }
         });
 
         // Settings Nickname Validation
@@ -147,7 +201,7 @@ const CommunityModule = {
         if (!container) return;
 
         container.innerHTML = messages.map(msg => `
-            <div class="msg ${msg.userId === this.user.uid ? 'user' : 'bot'}">
+            <div class="msg ${msg.userId === this.user.uid ? 'user' : 'other'}">
                 <div class="msg-header">
                     <span class="msg-author">${msg.username}</span>
                     <span class="msg-time">${msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</span>

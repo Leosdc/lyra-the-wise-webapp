@@ -4,6 +4,7 @@
  */
 
 import LyricsModule from '../modules/lyrics.js';
+import { SettingsModule } from '../modules/settings.js';
 
 /**
  * Returns theme-related methods to be mixed into the app object.
@@ -14,26 +15,43 @@ export function createThemeMixin(ctx) {
         checkMusicAutoPlay() {
             const player = document.getElementById('mystic-player');
             const audio = document.getElementById('lyra-bg-music');
-            const playBtn = document.getElementById('btn-play-pause');
-            const autoPlayPref = document.getElementById('setting-autoplay');
+            const playBtn = document.getElementById('btn-play-pause-float') ||
+                document.getElementById('btn-play-pause-mini') ||
+                document.getElementById('btn-play-pause');
 
             if (!audio || !playBtn) return;
 
-            if (autoPlayPref && !autoPlayPref.checked) {
+            // Use SettingsModule preference as source of truth if checkbox is missing
+            const autoPlayPref = SettingsModule.currentPrefs.autoPlayMusic ?? true;
+
+            if (autoPlayPref === false) {
                 console.log("🔇 Auto-play bloqueado por preferência do usuário.");
-                ctx.shouldAutoPlay = false;
+                ctx.musicState = { ...ctx.musicState, shouldAutoPlay: false };
                 return;
             }
 
-            ctx.shouldAutoPlay = true;
+            ctx.musicState = { ...ctx.musicState, shouldAutoPlay: true };
 
-            audio.volume = 0.4;
-            audio.play().then(() => {
-                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                if (player) player.classList.add('playing');
-            }).catch(e => {
-                console.log("Autoplay waiting for interaction...");
-            });
+            const startPlayback = () => {
+                audio.volume = 0.4;
+                audio.play().then(() => {
+                    ctx.musicState.isPlaying = true;
+                    if (ctx.syncMusicUI) ctx.syncMusicUI();
+                    console.log("🎵 Autoplay iniciado com sucesso.");
+                    // Cleanup: remove interaction listeners after successful play
+                    document.removeEventListener('click', startPlayback);
+                    document.removeEventListener('keydown', startPlayback);
+                }).catch(() => {
+                    console.log("⏳ Autoplay bloqueado pelo navegador. Aguardando interação...");
+                    // Register persistent listeners (not { once: true }) so they survive failed retries
+                    document.removeEventListener('click', startPlayback);
+                    document.removeEventListener('keydown', startPlayback);
+                    document.addEventListener('click', startPlayback);
+                    document.addEventListener('keydown', startPlayback);
+                });
+            };
+
+            startPlayback();
         },
 
         setTheme(themeName) {
@@ -168,22 +186,29 @@ export function createThemeMixin(ctx) {
             const miniBtn = document.getElementById('btn-play-pause-mini');
             const miniVolume = document.getElementById('player-volume-mini');
 
-            let isPlaying = false;
+            // Initialize music state in context if not present
+            if (!ctx.musicState) {
+                ctx.musicState = {
+                    isPlaying: !audio.paused,
+                    shouldAutoPlay: true
+                };
+            }
 
             const togglePlay = () => {
                 if (audio.paused) {
                     audio.play().then(() => {
-                        isPlaying = true;
+                        ctx.musicState.isPlaying = true;
                         updateIcons();
                     }).catch(e => console.error("Audio Play Error:", e));
                 } else {
                     audio.pause();
-                    isPlaying = false;
+                    ctx.musicState.isPlaying = false;
                     updateIcons();
                 }
             };
 
             const updateIcons = () => {
+                const isPlaying = ctx.musicState.isPlaying;
                 const iconClass = isPlaying ? 'fa-pause' : 'fa-play';
                 if (floatBtn) floatBtn.innerHTML = `<i class="fas ${iconClass}"></i>`;
                 if (miniBtn) miniBtn.innerHTML = `<i class="fas ${iconClass}"></i>`;
@@ -193,6 +218,9 @@ export function createThemeMixin(ctx) {
                     else floatContainer.classList.remove('playing');
                 }
             };
+
+            // Export sync function for other modules
+            ctx.syncMusicUI = updateIcons;
 
             const setVolume = (val) => {
                 audio.volume = val;
@@ -215,7 +243,7 @@ export function createThemeMixin(ctx) {
                 });
 
                 audio.addEventListener('ended', () => {
-                    isPlaying = false;
+                    ctx.musicState.isPlaying = false;
                     updateIcons();
                 });
             }

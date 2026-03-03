@@ -2,6 +2,42 @@ import DOMPurify from 'dompurify';
 
 export const ChangelogModule = {
 
+    init() {
+        this.injectHTML();
+        this.loadChangelog();
+    },
+
+    injectHTML() {
+        if (document.getElementById('changelog-modal')) return;
+
+        const modalHtml = `
+            <!-- Notification & Changelog Modal -->
+            <div id="changelog-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal split-panel">
+                    <button class="close-modal" id="close-changelog"><i class="fas fa-times"></i></button>
+                    <div class="notification-center-layout">
+                        <!-- Left Panel: Static Changelog -->
+                        <div class="notification-panel changelog-side">
+                            <h2 class="modal-title"><i class="fas fa-scroll"></i> Crônicas do Verso</h2>
+                            <div class="changelog-list parchment-content">
+                                <div class="mystic-spinner small" style="margin: 2rem auto; display: block;"></div>
+                                <p style="text-align:center; opacity:0.7;">Desenrolando pergaminhos...</p>
+                            </div>
+                        </div>
+                        <!-- Right Panel: Dynamic Notifications -->
+                        <div class="notification-panel system-side">
+                            <h2 class="modal-title"><i class="fas fa-bell"></i> Alertas da Guilda</h2>
+                            <div id="modal-notifications-list" class="notifications-list parchment-content">
+                                <p class="empty-state">O horizonte está calmo. Nenhuma nova mensagem dos corvos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+
     async loadChangelog() {
         try {
             // Add cache buster

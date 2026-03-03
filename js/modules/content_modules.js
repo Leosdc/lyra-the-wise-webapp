@@ -98,13 +98,188 @@ export const ContentModule = {
             icon: 'fa-skull-crossbones',
             title: 'Armadilhas',
             aiPrompt: 'Descreva a armadilha que deseja criar. A Magia definirá os perigos e mecanismos.',
-            aiPlaceholder: 'Ex: Uma sala com chão que desaba revelando espinhos envenenados...'
+            aiPlaceholder: 'Ex: Uma placa de pressão que dispara dardos envenenados das paredes...',
+            selectionTitle: 'Biblioteca de Armadilhas',
+            selectionDescSystem: 'Armadilhas oficiais e perigos ambientais.',
+            selectionDescPersonal: 'Gerencie seus próprios mecanismos mortais.'
         }
     },
 
     init() {
+        this.injectHTML();
         // Global listeners for specialized interactions
         this.bindGlobalEvents();
+    },
+
+    injectSelectionHTML(moduleId) {
+        const config = this.configs[moduleId];
+        if (!config || document.getElementById(`${moduleId}-selection`)) return;
+
+        const html = `
+            <!-- ${config.title} Selection View -->
+            <section id="${moduleId}-selection" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas ${config.icon}"></i> ${config.selectionTitle || config.title}</h2>
+                </div>
+                <div class="selection-grid">
+                    <div class="selection-card" data-source="system">
+                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-users' : (config.id === 'armadilhas' || config.id === 'monstros' || config.id === 'villains' ? 'fa-skull' : 'fa-scroll')}"></i></div>
+                        <div class="selection-info">
+                            <h3>Sistema</h3>
+                            <p>${config.selectionDescSystem || 'Consulte os arquivos oficiais.'}</p>
+                        </div>
+                    </div>
+                    <div class="selection-card" data-source="personal">
+                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-id-card' : (config.id === 'villains' ? 'fa-user-ninja' : 'fa-hammer')}"></i></div>
+                        <div class="selection-info">
+                            <h3>${config.id === 'npcs' ? 'Meus NPCs' : (config.id === 'villains' ? 'Meus Vilões' : 'Minhas Criações')}</h3>
+                            <p>${config.selectionDescPersonal || 'Gerencie seu próprio arsenal.'}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+        document.getElementById('main-content')?.insertAdjacentHTML('beforeend', html);
+        this.bindSelectionEvents(moduleId);
+    },
+
+    bindSelectionEvents(moduleId) {
+        const section = document.getElementById(`${moduleId}-selection`);
+        if (!section) return;
+
+        section.querySelectorAll('.selection-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const source = card.dataset.source;
+                this.openModule(moduleId, source);
+            });
+        });
+    },
+
+    async openModule(moduleId, source = 'personal') {
+        this.activeModule = this.configs[moduleId];
+        this.currentSource = source;
+
+        // If the module view itself is not in DOM (the generic ones often reuse the 'itens' or 'grimorio' style but need their own section)
+        // Actually, many modules share the same 'grid' style. 
+        // For now, we assume the specific module section (e.g., #npcs, #villains) is either in index.html or injected.
+
+        // For simple modules, we can inject the main view too if missing
+        this.injectMainViewHTML(moduleId);
+
+        NavigationModule.switchView(moduleId, {
+            [`load${moduleId.charAt(0).toUpperCase()}${moduleId.slice(1)}`]: () => this.switchToModule(moduleId)
+        });
+    },
+
+    injectMainViewHTML(moduleId) {
+        if (document.getElementById(moduleId)) return;
+        const config = this.configs[moduleId];
+
+        const html = `
+            <section id="${moduleId}" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas ${config.icon}"></i> ${config.title}</h2>
+                    <div class="header-actions">
+                        <button id="back-to-${moduleId}-selection" class="medieval-btn small secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                        <button id="${moduleId}-new-btn" class="medieval-btn small">
+                            <i class="fas fa-plus"></i> Novo
+                        </button>
+                    </div>
+                </div>
+                <div class="items-controls-bar">
+                    <div class="items-search-container">
+                        <div class="search-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="${moduleId}-search" class="premium-search-input" placeholder="Pesquisar...">
+                        </div>
+                    </div>
+                </div>
+                <div id="${moduleId}-grid" class="items-grid-layout"></div>
+            </section>
+        `;
+        document.getElementById('main-content')?.insertAdjacentHTML('beforeend', html);
+
+        // Bind back button
+        document.getElementById(`back-to-${moduleId}-selection`)?.addEventListener('click', () => {
+            NavigationModule.switchView(`${moduleId}-selection`, {});
+        });
+
+        // Bind search
+        document.getElementById(`${moduleId}-search`)?.addEventListener('input', (e) => {
+            this.filters.search = e.target.value;
+            this.renderItems();
+        });
+
+        // Bind new button
+        document.getElementById(`${moduleId}-new-btn`)?.addEventListener('click', () => {
+            this.openChoiceModal();
+        });
+    },
+
+
+    injectHTML() {
+        if (document.getElementById('generic-choice-modal')) return;
+
+        const modalHtml = `
+            <!-- Generic Choice Modal -->
+            <div id="generic-choice-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal medium">
+                    <button class="close-modal" id="close-generic-choice-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-hammer"></i> <span id="generic-choice-title">MÉTODO DE FORJA</span></h2>
+                    <div class="mode-choices">
+                        <button class="choice-card" id="generic-choice-manual">
+                            <i class="fas fa-hammer"></i>
+                            <h4>MANUAL</h4>
+                            <p>Preencha os detalhes do item você mesmo.</p>
+                        </button>
+                        <button class="choice-card" id="generic-choice-ai">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <h4>INSPIRAÇÃO ARCANA</h4>
+                            <p>Deixe a magia moldar o item para você.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generic AI Prompt Modal -->
+            <div id="generic-ai-prompt-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" id="close-generic-ai-prompt"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-sparkles"></i> Inspiração de <span id="generic-ai-persona-name">Lyra</span></h2>
+                    <div class="parchment-content">
+                        <p id="generic-ai-prompt-description">Descreva brevemente o item que deseja. A Magia tecerá os detalhes e adicionará um toque especial.</p>
+                        <textarea id="generic-ai-prompt" class="medieval-textarea" rows="5" placeholder="Ex: Uma espada feita de gelo eterno que brilha no escuro..."></textarea>
+                        <div class="modal-actions">
+                            <button id="confirm-generic-ai-btn" class="medieval-btn">Invocar Criação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generic Creator Modal -->
+            <div id="generic-creator-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal wide">
+                    <button class="close-modal" id="close-generic-creator"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-scroll" id="generic-creator-icon"></i> <span id="generic-creator-title">Criação Arcana</span></h2>
+                    <form id="generic-creator-form" class="parchment-content">
+                        <div class="form-group">
+                            <label>Nome / Título</label>
+                            <input type="text" id="generic-create-name" class="medieval-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição / Detalhes (Markdown aceito)</label>
+                            <textarea id="generic-create-desc" class="medieval-textarea" rows="12" required></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="medieval-btn">Salvar em Meus Anais</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
     },
 
     bindGlobalEvents() {
@@ -127,7 +302,13 @@ export const ContentModule = {
                 });
             }
         });
+
+        // Generic Creator Modal Events
+        document.getElementById('close-generic-creator')?.addEventListener('click', () => {
+            document.getElementById('generic-creator-modal')?.classList.add('hidden');
+        });
     },
+
 
     async switchToModule(moduleId) {
         this.activeModule = this.configs[moduleId];
@@ -316,7 +497,7 @@ export const ContentModule = {
     },
 
     openChoiceModal() {
-        const modal = document.getElementById('generic-creation-choice-modal');
+        const modal = document.getElementById('generic-choice-modal');
         if (!modal) return;
 
         // Update title based on active module
@@ -468,18 +649,30 @@ export const ContentModule = {
             const user = auth.currentUser;
             const systemId = localStorage.getItem('lyra_current_system') || 'dnd5e';
 
+            // Find current item to preserve createdAt if editing
+            const existingItem = this.editingId ? this.cachedItems.find(i => i.id === this.editingId) : null;
+
             const payload = {
                 id: this.editingId,
                 name: document.getElementById('generic-create-name').value,
-                description: document.getElementById('generic-create-desc').value
+                description: document.getElementById('generic-create-desc').value,
+                author: window.app.userProfile?.nickname || user.displayName || 'Mestre Anônimo',
+                createdAt: existingItem?.createdAt || new Date().toISOString()
             };
 
             this.openSummoning();
             modal.classList.add('hidden');
 
             try {
+                // IMPORTANT: saveModuleItem expects (collection, userId, systemId, itemData)
                 await DataModule.saveModuleItem(this.activeModule.collection, user.uid, systemId, payload);
-                this.showSummoningSuccess(this.editingId ? "Anais atualizados com sucesso." : "Novo registro manifestado nos anais.", !!this.editingId);
+
+                this.showSummoningSuccess(
+                    this.editingId ? "Anais atualizados com sucesso." : "Novo registro manifestado nos anais.",
+                    !!this.editingId
+                );
+
+                this.editingId = null;
                 await this.loadData();
                 this.applyFilters();
             } catch (err) {

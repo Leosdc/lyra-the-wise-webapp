@@ -24,13 +24,199 @@ export const MonsterModule = {
     editingItemId: null,
 
     async init() {
+        this.injectHTML();
         this.currentSource = sessionStorage.getItem('lyra_monstros_source') || 'system';
         this.bindEvents();
         this.bindFilters();
         this.setupInfiniteScroll();
     },
 
+    injectHTML() {
+        if (document.getElementById('monster-creator-modal')) return;
+
+        const modalHtml = `
+            <!-- CINEMATIC SUMMONING OVERLAY -->
+            <div id="summoning-overlay" class="modal-overlay hidden">
+                <div class="summoning-container">
+                    <div class="summoning-animation">
+                        <div class="summoning-spinner">
+                            <div class="summoning-rune outer"></div>
+                            <div class="summoning-rune middle"></div>
+                            <div class="summoning-rune inner"></div>
+                            <i class="fas fa-dragon summoning-center-icon"></i>
+                        </div>
+                        <div class="summoning-glow"></div>
+                    </div>
+                    <div class="summoning-status">
+                        <h2 class="summoning-title">Invocando...</h2>
+                        <p class="summoning-msg">Manifestando a essência da criatura no plano material.</p>
+                    </div>
+                    <div class="summoning-success-content hidden">
+                        <h3 class="summoning-success-title">Manifestação Concluída!</h3>
+                        <p class="summoning-success-msg">A criatura agora habita os registros desta realidade.</p>
+                        <button class="medieval-btn" data-action="monsters-close-summoning">Concluir</button>
+                    </div>
+                    <div class="summoning-error-content hidden">
+                        <h3 style="color: #ef4444;">Falha na Invocação!</h3>
+                        <p class="error-msg">A essência se dissipou antes de atravessar o véu.</p>
+                        <button class="medieval-btn secondary" data-action="monsters-close-summoning">Tentar Novamente</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monster Creator Modal -->
+            <div id="monster-creator-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal wide">
+                    <button class="close-modal" id="close-monster-creator"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title" id="monster-creator-title"><i class="fas fa-hammer"></i> Bestiário Arcano</h2>
+                    <form id="monster-creator-form" class="parchment-content">
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Nome da Criatura</label>
+                                <input type="text" id="create-monster-name" class="medieval-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>ND (Nível de Desafio)</label>
+                                <input type="text" id="create-monster-cr" class="medieval-input" placeholder="0, 1/4, 2, 30...">
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select id="create-monster-type" class="medieval-select">
+                                    <option value="Aberração">Aberração</option>
+                                    <option value="Besta">Besta</option>
+                                    <option value="Celestial">Celestial</option>
+                                    <option value="Constructo">Constructo</option>
+                                    <option value="Dragão">Dragão</option>
+                                    <option value="Elemental">Elemental</option>
+                                    <option value="Fada">Fada</option>
+                                    <option value="Ínfero">Ínfero</option>
+                                    <option value="Gigante">Gigante</option>
+                                    <option value="Humanoide">Humanoide</option>
+                                    <option value="Monstruosidade">Monstruosidade</option>
+                                    <option value="Gosma">Gosma</option>
+                                    <option value="Planta">Planta</option>
+                                    <option value="Morto-Vivo">Morto-Vivo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Tamanho</label>
+                                <select id="create-monster-size" class="medieval-select">
+                                    <option value="Tiny">Miúdo (Tiny)</option>
+                                    <option value="Small">Pequeno (Small)</option>
+                                    <option value="Medium" selected>Médio (Medium)</option>
+                                    <option value="Large">Grande (Large)</option>
+                                    <option value="Huge">Enorme (Huge)</option>
+                                    <option value="Gargantuan">Imenso (Gargantuan)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Vida (PV)</label>
+                                <input type="text" id="create-monster-hp" class="medieval-input" placeholder="Ex: 45 (7d8 + 14)">
+                            </div>
+                            <div class="form-group">
+                                <label>Armadura (CA)</label>
+                                <input type="number" id="create-monster-ac" class="medieval-input" placeholder="10">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ações & Habilidades</label>
+                            <textarea id="create-monster-description" class="medieval-textarea" rows="8" placeholder="Habilidades especiais, ataques e descrições..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Atributos</label>
+                            <div class="stats-grid-creator">
+                                <div class="stat-creator">
+                                    <label>FOR</label>
+                                    <input type="number" id="create-monster-for" class="medieval-input" value="10">
+                                </div>
+                                <div class="stat-creator">
+                                    <label>DES</label>
+                                    <input type="number" id="create-monster-des" class="medieval-input" value="10">
+                                </div>
+                                <div class="stat-creator">
+                                    <label>CON</label>
+                                    <input type="number" id="create-monster-con" class="medieval-input" value="10">
+                                </div>
+                                <div class="stat-creator">
+                                    <label>INT</label>
+                                    <input type="number" id="create-monster-int" class="medieval-input" value="10">
+                                </div>
+                                <div class="stat-creator">
+                                    <label>SAB</label>
+                                    <input type="number" id="create-monster-sab" class="medieval-input" value="10">
+                                </div>
+                                <div class="stat-creator">
+                                    <label>CAR</label>
+                                    <input type="number" id="create-monster-car" class="medieval-input" value="10">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="submit" class="medieval-btn">REGISTRAR NA CRIPTA</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Monster Creation Choice Modal -->
+            <div id="monster-creation-choice-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal medium">
+                    <button id="close-monster-choice-modal" class="close-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-hammer"></i> MÉTODO DE FORJA</h2>
+                    <div class="mode-choices">
+                        <button id="monster-choice-manual" class="choice-card">
+                            <i class="fas fa-hammer"></i>
+                            <h4>MANUAL</h4>
+                            <p>Preencha os detalhes da criatura você mesmo.</p>
+                        </button>
+                        <button id="monster-choice-ai" class="choice-card">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <h4>INSPIRAÇÃO ARCANA</h4>
+                            <p>Deixe a magia moldar a criatura para você.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monster AI Prompt Modal -->
+            <div id="monster-ai-prompt-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal medium">
+                    <button id="close-monster-ai-prompt" class="close-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-wand-magic-sparkles"></i> Inspiração de <span id="monster-ai-persona-name">Lyra</span></h2>
+                    <div class="parchment-content">
+                        <p>Descreva o efeito mágico que deseja invocar. A Magia cuidará dos componentes e rituais.</p>
+                        <textarea id="ai-monster-prompt" class="medieval-textarea" rows="8" placeholder="Ex: Um lobo das sombras com olhos flamejantes que caça nas noites sem lua..."></textarea>
+                        <div class="modal-actions">
+                            <button id="confirm-monster-generation-btn" class="medieval-btn">INVOCAR MAGIA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+
     bindEvents() {
+        // Delegated handler for monster data-action clicks
+        document.addEventListener('click', (e) => {
+            const actionEl = e.target.closest('[data-action]');
+            if (!actionEl) return;
+
+            switch (actionEl.dataset.action) {
+                case 'monsters-close-summoning': this.closeSummoning(); break;
+                case 'monsters-view-detail': {
+                    const id = actionEl.dataset.monsterId;
+                    if (id) this.viewDetail(id);
+                    break;
+                }
+            }
+        });
         // Selection Screen
         document.querySelectorAll('#monstros-selection .selection-card').forEach(card => {
             card.addEventListener('click', () => {
@@ -327,7 +513,7 @@ export const MonsterModule = {
                 <div class="item-card monster-card" data-id="${monster.id}">
                     <div class="monster-cr-badge">ND ${crLabel}</div>
                     ${actionButtons}
-                    <button class="gallery-card" onclick="MonsterModule.viewDetail('${monster.id}')">
+                    <button class="gallery-card" data-action="monsters-view-detail" data-monster-id="${monster.id}">
                         <div class="monster-icon-wrapper">
                             <i class="fas fa-dragon"></i>
                         </div>

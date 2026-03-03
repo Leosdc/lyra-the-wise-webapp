@@ -17,6 +17,309 @@ import { createSearchMixin } from './sheet-search.js';
 
 export const SheetModule = {
 
+    init() {
+        this.injectHTML();
+    },
+
+    injectHTML() {
+        if (document.getElementById('fichas')) return;
+
+        const fichasHtml = `
+            <!-- Fichas View -->
+            <section id="fichas" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas fa-user-shield"></i> Seus Personagens</h2>
+                    <div class="header-actions">
+                        <button id="bulk-delete-fichas-btn" class="medieval-btn small secondary"><i
+                                class="fas fa-trash-can"></i>
+                            Excluir</button>
+                        <button id="show-wizard-btn" class="medieval-btn small"><i class="fas fa-plus"></i>
+                            Novo</button>
+                    </div>
+                </div>
+                <div id="fichas-list" class="items-grid"></div>
+            </section>
+        `;
+
+        const sheetHtml = `
+            <!-- Character Sheet -->
+            <div id="character-sheet" class="sheet-container hidden">
+                <div id="sheet-inspection-banner" class="hidden"></div>
+                <div class="sheet-header">
+                    <!-- Left: Token -->
+                    <div class="header-token-section">
+                        <div class="char-token-wrapper">
+                            <img id="sheet-token" src="assets/tokens/lyra.png" alt="Token" class="char-token">
+                            <input type="file" id="token-upload" accept="image/*" class="hidden">
+                            <label for="token-upload" id="token-upload-btn" class="token-upload-overlay">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Center: Name & Dropdowns -->
+                    <div class="header-info-section">
+                        <div class="header-row-top">
+                            <h2 id="sheet-char-name" class="editable" data-field="bio.name">Nome do Herói</h2>
+                        </div>
+                        <div class="header-row-bottom" style="align-items: flex-start;">
+                            <div class="header-field-group">
+                                <label>Alinhamento</label>
+                                <span id="sheet-alignment-display"></span>
+                            </div>
+
+                            <!-- Race Column -->
+                            <div style="display: flex; flex-direction: column; flex: 1; gap: 5px;">
+                                <div class="header-field-group" style="width: 100%; margin: 0;">
+                                    <label>Raça</label>
+                                    <span id="sheet-race-display"></span>
+                                </div>
+                                <div class="header-field-group" style="width: 100%; margin: 0;">
+                                    <label>Sub-raça</label>
+                                    <div id="sheet-subrace-display" style="width: 100%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Class Column -->
+                            <div style="display: flex; flex-direction: column; flex: 1; gap: 5px;">
+                                <div class="header-field-group" style="width: 100%; margin: 0;">
+                                    <label>Classe</label>
+                                    <span id="sheet-class-display"></span>
+                                </div>
+                                <div class="header-field-group" style="width: 100%; margin: 0;">
+                                    <label>Arquétipo</label>
+                                    <div id="sheet-archetype-display" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Level & Save -->
+                    <div class="header-meta-section">
+                        <div class="level-display">
+                            <label>Nível</label>
+                            <span id="sheet-level-val" class="level-value">1</span>
+                        </div>
+                        <button id="save-sheet-btn" class="medieval-btn small"><i class="fas fa-save"></i>
+                            Salvar</button>
+                    </div>
+                </div>
+                <div class="sheet-tabs">
+                    <button class="sheet-tab active" data-tab="geral">Principal</button>
+                    <button class="sheet-tab" data-tab="combate">Combate</button>
+                    <button class="sheet-tab" data-tab="magia">Grimório</button>
+                    <button class="sheet-tab" data-tab="inventario">Mochila</button>
+                    <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                </div>
+                <div class="sheet-content">
+                    <!-- Aba Geral: Bio, Atributos, Resistências e Perícias -->
+                    <div id="sheet-geral" class="sheet-section">
+                        <div class="bio-grid">
+                            <div class="form-group"><label>Antecedente</label><span id="sheet-background"
+                                    class="editable" data-field="bio.background"></span></div>
+                            <div class="form-group"><label>XP</label><span id="sheet-xp" class="editable"
+                                    data-field="bio.xp"></span></div>
+                            <div class="form-group"><label>Nome do Jogador</label><span id="sheet-player-name"
+                                    class="editable" data-field="bio.playerName"></span></div>
+                        </div>
+                        <div class="stats-main-grid">
+                            <div class="attributes-column">
+                                <div class="scores-grid" id="sheet-scores"></div>
+                                <h4 class="section-title">Testes de Resistência</h4>
+                                <div class="saves-list" id="sheet-saves"></div>
+                            </div>
+                            <div class="skills-column">
+                                <div class="top-vitals-row">
+                                    <div class="vital-mini-box"><span>Proficiência</span><strong
+                                            id="sheet-prof"></strong></div>
+                                    <div class="vital-mini-box"><span>Percepção Passiva</span><strong
+                                            id="sheet-passive-percep"></strong></div>
+                                </div>
+                                <h4 class="section-title">Perícias</h4>
+                                <div class="skills-list" id="sheet-skills"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba Combate: PV, CA, Iniciativa, Ataques, Death Saves -->
+                    <div id="sheet-combate" class="sheet-section hidden">
+                        <div class="combat-status-grid">
+                            <div class="vital-box large"><span>CA</span><strong id="sheet-ca" class="editable"
+                                    data-field="stats.ac">10</strong></div>
+                            <div class="vital-box large"><span>Iniciativa</span><strong id="sheet-inic"
+                                    class="editable" data-field="stats.initiative">0</strong></div>
+                            <div class="vital-box large"><span>Velocidade</span><strong id="sheet-speed"
+                                    class="editable" data-field="stats.speed">9m</strong></div>
+                            <div class="hp-container-main">
+                                <div class="hp-box-full">
+                                    <span class="label">Pontos de Vida</span>
+                                    <div class="hp-controls">
+                                        <input type="number" id="sheet-hp-curr" class="hp-input"
+                                            data-field="stats.hp_current">
+                                        <span class="sep">/</span>
+                                        <input type="number" id="sheet-hp-max" class="hp-input"
+                                            data-field="stats.hp_max">
+                                    </div>
+                                </div>
+                                <div class="hp-temp">
+                                    <span>PV Temporários</span>
+                                    <input type="number" id="sheet-hp-temp" class="hp-input small"
+                                        data-field="stats.hp_temp">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="combat-details-grid">
+                            <div class="hit-dice-death-saves">
+                                <div class="death-saves-block">
+                                    <h4>Resistência à Morte</h4>
+                                    <div class="death-row successes">Sucessos
+                                        <input type="checkbox" id="death-s1" data-field="death_saves.successes"
+                                            value="1">
+                                        <input type="checkbox" id="death-s2" data-field="death_saves.successes"
+                                            value="2">
+                                        <input type="checkbox" id="death-s3" data-field="death_saves.successes"
+                                            value="3">
+                                    </div>
+                                    <div class="death-row failures">Falhas
+                                        <input type="checkbox" id="death-f1" data-field="death_saves.failures"
+                                            value="1">
+                                        <input type="checkbox" id="death-f2" data-field="death_saves.failures"
+                                            value="2">
+                                        <input type="checkbox" id="death-f3" data-field="death_saves.failures"
+                                            value="3">
+                                    </div>
+                                </div>
+                                <div class="hit-dice-block">
+                                    <h4>Dados de Vida</h4>
+                                    <div class="hit-dice-row">
+                                        <input type="number" id="sheet-hd-curr" data-field="stats.hit_dice_current"
+                                            class="medieval-input" style="width: 60px; text-align: center;">
+                                        <span> de </span>
+                                        <span id="sheet-hd-total" class="editable"
+                                            data-field="stats.hit_dice_total">1d8</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="attacks-section">
+                                <h4 class="section-title">Ataques</h4>
+                                <div id="attacks-body" class="attacks-list-v2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba Magia: Slots, Grimório, CD -->
+                    <div id="sheet-magia" class="sheet-section hidden">
+                        <div class="magic-header-stats">
+                            <div class="vital-box"><span>CD Salva.</span><strong id="sheet-spell-dc">8</strong>
+                            </div>
+                            <div class="vital-box"><span>Ataque Mág.</span><strong id="sheet-spell-atk">0</strong>
+                            </div>
+                            <div class="form-group spell-casting-container">
+                                <h4 class="section-title spell-casting-title">Atributo
+                                    de Conjuração</h4>
+                                <select id="sheet-spell-attr" data-field="spells.ability"
+                                    class="medieval-select spell-casting-select">
+                                    <option value="int">Inteligência</option>
+                                    <option value="wis">Sabedoria</option>
+                                    <option value="cha">Carisma</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="spell-slots-tracker" id="sheet-spell-slots"></div>
+                        <h4 class="section-title spellbook-title">Livro de Magias
+                        </h4>
+                        <div class="sheet-search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="sheet-spell-search" class="medieval-input"
+                                placeholder="Buscar no Grande Grimório...">
+                            <div id="sheet-spell-results" class="search-results-overlay hidden"></div>
+                        </div>
+                        <div id="spells-body" class="spells-list-v2"></div>
+                    </div>
+
+                    <!-- Aba Inventário: Itens, Moedas, Carga -->
+                    <div id="sheet-inventario" class="sheet-section hidden">
+                        <div class="inventory-top-grid">
+                            <div class="coins-pouch">
+                                <h4>Bolsa de Moedas</h4>
+                                <div class="coins-grid">
+                                    <div class="coin-item pc"><span>PC</span><input type="number"
+                                            data-field="inventory.coins.pc"></div>
+                                    <div class="coin-item pp"><span>PP</span><input type="number"
+                                            data-field="inventory.coins.pp"></div>
+                                    <div class="coin-item pe"><span>PE</span><input type="number"
+                                            data-field="inventory.coins.pe"></div>
+                                    <div class="coin-item po"><span>PO</span><input type="number"
+                                            data-field="inventory.coins.po"></div>
+                                    <div class="coin-item pl"><span>PL</span><input type="number"
+                                            data-field="inventory.coins.pl"></div>
+                                </div>
+                            </div>
+                            <div class="encumbrance-tracker">
+                                <h4 class="section-title">Carga</h4>
+                                <div class="weight-bar">
+                                    <div id="weight-progress" class="bar"></div><span id="weight-text">0 / 0
+                                        lbs</span>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="section-title">Equipamentos & Tesouros</h4>
+                        <div class="sheet-search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="sheet-item-search" class="medieval-input"
+                                placeholder="Buscar nos Arquivos de Itens...">
+                            <div id="sheet-item-results" class="search-results-overlay hidden"></div>
+                        </div>
+                        <div id="inventory-body" class="inventory-list-v2"></div>
+                    </div>
+
+                    <!-- Aba História: Notas, Traços, Exaustão -->
+                    <div id="sheet-historia" class="sheet-section hidden">
+                        <div class="traits-full-grid">
+                            <div class="form-group">
+                                <h4 class="section-title">Traços de Personalidade</h4><textarea
+                                    data-field="story.traits" class="medieval-textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <h4 class="section-title">Ideais</h4><textarea data-field="story.ideals"
+                                    class="medieval-textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <h4 class="section-title">Vínculos</h4><textarea data-field="story.bonds"
+                                    class="medieval-textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <h4 class="section-title">Defeitos</h4><textarea data-field="story.flaws"
+                                    class="medieval-textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <h4 class="section-title">Maneirismos</h4><textarea data-field="story.mannerisms"
+                                    class="medieval-textarea"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <h4 class="section-title">Talento de Interpretação</h4><textarea
+                                    data-field="story.talents" class="medieval-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="chronic-notes">
+                            <h4 class="section-title">Aparência</h4>
+                            <textarea data-field="story.appearance" class="medieval-textarea"
+                                placeholder="Aparência física..."></textarea>
+
+                            <h4 class="section-title">História</h4>
+                            <textarea data-field="story.notes" class="medieval-textarea large"
+                                placeholder="Suas crônicas escritas nas estrelas..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('main-content')?.insertAdjacentHTML('beforeend', fichasHtml);
+        document.getElementById('modal-body')?.insertAdjacentHTML('beforeend', sheetHtml);
+    },
+
     characterBackup: null,
     currentCharacter: null,
     isInspection: false,

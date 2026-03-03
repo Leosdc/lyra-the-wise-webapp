@@ -42,10 +42,179 @@ export const SpellModule = {
     },
 
     async init() {
+        this.injectHTML();
         this.bindEvents();
     },
 
+    injectHTML() {
+        if (document.getElementById('spell-creator-modal')) return;
+
+        const modalHtml = `
+            <!-- ARCANE INSCRIPTION OVERLAY -->
+            <div id="inscription-overlay" class="modal-overlay hidden">
+                <div class="inscription-container">
+                    <div class="inscription-animation">
+                        <div class="inscription-spinner">
+                            <div class="inscription-rune outer"></div>
+                            <div class="inscription-rune middle"></div>
+                            <div class="inscription-rune inner"></div>
+                            <i class="fas fa-quill inscription-center-icon"></i>
+                        </div>
+                        <div class="inscription-glow"></div>
+                    </div>
+                    <div class="inscription-status">
+                        <h2 class="inscription-title">Inscrevendo...</h2>
+                        <p class="inscription-msg">Canalizando a trama mágica em palavras.</p>
+                    </div>
+                    <div class="inscription-success-content hidden">
+                        <h3 class="inscription-success-title">Sucesso Arcano!</h3>
+                        <p class="inscription-success-msg">A magia foi gravada em seu grimório com perfeição.</p>
+                        <button class="medieval-btn" data-action="spells-close-inscription">Concluir</button>
+                    </div>
+                    <div class="inscription-error-content hidden">
+                        <h3 style="color: #ef4444;">Falha na Inscrição!</h3>
+                        <p class="error-msg">A magia se desfez antes de completar o ritual.</p>
+                        <button class="medieval-btn secondary" data-action="spells-close-inscription">Tentar Novamente</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spell Creation Choice Modal -->
+            <div id="spell-creation-choice-modal" class="modal-overlay hidden">
+                <div class="modal-content parchment" style="max-width: 600px;">
+                    <button class="close-modal" id="close-spell-choice-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title" style="text-align: center; margin-bottom: 2rem;">
+                        <i class="fas fa-scroll"></i> MÉTODO DE ESCRITA
+                    </h2>
+                    <div class="mode-choices">
+                        <button id="spell-choice-manual" class="choice-card">
+                            <i class="fas fa-pen-nib"></i>
+                            <h4>MANUAL</h4>
+                            <p>Transcreva os glifos você mesmo.</p>
+                        </button>
+                        <button id="spell-choice-ai" class="choice-card">
+                            <i class="fas fa-hat-wizard"></i>
+                            <h4>INSPIRAÇÃO ARCANA</h4>
+                            <p>Deixe a magia fluir através de você.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Spell Prompt Modal -->
+            <div id="spell-ai-prompt-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal medium">
+                    <button class="close-modal" id="close-spell-ai-prompt"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-wand-magic-sparkles"></i> Inspiração de <span id="spell-ai-persona">Lyra</span></h2>
+                    <div class="parchment-content">
+                        <p>Descreva o efeito mágico que deseja invocar. A Magia cuidará dos componentes e rituais.</p>
+                        <textarea id="ai-spell-prompt" class="medieval-textarea" rows="8" placeholder="Ex: Uma bola de fogo que causa dano de frio e desacelera inimigos..."></textarea>
+                        <div class="modal-actions">
+                            <button id="confirm-spell-generation-btn" class="medieval-btn">INVOCAR MAGIA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spell Creator Modal -->
+            <div id="spell-creator-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal wide">
+                    <button class="close-modal" id="close-spell-creator"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-scroll"></i> Escrivaninha de Magias</h2>
+                    <form id="spell-creator-form" class="parchment-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome da Magia</label>
+                                <input type="text" id="create-spell-name" class="medieval-input" required placeholder="Ex: Raio de Gelo">
+                            </div>
+                            <div class="form-group">
+                                <label>Nível</label>
+                                <select id="create-spell-level" class="medieval-select" required>
+                                    <option value="0">Truque</option>
+                                    <option value="1">1º Nível</option>
+                                    <option value="2">2º Nível</option>
+                                    <option value="3">3º Nível</option>
+                                    <option value="4">4º Nível</option>
+                                    <option value="5">5º Nível</option>
+                                    <option value="6">6º Nível</option>
+                                    <option value="7">7º Nível</option>
+                                    <option value="8">8º Nível</option>
+                                    <option value="9">9º Nível</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Escola</label>
+                                <select id="create-spell-school" class="medieval-select" required>
+                                    <option value="" disabled selected>Selecione...</option>
+                                    <option value="Abjuração">Abjuração</option>
+                                    <option value="Adivinhação">Adivinhação</option>
+                                    <option value="Conjuração">Conjuração</option>
+                                    <option value="Encantamento">Encantamento</option>
+                                    <option value="Evocação">Evocação</option>
+                                    <option value="Ilusão">Ilusão</option>
+                                    <option value="Necromancia">Necromancia</option>
+                                    <option value="Transmutação">Transmutação</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tempo de Conjuração</label>
+                                <input type="text" id="create-spell-time" class="medieval-input" placeholder="Ex: 1 ação">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Alcance</label>
+                                <input type="text" id="create-spell-range" class="medieval-input" placeholder="Ex: 9 metros">
+                            </div>
+                            <div class="form-group">
+                                <label>Duração</label>
+                                <input type="text" id="create-spell-duration" class="medieval-input" placeholder="Ex: Instantânea">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Componentes (V, S, M)</label>
+                            <input type="text" id="create-spell-components" class="medieval-input" placeholder="Ex: V, S, M (uma pena de coruja)">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Classes (Separe por vírgula)</label>
+                            <input type="text" id="create-spell-classes" class="medieval-input" placeholder="Ex: Mago, Feiticeiro">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Descrição</label>
+                            <textarea id="create-spell-desc" class="medieval-textarea" rows="6" placeholder="Descreva os efeitos da magia..."></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="medieval-btn">Inscrever Magia</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+
     bindEvents() {
+        // Delegated handler for spell data-action clicks
+        document.addEventListener('click', (e) => {
+            const actionEl = e.target.closest('[data-action]');
+            if (!actionEl) return;
+
+            switch (actionEl.dataset.action) {
+                case 'spells-close-inscription': this.closeInscription(); break;
+                case 'spells-view-spell': {
+                    const id = actionEl.dataset.spellId;
+                    if (id) this.viewSpell(id);
+                    break;
+                }
+            }
+        });
 
         document.querySelectorAll('#grimorio-selection .selection-card[data-source]').forEach(card => {
             card.addEventListener('click', () => {
@@ -257,7 +426,7 @@ export const SpellModule = {
                     <div class="item-card spell-card" data-id="${spell.id}">
                         <div class="spell-level-corner">${levelLabel}</div>
                         ${actionButtons}
-                        <button class="gallery-card" onclick="SpellModule.viewSpell('${spell.id}')">
+                        <button class="gallery-card" data-action="spells-view-spell" data-spell-id="${spell.id}">
                              <div class="spell-icon-wrapper">
                                 ${iconHtml}
                             </div>

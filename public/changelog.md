@@ -2,6 +2,16 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
  
+## [3.3.0] - 2026-03-02
+### 🏛️ Ascensão do Atrium & Otimização Ancestral
+- **Refatoração de Núcleo**:
+    - Otimização massiva do `index.html`, reduzindo drasticamente o número de linhas para melhor performance e facilidade de manutenção.
+- **Auditoria de Banco de Dados**:
+    - Adição do botão de download de JSON no módulo de auditoria para facilitar a exportação e backup de dados.
+- **Aprimoramento do Atrium**:
+    - Integração profunda com as fichas de personagens, vinculando atributos e informações vitais.
+    - Suporte a rolagens de dados diretamente no fluxo do Atrium, facilitando a interação e o combate.
+
 ## [3.2.0] - 2026-02-21
 ### 🏰 Fortaleza Arcaica & Nuvem Soberana
 - **Migração para App Hosting**:

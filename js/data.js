@@ -393,15 +393,14 @@ export const getSystemRules = async (systemId) => {
 };
 
 
-export const getSessions = async (userId, userEmail, systemId) => {
-    // 1. Get owned sessions
+export const getSessions = async (userId, userEmail, systemId, roleFilter = 'all') => {
+    // 1. Get owned sessions (fetch all by user to ensure correct deduplication)
     const qOwned = query(
         collection(db, COLLECTIONS.SESSIONS),
-        where("userId", "==", userId),
-        where("systemId", "==", systemId)
+        where("userId", "==", userId)
     );
 
-    // 2. Get joined sessions (where invite status is accepted, online, or offline)
+    // 2. Get joined sessions
     const qJoined = query(
         collection(db, "session_invites"),
         where("email", "==", userEmail.toLowerCase()),
@@ -410,20 +409,34 @@ export const getSessions = async (userId, userEmail, systemId) => {
 
     const [ownedSnap, joinedSnap] = await Promise.all([getDocs(qOwned), getDocs(qJoined)]);
 
-    const owned = ownedSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), isOwner: true }));
+    // Map owned sessions and tag them
+    const allOwned = ownedSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), isOwner: true }));
 
-    // For joined sessions, we need to fetch the session details
+    // Filter owned by system if requested (but keep full list for deduplication)
+    const owned = allOwned.filter(s => !systemId || s.systemId === systemId);
+
+    // For joined sessions, fetch details
     const joinedIds = [...new Set(joinedSnap.docs.map(d => d.data().sessionId))];
     const joinedPromises = joinedIds.map(id => getDoc(doc(db, COLLECTIONS.SESSIONS, id)));
     const joinedSnaps = await Promise.all(joinedPromises);
 
-    // Deduplicate: If owned, don't show in joined list
-    const ownedIds = new Set(owned.map(s => s.id));
+    // Deduplicate: If owned by this user (any system), don't show in joined list
+    const allOwnedIds = new Set(allOwned.map(s => s.id));
     const joined = joinedSnaps
-        .filter(s => s.exists() && !ownedIds.has(s.id))
-        .map(s => ({ id: s.id, ...s.data(), isOwner: false }));
+        .filter(s => s.exists() && !allOwnedIds.has(s.id))
+        .map(s => ({ id: s.id, ...s.data(), isOwner: false }))
+        .filter(s => !systemId || s.systemId === systemId); // Filter joined by systemId too
 
-    return [...owned, ...joined].sort((a, b) => {
+    let result = [];
+    if (roleFilter === 'gm') {
+        result = owned;
+    } else if (roleFilter === 'player') {
+        result = joined;
+    } else {
+        result = [...owned, ...joined];
+    }
+
+    return result.sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || 0);
         const dateB = b.updatedAt?.toDate ? b.updatedAt.toDate() : new Date(b.updatedAt || 0);
         return dateB - dateA;

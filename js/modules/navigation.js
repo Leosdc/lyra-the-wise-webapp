@@ -11,6 +11,18 @@ import { escapeHTML } from './utils.js';
 export const NavigationModule = {
 
 
+    init() {
+        // Setup scroll indicators logic
+        window.addEventListener('scroll', () => this.updateScrollIndicators());
+        // Initial check
+        this.updateScrollIndicators();
+    },
+
+    injectHTML() {
+        // No-op for now to fix UI breakage. 
+        // If we want a sidebar later, we need matching CSS.
+    },
+
     async switchView(viewId, loaders) {
         if (viewId !== 'gm-panel') {
             document.body.classList.remove('gm-panel-active');

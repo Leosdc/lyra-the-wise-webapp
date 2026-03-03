@@ -17,6 +17,7 @@ import { COLLECTIONS } from '../data.js';
 
 import { createSessionMixin } from './gm-session.js';
 import { createInvitesMixin } from './gm-invites.js';
+import { WizardModule } from './wizard.js';
 
 export const GMPanelModule = {
     activeSession: null,
@@ -25,13 +26,275 @@ export const GMPanelModule = {
     isEditing: false,
 
     init() {
+        this.injectHTML();
         window.GMPanelModule = this;
         this.bindEvents();
+    },
+
+    injectHTML() {
+        if (document.getElementById('gm-panel')) return;
+
+        const gmHtml = `
+            <!-- Painel do Mestre: Seleção Inicial -->
+            <section id="gm-selection" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas fa-desktop"></i> Painel do Mestre</h2>
+                    <button class="medieval-btn small secondary" data-action="gm-back-dashboard">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+                <div class="selection-grid">
+                    <div class="selection-card" data-action="new-journey">
+                        <div class="selection-icon"><i class="fas fa-wand-sparkles"></i></div>
+                        <div class="selection-info">
+                            <h3>Nova Jornada</h3>
+                            <p>Abra os portões de uma nova aventura neste sistema.</p>
+                        </div>
+                    </div>
+                    <div class="selection-card" data-target="my-sessions">
+                        <div class="selection-icon"><i class="fas fa-book-journal-whills"></i></div>
+                        <div class="selection-info">
+                            <h3>Meus Registros</h3>
+                            <p>Consulte os anais de sessões passadas.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Painel do Mestre: Principal -->
+            <section id="gm-panel" class="view hidden">
+                <div class="view-header">
+                    <h2><i class="fas fa-desktop"></i> Painel do Mestre</h2>
+                    <div class="header-actions">
+                        <button class="medieval-btn small secondary" data-action="gm-back-selection">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="gm-panel-container">
+                    <aside class="gm-sidebar" id="gm-sidebar-left">
+                        <div class="gm-sidebar-content">
+                            <div class="gm-search-section">
+                                <div class="mini-grid-header">Estado da Crônica</div>
+                                <div class="session-sidebar-info">
+                                    <div class="gm-status-selector-container">
+                                        <div class="gm-status-row">
+                                            <select id="gm-session-status-select" class="medieval-select small">
+                                                <option value="preparing">🟠 Preparando</option>
+                                                <option value="active">🟢 Em Andamento</option>
+                                                <option value="completed">📜 Concluída</option>
+                                                <option value="archived">🌑 Arquivada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="session-stats-mini">
+                                        <span><i class="fas fa-users"></i> <span id="active-player-count">0</span> Jogadores</span>
+                                    </div>
+                                    <div class="gm-control-groups">
+                                        <div class="control-group-row">
+                                            <button class="medieval-btn small" id="toggle-visibility-btn" title="Privacidade"><i class="fas fa-eye-slash"></i> PRIVADO</button>
+                                            <button class="medieval-btn small primary" id="save-gm-notes" title="Salvar Anais"><i class="fas fa-save"></i> SALVAR</button>
+                                        </div>
+                                        <div class="control-group-row">
+                                            <button class="medieval-btn small gold-pulse" id="btn-session-summary" title="Resumo do Oráculo"><i class="fas fa-magic"></i> RESUMO</button>
+                                            <button class="medieval-btn small secondary" id="btn-prolong-session" title="Expandir Cronologia"><i class="fas fa-expand-arrows-alt"></i> EXPANDIR</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gm-search-section">
+                                <div class="mini-grid-header">Dados da Saga</div>
+                                <div id="gm-saga-data" class="saga-data-container">
+                                    <div class="saga-item empty"><i class="fas fa-feather-pointed"></i><p>Nenhum dado vinculado ainda.</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main class="gm-main-area">
+                        <div id="no-active-session" class="gm-session-info">
+                            <i class="fas fa-scroll fa-3x" style="color: var(--gold); margin-bottom: 1rem;"></i>
+                            <h3>Nenhuma Temporada Ativa</h3>
+                            <p>Invoque uma nova jornada para começar a mestrear.</p>
+                            <div class="system-warning" style="margin: 1rem 0; color: var(--gold); font-size: 0.9rem;">
+                                <i class="fas fa-info-circle"></i> A sessão será vinculada ao sistema: <strong id="active-system-display">D&D 5e</strong>
+                            </div>
+                            <button class="medieval-btn" data-action="gm-create-session">
+                                <i class="fas fa-wand-sparkles"></i> Iniciar Nova Sessão
+                            </button>
+                        </div>
+
+                        <div id="active-session-ui" class="gm-session-info hidden">
+                            <div class="session-header-flex">
+                                <h3 id="active-session-title">Título da Sessão</h3>
+                                <button class="medieval-btn icon-only small" id="edit-session-btn" title="Editar Título"><i class="fas fa-pen-fancy"></i></button>
+                            </div>
+                            <div class="gm-story-central hidden" id="gm-story-container">
+                                <div class="medieval-subtitle"><i class="fas fa-scroll"></i> PRÓLOGO DA SAGA</div>
+                                <textarea class="gm-story-area" id="gm-story-input-central" placeholder="Prepare sua história..."></textarea>
+                            </div>
+                            <div id="oracle-summary-section" class="oracle-wizard-container hidden">
+                                <div class="oracle-avatar-wrapper">
+                                    <img id="oracle-avatar-img" src="assets/Lyra_the_wise.png" alt="Oráculo Lyra">
+                                    <div class="avatar-glow"></div>
+                                </div>
+                                <div class="oracle-speech-bubble">
+                                    <i class="fas fa-quote-left bubble-quote"></i>
+                                    <p id="oracle-summary-text">O destino está sendo traçado...</p>
+                                </div>
+                            </div>
+                            <div id="session-summary-container" class="session-summary-container hidden" style="margin-top: 20px;">
+                                <div class="medieval-subtitle"><i class="fas fa-feather"></i> RESUMO DA CRÔNICA</div>
+                                <textarea id="session-summary-display" class="gm-summary-area" readonly placeholder="O Oráculo ainda não teceu o resumo..."></textarea>
+                            </div>
+                            <div id="gm-session-start-options" class="gm-session-start-options">
+                                <button class="medieval-btn primary large" id="btn-enter-session"><i class="fas fa-door-open"></i> ADENTRAR ATRIUM</button>
+                            </div>
+                            <div id="gm-timeline-summary" class="gm-timeline-summary hidden">
+                                <div class="medieval-subtitle"><i class="fas fa-hourglass-half"></i> CRONOLOGIA DA SAGA</div>
+                                <div class="timeline-track" id="gm-timeline-track"></div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <aside class="gm-sidebar" id="gm-sidebar-right">
+                        <div class="gm-sidebar-header">
+                            <h3>Aventureiros</h3>
+                            <button class="medieval-btn icon-only" data-action="gm-open-invite" title="Convidar Jogador"><i class="fas fa-user-plus"></i></button>
+                        </div>
+                        <div class="gm-sidebar-content">
+                            <ul class="player-list" id="gm-player-list"></ul>
+                            <div class="gm-map-section">
+                                <div class="gm-sidebar-header"><h3>MAPA</h3><button class="medieval-btn icon-only" title="Configurar Mapa"><i class="fas fa-map"></i></button></div>
+                                <div id="gm-map-container" class="gm-map-container"><div class="map-grid-overlay"></div><div class="map-placeholder"><i class="fas fa-compass fa-spin"></i><p>Em breve: Mapas Táticos</p></div></div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- GM Modals -->
+            <div id="gm-add-content-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" data-action="gm-close-add-menu"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-toolbox"></i> Arsenal do Mestre</h2>
+                    <div class="parchment-content">
+                        <p>O que desejas manifestar nesta jornada?</p>
+                        <div class="selection-grid-mini">
+                            <div class="selection-card-mini" data-action="gm-open-creator" data-creator-type="npc"><i class="fas fa-user-shield"></i><span>NPC / Monstro</span></div>
+                            <div class="selection-card-mini" data-action="gm-open-creator" data-creator-type="treasure"><i class="fas fa-gem"></i><span>Tesouro</span></div>
+                            <div class="selection-card-mini" data-action="gm-open-creator" data-creator-type="item"><i class="fas fa-sword"></i><span>Item Mágico</span></div>
+                            <div class="selection-card-mini" data-action="gm-open-creator" data-creator-type="encounter"><i class="fas fa-skull-crossbones"></i><span>Encontro</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gm-session-create-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" data-action="gm-close-session-create"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-scroll"></i> Alterar Destino</h2>
+                    <div class="parchment-content">
+                        <div class="form-group"><label>Título da Saga</label><input type="text" id="gm-new-session-title" class="medieval-input" placeholder="Ex: A Queda de Phandalin"></div>
+                        <div class="modal-actions"><button class="medieval-btn primary" id="confirm-new-session-btn"><i class="fas fa-save"></i> Salvar Alterações</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gm-session-select-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small allow-overflow">
+                    <button class="close-modal" data-action="gm-close-session-select"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-scroll"></i> ESCOLHER CAPÍTULO</h2>
+                    <div class="parchment-content">
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Selecione o Destino</label>
+                            <div class="custom-select-container" id="gm-session-select-container">
+                                <div class="custom-select-trigger" id="gm-session-select-trigger"><span id="gm-session-select-text">Selecione um capítulo...</span><i class="fas fa-chevron-down"></i></div>
+                                <div class="custom-select-options-wrapper hidden" id="gm-session-select-options-wrapper">
+                                    <div class="custom-select-options" id="gm-session-select-options"></div>
+                                </div>
+                                <input type="hidden" id="gm-session-select-value">
+                            </div>
+                        </div>
+                        <div class="modal-actions-centered" style="margin-top: 20px;"><button class="medieval-btn gold-pulse" id="gm-session-select-confirm"><i class="fas fa-check"></i> CONFIRMAR TRILHA</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gm-chapter-detail-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal">
+                    <button class="close-modal" data-action="gm-close-chapter-detail"><i class="fas fa-times"></i></button>
+                    <h2 id="gm-chapter-detail-title" class="modal-title"><i class="fas fa-scroll"></i> Detalhes do Capítulo</h2>
+                    <div id="gm-chapter-detail-content" class="parchment-content" style="max-height: 70vh; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <div id="gm-prolong-session-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" data-action="gm-close-prolong"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-expand-arrows-alt"></i> Prolongar Jornada</h2>
+                    <div class="parchment-content">
+                        <p>Defina como a trama deve se expandir.</p>
+                        <div class="form-group"><label>Quantidade de Capítulos (Sessões)</label><input type="number" id="prolong-session-count" class="medieval-input" value="1" min="1" max="5"></div>
+                        <div class="form-group">
+                            <label>Onde os novos capítulos se encaixam?</label>
+                            <select id="prolong-session-position" class="medieval-select">
+                                <option value="end">No FIM da atual cronologia</option>
+                                <option value="start">No COMEÇO da atual cronologia</option>
+                                <option value="middle">No MEIO (entre capítulos)</option>
+                            </select>
+                        </div>
+                        <div class="modal-actions-centered"><button class="medieval-btn gold-pulse" data-action="gm-confirm-prolong"><i class="fas fa-wand-magic-sparkles"></i> TECER DESTINO</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gm-invite-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" data-action="gm-close-invite"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-ghost"></i> Convocar Viajante</h2>
+                    <div class="parchment-content">
+                        <div class="form-group"><label>Identidade Arcana (Nickname ou E-mail)</label><input type="text" id="invite-email-input" class="medieval-input" placeholder="Ex: Gandalf ou heroi@reino.com"></div>
+                        <div class="modal-actions"><button class="medieval-btn gold-pulse" data-action="gm-send-invite">Enviar Mensageiro</button></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.insertAdjacentHTML('beforeend', gmHtml);
+        } else {
+            document.body.insertAdjacentHTML('beforeend', gmHtml);
+        }
     },
 
     bindEvents() {
         this.setupEventListeners();
         this.syncMiniMusic();
+
+        // Delegated handler for all data-action clicks in GM panel
+        document.addEventListener('click', (e) => {
+            const actionEl = e.target.closest('[data-action]');
+            if (!actionEl) return;
+
+            const action = actionEl.dataset.action;
+            switch (action) {
+                case 'gm-back-dashboard': window.app.switchView('dashboard'); break;
+                case 'gm-back-selection': window.app.switchView('gm-selection'); break;
+                case 'gm-create-session': this.createNewSession(); break;
+                case 'gm-open-invite': this.openInviteModal(); break;
+                case 'gm-close-add-menu': this.closeAddMenu(); break;
+                case 'gm-open-creator': this.openCreator(actionEl.dataset.creatorType); break;
+                case 'gm-close-session-create': this.closeSessionCreateModal(); break;
+                case 'gm-close-session-select': this.closeSessionSelectModal(); break;
+                case 'gm-close-chapter-detail': document.getElementById('gm-chapter-detail-modal')?.classList.add('hidden'); break;
+                case 'gm-close-prolong': this.closeProlongModal(); break;
+                case 'gm-confirm-prolong': this.confirmProlongSession(); break;
+                case 'gm-close-invite': this.closeInviteModal(); break;
+                case 'gm-send-invite': this.sendInvite(); break;
+            }
+        });
 
         // Toggle visibility/privacy
         document.getElementById('toggle-visibility-btn')?.addEventListener('click', () => this.toggleVisibility());
@@ -64,7 +327,7 @@ export const GMPanelModule = {
 
                 const action = card.dataset.action;
                 if (action === 'new-journey') {
-                    window.WizardModule.showSessionWizard(window.app, 'manual');
+                    WizardModule.showSessionWizard(window.app.getWizardContext(), 'manual');
                 } else if (action === 'past-records') {
                     window.app.switchView('sessoes');
                 }
@@ -269,7 +532,7 @@ export const GMPanelModule = {
 
     createNewSession() {
         console.log("🕯️ Invocando o Mago do Destino...");
-        window.WizardModule.showSessionWizard(window.app, 'manual');
+        WizardModule.showSessionWizard(window.app.getWizardContext(), 'manual');
     },
 
     async saveStory() {

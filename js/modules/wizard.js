@@ -14,11 +14,398 @@ export const WizardModule = {
     wizardStep: 0,
     creationMode: 'ai',
 
+    init(context) {
+        this.injectHTML();
+        this.bindEvents(context);
+        this.initGuidanceListeners();
+        this.initAutoResize();
+    },
+
+    injectHTML() {
+        if (document.getElementById('creation-wizard')) return;
+
+        const html = `
+            <!-- Character Wizard -->
+            <div id="creation-wizard" class="wizard-container hidden">
+                <div id="char-choice-step" class="wizard-step" data-step="0">
+                    <h3>Como deseja criar, viajante?</h3>
+                    <div class="mode-choices">
+                        <button class="choice-card" data-mode="ai">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <h4>Com Lyra</h4>
+                            <p>A Magia tecerá os detalhes arcanos para você.</p>
+                        </button>
+                        <button class="choice-card" data-mode="manual">
+                            <i class="fas fa-feather-pointed"></i>
+                            <h4>Manualmente</h4>
+                            <p>Você mesmo escreve cada detalhe da sua história.</p>
+                        </button>
+                    </div>
+                </div>
+                <div class="wizard-progress hidden">
+                    <div class="step-indicator active" data-step="1">1</div>
+                    <div class="step-indicator" data-step="2">2</div>
+                    <div class="step-indicator" data-step="3">3</div>
+                    <div class="step-indicator" data-step="4">4</div>
+                    <div class="step-indicator" data-step="5">5</div>
+                </div>
+                <!-- Steps content... same as before -->
+                <div class="wizard-step" data-step="1">
+                    <h3>Origens</h3>
+                    <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
+                            placeholder="Ex: Valerius"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Raça</label>
+                            <select id="wiz-race" class="medieval-select" required>
+                                <option value="">Carregando...</option> <!-- Will be populated by JS -->
+                            </select>
+                            <div id="wiz-subrace-container" class="hidden" style="margin-top: 5px;">
+                                <select id="wiz-subrace" class="medieval-select small">
+                                    <option value="">Selecione Sub-raça</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Classe</label>
+                            <select id="wiz-class" class="medieval-select" required>
+                                <option value="">Carregando...</option> <!-- Will be populated by JS -->
+                            </select>
+                            <div id="wiz-archetype-container" class="hidden" style="margin-top: 5px;">
+                                <select id="wiz-archetype" class="medieval-select small">
+                                    <option value="">Selecione Arquétipo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Alinhamento</label>
+                            <select id="wiz-alignment" class="medieval-select">
+                                <option value="">Selecione Alinhamento...</option>
+                                <option value="Leal e Bom">Leal e Bom</option>
+                                <option value="Neutro e Bom">Neutro e Bom</option>
+                                <option value="Caótico e Bom">Caótico e Bom</option>
+                                <option value="Leal e Neutro">Leal e Neutro</option>
+                                <option value="Neutro">Neutro</option>
+                                <option value="Caótico e Neutro">Caótico e Neutro</option>
+                                <option value="Leal e Mau">Leal e Mau</option>
+                                <option value="Neutro e Mau">Neutro e Mau</option>
+                                <option value="Caótico e Mau">Caótico e Mau</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
+                                value="9m"></div>
+                    </div>
+                    <div class="form-group"><label>Antecedente</label>
+                        <select id="wiz-background" class="medieval-select">
+                            <option value="">Selecione Antecedente...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="wizard-step hidden" data-step="2">
+                    <h3>Atributos <i class="fas fa-book-open pointer-icon" id="open-attr-tips"
+                            title="Dicas de Geração"></i></h3>
+                    <div class="attributes-grid">
+                        <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10" min="0"
+                                max="25"></div>
+                        <div class="attr-input"><span>DES</span><input type="number" id="wiz-dex" value="10" min="0"
+                                max="25"></div>
+                        <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10" min="0"
+                                max="25"></div>
+                        <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10" min="0"
+                                max="25"></div>
+                        <div class="attr-input"><span>SAB</span><input type="number" id="wiz-wis" value="10" min="0"
+                                max="25"></div>
+                        <div class="attr-input"><span>CAR</span><input type="number" id="wiz-cha" value="10" min="0"
+                                max="25"></div>
+                    </div>
+                </div>
+                <div class="wizard-step hidden" data-step="3">
+                    <h3>Perícias</h3>
+                    <div class="skills-selection">
+                        <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
+                        <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
+                        <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
+                        <label><input type="checkbox" value="Atletismo"> Atletismo</label>
+                        <label><input type="checkbox" value="Atuação"> Atuação</label>
+                        <label><input type="checkbox" value="Blefar"> Blefar</label>
+                        <label><input type="checkbox" value="Furtividade"> Furtividade</label>
+                        <label><input type="checkbox" value="História"> História</label>
+                        <label><input type="checkbox" value="Intimidação"> Intimidação</label>
+                        <label><input type="checkbox" value="Intuição"> Intuição</label>
+                        <label><input type="checkbox" value="Investigação"> Investigação</label>
+                        <label><input type="checkbox" value="Medicina"> Medicina</label>
+                        <label><input type="checkbox" value="Natureza"> Natureza</label>
+                        <label><input type="checkbox" value="Percepção"> Percepção</label>
+                        <label><input type="checkbox" value="Persuasão"> Persuasão</label>
+                        <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
+                        <label><input type="checkbox" value="Religião"> Religião</label>
+                        <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
+                    </div>
+                </div>
+                <div class="wizard-step hidden" data-step="4">
+                    <h3>Crônicas e Personalidade</h3>
+                    <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
+                            class="medieval-textarea"
+                            placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                                class="medieval-textarea"
+                                placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                        </div>
+                        <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
+                                class="medieval-textarea"
+                                placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
+                    </div>
+                    <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
+                            class="medieval-textarea"
+                            placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
+                                class="medieval-textarea"
+                                placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                        </div>
+                        <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                                class="medieval-textarea"
+                                placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
+                            class="medieval-textarea"
+                            placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
+                    </div>
+                    <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
+                            class="medieval-textarea"
+                            placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo Arcano)"></textarea>
+                    </div>
+                </div>
+
+                <div class="wizard-step hidden" data-step="5">
+                    <h3>Consagração</h3>
+                    <p id="wiz-final-msg">Lyra irá tecer a trama final do seu herói.</p>
+                </div>
+
+                <div class="wizard-nav">
+                    <button id="wiz-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                    <button id="wiz-next" class="medieval-btn small">Próximo</button>
+                    <button id="wiz-finish" class="medieval-btn small hidden">Consagrar</button>
+                </div>
+
+                <!-- Lyra's Guidance (Inside Wizard) -->
+                <div id="lyra-guidance" class="lyra-guidance-container hidden">
+                    <img src="assets/Lyra_the_wise.png" alt="Lyra guidance" class="guidance-portrait">
+                    <div class="guidance-bubble parchment">
+                        <p id="guidance-text">Em que posso ajudá-lo, viajante?</p>
+                        <div class="bubble-tail"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monster Wizard -->
+            <div id="monster-wizard" class="wizard-container hidden">
+                <div id="mon-choice-step" class="wizard-step">
+                    <h3>Origem da Criatura</h3>
+                    <div class="mode-choices">
+                        <div class="choice-card" data-mode="ai">
+                            <i class="fas fa-dragon"></i>
+                            <h4>Invocar com Lyra</h4>
+                            <p>A Magia gerará as estatísticas e a descrição.</p>
+                        </div>
+                        <div class="choice-card" data-mode="manual">
+                            <i class="fas fa-hammer"></i>
+                            <h4>Forjar Manualmente</h4>
+                            <p>Preencha os detalhes da criatura você mesmo.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="mon-form" class="hidden">
+                    <h3><i class="fas fa-dragon"></i> Invocação de Criatura</h3>
+                    <div class="form-group"><label>Nome</label><input type="text" id="mon-name"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ND</label><input type="text" id="mon-cr"></div>
+                        <div class="form-group"><label>Tipo</label><input type="text" id="mon-type"></div>
+                    </div>
+                    <div class="form-group"><label>Descrição/Prompt</label><textarea id="mon-prompt"
+                            class="medieval-textarea"
+                            placeholder="Ex: Um lobo das sombras com olhos flamejantes..."></textarea></div>
+                    <div class="wizard-nav">
+                        <button id="mon-finish-btn" class="medieval-btn small">Invocar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Wizard -->
+            <div id="session-wizard" class="wizard-container hidden">
+                <div class="wizard-step" data-step="0" id="sess-choice-step">
+                    <h3>Registro da Crônica</h3>
+                    <div class="mode-choices">
+                        <button class="choice-card" data-mode="ai">
+                            <i class="fas fa-magic"></i>
+                            <h4>Oráculo Eldrin</h4>
+                            <p>O Oráculo tecerá a narrativa com base em suas escolhas.</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 1: Base Context -->
+                <div class="wizard-step hidden" data-step="1">
+                    <h3>Contexto da Saga</h3>
+                    <div class="form-group">
+                        <label>Título da Aventura</label>
+                        <input type="text" id="sess-title" placeholder="Ex: O Segredo do Templo Perdido">
+                    </div>
+                    <div class="form-group">
+                        <label>Gancho de Abertura</label>
+                        <textarea id="sess-hook" class="medieval-textarea"
+                            placeholder="Como a aventura começa?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo Principal</label>
+                        <textarea id="sess-goal" class="medieval-textarea"
+                            placeholder="O que os heróis precisam alcançar?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 2: World & NPCs -->
+                <div class="wizard-step hidden" data-step="2">
+                    <h3>Mundo e Personagens</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Localidades de Destaque</label>
+                            <textarea id="sess-locations" class="medieval-textarea"
+                                placeholder="Onde a ação ocorre?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>NPCs Pivotais</label>
+                            <textarea id="sess-npcs" class="medieval-textarea"
+                                placeholder="Quem são os aliados e informantes?"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Threats & Combat -->
+                <div class="wizard-step hidden" data-step="3">
+                    <h3>Perigos e Desafios</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ameaças e Monstros</label>
+                            <textarea id="sess-threats" class="medieval-textarea"
+                                placeholder="Quem ou o que se opõe aos heróis?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Encontros (3-5)</label>
+                            <textarea id="sess-encounters" class="medieval-textarea"
+                                placeholder="Descreva os principais desafios planejados."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Spoils & Climax -->
+                <div class="wizard-step hidden" data-step="4">
+                    <h3>Clímax e Recompensas</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>O Grande Clímax</label>
+                            <textarea id="sess-climax" class="medieval-textarea"
+                                placeholder="Como será o confronto final?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Tesouros e Recompensas</label>
+                            <textarea id="sess-treasure" class="medieval-textarea"
+                                placeholder="O que os heróis ganharão?"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Atmosphere & Resolution -->
+                <div class="wizard-step hidden" data-step="5">
+                    <h3>Finalização e Atmosfera</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Consequências e Resolução</label>
+                            <textarea id="sess-resolution" class="medieval-textarea"
+                                placeholder="O que acontece após o clímax?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ambiente e Atmosfera</label>
+                            <textarea id="sess-atmosphere" class="medieval-textarea"
+                                placeholder="Cores, sons, cheiros predominantes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Duração Pretendida (Linha do Tempo)</label>
+                            <select id="sess-timeline" class="medieval-select">
+                                <option value="1" selected>Sessão Única (One-shot)</option>
+                                <option value="3">Campanha Curta (3 sessões)</option>
+                                <option value="5">Campanha Média (5 sessões)</option>
+                                <option value="10">Campanha Épica (10 sessões)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cadência Narrativa</label>
+                            <select id="sess-pacing" class="medieval-select">
+                                <option value="short">Curta (Direta e Ágil)</option>
+                                <option value="balanced" selected>Equilibrada (Misto)</option>
+                                <option value="long">Longa (Imersiva e Detalhada)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-nav sess-nav hidden">
+                    <button id="sess-prev" class="medieval-btn small secondary hidden">Anterior</button>
+                    <button id="sess-magic-fill" class="medieval-btn small secondary"
+                        title="O Oráculo preencherá as lacunas da sua narrativa.">
+                        <i class="fas fa-wand-magic-sparkles"></i> Preencher com Magia
+                    </button>
+                    <button id="sess-next" class="medieval-btn small">Próximo</button>
+                    <button id="sess-finish-btn" class="medieval-btn small hidden">Registrar Saga</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('modal-body')?.insertAdjacentHTML('beforeend', html);
+    },
+
+    bindEvents(context) {
+        // Choice Cards
+        document.querySelectorAll('.wizard-container .choice-card').forEach(card => {
+            card.onclick = () => this.handleChoiceClick(card);
+        });
+
+        // Navigation Buttons
+        document.getElementById('wiz-prev')?.addEventListener('click', () => this.updateWizardStep(-1));
+        document.getElementById('wiz-next')?.addEventListener('click', () => this.updateWizardStep(1));
+        document.getElementById('wiz-finish')?.addEventListener('click', () => this.handleWizardFinish(context));
+
+        document.getElementById('mon-finish-btn')?.addEventListener('click', () => this.handleMonsterFinish(context));
+
+        document.getElementById('sess-prev')?.addEventListener('click', () => this.updateWizardStep(-1));
+        document.getElementById('sess-next')?.addEventListener('click', () => this.updateWizardStep(1));
+        document.getElementById('sess-finish-btn')?.addEventListener('click', () => this.handleSessionFinish(context));
+        document.getElementById('sess-magic-fill')?.addEventListener('click', () => this.fillSessionBlanksWithAI(context));
+
+        // Attr Tips
+        document.getElementById('open-attr-tips')?.addEventListener('click', () => {
+            document.getElementById('attribute-tips-modal')?.classList.remove('hidden');
+        });
+
+        document.getElementById('close-attr-tips')?.addEventListener('click', () => {
+            document.getElementById('attribute-tips-modal')?.classList.add('hidden');
+        });
+    },
+
+    wizardStep: 0,
+    creationMode: 'ai',
+
     // --- Entry Points ---
     showCreationWizard(context) {
         if (!context.checkAuth()) return;
         logger.info("✨ Abrindo Criador de Personagem");
 
+        this.resetCharacterWizard();
         this.updateThemeText();
 
         context.openModal('creation-wizard');
@@ -28,6 +415,37 @@ export const WizardModule = {
 
         // Load Dynamic Data
         this.loadSystemData(context);
+    },
+
+    resetCharacterWizard() {
+        // Reset basic fields
+        const fields = [
+            'wiz-name', 'wiz-race', 'wiz-subrace', 'wiz-class', 'wiz-archetype',
+            'wiz-background', 'wiz-alignment', 'wiz-speed', 'wiz-traits',
+            'wiz-ideals', 'wiz-bonds', 'wiz-flaws', 'wiz-mannerisms',
+            'wiz-talents', 'wiz-appearance', 'wiz-backstory'
+        ];
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = (id === 'wiz-speed' ? '9m' : '');
+        });
+
+        // Reset attributes
+        ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(attr => {
+            const el = document.getElementById(`wiz-${attr}`);
+            if (el) el.value = 10;
+        });
+
+        // Reset Skills
+        document.querySelectorAll('#creation-wizard .skills-selection input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Hide sub-containers
+        document.getElementById('wiz-subrace-container')?.classList.add('hidden');
+        document.getElementById('wiz-archetype-container')?.classList.add('hidden');
+
+        this.wizardStep = 0;
     },
 
     async loadSystemData(context) {
@@ -207,6 +625,7 @@ export const WizardModule = {
 
     showMonsterCreator(context) {
         if (!context.checkAuth()) return;
+        this.resetMonsterWizard();
         const monCr = document.getElementById('mon-cr');
         if (monCr) monCr.parentElement.classList.remove('hidden');
         const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
@@ -216,11 +635,22 @@ export const WizardModule = {
 
     showTrapCreator(context) {
         if (!context.checkAuth()) return;
+        this.resetMonsterWizard();
         const monCr = document.getElementById('mon-cr');
         if (monCr) monCr.parentElement.classList.add('hidden');
         const monTitle = document.getElementById('monster-wizard')?.querySelector('h3');
         if (monTitle) monTitle.innerText = "Criação de Armadilha";
         context.openModal('monster-wizard');
+    },
+
+    resetMonsterWizard() {
+        const fields = ['mon-name', 'mon-cr', 'mon-type', 'mon-prompt'];
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
+        document.getElementById('mon-choice-step')?.classList.remove('hidden');
+        document.getElementById('mon-form')?.classList.add('hidden');
     },
 
     showSessionWizard(context, mode = 'manual') {
@@ -275,7 +705,11 @@ export const WizardModule = {
             document.getElementById('mon-choice-step').classList.add('hidden');
             document.getElementById('mon-form').classList.remove('hidden');
         } else if (wizardId === 'session-wizard') {
-            this.wizardStep = 1;
+            if (mode === 'manual') {
+                this.wizardStep = 1;
+            } else {
+                this.wizardStep = 1; // Both follow the same wizard steps now, but AI will fill gaps
+            }
             this.updateSessionWizardUI();
         }
     },
@@ -363,12 +797,16 @@ export const WizardModule = {
 
     // --- Finish Handlers ---
     async handleWizardFinish(context) {
+        if (!context.user) {
+            if (!context.checkAuth()) return;
+        }
         const name = document.getElementById('wiz-name').value.trim();
         const race = document.getElementById('wiz-race').value.trim();
         const className = document.getElementById('wiz-class').value;
+        const alignment = document.getElementById('wiz-alignment').value;
 
-        if (!name || !race || !className) {
-            context.showAlert("Nome, Raça e Classe são obrigatórios para a jornada!", "Campos Faltando");
+        if (!name || !race || !className || !alignment) {
+            context.showAlert("Nome, Raça, Classe e Alinhamento são obrigatórios para a jornada!", "Campos Faltando");
             return;
         }
 
@@ -500,6 +938,9 @@ export const WizardModule = {
     },
 
     async handleMonsterFinish(context) {
+        if (!context.user) {
+            if (!context.checkAuth()) return;
+        }
         context.toggleLoading(true);
         try {
             const isTrap = document.getElementById('monster-wizard').querySelector('h3').innerText.includes("Armadilha");
@@ -535,6 +976,9 @@ export const WizardModule = {
     },
 
     async handleSessionFinish(context) {
+        if (!context.user) {
+            if (!context.checkAuth()) return;
+        }
         const finishBtn = document.getElementById('sess-finish-btn');
         if (finishBtn) {
             finishBtn.disabled = true;
