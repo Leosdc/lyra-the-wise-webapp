@@ -55,14 +55,25 @@ const callProxy = async (payload) => {
         isAiBusy = true;
         logger.debug("📡 Invocando Proxy Arcano...", payload.message?.substring(0, 50));
 
-        const { getToken } = await import('./auth.js');
+        const { getToken, auth: firebaseAuth } = await import('./auth.js');
         const appCheckToken = await getToken();
+
+        // Get the Firebase Auth ID token for the Authorization header
+        let idToken = '';
+        if (firebaseAuth.currentUser) {
+            try {
+                idToken = await firebaseAuth.currentUser.getIdToken();
+            } catch (e) {
+                logger.warn("⚠️ Falha ao obter ID Token:", e.message);
+            }
+        }
 
         const response = await fetch(AI_PROXY_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Firebase-AppCheck': appCheckToken || ''
+                'X-Firebase-AppCheck': appCheckToken || '',
+                ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
             },
             body: JSON.stringify({
                 message: payload.message || "",
