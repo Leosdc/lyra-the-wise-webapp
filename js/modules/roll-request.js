@@ -392,6 +392,12 @@ const RollRequestModule = {
                         const char = window.StageModule.characterData;
                         const skill = request.skill;
 
+                        logger.info("🎲 RollRequest DEBUG: characterData encontrada:", {
+                            name: char.bio?.name,
+                            attributes: char.attributes,
+                            skill: skill
+                        });
+
                         // Mapping
                         const attrMap = {
                             'Força': 'str', 'Destreza': 'dex', 'Constituição': 'con',
@@ -420,9 +426,13 @@ const RollRequestModule = {
                             const score = parseInt(char.attributes?.[attrCode] || 10);
                             bonus = Math.floor((score - 10) / 2);
 
-                            // Check if it's a Saving Throw (requested from Atributos panel often means Save in this context)
-                            // or if it's just a raw check. Original UI has "Atributos" and "Perícias".
-                            // For simplicity, we use raw attribute mod for "Atributos" tab selections.
+                            // Add proficiency for saving throws
+                            const isProf = (char.proficiencies_choice?.saves || []).includes(attrCode);
+                            const level = parseInt(char.bio?.level || 1);
+                            const profBonus = Math.ceil(1 + (level / 4));
+                            if (isProf) bonus += profBonus;
+
+                            logger.info(`🎲 RollRequest DEBUG: Atributo match: ${skill} -> ${attrCode}, score=${score}, mod=${Math.floor((score - 10) / 2)}, isProf=${isProf}, bonus final=${bonus}`);
                         } else if (skillMap[skill]) {
                             const skCode = skillMap[skill];
                             const attrCode = skillToAttr[skCode];
@@ -436,7 +446,12 @@ const RollRequestModule = {
                             const profBonus = Math.ceil(1 + (level / 4));
 
                             bonus = attrMod + (isProf ? profBonus : 0) + (isExpert ? profBonus : 0);
+                            logger.info(`🎲 RollRequest DEBUG: Skill match: ${skill} -> ${skCode} -> ${attrCode}, score=${score}, attrMod=${attrMod}, isProf=${isProf}, bonus final=${bonus}`);
+                        } else {
+                            logger.warn(`🎲 RollRequest DEBUG: Nenhum match encontrado para skill="${skill}"`);
                         }
+                    } else {
+                        logger.warn("🎲 RollRequest DEBUG: characterData NÃO encontrada em window.StageModule");
                     }
 
                     const total = roll + bonus;

@@ -241,10 +241,20 @@ export const WizardModule = {
                 <div class="wizard-step" data-step="0" id="sess-choice-step">
                     <h3>Registro da Crônica</h3>
                     <div class="mode-choices">
+                        <button class="choice-card" data-mode="manual">
+                            <i class="fas fa-feather-pointed"></i>
+                            <h4>Manualmente</h4>
+                            <p>Você escreve cada detalhe da sua crônica.</p>
+                        </button>
                         <button class="choice-card" data-mode="ai">
                             <i class="fas fa-magic"></i>
-                            <h4>Oráculo Eldrin</h4>
+                            <h4>Oráculo</h4>
                             <p>O Oráculo tecerá a narrativa com base em suas escolhas.</p>
+                        </button>
+                        <button class="choice-card" data-mode="ai-dm">
+                            <i class="fas fa-dragon"></i>
+                            <h4 id="sess-ai-dm-title">Contra o Oráculo</h4>
+                            <p id="sess-ai-dm-desc">A IA assume o controle total da narrativa e das regras.</p>
                         </button>
                     </div>
                 </div>
@@ -614,12 +624,24 @@ export const WizardModule = {
         if (document.body.classList.contains('damien-theme')) {
             if (h4) h4.innerText = "Oráculo Damien";
             if (p) p.innerText = "O Poder Verdadeiro tecerá a narrativa com base em suas escolhas.";
+            const aidmTitle = wizard.querySelector('#sess-ai-dm-title');
+            const aidmDesc = wizard.querySelector('#sess-ai-dm-desc');
+            if (aidmTitle) aidmTitle.innerText = "Contra Damien";
+            if (aidmDesc) aidmDesc.innerText = "O Poder Verdadeiro assume o controle total da sua destruição.";
         } else if (document.body.classList.contains('eldrin-theme')) {
             if (h4) h4.innerText = "Oráculo Eldrin";
             if (p) p.innerText = "O Bardo Sagaz cantará a narrativa com base em suas escolhas.";
+            const aidmTitle = wizard.querySelector('#sess-ai-dm-title');
+            const aidmDesc = wizard.querySelector('#sess-ai-dm-desc');
+            if (aidmTitle) aidmTitle.innerText = "Contra Eldrin";
+            if (aidmDesc) aidmDesc.innerText = "O Bardo Sagaz conduzirá a melodia do seu destino.";
         } else {
             if (h4) h4.innerText = "Oráculo Lyra";
             if (p) p.innerText = "O Sabedoria Ancestral tecerá a narrativa com base em suas escolhas.";
+            const aidmTitle = wizard.querySelector('#sess-ai-dm-title');
+            const aidmDesc = wizard.querySelector('#sess-ai-dm-desc');
+            if (aidmTitle) aidmTitle.innerText = "Contra Lyra";
+            if (aidmDesc) aidmDesc.innerText = "A Sabedoria Ancestral guiará cada passo da sua jornada.";
         }
     },
 
@@ -672,6 +694,12 @@ export const WizardModule = {
 
         const timelineSelect = document.getElementById('sess-timeline');
         if (timelineSelect) timelineSelect.value = "1";
+
+        const finishBtn = document.getElementById('sess-finish-btn');
+        if (finishBtn) {
+            finishBtn.disabled = false;
+            finishBtn.innerHTML = 'Registrar Saga';
+        }
 
         this.updateSessionWizardThemeText();
         context.openModal('session-wizard');
@@ -1014,10 +1042,10 @@ export const WizardModule = {
                 started: false,
                 maxPlayers: 6,
                 currentPlayers: 0,
-                mode: this.creationMode === 'ai' ? 'oracle' : 'manual'
+                mode: this.creationMode === 'manual' ? 'manual' : (this.creationMode === 'ai-dm' ? 'ai-dm' : 'oracle')
             };
 
-            if (this.creationMode === 'ai' && context.user) {
+            if (this.creationMode !== 'manual' && context.user) {
                 const idToken = await context.user.getIdToken();
                 const { generateTimelineWithLyra, generateSessionGaps } = await import('../ai.js');
 

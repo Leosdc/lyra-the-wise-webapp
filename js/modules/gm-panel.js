@@ -130,20 +130,6 @@ export const GMPanelModule = {
                                 <h3 id="active-session-title">Título da Sessão</h3>
                                 <button class="medieval-btn icon-only small" id="edit-session-btn" title="Editar Título"><i class="fas fa-pen-fancy"></i></button>
                             </div>
-                            <div class="gm-story-central hidden" id="gm-story-container">
-                                <div class="medieval-subtitle"><i class="fas fa-scroll"></i> PRÓLOGO DA SAGA</div>
-                                <textarea class="gm-story-area" id="gm-story-input-central" placeholder="Prepare sua história..."></textarea>
-                            </div>
-                            <div id="oracle-summary-section" class="oracle-wizard-container hidden">
-                                <div class="oracle-avatar-wrapper">
-                                    <img id="oracle-avatar-img" src="assets/Lyra_the_wise.png" alt="Oráculo Lyra">
-                                    <div class="avatar-glow"></div>
-                                </div>
-                                <div class="oracle-speech-bubble">
-                                    <i class="fas fa-quote-left bubble-quote"></i>
-                                    <p id="oracle-summary-text">O destino está sendo traçado...</p>
-                                </div>
-                            </div>
                             <div id="session-summary-container" class="session-summary-container hidden" style="margin-top: 20px;">
                                 <div class="medieval-subtitle"><i class="fas fa-feather"></i> RESUMO DA CRÔNICA</div>
                                 <textarea id="session-summary-display" class="gm-summary-area" readonly placeholder="O Oráculo ainda não teceu o resumo..."></textarea>
@@ -690,44 +676,6 @@ export const GMPanelModule = {
             statusSelect.value = session.status || "preparing";
         }
 
-        const storyInput = document.getElementById('gm-story-input-central');
-        if (storyInput) {
-            storyInput.value = session.story || "";
-            storyInput.readOnly = !!session.started;
-            storyInput.classList.toggle('readonly-perchment', !!session.started);
-        }
-
-        const oracleSection = document.getElementById('oracle-summary-section');
-        if (oracleSection) {
-            oracleSection.classList.toggle('hidden', !session.started);
-
-            const avatarImg = document.getElementById('oracle-avatar-img');
-            if (avatarImg && window.app) {
-                const theme = window.app.currentThemeName || 'lyra';
-                const avatars = {
-                    'lyra': 'assets/Lyra_the_wise.png',
-                    'damien': 'assets/Damien_Kael.png',
-                    'eldrin': 'assets/Eldrin_the_Bard.png'
-                };
-                avatarImg.src = avatars[theme] || avatars['lyra'];
-            }
-
-            // Fix text if available
-            const oracleText = document.getElementById('oracle-summary-text');
-            if (oracleText && session.summary) {
-                oracleText.innerText = session.summary;
-            }
-        }
-
-        if (session.started) {
-            this.showStoryArea(session.story);
-        } else {
-            this.showStartOptions();
-            if (session.story) {
-                const storyArea = document.getElementById('gm-story-container');
-                if (storyArea) storyArea.classList.remove('hidden');
-            }
-        }
 
         this.startInviteListener(session.id);
         this.renderSagaData(session);
@@ -737,20 +685,10 @@ export const GMPanelModule = {
 
     showStartOptions() {
         document.getElementById('gm-session-start-options').classList.remove('hidden');
-        document.getElementById('gm-story-container').classList.add('hidden');
-        const oracleSection = document.getElementById('oracle-summary-section');
-        if (oracleSection) oracleSection.classList.add('hidden');
     },
 
     showStoryArea(storyContent = "") {
         document.getElementById('gm-session-start-options').classList.remove('hidden'); // KEEP BUTTON VISIBLE
-        document.getElementById('gm-story-container').classList.remove('hidden');
-        const storyArea = document.getElementById('gm-story-input-central');
-        if (storyArea) {
-            storyArea.value = storyContent;
-            storyArea.readOnly = true;
-            storyArea.classList.add('readonly-perchment');
-        }
     },
 
     // --- Timeline & Saga ---

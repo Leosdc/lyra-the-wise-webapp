@@ -29,8 +29,14 @@ Thumbs.db
 .firebase/
 firebase-debug.log
 firestore-debug.log
+firestore.rules
 
 lyra_proxy.gs
 fichas/
 .venv/
 assets/lore/
+
+# Docs internos de referência
+public/assets/systems/dnd5e/D&D 5e_ Combate Detalhado e Cálculos.md
+public/assets/systems/dnd5e/IA Mestre de RPG D&D 5e.md
+public/assets/systems/dnd5e/implementation_plan.md

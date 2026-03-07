@@ -211,8 +211,37 @@ export function createDamageMixin(ctx) {
             try {
                 let result;
 
-                const ac = target.ac || 10;
-                const hit = rolls && rolls.hit !== undefined ? (rolls.hit >= ac || rolls.hit === 20) : (Math.random() > 0.5);
+                // Check target for defensive status effects
+                const targetEffects = target.statusEffects || [];
+                const hasDodge = targetEffects.some(e => e.type === 'dodge');
+                const hasDefend = targetEffects.some(e => e.type === 'defend');
+
+                const ac = target.ac || 10; // AC already includes defend bonus if active
+                let hit;
+                let hitNote = '';
+
+                if (rolls && rolls.hit !== undefined) {
+                    // GM rolled manually — but if target is dodging, we impose disadvantage on the ATTACKER
+                    if (hasDodge && !rolls.isAlreadyDisadvantaged) {
+                        // Roll a second d20 and take the lower
+                        const secondRoll = Math.floor(Math.random() * 20) + 1;
+                        const originalRoll = rolls.hit;
+                        const disadvantagedRoll = Math.min(originalRoll, secondRoll);
+                        hit = (disadvantagedRoll >= ac || disadvantagedRoll === 20);
+                        if (disadvantagedRoll === 1) hit = false;
+                        hitNote = ` *(Alvo esquivando: ${originalRoll} e ${secondRoll} → ${disadvantagedRoll})*`;
+                    } else {
+                        hit = (rolls.hit >= ac || rolls.hit === 20);
+                        if (rolls.hit === 1) hit = false;
+                    }
+                } else {
+                    hit = Math.random() > 0.5;
+                }
+
+                if (hasDefend && !hit) {
+                    hitNote += ' *(Alvo defendendo: CA +2)*';
+                }
+
                 const damageValue = rolls && rolls.damage !== undefined ? rolls.damage : (hit ? 5 : 0);
 
                 result = {
@@ -226,7 +255,7 @@ export function createDamageMixin(ctx) {
                 }
 
                 let systemMsg = `⚔️ **${escapeHTML(monster.name)}** ataca **${escapeHTML(target.name)}** com **${escapeHTML(attackName)}**!\n`;
-                systemMsg += `Acerto: **${result.hit ? 'ACERTOU' : 'ERROU'}**\n`;
+                systemMsg += `Acerto: **${result.hit ? 'ACERTOU' : 'ERROU'}**${hitNote}\n`;
                 if (result.hit && result.damage > 0) {
                     systemMsg += `Dano: **${escapeHTML(String(result.damage))}**`;
                 }
@@ -244,6 +273,11 @@ export function createDamageMixin(ctx) {
                 await ctx.saveCombatState();
 
                 setTimeout(async () => {
+                    // Guard: don't advance turn if combat already ended (target death triggered endCombat)
+                    if (ctx.combatState?.phase === 'ended') {
+                        console.log('🏁 [Combat] Combate já encerrado, ignorando avanço de turno.');
+                        return;
+                    }
                     await ctx.nextTurn();
                 }, 3000);
 

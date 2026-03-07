@@ -28,6 +28,44 @@ import { escapeHTML } from "./utils.js";
 
 import { createDamageMixin } from './combat-damage.js';
 
+/**
+ * Extrai dano de uma descrição de magia usando regex inteligente.
+ * Procura padrões como "3d8 radiante", "8d6 de fogo", "2d10 + 5 necrótico", etc.
+ * @param {string} description - Texto descritivo da magia
+ * @returns {string} Dano formatado (ex: "8d6 fogo") ou "---" se não encontrar
+ */
+function extractSpellDamage(description) {
+    if (!description || typeof description !== 'string') return '---';
+
+    // Regex: captura NdN (opcionalmente + modificador) seguido de tipo de dano
+    const dmgRegex = /(\d+d\d+)(?:\s*\+\s*\d+)?(?:\s+(?:de\s+)?(?:dano\s+)?(?:de\s+)?(\w+))?/gi;
+    const matches = [];
+    let match;
+
+    while ((match = dmgRegex.exec(description)) !== null) {
+        const dice = match[1];
+        const rawType = (match[2] || '').toLowerCase();
+
+        // Filter out false positives — common non-damage-type words
+        const ignoredWords = [
+            'pés', 'metros', 'minutos', 'horas', 'dias', 'rounds', 'rodadas',
+            'criaturas', 'alvos', 'pontos', 'feet', 'minutes', 'hours',
+            'rounds', 'targets', 'creatures', 'points', 'cada', 'each',
+            'nível', 'level', 'slot', 'slots'
+        ];
+
+        if (ignoredWords.includes(rawType)) {
+            matches.push(dice);
+        } else if (rawType) {
+            matches.push(`${dice} ${rawType}`);
+        } else {
+            matches.push(dice);
+        }
+    }
+
+    return matches.length > 0 ? matches[0] : '---';
+}
+
 const CombatEngine = {
     sessionId: null,
     sessionData: null,
@@ -175,6 +213,7 @@ const CombatEngine = {
                             maxHp: maxHp,
                             ac: ac,
                             dexterity: char.stats?.dexterity || char.abilities?.dex?.value || 10,
+                            constitution: char.stats?.constitution || char.abilities?.con?.value || 10,
                             characterData: {
                                 bio: char.bio || {},
                                 stats: char.stats || {},
@@ -183,7 +222,37 @@ const CombatEngine = {
                                 inventory: char.inventory || { items: [] },
                                 background: char.background || {}
                             },
-                            actions: char.combat?.attacks || []
+                            actions: (() => {
+                                // 1. Ataques de arma com categoria "Combate"
+                                const weaponActions = (char.combat?.attacks || []).map(atk => ({
+                                    ...atk,
+                                    category: 'Combate'
+                                }));
+
+                                // 2. Magias preparadas (+ truques) convertidas em ações
+                                const spellList = char.spells?.list || [];
+                                const spellActions = spellList
+                                    .filter(sp => sp.prepared === true || sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
+                                    .map(sp => {
+                                        const dmg = extractSpellDamage(sp.description);
+                                        const levelLabel = (sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
+                                            ? 'Truque'
+                                            : `Nv. ${sp.level}`;
+                                        return {
+                                            name: sp.name,
+                                            damage: dmg,
+                                            range: sp.range || '---',
+                                            desc: sp.description ? sp.description.substring(0, 120) + '...' : '',
+                                            category: 'Magias',
+                                            spellLevel: sp.level,
+                                            school: sp.school || '',
+                                            isSpell: true,
+                                            levelLabel: levelLabel
+                                        };
+                                    });
+
+                                return [...weaponActions, ...spellActions];
+                            })()
                         });
                     }
                 }
@@ -208,7 +277,9 @@ const CombatEngine = {
                 ...player,
                 initiative: dexMod + roll,
                 initiativeRoll: roll,
-                dexMod: dexMod
+                dexMod: dexMod,
+                conMod: Math.floor(((player.constitution || 10) - 10) / 2),
+                statusEffects: []
             });
         }
 
@@ -230,6 +301,8 @@ const CombatEngine = {
                 initiative: dexMod + roll,
                 initiativeRoll: roll,
                 dexMod: dexMod,
+                conMod: 0,
+                statusEffects: [],
                 monsterData: monster
             });
         }
@@ -463,6 +536,18 @@ const CombatEngine = {
 
             this.combatState.activeTurnIndex = nextIndex;
             const currentActor = this.combatState.turnOrder[nextIndex];
+
+            // Clear expired status effects when this actor's turn starts
+            if (currentActor.statusEffects && currentActor.statusEffects.length > 0) {
+                console.log(`🧹 [Combat] Limpando efeitos de ${currentActor.name}: ${currentActor.statusEffects.map(e => e.type).join(', ')}`);
+                // Restore AC if defend bonus was active
+                const defendEffect = currentActor.statusEffects.find(e => e.type === 'defend');
+                if (defendEffect && defendEffect.acBonus) {
+                    currentActor.ac = (currentActor.ac || 10) - defendEffect.acBonus;
+                    console.log(`🛡️ [Combat] CA de ${currentActor.name} restaurada para ${currentActor.ac}`);
+                }
+                currentActor.statusEffects = [];
+            }
 
             console.log(`➡️ Avançando turno para: ${currentActor.name} (Index: ${nextIndex})`);
 

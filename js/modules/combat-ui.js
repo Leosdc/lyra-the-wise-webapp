@@ -122,6 +122,29 @@ const CombatUI = {
                         maxHp: hpMax ?? p.maxHp,
                         ac: acVal ?? p.ac
                     });
+
+                    // Atualizar ações de magia reativamente quando o grimório muda
+                    const participant = this.combatState?.turnOrder?.find(t => t.characterId === charId);
+                    if (participant && data) {
+                        const weaponActions = (participant.actions || []).filter(a => !a.isSpell);
+                        const spellList = data.spells?.list || [];
+                        const dmgRegex = /(\d+d\d+)(?:\s*\+\s*\d+)?(?:\s+(?:de\s+)?(?:dano\s+)?(?:de\s+)?(\w+))?/i;
+                        const spellActions = spellList
+                            .filter(sp => sp.prepared === true || sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
+                            .map(sp => {
+                                const m = sp.description ? sp.description.match(dmgRegex) : null;
+                                const dmg = m ? (m[2] ? `${m[1]} ${m[2]}` : m[1]) : '---';
+                                const levelLabel = (sp.level === 0 || sp.level === '0' || sp.level === 'Truque') ? 'Truque' : `Nv. ${sp.level}`;
+                                return {
+                                    name: sp.name, damage: dmg, range: sp.range || '---',
+                                    desc: sp.description ? sp.description.substring(0, 120) + '...' : '',
+                                    category: 'Magias', spellLevel: sp.level, school: sp.school || '',
+                                    isSpell: true, levelLabel
+                                };
+                            });
+                        participant.actions = [...weaponActions, ...spellActions];
+                    }
+
                     this.renderVerticalCombatList(this.combatState);
                 });
                 this.characterListeners.set(charId, unsub);
@@ -315,13 +338,29 @@ const CombatUI = {
             const globalIndex = attacks.indexOf(a);
             // Use base64 encoding to completely avoid quote issues in HTML attributes
             const safeActionB64 = btoa(unescape(encodeURIComponent(JSON.stringify(a))));
+
+            // Build meta info: spells show level + school + damage; weapons show damage + range
+            const noDmg = !a.damage || a.damage === '---' || a.damage.toLowerCase() === 'nenhum';
+            const noRange = !a.range || a.range === '---' || a.range.toLowerCase() === 'nenhum';
+            let metaHtml = '';
+            if (a.isSpell) {
+                const dmgDisplay = !noDmg ? `Dano: ${escapeHTML(a.damage)}` : '<em>Utilidade</em>';
+                metaHtml = `${dmgDisplay} | Alcance: ${escapeHTML(!noRange ? a.range : '---')}` +
+                    (a.levelLabel ? ` | ${escapeHTML(a.levelLabel)}` : '') +
+                    (a.school ? ` · ${escapeHTML(a.school)}` : '');
+            } else {
+                const dmgPart = !noDmg ? `Dano: ${escapeHTML(a.damage)}` : '';
+                const rangePart = !noRange ? `Alcance: ${escapeHTML(a.range)}` : '';
+                metaHtml = [dmgPart, rangePart].filter(Boolean).join(' | ');
+            }
+
             return `
-                                        <div class="action-item-premium attack-item-btn ${isSelected ? 'selected' : ''}" 
+                                        <div class="action-item-premium attack-item-btn ${isSelected ? 'selected' : ''} ${a.isSpell ? 'spell-action' : ''}" 
                                              onclick="CombatUI.selectAttack(${globalIndex}, '${safeActionB64}', true)"
                                              title="${escapeHTML(a.desc || 'Sem descrição.')}">
                                             <div class="action-info-main">
-                                                <span class="action-name-bold">${escapeHTML(a.name)}</span>
-                                                <span class="action-meta-tiny">${a.damage ? `Dano: ${escapeHTML(a.damage)}` : ''} ${a.range ? `| Alcance: ${escapeHTML(a.range)}` : ''}</span>
+                                                <span class="action-name-bold">${a.isSpell ? '<i class="fas fa-hat-wizard" style="opacity:0.6; margin-right:4px;"></i>' : ''}${escapeHTML(a.name)}</span>
+                                                <span class="action-meta-tiny">${metaHtml}</span>
                                             </div>
                                             <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-chevron-right'}" style="opacity: ${isSelected ? '0.8' : '0.3'};"></i>
                                         </div>
@@ -356,21 +395,44 @@ const CombatUI = {
                                 <div class="hit-indicator ${state.hitResult === 'hit' ? 'is-hit' : 'is-miss'}">
                                     ${state.hitResult === 'hit' ? 'ACERTOU!' : 'ERROU!'}
                                 </div>
-                            ` : ''}
-
-                            ${state.advantageRolls.length > 0 ? `
-                                <div class="advantage-debug">Dados: ${state.advantageRolls.join(' e ')}</div>
+                                <div class="advantage-debug" style="font-size: 0.7rem; opacity: 0.7; margin-top: 4px;">
+                                    ${state.advantageRolls.length > 0
+                        ? `Dados: ${state.advantageRolls.join(' e ')} → ${state.hitRollRaw || state.hitRoll}`
+                        : `d20: ${state.hitRollRaw || state.hitRoll}`}${state.hitBonus ? ` + bônus: ${state.hitBonus}` : ''} = <strong>${state.hitRoll}</strong>
+                                </div>
                             ` : ''}
                         </div>
 
                         <!-- Damage Roll Area -->
                         <div class="roll-step-box">
                             <div class="step-label">ROLA DANO</div>
-                            <button class="damage-roll-btn ${!state.attack.damage ? 'disabled' : ''}" 
-                                    onclick="CombatUI.performLocalRoll('damage', '${state.attack.damage || '1d6'}')"
-                                    ${!state.attack.damage ? 'disabled' : ''}>
-                                ${state.damageRoll ? `<span>${state.damageRoll}</span>` : `<i class="fas fa-burst"></i> ${state.attack.damage || 'Rolar'}`}
+                            ${(() => {
+                    const hasDamage = state.attack.damage && state.attack.damage !== '---' && state.attack.damage.toLowerCase() !== 'nenhum';
+                    const dmgFormula = hasDamage ? state.attack.damage.split(' ')[0] : '1d6';
+                    if (hasDamage) {
+                        return `<button class="damage-roll-btn" 
+                                    onclick="CombatUI.performLocalRoll('damage', '${dmgFormula}')">
+                                ${state.damageRoll ? `<span>${state.damageRoll}</span>` : `<i class="fas fa-burst"></i> ${state.attack.damage}`}
+                            </button>`;
+                    } else {
+                        // Utility spell — show disabled indicator + dice picker
+                        return `<button class="damage-roll-btn disabled" disabled>
+                                ${state.damageRoll ? `<span>${state.damageRoll}</span>` : '<i class="fas fa-shield-alt"></i> Sem dano'}
                             </button>
+                            <div class="dice-picker-row" style="display: flex; gap: 6px; margin-top: 8px; justify-content: center; flex-wrap: wrap;">
+                                <span style="font-size: 0.7rem; opacity: 0.6; width: 100%; text-align: center; margin-bottom: 2px;">Escolher dado manual:</span>
+                                ${['1d4', '1d6', '1d8', '1d10', '1d12'].map(d => `
+                                    <button class="dice-pick-btn" onclick="CombatUI.overrideSpellDamage('${d}')"
+                                        style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--gold-dark, #b8860b); background: rgba(212,175,55,0.1); color: var(--ink, #2c1810); cursor: pointer; transition: all 0.2s;"
+                                        onmouseover="this.style.background='rgba(212,175,55,0.3)'" 
+                                        onmouseout="this.style.background='rgba(212,175,55,0.1)'"
+                                        title="Rolar ${d}">
+                                        <i class="fas fa-dice-d20" style="font-size: 0.65rem; margin-right: 2px;"></i>${d}
+                                    </button>
+                                `).join('')}
+                            </div>`;
+                    }
+                })()}
                         </div>
                     </div>
                 </div>
@@ -395,7 +457,7 @@ const CombatUI = {
     getCategoryIcon(cat) {
         const icons = {
             'Combate': 'fa-swords',
-            'Magias': 'fa-sparkles',
+            'Magias': 'fa-hat-wizard',
             'Itens': 'fa-bag-shopping',
             'Outros': 'fa-ellipsis'
         };
@@ -405,6 +467,16 @@ const CombatUI = {
     selectTarget(id, name) {
         this.localRollState.targetId = id;
         this.localRollState.targetName = name;
+        this.renderTargetingPanel();
+    },
+
+    /**
+     * Override de dano para magias utilitárias — permite escolher dado manual
+     */
+    overrideSpellDamage(diceFormula) {
+        if (this.localRollState.attack) {
+            this.localRollState.attack.damage = diceFormula;
+        }
         this.renderTargetingPanel();
     },
 
@@ -426,8 +498,11 @@ const CombatUI = {
         }
 
         // Safe defaults for damage to avoid blocking the UI
-        if (attackObj && !attackObj.damage && !attackObj.desc?.toLowerCase().includes("sem dano")) {
-            attackObj.damage = "1d6";
+        // Skip default damage for spells or actions with no real damage ("---", "Nenhum", etc.)
+        const hasNoDamage = !attackObj.damage || attackObj.damage === '---' || attackObj.damage.toLowerCase() === 'nenhum';
+        if (attackObj && hasNoDamage && !attackObj.isSpell && !attackObj.desc?.toLowerCase().includes("sem dano")) {
+            // Don't force 1d6 — let the dice picker handle it
+            attackObj.damage = '---';
         }
 
         this.localRollState.attack = attackObj;
@@ -467,16 +542,21 @@ const CombatUI = {
                 result = Math.floor(Math.random() * 20) + 1;
                 this.localRollState.advantageRolls = [];
             }
-            this.localRollState.hitRoll = result;
+            this.localRollState.hitRollRaw = result; // natural d20
             this.localRollState.hitFormula = formula;
 
-            // AC Logic
+            // Extract attack bonus from the selected action
+            const atkBonus = parseInt(this.localRollState.attack?.bonus) || 0;
+            const totalHit = result + atkBonus;
+            this.localRollState.hitRoll = totalHit;
+            this.localRollState.hitBonus = atkBonus;
+
+            // AC Logic — compare total (d20 + bonus) vs AC
             const target = this.combatState.turnOrder.find(p => p.id === this.localRollState.targetId);
             if (target) {
                 const ac = target.ac || 10;
-                // Add any modifiers if applicable (for now pure roll vs AC)
-                this.localRollState.hitResult = (result >= ac) ? 'hit' : 'miss';
-                // Critical override
+                this.localRollState.hitResult = (totalHit >= ac) ? 'hit' : 'miss';
+                // Critical override (natural 20/1)
                 if (result === 20) this.localRollState.hitResult = 'hit';
                 if (result === 1) this.localRollState.hitResult = 'miss';
             }
@@ -558,7 +638,7 @@ const CombatUI = {
             } else if (attacker.type === 'player' && attacker.playerId) {
                 // Registrar ação do jogador no motor
                 const actionData = {
-                    type: state.attack.type || 'attack',
+                    type: state.attack.isSpell ? 'spell' : (state.attack.type || 'attack'),
                     target: state.targetId,
                     targetName: state.targetName,
                     details: state.attack,
@@ -599,19 +679,20 @@ const CombatUI = {
         const attacker = this.combatState.turnOrder[this.combatState.activeTurnIndex || 0];
         if (!attacker) return;
 
-        // Roll d20 + Modifier
+        // Initialize statusEffects if missing
+        if (!attacker.statusEffects) attacker.statusEffects = [];
+
+        // Roll d20 + Modifier (real stats)
         const d20 = Math.floor(Math.random() * 20) + 1;
         let modifier = 0;
         let modType = "";
 
         if (attackObj.name === "Esquivar" || attackObj.name === "Fugir") {
             modifier = attacker.dexMod || 0;
-            modType = "DEX";
+            modType = "DES";
         } else if (attackObj.name === "Defender") {
-            // Placeholder for CON/STR or just base AC influence.
-            // Using a flat +2 for now or a stat if available
-            modifier = Math.floor(((attacker.hp / attacker.maxHp) * 5)); // Just a simple flavor mod, or 0
-            modType = "Constituição";
+            modifier = attacker.conMod || 0;
+            modType = "CON";
         }
 
         const total = d20 + modifier;
@@ -619,21 +700,66 @@ const CombatUI = {
 
         let actionVerb = "prepara uma ação";
         let icon = "🛡️";
-        if (attackObj.name === "Defender") { actionVerb = "assume uma postura defensiva"; icon = "🛡️"; }
-        if (attackObj.name === "Esquivar") { actionVerb = "tenta se esquivar"; icon = "💨"; }
-        if (attackObj.name === "Fugir") { actionVerb = "tenta fugir do combate"; icon = "🏃"; }
+        let resultMsg = "";
+
+        // === DEFENDER: +2 CA até o próximo turno ===
+        if (attackObj.name === "Defender") {
+            actionVerb = "assume uma postura defensiva";
+            icon = "🛡️";
+            const acBonus = 2;
+            attacker.ac = (attacker.ac || 10) + acBonus;
+            attacker.statusEffects.push({ type: 'defend', acBonus: acBonus });
+            resultMsg = `\n🛡️ **Sucesso!** CA aumentada para **${attacker.ac}** (+${acBonus}) até o próximo turno.`;
+        }
+
+        // === ESQUIVAR: impõe desvantagem nos ataques até o próximo turno ===
+        if (attackObj.name === "Esquivar") {
+            actionVerb = "toma posição evasiva";
+            icon = "💨";
+            attacker.statusEffects.push({ type: 'dodge' });
+            resultMsg = `\n💨 **Sucesso!** Ataques contra **${attacker.name}** terão **desvantagem** até o próximo turno.`;
+        }
+
+        // === FUGIR: CD 10 para escapar do combate ===
+        if (attackObj.name === "Fugir") {
+            actionVerb = "tenta fugir do combate";
+            icon = "🏃";
+            const dc = 10;
+            if (total >= dc) {
+                resultMsg = `\n✅ **Fuga bem-sucedida!** (${total} ≥ CD ${dc}) **${attacker.name}** escapa do campo de batalha!`;
+            } else {
+                resultMsg = `\n❌ **Fuga fracassada!** (${total} < CD ${dc}) **${attacker.name}** não conseguiu escapar.`;
+            }
+        }
 
         let msg = `${icon} **${attacker.name}** ${actionVerb} (**${attackObj.name}**)!`;
         msg += `\n🎲 Rolagem: **${total}** (d20: ${d20} ${modString} ${modType})`;
+        msg += resultMsg;
 
         // Send to chat
         if (window.StageModule) {
             await window.StageModule.addSystemMessage(msg);
         }
 
-        // Execute backend logic (self-targeted)
+        // Save combat state with effects applied
         if (window.CombatEngine) {
-            // Mapeia o tipo da ação de "ataque" para um tipo interno específico
+            await window.CombatEngine.saveCombatState();
+
+            // Handle flee: remove from combat if successful
+            if (attackObj.name === "Fugir" && total >= 10) {
+                // Mark as 0 HP to effectively remove from turn order
+                attacker.hp = 0;
+                attacker.fled = true;
+                await window.CombatEngine.saveCombatState();
+
+                // Check if all players fled (count as defeat) or if combat can continue
+                const combatEnd = window.CombatEngine.checkCombatEnd();
+                if (combatEnd) {
+                    await window.CombatEngine.endCombat(combatEnd.winner);
+                }
+            }
+
+            // Register action for the backend
             let actionType = 'defend';
             if (attackObj.name === "Esquivar") actionType = 'dodge';
             if (attackObj.name === "Fugir") actionType = 'flee';
@@ -641,19 +767,12 @@ const CombatUI = {
             if (attacker.type === 'player' && attacker.playerId) {
                 const actionData = {
                     type: actionType,
-                    target: attacker.id, // Self
+                    target: attacker.id,
                     targetName: attacker.name,
                     details: attackObj,
                     rollResults: { hit: total, total: total, d20: d20, damage: null }
                 };
                 await window.CombatEngine.registerAction(attacker.playerId, actionData);
-            } else {
-                await window.CombatEngine.executeManualMonsterAttack(
-                    this.currentAttackerId,
-                    attacker.id, // Self
-                    attackObj.name,
-                    { hit: total, damage: null }
-                );
             }
         }
 

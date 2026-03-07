@@ -996,6 +996,65 @@
     font-size: 0.75rem !important;
 }
 
+/* Saving Throws Grid (2 columns) */
+.saves-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.save-roll-item {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 8px !important;
+    gap: 4px;
+}
+
+.save-roll-item .save-name {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.save-roll-item .save-mod {
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: var(--font-medieval);
+}
+
+.save-roll-item .save-mod.positive {
+    color: var(--gold-bright);
+}
+
+.save-roll-item .save-mod.negative {
+    color: var(--crimson, #c0392b);
+}
+
+.save-roll-item.proficient {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.06);
+}
+
+/* Skill Roll Items */
+.skill-roll-item {
+    font-size: 0.85rem;
+}
+
+.skill-roll-item .skill-name {
+    flex: 1;
+}
+
+.skill-roll-item .skill-mod {
+    color: var(--gold-bright);
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.skill-roll-item.proficient {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.06);
+}
+
 .empty-msg {
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.3);
