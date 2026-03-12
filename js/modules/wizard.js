@@ -241,11 +241,6 @@ export const WizardModule = {
                 <div class="wizard-step" data-step="0" id="sess-choice-step">
                     <h3>Registro da Crônica</h3>
                     <div class="mode-choices">
-                        <button class="choice-card" data-mode="manual">
-                            <i class="fas fa-feather-pointed"></i>
-                            <h4>Manualmente</h4>
-                            <p>Você escreve cada detalhe da sua crônica.</p>
-                        </button>
                         <button class="choice-card" data-mode="ai">
                             <i class="fas fa-magic"></i>
                             <h4>Oráculo</h4>

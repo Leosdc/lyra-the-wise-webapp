@@ -138,7 +138,12 @@ export const GMPanelModule = {
                                 <button class="medieval-btn primary large" id="btn-enter-session"><i class="fas fa-door-open"></i> ADENTRAR ATRIUM</button>
                             </div>
                             <div id="gm-timeline-summary" class="gm-timeline-summary hidden">
-                                <div class="medieval-subtitle"><i class="fas fa-hourglass-half"></i> CRONOLOGIA DA SAGA</div>
+                                <div class="timeline-header-row">
+                                    <div class="medieval-subtitle"><i class="fas fa-hourglass-half"></i> CRONOLOGIA DA SAGA</div>
+                                    <div class="timeline-header-actions">
+                                        <button class="medieval-btn icon-only small" id="btn-toggle-timeline-edit" title="Editar Cronologia"><i class="fas fa-pen"></i></button>
+                                    </div>
+                                </div>
                                 <div class="timeline-track" id="gm-timeline-track"></div>
                             </div>
                         </div>
@@ -246,6 +251,18 @@ export const GMPanelModule = {
                     </div>
                 </div>
             </div>
+
+            <div id="gm-manual-session-modal" class="modal-overlay hidden">
+                <div class="modal-content medieval-modal small">
+                    <button class="close-modal" data-action="gm-close-manual-session"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-feather-pointed"></i> Nova Sessão Manual</h2>
+                    <div class="parchment-content">
+                        <div class="form-group"><label>Título da Sessão</label><input type="text" id="manual-session-title" class="medieval-input" placeholder="Ex: A Emboscada na Floresta"></div>
+                        <div class="form-group"><label>Descrição / Resumo</label><textarea id="manual-session-desc" class="medieval-textarea" placeholder="Descreva brevemente o que aconteceu nesta sessão..."></textarea></div>
+                        <div class="modal-actions-centered"><button class="medieval-btn gold-pulse" data-action="gm-confirm-manual-session"><i class="fas fa-plus"></i> Adicionar à Cronologia</button></div>
+                    </div>
+                </div>
+            </div>
         `;
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
@@ -279,6 +296,8 @@ export const GMPanelModule = {
                 case 'gm-confirm-prolong': this.confirmProlongSession(); break;
                 case 'gm-close-invite': this.closeInviteModal(); break;
                 case 'gm-send-invite': this.sendInvite(); break;
+                case 'gm-close-manual-session': document.getElementById('gm-manual-session-modal')?.classList.add('hidden'); break;
+                case 'gm-confirm-manual-session': this.confirmManualSession(); break;
             }
         });
 
@@ -290,6 +309,9 @@ export const GMPanelModule = {
 
         // Prolong Session
         document.getElementById('btn-prolong-session')?.addEventListener('click', () => this.prolongSession());
+
+        // Toggle Timeline Edit Mode
+        document.getElementById('btn-toggle-timeline-edit')?.addEventListener('click', () => this.toggleTimelineEditMode());
 
         // Session Summary
         const summaryBtn = document.getElementById('btn-session-summary');
@@ -691,6 +713,134 @@ export const GMPanelModule = {
         document.getElementById('gm-session-start-options').classList.remove('hidden'); // KEEP BUTTON VISIBLE
     },
 
+    // --- Timeline Edit Mode ---
+    isTimelineEditMode: false,
+    dragSrcIndex: null,
+
+    toggleTimelineEditMode() {
+        this.isTimelineEditMode = !this.isTimelineEditMode;
+        const btn = document.getElementById('btn-toggle-timeline-edit');
+        const container = document.getElementById('gm-timeline-summary');
+
+        if (btn) {
+            btn.innerHTML = this.isTimelineEditMode
+                ? '<i class="fas fa-check"></i>'
+                : '<i class="fas fa-pen"></i>';
+            btn.title = this.isTimelineEditMode ? 'Concluir Edição' : 'Editar Cronologia';
+        }
+
+        container?.classList.toggle('edit-mode-active', this.isTimelineEditMode);
+
+        if (this.activeSession) {
+            this.renderTimeline(this.activeSession);
+        }
+    },
+
+    openManualSessionModal() {
+        const titleInput = document.getElementById('manual-session-title');
+        const descInput = document.getElementById('manual-session-desc');
+        if (titleInput) titleInput.value = '';
+        if (descInput) descInput.value = '';
+        document.getElementById('gm-manual-session-modal')?.classList.remove('hidden');
+    },
+
+    async confirmManualSession() {
+        if (!this.activeSession) return;
+
+        const title = document.getElementById('manual-session-title')?.value?.trim();
+        const desc = document.getElementById('manual-session-desc')?.value?.trim();
+
+        if (!title) {
+            window.app.showAlert('Preencha pelo menos o título da sessão.', 'Campo Obrigatório');
+            return;
+        }
+
+        const timeline = this.activeSession.fullTimeline || [];
+        const newEntry = {
+            session: timeline.length + 1,
+            title: title,
+            summary: desc || 'Registrada manualmente pelo mestre.',
+            description: desc || '',
+            manual: true,
+            status: 'pending'
+        };
+
+        timeline.push(newEntry);
+
+        // Renumber all sessions
+        timeline.forEach((s, i) => s.session = i + 1);
+
+        try {
+            await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                fullTimeline: timeline,
+                updatedAt: serverTimestamp()
+            });
+            this.activeSession.fullTimeline = timeline;
+            this.renderTimeline(this.activeSession);
+            document.getElementById('gm-manual-session-modal')?.classList.add('hidden');
+            window.app.showAlert('Sessão adicionada à cronologia!', 'Crônica Expandida');
+        } catch (err) {
+            console.error('Erro ao adicionar sessão manual:', err);
+            window.app.showAlert('Falha ao registrar nos anais.', 'Erro');
+        }
+    },
+
+    async deleteTimelineEntry(index) {
+        if (!this.activeSession || !this.activeSession.fullTimeline) return;
+
+        const item = this.activeSession.fullTimeline[index];
+        const title = item?.title || `Sessão ${index + 1}`;
+
+        const confirmed = await window.app.showConfirm(
+            `Deseja realmente excluir "${title}" da cronologia? Esta ação não poderá ser desfeita.`,
+            "Apagar Capítulo"
+        );
+        if (!confirmed) return;
+
+        const timeline = [...this.activeSession.fullTimeline];
+        timeline.splice(index, 1);
+
+        // Renumber
+        timeline.forEach((s, i) => s.session = i + 1);
+
+        try {
+            await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                fullTimeline: timeline,
+                updatedAt: serverTimestamp()
+            });
+            this.activeSession.fullTimeline = timeline;
+            this.renderTimeline(this.activeSession);
+            window.app.showAlert('Sessão removida da cronologia.', 'Capítulo Apagado');
+        } catch (err) {
+            console.error('Erro ao excluir sessão:', err);
+            window.app.showAlert('Falha ao excluir dos anais.', 'Erro');
+        }
+    },
+
+    async reorderTimeline(fromIndex, toIndex) {
+        if (!this.activeSession || !this.activeSession.fullTimeline) return;
+        if (fromIndex === toIndex) return;
+
+        const timeline = [...this.activeSession.fullTimeline];
+        const [moved] = timeline.splice(fromIndex, 1);
+        timeline.splice(toIndex, 0, moved);
+
+        // Renumber
+        timeline.forEach((s, i) => s.session = i + 1);
+
+        try {
+            await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                fullTimeline: timeline,
+                updatedAt: serverTimestamp()
+            });
+            this.activeSession.fullTimeline = timeline;
+            this.renderTimeline(this.activeSession);
+        } catch (err) {
+            console.error('Erro ao reordenar timeline:', err);
+            window.app.showAlert('Falha ao reordenar a cronologia.', 'Erro');
+        }
+    },
+
     // --- Timeline & Saga ---
     renderTimeline(session) {
         const track = document.getElementById('gm-timeline-track');
@@ -698,7 +848,10 @@ export const GMPanelModule = {
 
         if (!track || !container) return;
 
-        if (!session.fullTimeline || session.fullTimeline.length === 0) {
+        const hasTimeline = session.fullTimeline && session.fullTimeline.length > 0;
+
+        // In edit mode, always show the timeline area (even if empty, so user can add)
+        if (!hasTimeline && !this.isTimelineEditMode) {
             container.classList.add('hidden');
             return;
         }
@@ -706,26 +859,90 @@ export const GMPanelModule = {
         container.classList.remove('hidden');
         track.innerHTML = '';
 
-        session.fullTimeline.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'timeline-card';
-            card.onclick = () => this.showChapterDetail(index);
+        if (hasTimeline) {
+            session.fullTimeline.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `timeline-card${item.manual ? ' timeline-card--manual' : ''}`;
+                card.dataset.index = index;
 
-            const sessionNum = item.session || (index + 1);
-            const title = item.title || `Sessão ${sessionNum}`;
-            const summary = item.summary || item.description || "Sem registro nos anais.";
+                if (this.isTimelineEditMode) {
+                    card.draggable = true;
+                    card.addEventListener('dragstart', (e) => {
+                        this.dragSrcIndex = index;
+                        card.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', String(index));
+                    });
+                    card.addEventListener('dragend', () => {
+                        card.classList.remove('dragging');
+                        track.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('drag-over'));
+                    });
+                    card.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        card.classList.add('drag-over');
+                    });
+                    card.addEventListener('dragleave', () => {
+                        card.classList.remove('drag-over');
+                    });
+                    card.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        card.classList.remove('drag-over');
+                        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                        const toIndex = index;
+                        if (fromIndex !== toIndex) {
+                            this.reorderTimeline(fromIndex, toIndex);
+                        }
+                    });
+                } else {
+                    card.onclick = () => this.showChapterDetail(index);
+                }
 
-            card.innerHTML = `
-                <div class="timeline-card-header">
-                    <span class="timeline-session-number">Sessão ${sessionNum}</span>
-                    ${item.status === 'completed' ? '<i class="fas fa-flag-checkered" style="color:var(--gold); font-size: 0.8rem;" title="Concluída"></i>' : ''}
+                const sessionNum = item.session || (index + 1);
+                const title = item.title || `Sessão ${sessionNum}`;
+                const summary = item.summary || item.description || "Sem registro nos anais.";
+
+                card.innerHTML = `
+                    <div class="timeline-card-header">
+                        <span class="timeline-session-number">${this.isTimelineEditMode ? '<i class="fas fa-grip-vertical drag-handle"></i> ' : ''}Sessão ${sessionNum}</span>
+                        <div class="timeline-card-badges">
+                            ${item.manual ? '<i class="fas fa-feather-pointed" style="color:var(--crimson); font-size: 0.8rem;" title="Criada Manualmente"></i>' : ''}
+                            ${item.status === 'completed' ? '<i class="fas fa-flag-checkered" style="color:var(--gold); font-size: 0.8rem;" title="Concluída"></i>' : ''}
+                            ${this.isTimelineEditMode ? `<button class="btn-delete-session" data-delete-index="${index}" title="Excluir Sessão"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                    <div class="timeline-card-title">${title}</div>
+                    <div class="timeline-card-summary">${summary}</div>
+                `;
+
+                track.appendChild(card);
+            });
+
+            // Bind delete buttons
+            if (this.isTimelineEditMode) {
+                track.querySelectorAll('.btn-delete-session').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(btn.dataset.deleteIndex, 10);
+                        this.deleteTimelineEntry(idx);
+                    });
+                });
+            }
+        }
+
+        // In edit mode, add a "+" card at the end
+        if (this.isTimelineEditMode) {
+            const addCard = document.createElement('div');
+            addCard.className = 'timeline-card timeline-card--add';
+            addCard.innerHTML = `
+                <div class="timeline-add-content">
+                    <i class="fas fa-plus"></i>
+                    <span>Nova Sessão</span>
                 </div>
-                <div class="timeline-card-title">${title}</div>
-                <div class="timeline-card-summary">${summary}</div>
             `;
-
-            track.appendChild(card);
-        });
+            addCard.onclick = () => this.openManualSessionModal();
+            track.appendChild(addCard);
+        }
     },
 
     openChoiceModal() {
