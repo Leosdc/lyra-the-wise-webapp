@@ -9,7 +9,7 @@ import { db } from "../../auth.js";
 import {
     doc, collection, addDoc, serverTimestamp, updateDoc, getDocs, query, orderBy, limit, where
 } from "firebase/firestore";
-import { extendSessionStory } from "../../ai.js";
+import { extendSessionStory, callGeminiAPI } from "../../ai.js";
 import ContentParser from "../content-parser.js";
 import RollRequestModule from "../roll-request.js";
 
@@ -347,14 +347,12 @@ export function createChatMixin(ctx) {
             try {
                 const prompt = `Você é o Oráculo Arcano. Melhore e torne mais épico o seguinte parágrafo de narração ou anotação para um RPG de fantasia, mantendo o sentido original, mas usando um vocabulário rico e imersivo.
                 
-                TEXTOR ORIGINAL:
+                TEXTO ORIGINAL:
                 "${text}"
                 
                 RETORNE APENAS O TEXTO MELHORADO, SEM TÍTULOS OU COMENTÁRIOS ADICIONAIS.`;
 
-                const { callGeminiAPI } = await import('../../ai.js');
-                const token = await ctx.user.getIdToken();
-                const enhanced = await callGeminiAPI(prompt, token);
+                const enhanced = await callGeminiAPI(prompt);
 
                 if (enhanced) {
                     textarea.value = enhanced.trim();

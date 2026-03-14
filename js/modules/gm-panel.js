@@ -22,6 +22,7 @@ import { WizardModule } from './wizard.js';
 export const GMPanelModule = {
     activeSession: null,
     unsubscribeInvites: null,
+    unsubscribeAccessRequests: null,
     unsubscribeSession: null,
     isEditing: false,
 
@@ -630,6 +631,8 @@ export const GMPanelModule = {
             where("status", "in", ["active", "preparing"])
         );
 
+        if (this.unsubscribeInvites) this.unsubscribeInvites();
+        if (this.unsubscribeAccessRequests) this.unsubscribeAccessRequests();
         if (this.unsubscribeSession) this.unsubscribeSession();
 
         this.unsubscribeSession = onSnapshot(q, async (snapshot) => {
@@ -1438,6 +1441,7 @@ export const GMPanelModule = {
             const snap = await getDoc(docRef);
             if (snap.exists()) {
                 if (this.unsubscribeInvites) this.unsubscribeInvites();
+                if (this.unsubscribeAccessRequests) this.unsubscribeAccessRequests();
 
                 this.activeSession = { id: snap.id, ...snap.data() };
                 this.displayActiveSession(this.activeSession);

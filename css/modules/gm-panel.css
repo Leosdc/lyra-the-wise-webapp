@@ -481,6 +481,35 @@
     color: #888;
 }
 
+.player-item.request {
+    background: rgba(212, 175, 55, 0.1) !important;
+    border-left: 4px solid var(--gold);
+    padding-left: 0.8rem;
+}
+
+.request-badge {
+    background: var(--gold);
+    color: #1a1010;
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+    margin-left: 8px;
+    text-transform: uppercase;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.player-actions .accept-glow:hover {
+    color: #2ecc71 !important;
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.6);
+}
+
+.player-actions .reject-glow:hover {
+    color: #e74c3c !important;
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+}
+
 /* Selection Grid Mini */
 .selection-grid-mini {
     display: grid;

@@ -10,6 +10,7 @@ import {
     doc, updateDoc, onSnapshot, serverTimestamp, deleteDoc, increment
 } from "firebase/firestore";
 import { COLLECTIONS } from '../data.js';
+import { AccessRequestsModule } from './access-requests.js';
 
 /**
  * Returns invitation-management methods to be mixed into GMPanelModule.
@@ -126,41 +127,52 @@ export function createInvitesMixin(ctx) {
 
         startInviteListener(sessionId) {
             if (ctx.unsubscribeInvites) ctx.unsubscribeInvites();
+            if (ctx.unsubscribeAccessRequests) ctx.unsubscribeAccessRequests();
 
-            const q = query(
-                collection(db, "session_invites"),
-                where("sessionId", "==", sessionId)
-            );
+            const list = document.getElementById('gm-player-list');
+            if (!list) return;
 
-            let previousReadyCount = -1;
+            let currentInvites = [];
+            let currentRequests = [];
 
-            ctx.unsubscribeInvites = onSnapshot(q, (snapshot) => {
-                const list = document.getElementById('gm-player-list');
-                if (!list) return;
-
+            const renderUnifiedList = () => {
                 list.innerHTML = "";
-                let totalInvited = snapshot.size;
-                let readyCount = 0;
-                let onlineCount = 0;
                 const gmEmail = getAuth().currentUser.email.toLowerCase();
+                let onlineCount = 0;
 
-                snapshot.forEach(docSnap => {
-                    const invite = docSnap.data();
+                // 1. Render Requests (First)
+                currentRequests.forEach(req => {
+                    const li = document.createElement('li');
+                    li.className = `player-item request`;
+                    li.innerHTML = `
+                        <div class="player-status invited" style="background: var(--gold); box-shadow: 0 0 5px var(--gold);"></div>
+                        <div class="player-info">
+                            <span class="player-name">${req.requesterNickname || req.requesterName || "Interessado"} <span class="request-badge">Pedido</span></span>
+                            <span class="player-sheet pending">Deseja participar da crônica</span>
+                        </div>
+                        <div class="player-actions">
+                            <button class="medieval-btn icon-only accept-glow" title="Aceitar" onclick="GMPanelModule.acceptAccessRequest('${req.id}')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="medieval-btn icon-only reject-glow" title="Recusar" onclick="GMPanelModule.rejectAccessRequest('${req.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
 
+                // 2. Render Invites
+                currentInvites.forEach(invite => {
                     // IGNORE GM/OWNER in this list
-                    if (invite.role === 'gm' || invite.email.toLowerCase() === gmEmail) {
+                    if (invite.role === 'gm' || invite.email?.toLowerCase() === gmEmail) {
                         return;
                     }
 
-                    const isReady = invite.characterId && invite.status !== 'refused';
-                    if (isReady) readyCount++;
                     if (['accepted', 'online'].includes(invite.status)) onlineCount++;
 
                     const li = document.createElement('li');
                     li.className = `player-item list-item-v2 ${invite.status}`;
-                    li.dataset.type = 'character';
-                    li.dataset.id = invite.characterId;
-                    li.dataset.mode = 'inspection';
                     li.innerHTML = `
                         <div class="player-status ${invite.status}"></div>
                         <div class="player-info">
@@ -175,7 +187,7 @@ export function createInvitesMixin(ctx) {
                                     <i class="fas fa-eye"></i>
                                 </button>
                             ` : ''}
-                            <button class="medieval-btn icon-only delete-glow" title="Cancelar Convite" onclick="GMPanelModule.cancelInvite('${docSnap.id}', '${invite.nickname || invite.email}')">
+                            <button class="medieval-btn icon-only delete-glow" title="Cancelar Convite" onclick="GMPanelModule.cancelInvite('${invite.id}', '${invite.nickname || invite.email}')">
                                 <i class="fas fa-trash-can"></i>
                             </button>
                         </div>
@@ -183,11 +195,55 @@ export function createInvitesMixin(ctx) {
                     list.appendChild(li);
                 });
 
-                previousReadyCount = readyCount;
-
                 const countEl = document.getElementById('active-player-count');
                 if (countEl) countEl.innerText = onlineCount;
+            };
+
+            // Invites Listener
+            const qi = query(collection(db, "session_invites"), where("sessionId", "==", sessionId));
+            ctx.unsubscribeInvites = onSnapshot(qi, (snapshot) => {
+                currentInvites = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderUnifiedList();
             });
+
+            // Access Requests Listener
+            const qr = query(
+                collection(db, 'session_access_requests'),
+                where('sessionId', '==', sessionId),
+                where('status', '==', 'pending')
+            );
+            ctx.unsubscribeAccessRequests = onSnapshot(qr, (snapshot) => {
+                currentRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderUnifiedList();
+            });
+        },
+
+        async acceptAccessRequest(requestId) {
+            try {
+                window.app.toggleLoading(true, "Abrindo os portões...");
+                await AccessRequestsModule.acceptRequest(requestId);
+                window.app.showAlert("Viajante aceito na jornada!", "Sucesso");
+            } catch (error) {
+                console.error("Erro ao aceitar pedido:", error);
+                window.app.showAlert("Falha ao aceitar viajante.");
+            } finally {
+                window.app.toggleLoading(false);
+            }
+        },
+
+        async rejectAccessRequest(requestId) {
+            try {
+                const confirmed = await window.app.showConfirm("Deseja realmente ignorar esta solicitação?", "Recusar Acesso");
+                if (!confirmed) return;
+
+                window.app.toggleLoading(true, "Fechando os portões...");
+                await AccessRequestsModule.rejectRequest(requestId);
+            } catch (error) {
+                console.error("Erro ao recusar pedido:", error);
+                window.app.showAlert("Falha ao recusar pedido.");
+            } finally {
+                window.app.toggleLoading(false);
+            }
         },
 
         formatStatus(status) {
