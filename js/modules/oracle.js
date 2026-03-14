@@ -309,6 +309,7 @@ const OracleModule = {
                 pacingInstructions = `   - RITMO EQUILIBRADO: Alterne entre momentos de roleplay detalhado e ação direta. Mantenha a história fluindo, mas dê espaço para respiro.`;
         }
 
+
         return `Você é o Oráculo Arcano, mestre narrador de RPG D&D 5ª Edição.
 
 CONTEXTO DA SESSÃO:

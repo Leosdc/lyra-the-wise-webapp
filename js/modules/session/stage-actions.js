@@ -41,12 +41,16 @@ export function createActionsMixin(ctx) {
                 document.getElementById('narrative-actions-container')?.classList.add('hidden');
                 document.getElementById('combat-actions-container')?.classList.remove('hidden');
                 container.innerHTML = "";
-                title.textContent = "Ações do Herói";
+                if (title) title.textContent = ctx.isGM ? "Comandos do Mestre" : "Ações do Herói";
                 return;
             }
 
             document.getElementById('narrative-actions-container')?.classList.remove('hidden');
             document.getElementById('combat-actions-container')?.classList.add('hidden');
+
+            if (title) {
+                title.textContent = ctx.isGM ? "Comandos do Mestre" : "Ações do Herói";
+            }
 
             if (isOracleMode && !ctx.isGM) {
                 document.getElementById('actions-sidebar')?.classList.remove('hidden');
@@ -162,7 +166,12 @@ export function createActionsMixin(ctx) {
                 if (heroBtn) {
                     heroBtn.innerHTML = `<i class="fas fa-hat-wizard"></i> AÇÃO DO MESTRE`;
                 }
-                ctx.injectManualNarrativeEditor();
+                ctx.injectManualNarrativeEditor?.();
+            } else {
+                const heroBtn = document.getElementById('btn-hero-actions');
+                if (heroBtn) {
+                    heroBtn.innerHTML = `<i class="fas fa-suitcase"></i> MOCHILA DO HERÓI`;
+                }
             }
         },
 

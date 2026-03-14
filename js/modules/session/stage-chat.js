@@ -60,18 +60,7 @@ export function createChatMixin(ctx) {
                 });
                 input.value = '';
 
-                // AUTONOMOUS ORACLE: Reactive response if session is in Oracle mode
-                if (ctx.activeSession?.mode === 'oracle' && !ctx.activeSession.combatActive) {
-                    const canProceed = await ctx.checkIfAllPlayersReadyForOracle();
 
-                    if (canProceed) {
-                        ctx.addSystemMessage('<i class="fas fa-wand-magic-sparkles"></i> Todos se manifestaram. O Mestre está tecendo o destino...');
-                        const { default: OracleModule } = await import('../oracle.js');
-                        OracleModule.sessionId = ctx.sessionId;
-                        OracleModule.sessionData = ctx.activeSession;
-                        OracleModule.extendNarrative();
-                    }
-                }
             } catch (err) {
                 logger.error("Erro ao enviar mensagem:", err);
             }
@@ -98,21 +87,34 @@ export function createChatMixin(ctx) {
                     .map(d => d.data())
                     .filter(m => m.chapterIndex === ctx.currentChapterIdx);
 
-                const lastOracleIdx = messages.findIndex(m => m.role === 'gm' || m.type === 'oracle');
+                // Find the last ACTUAL Oracle/AI response (not human GM messages)
+                // In oracle/ai-dm mode, human GM messages (role: 'gm') are NOT Oracle responses
+                const lastOracleIdx = messages.findIndex(m => m.type === 'oracle');
                 const messagesAfterOracle = lastOracleIdx === -1 ? messages : messages.slice(0, lastOracleIdx);
 
                 const gmId = ctx.activeSession.userId;
-                const playersWhoSpoke = new Set(
-                    messagesAfterOracle
-                        .filter(m => m.senderId !== gmId && m.role !== 'gm')
-                        .map(m => m.senderId)
-                );
 
+                // In AI-DM mode, the owner is a player (not GM), so don't exclude them
                 const realPlayerInvites = snapshotInvites.docs.filter(d => {
                     const data = d.data();
                     return data.uid !== gmId && !data.isGM;
                 });
                 const requiredCount = realPlayerInvites.length;
+
+                // If no real players are online (GM is alone in oracle mode),
+                // check if GM sent a message since last oracle response
+                if (requiredCount === 0) {
+                    const gmSpokeAfterOracle = messagesAfterOracle.some(
+                        m => m.senderId === gmId || m.role === 'gm'
+                    );
+                    return gmSpokeAfterOracle;
+                }
+
+                const playersWhoSpoke = new Set(
+                    messagesAfterOracle
+                        .filter(m => m.senderId !== gmId && m.role !== 'gm')
+                        .map(m => m.senderId)
+                );
 
                 return playersWhoSpoke.size >= requiredCount && requiredCount > 0;
             } catch (err) {

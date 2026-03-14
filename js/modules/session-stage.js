@@ -230,6 +230,7 @@ const StageModule = {
                     const isSessionOwner = String(sessionData.userId) === String(this.user.uid);
 
                     if (isSessionOwner) {
+
                         this.isGM = true;
                         this.activeSession = { id: sessionSnap.id, ...sessionData };
                         logger.info("StageModule: Mestre Absoluto identificado. Acesso concedido.");
@@ -278,9 +279,20 @@ const StageModule = {
             }
 
             if (this.activeSession && String(this.activeSession.userId) === String(this.user.uid)) {
-                this.isGM = true;
-                logger.info("StageModule: Mestre identificado via invite existente.");
-                return;
+                // In AI-DM mode, owner is a PLAYER, not GM
+                if (this.activeSession.mode === 'ai-dm') {
+                    this.isGM = false;
+                    logger.info("StageModule: AI-DM — owner tratado como jogador via invite existente.");
+                    if (!participant.characterId) {
+                        await this.showCharacterSelection();
+                        return;
+                    }
+                    // Character already selected, continue to load it below
+                } else {
+                    this.isGM = true;
+                    logger.info("StageModule: Mestre identificado via invite existente.");
+                    return;
+                }
             }
 
             if (!this.isGM && !participant.characterId) {
@@ -380,7 +392,7 @@ const StageModule = {
 
             document.getElementById('modal-container').innerHTML = "";
 
-            if (this.activeSession?.mode !== 'oracle') {
+            if (this.activeSession?.mode !== 'oracle' && this.activeSession?.mode !== 'ai-dm') {
                 this.addSystemMessage(`${this.user.displayName || "Um viajante"} manifestou-se como ${charName}.`);
             }
 
@@ -389,7 +401,18 @@ const StageModule = {
                 this.characterData = await getCharacter(charId);
                 this.renderSidebarActions();
 
-                if (this.activeSession?.mode === 'oracle') {
+                if (this.activeSession?.mode === 'ai-dm') {
+                    // AI-DM: Initialize the Oracle as the Game Master
+                    logger.info("🎲 AI-DM: Inicializando Oráculo como Mestre para:", charName);
+
+                    try {
+                        const { default: OracleModule } = await import('./oracle.js');
+                        await OracleModule.initializeOracle(this.sessionId, this.activeSession);
+                        logger.info("✅ AI-DM: Oráculo inicializado com sucesso como Mestre.");
+                    } catch (oracleErr) {
+                        logger.error("Erro ao inicializar Oráculo AI-DM:", oracleErr);
+                    }
+                } else if (this.activeSession?.mode === 'oracle') {
                     logger.info("🧩 Solicitando entrada épica ao Oráculo para:", charName);
 
                     const historyQuery = query(
