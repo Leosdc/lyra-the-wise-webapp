@@ -535,12 +535,10 @@ export const SpellModule = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invocando...';
 
         try {
-            const user = auth.currentUser;
-            const idToken = await user.getIdToken();
             const persona = window.app?.currentThemeName || 'lyra';
 
             const { generateSpell } = await import('../ai.js');
-            const spell = await generateSpell(prompt, persona, idToken);
+            const spell = await generateSpell(prompt, persona);
 
             document.getElementById('spell-ai-prompt-modal').classList.add('hidden');
             this.openCreatorModal(spell); // Fill the form with AI data

@@ -1,19 +1,19 @@
 /* Lyra the Wise - Medieval Design System */
 
-/* Global Scrollbar Hiding */
-::-webkit-scrollbar {
+/* Scrollbar escondida apenas no body (módulos estilizam as suas) */
+body::-webkit-scrollbar {
     display: none;
 }
 
 * {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     font-family: var(--font-body);
     font-size: 1.1rem;
     color: #e0e0e0;

@@ -442,8 +442,7 @@ export const GMPanelModule = {
         window.app.toggleLoading(true, "As parcas estão tecendo novos fios...");
         try {
             const { prolongTimelineWithLyra } = await import('../ai.js');
-            const idToken = await getAuth().currentUser.getIdToken();
-            const newSessions = await prolongTimelineWithLyra(this.activeSession, count, position, idToken);
+            const newSessions = await prolongTimelineWithLyra(this.activeSession, count, position);
 
             let updatedTimeline = this.activeSession.fullTimeline || [];
             if (position === 'start') {
@@ -479,8 +478,7 @@ export const GMPanelModule = {
         window.app.toggleLoading(true, "A Mente Arcana está sintetizando o destino...");
         try {
             const { summarizeSession } = await import('../ai.js');
-            const idToken = await getAuth().currentUser.getIdToken();
-            const summary = await summarizeSession(this.activeSession, idToken);
+            const summary = await summarizeSession(this.activeSession);
 
             await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
                 summary: summary,

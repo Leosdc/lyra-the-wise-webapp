@@ -597,11 +597,10 @@ export const MonsterModule = {
             const user = auth.currentUser;
             if (!user) throw new Error("Usuário não autenticado");
 
-            const idToken = await user.getIdToken();
             const persona = window.app?.currentThemeName || 'lyra';
 
             const { generateMonster } = await import('../ai.js');
-            const monster = await generateMonster(prompt, persona, idToken);
+            const monster = await generateMonster(prompt, persona);
 
             this.closeModal('monster-ai-prompt-modal');
             this.openCreatorModal(monster);

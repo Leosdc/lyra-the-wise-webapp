@@ -73,22 +73,7 @@
     animation: mystic-line 3s infinite ease-in-out;
 }
 
-@keyframes mystic-line {
-    0% {
-        width: 0%;
-        left: 0;
-    }
-
-    50% {
-        width: 100%;
-        left: 0;
-    }
-
-    100% {
-        width: 0%;
-        left: 100%;
-    }
-}
+/* mystic-line → animations.css */
 
 #rpg-trivia {
     color: #2c1e16;

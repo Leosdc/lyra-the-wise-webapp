@@ -1,4 +1,4 @@
-﻿/* Session Stage VTT Styles */
+/* Session Stage VTT Styles */
 
 /* Custom Scrollbars for Atrium */
 ::-webkit-scrollbar {
@@ -70,15 +70,7 @@
     animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
+/* spin → animations.css */
 
 * {
     box-sizing: border-box;

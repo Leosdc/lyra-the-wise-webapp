@@ -1,7 +1,23 @@
 # 📜 Registro de Alterações (Changelog)
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
- 
+
+## [3.4.0] - 2026-03-20
+### 🧠 Separação dos Ecos & Polimento Arcano
+- **Refatoração de Prompts (Arquitetura)**:
+    - Criação do módulo dedicado `prompts.js`, extraindo todas as instruções de IA, identidades de persona, flavor texts, schemas de módulos e prompt builders do `ai.js`.
+    - Separação de responsabilidades: `ai.js` agora cuida apenas de rede/proxy, enquanto `prompts.js` centraliza toda a lógica de prompts para facilitar iteração e manutenção.
+- **Refinamento de Combate**:
+    - Ajustes nos módulos `combat-damage.js`, `combat-engine.js` e `combat-ui.js` para maior estabilidade e fluidez no fluxo de batalha.
+- **Polimento Visual & CSS**:
+    - Overhaul de animações (`animations.css`) com novas transições e efeitos visuais.
+    - Refinamento de estilos nos módulos: Wizard, Itens, Sessão de Combate, Palco de Sessão, Painel do GM, Dados e Dashboard.
+    - Ajustes globais em `style.css`, `base.css` e `utilities.css` para consistência visual.
+- **Melhorias de Módulos**:
+    - Aprimoramentos no Wizard de criação de personagem, Oracle, Itens, Magias, Monstros, Gerador de Nomes e Módulos de Conteúdo.
+    - Refinamento do Painel do GM e sistema de convites.
+    - Correções no fluxo de chat principal (`app-chat.js`).
+
 ## [3.3.0] - 2026-03-02
 ### 🏛️ Ascensão do Atrium & Otimização Ancestral
 - **Refatoração de Núcleo**:

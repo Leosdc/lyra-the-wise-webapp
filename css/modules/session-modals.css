@@ -1,4 +1,4 @@
-﻿/* =========================================
+/* =========================================
    SIDEBAR COMBAT (VERTICAL)
    ========================================= */
 .combat-header-mini {
@@ -67,17 +67,7 @@
     animation: bounceRight 1.5s infinite;
 }
 
-@keyframes bounceRight {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    50% {
-        transform: translateX(5px);
-    }
-}
+/* bounceRight → animations.css */
 
 .token-icon-sml {
     width: 40px;
@@ -272,19 +262,7 @@
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-@keyframes pulse-glow {
-
-    0%,
-    100% {
-        opacity: 0.6;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.1);
-    }
-}
+/* pulse-glow → animations.css */
 
 /* Narrative Parchment Flow - Premium Intro */
 .narrative-parchment-flow {
@@ -857,17 +835,7 @@
     --msg-local-bg: rgba(230, 240, 255, 0.9);
 } */
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* fadeIn (com translateY) → fadeInSlide em animations.css */
 
 /* Final Sidebar Refinements */
 #btn-end-session {
@@ -1035,15 +1003,7 @@ body.lyra-theme .premium-roll-request .mystic-msg {
     animation: d20-chaos 0.2s infinite alternate;
 }
 
-@keyframes d20-chaos {
-    0% {
-        transform: rotate(-10deg) scale(1);
-    }
-
-    100% {
-        transform: rotate(10deg) scale(1.1);
-    }
-}
+/* d20-chaos, result-pop → animations.css */
 
 .roll-result-final {
     font-size: 4.5rem;
@@ -1051,18 +1011,6 @@ body.lyra-theme .premium-roll-request .mystic-msg {
     font-family: var(--font-medieval);
     text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(212, 175, 55, 0.5);
     animation: result-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes result-pop {
-    0% {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
 }
 
 .text-center {

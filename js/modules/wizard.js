@@ -891,8 +891,7 @@ export const WizardModule = {
             let finalData = { name: name, ...template };
 
             if (this.creationMode === 'ai') {
-                const idToken = await context.user.getIdToken();
-                const aiResult = await createCharacterWithLyra(finalData, idToken);
+                const aiResult = await createCharacterWithLyra(finalData);
                 if (aiResult) {
                     // Merge AI results
                     const fieldMap = {
@@ -962,8 +961,7 @@ export const WizardModule = {
 
             let result;
             if (this.creationMode === 'ai') {
-                const idToken = await context.user.getIdToken();
-                result = await createMonsterWithLyra(monsterData, idToken);
+                result = await createMonsterWithLyra(monsterData);
             } else {
                 result = { ...monsterData, stats: "Estatísticas manuais (em desenvolvimento)" };
             }
@@ -1027,11 +1025,10 @@ export const WizardModule = {
             };
 
             if (this.creationMode !== 'manual' && context.user) {
-                const idToken = await context.user.getIdToken();
                 const { generateTimelineWithLyra, generateSessionGaps } = await import('../ai.js');
 
                 // 1. Fill Narrative Gaps (Hook, Goal, etc.) if they are blank
-                const gaps = await generateSessionGaps(sessionData, idToken);
+                const gaps = await generateSessionGaps(sessionData);
                 if (gaps) {
                     Object.keys(gaps).forEach(key => {
                         const currentVal = sessionData[key];
@@ -1045,7 +1042,7 @@ export const WizardModule = {
                 }
 
                 // 2. Generate Full Timeline based on the now-populated fields
-                const aiResponse = await generateTimelineWithLyra(sessionData, idToken);
+                const aiResponse = await generateTimelineWithLyra(sessionData);
                 if (aiResponse) {
                     sessionData.fullTimeline = aiResponse.timeline || [];
                     // Ensure summary is never undefined. Use AI intro, or fallback to hook, or empty string.
@@ -1077,7 +1074,6 @@ export const WizardModule = {
 
         context.toggleLoading(true, "O Oráculo está tecendo os detalhes...");
         try {
-            const idToken = await context.user.getIdToken();
             const { generateSessionGaps } = await import('../ai.js');
 
             const currentData = {
@@ -1093,7 +1089,7 @@ export const WizardModule = {
                 atmosphere: document.getElementById('sess-atmosphere').value
             };
 
-            const gaps = await generateSessionGaps(currentData, idToken);
+            const gaps = await generateSessionGaps(currentData);
 
             if (gaps) {
                 // Mapping keys to element IDs (prefixing with 'sess-')

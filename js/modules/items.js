@@ -541,10 +541,9 @@ export const ItemsModule = {
             const user = auth.currentUser;
             if (!user) throw new Error("Usuário não autenticado");
 
-            const idToken = await user.getIdToken();
             const persona = this.getCurrentPersona();
 
-            const item = await generateItem(prompt, persona, idToken);
+            const item = await generateItem(prompt, persona);
 
             document.getElementById('item-ai-prompt-modal').classList.add('hidden');
             this.openCreatorModal(item);

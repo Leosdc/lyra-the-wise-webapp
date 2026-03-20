@@ -34,9 +34,8 @@ export function createChatMixin(ctx) {
             ctx.isWaitingForAI = true;
 
             try {
-                const idToken = await ctx.user.getIdToken();
                 const aiContext = await ctx.getAIContext();
-                const response = await sendMessageToLyra(message, idToken, ctx.chatHistory, aiContext, ctx.currentThemeName);
+                const response = await sendMessageToLyra(message, ctx.chatHistory, aiContext, ctx.currentThemeName);
                 ctx.addChatMsg('bot', response);
                 ctx.chatHistory.push(
                     { role: 'user', parts: [{ text: message }] },

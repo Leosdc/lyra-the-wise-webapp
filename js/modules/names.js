@@ -60,8 +60,7 @@ export const NamesModule = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invocando...';
 
         try {
-            const idToken = await user.getIdToken();
-            const newNames = await generateNames(race, clazz, gender, idToken);
+            const newNames = await generateNames(race, clazz, gender);
 
             // Validação de segurança: garantir que é array de strings
             if (!Array.isArray(newNames) || newNames.some(n => typeof n !== 'string')) {

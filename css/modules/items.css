@@ -709,19 +709,7 @@
     pointer-events: none;
 }
 
-@keyframes forge-pulse-glow {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-
-    50% {
-        transform: scale(1.1);
-        opacity: 0.5;
-    }
-}
+/* forge-pulse-glow → animations.css */
 
 .forge-title {
     font-family: var(--font-fancy);

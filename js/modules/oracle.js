@@ -20,37 +20,7 @@ import {
 import { getCharacter } from "../data.js";
 import { escapeHTML } from "./utils.js";
 
-// Arcane Proxy Configuration
-const AI_PROXY_URL = "/api/ai";
-
-const callProxy = async (payload) => {
-    // Note: Local backend uses application/json and simplified payload
-    try {
-        const { getToken } = await import('../auth.js');
-        const appCheckToken = await getToken();
-
-        const response = await fetch(AI_PROXY_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Firebase-AppCheck': appCheckToken || ''
-            },
-            body: JSON.stringify({
-                message: payload.message || "",
-                history: payload.history || [],
-                systemInstruction: payload.systemInstruction || ""
-            })
-        });
-
-        if (!response.ok) throw new Error(`Oracle Error: ${response.statusText}`);
-        const data = await response.json();
-
-        if (data.error) throw new Error(data.error);
-        return data;
-    } catch (error) {
-        throw error;
-    }
-};
+import { callProxy } from "../ai.js";
 
 const OracleModule = {
     sessionId: null,
@@ -260,13 +230,6 @@ const OracleModule = {
         }
 
         try {
-            // Get user token for authentication
-            const { getAuth } = await import('firebase/auth');
-            const user = getAuth().currentUser;
-            if (!user) throw new Error("Usuário não autenticado");
-
-            const idToken = await user.getIdToken();
-
             const data = await callProxy({
                 message: userPrompt,
                 systemInstruction: systemPrompt,
@@ -601,7 +564,7 @@ Responda sempre em português brasileiro, com narrativa rica e envolvente. LEMBR
                             monsters.push({ id: newDoc.id, ...newMonster });
                             console.log(`✨ Monstro gerado e salvo: ${name}`);
                         } else {
-                            // Temporary monster for combat if not logged in (unlikely)
+                            // Monstro temporário para combate quando não logado (improvável)
                             monsters.push({ id: 'temp-' + Date.now(), ...newMonster });
                         }
                     }
@@ -635,8 +598,8 @@ Responda sempre em português brasileiro, com narrativa rica e envolvente. LEMBR
 
             console.log("✅ Solicitação de rolagem enviada ao chat");
 
-            // TODO: Implement roll request modal/panel
-            // This will be implemented in a future update
+            // TODO: Implementar modal/painel de solicitação de rolagem
+            // Será implementado em uma atualização futura
         } catch (error) {
             console.error("❌ Erro ao solicitar rolagem:", error);
         }

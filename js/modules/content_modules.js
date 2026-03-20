@@ -564,12 +564,10 @@ export const ContentModule = {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invocando...';
 
             try {
-                const user = auth.currentUser;
-                const idToken = await user.getIdToken();
                 const persona = this.getCurrentPersona();
 
                 const { generateModuleContent } = await import('../ai.js');
-                const result = await generateModuleContent(this.activeModule.id.toUpperCase(), prompt, persona, idToken);
+                const result = await generateModuleContent(this.activeModule.id.toUpperCase(), prompt, persona);
                 modal.classList.add('hidden');
                 this.openCreatorModal(null, result);
             } catch (e) {

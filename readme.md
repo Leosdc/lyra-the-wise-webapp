@@ -10,13 +10,13 @@
 
 <p align="center">
   🧙 <strong>Taverna Digital de RPG</strong> • 🔮 <strong>Oráculo Arcano</strong> • 📜 <strong>Pergaminhos Automáticos</strong><br>
-  🚀 <strong>Versão Alfa 3.3.0 (Ascensão do Atrium)</strong><br>
+  🚀 <strong>Versão Alfa 3.4.0 (Separação dos Ecos)</strong><br>
 </p>
 
 <p align="center"> <strong>Lyra the Wise</strong> não é apenas um app, é uma velha sábia que transformará seu navegador em uma <strong>mesa de RPG lendária</strong>. Ela tece histórias, calcula números e guia aventureiros novatos e veteranos.</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.3.0-gold?style=for-the-badge&logo=none" />
+  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.4.0-gold?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/Magia-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/Estilo-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/Lógica-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
@@ -24,7 +24,7 @@
   <img src="https://img.shields.io/badge/Oráculo-Gemini%202.0-blue?style=for-the-badge&logo=google&logoColor=white" />
 </p>
 
-> **Aviso do Escriba:** O sistema atingiu um novo patamar de otimização! Com uma refatoração massiva do núcleo para maior performance, as brumas se dissipam para revelar o Atrium. Confira abaixo os recursos forjados.
+> **Aviso do Escriba:** Os Ecos foram separados! O Oráculo Arcano agora possui uma mente dedicada (`prompts.js`), o combate foi refinado e a interface recebeu polimento visual em toda a extensão do Sanctum. Confira abaixo os recursos forjados.
 
 ---
 

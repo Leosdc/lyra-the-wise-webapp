@@ -1,4 +1,4 @@
-﻿/* =========================================
+/* =========================================
    ATRIUM INTRO & HEROES LIST
    ========================================= */
 .session-summary-card {
@@ -334,17 +334,7 @@
     font-weight: 600;
 }
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
+/* pulse → animations.css */
 
 /* Narrative Bubbles & Sequential Flow */
 .narrative-bubble {
@@ -855,17 +845,7 @@
     animation: slideInRight 0.3s ease;
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(-20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
+/* slideInRight → animations.css */
 
 .targeting-section-title {
     font-family: var(--font-medieval);
@@ -1134,17 +1114,7 @@
     animation: pulse-red 1s infinite;
 }
 
-@keyframes pulse-red {
-
-    0%,
-    100% {
-        box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);
-    }
-
-    50% {
-        box-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
-    }
-}
+/* pulse-red → animations.css */
 
 .hp-text {
     font-weight: bold;
@@ -1211,23 +1181,7 @@
     opacity: 0;
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
-    }
-}
+/* slideInRight, fadeOut → animations.css */
 
 /* ============================================
    HERO ACTIONS MODAL
@@ -1248,15 +1202,7 @@
     animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
+/* fadeIn → animations.css */
 
 .hero-actions-modal {
     background: linear-gradient(135deg, #1a0f0f, #2d1810);
@@ -1270,17 +1216,7 @@
     animation: slideUp 0.3s ease;
 }
 
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+/* slideUp → animations.css */
 
 .hero-actions-modal .modal-header {
     background: rgba(0, 0, 0, 0.3);
@@ -1533,31 +1469,7 @@
     color: var(--gold-bright);
 }
 
-@keyframes mysticBlink {
-
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.5;
-        transform: scale(1.1);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
+/* mysticBlink, slideInRight → animations.css */
 
 /* Requests List inside Modal */
 .requests-list {
