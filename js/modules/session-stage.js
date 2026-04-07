@@ -401,6 +401,18 @@ const StageModule = {
                 this.characterData = await getCharacter(charId);
                 this.renderSidebarActions();
 
+                // Start character listener so UI updates on HP changes
+                const { onSnapshot } = await import("firebase/firestore");
+                if (this.charUnsubscribe) this.charUnsubscribe();
+                this.charUnsubscribe = onSnapshot(doc(db, "fichas", charId), (charSnap) => {
+                    if (charSnap.exists()) {
+                        this.characterData = { id: charSnap.id, ...charSnap.data() };
+                        this.renderSidebarActions();
+                    }
+                }, (err) => {
+                    logger.error("Erro no listener da ficha:", err);
+                });
+
                 if (this.activeSession?.mode === 'ai-dm') {
                     // AI-DM: Initialize the Oracle as the Game Master
                     logger.info("🎲 AI-DM: Inicializando Oráculo como Mestre para:", charName);
