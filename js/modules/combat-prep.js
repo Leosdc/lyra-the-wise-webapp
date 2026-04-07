@@ -178,7 +178,7 @@ const CombatPrep = {
 
         const btn = document.getElementById('btn-magic-write');
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Tecendo...`;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin fa-fw"></i> Tecendo...`;
         btn.disabled = true;
 
         try {
