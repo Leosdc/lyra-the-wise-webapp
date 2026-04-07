@@ -80,6 +80,9 @@ export const AdminModule = {
                                 <a href="audit.html" target="_blank" rel="noopener noreferrer" class="medieval-btn gold-pulse" style="text-decoration:none;">
                                     <i class="fas fa-database"></i> Auditoria de Banco
                                 </a>
+                                <button class="medieval-btn" id="admin-migrate-items-btn">
+                                    <i class="fas fa-truck-ram-box"></i> Migrar Itens (Root -> System)
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -152,6 +155,11 @@ export const AdminModule = {
         const toggleMaintenanceBtn = document.getElementById('admin-toggle-maintenance-btn');
         if (toggleMaintenanceBtn) {
             toggleMaintenanceBtn.addEventListener('click', () => this.handleToggleMaintenance());
+        }
+
+        const migrateItemsBtn = document.getElementById('admin-migrate-items-btn');
+        if (migrateItemsBtn) {
+            migrateItemsBtn.addEventListener('click', () => this.handleMigrateItems());
         }
     },
 
@@ -344,6 +352,23 @@ export const AdminModule = {
                 window.app.showAlert(`Sistema ${newState ? 'em Manutenção' : 'Reaberto'} com sucesso.`, "Decreto do GM");
             } catch (error) {
                 console.error("Erro ao atualizar manutenção:", error);
+            }
+        }
+    },
+
+    async handleMigrateItems() {
+        const confirmed = await window.app.showConfirm("Deseja migrar todos os itens da coleção raiz 'itens_database' para 'systems/dnd5e/itens_database'?", "Migração de Dados");
+        if (confirmed) {
+            try {
+                window.app.toggleLoading(true);
+                const result = await DataModule.migrateItemsToSystem('dnd5e');
+                window.app.toggleLoading(false);
+                if (result.success) {
+                    window.app.showAlert(`Sucesso! ${result.count} itens foram transladados para o novo tomo do sistema.`, "Migração Concluída");
+                }
+            } catch (error) {
+                window.app.toggleLoading(false);
+                window.app.showAlert("Falha na translação: " + error.message, "Erro Arcano");
             }
         }
     },

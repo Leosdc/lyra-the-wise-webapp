@@ -2,9 +2,9 @@
 import * as DataModule from '../data.js';
 import { NavigationModule } from './navigation.js';
 import { auth } from '../auth.js';
-import { SettingsModule } from './settings.js';
-import { generateMonster } from '../ai.js';
-import { sanitizeHTML, translateFirebaseError } from './utils.js';
+import { generateEntity } from '../ai.js';
+import { sanitizeHTML } from './utils.js';
+import { EntitySheetModule } from './entity-sheet.js';
 
 export const MonsterModule = {
     // State
@@ -12,7 +12,7 @@ export const MonsterModule = {
     filteredItems: [],
     displayItems: [],
     currentSource: 'system', // 'system' or 'personal'
-    itemsPerPage: 60, // Increased from 30 to see more initially
+    itemsPerPage: 60,
     currentPage: 1,
     filters: {
         search: '',
@@ -29,10 +29,15 @@ export const MonsterModule = {
         this.bindEvents();
         this.bindFilters();
         this.setupInfiniteScroll();
+
+        // Listen for entity-saved events to refresh list
+        window.addEventListener('entity-saved', (e) => {
+            if (e.detail?.type === 'monster') this.render();
+        });
     },
 
     injectHTML() {
-        if (document.getElementById('monster-creator-modal')) return;
+        if (document.getElementById('summoning-overlay')) return;
 
         const modalHtml = `
             <!-- CINEMATIC SUMMONING OVERLAY -->
@@ -61,106 +66,6 @@ export const MonsterModule = {
                         <p class="error-msg">A essência se dissipou antes de atravessar o véu.</p>
                         <button class="medieval-btn secondary" data-action="monsters-close-summoning">Tentar Novamente</button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Monster Creator Modal -->
-            <div id="monster-creator-modal" class="modal-overlay hidden">
-                <div class="modal-content medieval-modal wide">
-                    <button class="close-modal" id="close-monster-creator"><i class="fas fa-times"></i></button>
-                    <h2 class="modal-title" id="monster-creator-title"><i class="fas fa-hammer"></i> Bestiário Arcano</h2>
-                    <form id="monster-creator-form" class="parchment-content">
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label>Nome da Criatura</label>
-                                <input type="text" id="create-monster-name" class="medieval-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label>ND (Nível de Desafio)</label>
-                                <input type="text" id="create-monster-cr" class="medieval-input" placeholder="0, 1/4, 2, 30...">
-                            </div>
-                            <div class="form-group">
-                                <label>Tipo</label>
-                                <select id="create-monster-type" class="medieval-select">
-                                    <option value="Aberração">Aberração</option>
-                                    <option value="Besta">Besta</option>
-                                    <option value="Celestial">Celestial</option>
-                                    <option value="Constructo">Constructo</option>
-                                    <option value="Dragão">Dragão</option>
-                                    <option value="Elemental">Elemental</option>
-                                    <option value="Fada">Fada</option>
-                                    <option value="Ínfero">Ínfero</option>
-                                    <option value="Gigante">Gigante</option>
-                                    <option value="Humanoide">Humanoide</option>
-                                    <option value="Monstruosidade">Monstruosidade</option>
-                                    <option value="Gosma">Gosma</option>
-                                    <option value="Planta">Planta</option>
-                                    <option value="Morto-Vivo">Morto-Vivo</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label>Tamanho</label>
-                                <select id="create-monster-size" class="medieval-select">
-                                    <option value="Tiny">Miúdo (Tiny)</option>
-                                    <option value="Small">Pequeno (Small)</option>
-                                    <option value="Medium" selected>Médio (Medium)</option>
-                                    <option value="Large">Grande (Large)</option>
-                                    <option value="Huge">Enorme (Huge)</option>
-                                    <option value="Gargantuan">Imenso (Gargantuan)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Vida (PV)</label>
-                                <input type="text" id="create-monster-hp" class="medieval-input" placeholder="Ex: 45 (7d8 + 14)">
-                            </div>
-                            <div class="form-group">
-                                <label>Armadura (CA)</label>
-                                <input type="number" id="create-monster-ac" class="medieval-input" placeholder="10">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ações & Habilidades</label>
-                            <textarea id="create-monster-description" class="medieval-textarea" rows="8" placeholder="Habilidades especiais, ataques e descrições..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Atributos</label>
-                            <div class="stats-grid-creator">
-                                <div class="stat-creator">
-                                    <label>FOR</label>
-                                    <input type="number" id="create-monster-for" class="medieval-input" value="10">
-                                </div>
-                                <div class="stat-creator">
-                                    <label>DES</label>
-                                    <input type="number" id="create-monster-des" class="medieval-input" value="10">
-                                </div>
-                                <div class="stat-creator">
-                                    <label>CON</label>
-                                    <input type="number" id="create-monster-con" class="medieval-input" value="10">
-                                </div>
-                                <div class="stat-creator">
-                                    <label>INT</label>
-                                    <input type="number" id="create-monster-int" class="medieval-input" value="10">
-                                </div>
-                                <div class="stat-creator">
-                                    <label>SAB</label>
-                                    <input type="number" id="create-monster-sab" class="medieval-input" value="10">
-                                </div>
-                                <div class="stat-creator">
-                                    <label>CAR</label>
-                                    <input type="number" id="create-monster-car" class="medieval-input" value="10">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-actions">
-                            <button type="submit" class="medieval-btn">REGISTRAR NA CRIPTA</button>
-                        </div>
-                    </form>
                 </div>
             </div>
 
@@ -232,8 +137,6 @@ export const MonsterModule = {
             newBtn.addEventListener('click', () => {
                 if (this.currentSource === 'personal') {
                     this.openChoiceModal();
-                } else {
-                    this.openCreatorModal();
                 }
             });
         }
@@ -248,7 +151,8 @@ export const MonsterModule = {
         // Choice Modal Events
         document.getElementById('monster-choice-manual')?.addEventListener('click', () => {
             this.closeModal('monster-creation-choice-modal');
-            this.openCreatorModal();
+            // Open Entity Sheet for new monster
+            EntitySheetModule.openNewEntity('monster');
         });
 
         document.getElementById('monster-choice-ai')?.addEventListener('click', () => {
@@ -268,21 +172,6 @@ export const MonsterModule = {
         document.getElementById('confirm-monster-generation-btn')?.addEventListener('click', () => {
             this.handleAIRequest();
         });
-
-        const closeCreator = document.getElementById('close-monster-creator');
-        if (closeCreator) {
-            closeCreator.addEventListener('click', () => {
-                this.closeModal('monster-creator-modal');
-            });
-        }
-
-        const creatorForm = document.getElementById('monster-creator-form');
-        if (creatorForm) {
-            creatorForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await this.handleCreate();
-            });
-        }
     },
 
     bindFilters() {
@@ -331,7 +220,6 @@ export const MonsterModule = {
             const scrollHeight = document.documentElement.scrollHeight;
             const clientHeight = window.innerHeight;
 
-            // Only trigger if we are actually scrolling and near bottom
             if (scrollTop + clientHeight >= scrollHeight - 300) {
                 this.loadMore();
             }
@@ -340,17 +228,12 @@ export const MonsterModule = {
 
     resetFilters() {
         this.filters = { search: '', cr: 'all', type: 'all', size: 'all' };
-
-        // Update UI
         const si = document.getElementById('monstros-search');
         if (si) si.value = '';
-
         const cf = document.getElementById('monstros-filter-cr');
         if (cf) cf.value = 'all';
-
         const tf = document.getElementById('monstros-filter-type');
         if (tf) tf.value = 'all';
-
         const sf = document.getElementById('monstros-filter-size');
         if (sf) sf.value = 'all';
     },
@@ -362,7 +245,6 @@ export const MonsterModule = {
 
         if (!container) return;
 
-        // Update Title and New Button visibility
         const systemName = this.getSystemName();
         if (titleEl) {
             titleEl.innerHTML = this.currentSource === 'system'
@@ -392,12 +274,11 @@ export const MonsterModule = {
                     this.cachedItems = [];
                     return;
                 }
-                this.cachedItems = await DataModule.getUserMonsters(user.uid, user.email);
+                // Load from unified entity system
+                this.cachedItems = await DataModule.getEntities('monster', user.uid, user.email);
             }
         } catch (error) {
             console.error("Erro ao carregar monstros:", error);
-            const msg = translateFirebaseError(error);
-            container.innerHTML = `<p class="empty-state">${msg}</p>`;
             this.cachedItems = [];
         }
     },
@@ -406,37 +287,26 @@ export const MonsterModule = {
         const { search, cr, type, size } = this.filters;
 
         this.filteredItems = this.cachedItems.filter(m => {
-            const matchesSearch = m.name.toLowerCase().includes(search);
+            const matchesSearch = (m.name || '').toLowerCase().includes(search);
 
-            const monsterCR = m.cr || m.secoes?.ND || '0';
+            // Support both new (bio.cr) and legacy (cr, secoes.ND) format
+            const monsterCR = m.bio?.cr || m.cr || m.secoes?.ND || '0';
             let matchesCR = cr === 'all';
             if (!matchesCR) {
-                if (cr === '10+') {
-                    // Handle ND above 10 (always numeric strings or numbers)
-                    matchesCR = parseFloat(monsterCR) >= 10;
-                } else if (cr === '20+') {
-                    matchesCR = parseFloat(monsterCR) >= 20;
-                } else {
-                    // Exact match for fractions (1/2, 1/4, 1/8) and numbers
-                    matchesCR = monsterCR.toString() === cr;
-                }
+                if (cr === '10+') matchesCR = parseFloat(monsterCR) >= 10;
+                else if (cr === '20+') matchesCR = parseFloat(monsterCR) >= 20;
+                else matchesCR = monsterCR.toString() === cr;
             }
 
-            const monsterType = (m.type || m.secoes?.Tipo || '').toLowerCase();
+            const monsterType = (m.bio?.creature_type || m.type || m.secoes?.Tipo || '').toLowerCase();
             const matchesType = type === 'all' || monsterType.includes(type.toLowerCase());
 
             const sizeMap = {
-                'tiny': 'miúdo',
-                'small': 'pequeno',
-                'medium': 'médio',
-                'large': 'grande',
-                'huge': 'enorme',
-                'gargantuan': 'imenso'
+                'tiny': 'miúdo', 'small': 'pequeno', 'medium': 'médio',
+                'large': 'grande', 'huge': 'enorme', 'gargantuan': 'imenso'
             };
-
-            const monsterSize = (m.size || m.secoes?.Tamanho || m.detalhes?.tamanho || 'Médio').toLowerCase().trim();
+            const monsterSize = (m.bio?.size || m.size || m.secoes?.Tamanho || 'Médio').toLowerCase().trim();
             const normalizedSize = sizeMap[monsterSize] || monsterSize;
-
             const matchesSize = size === 'all' || normalizedSize === size.toLowerCase().trim();
 
             return matchesSearch && matchesCR && matchesType && matchesSize;
@@ -488,8 +358,13 @@ export const MonsterModule = {
 
     createCard(monster) {
         const isUserMonster = this.currentSource === 'personal';
-        const crLabel = monster.cr || monster.secoes?.ND || '0';
-        const typeLabel = monster.type || monster.secoes?.Tipo || 'Desconhecido';
+        // Support both new (bio.cr) and legacy format
+        const crLabel = monster.bio?.cr || monster.cr || monster.secoes?.ND || '0';
+        const typeLabel = monster.bio?.creature_type || monster.type || monster.secoes?.Tipo || 'Desconhecido';
+
+        // Show additional stats for new format
+        const acLabel = monster.stats?.ac || monster.ac || monster.secoes?.Status?.CA || '';
+        const hpLabel = monster.stats?.hp_max || monster.hp || monster.secoes?.Status?.PV || '';
 
         const actionButtons = (isUserMonster && monster.isOwner) ? `
             <div class="card-actions">
@@ -508,6 +383,14 @@ export const MonsterModule = {
         const safeName = sanitizeHTML(monster.name);
         const safeType = sanitizeHTML(typeLabel);
 
+        // Show stats row for new format entities
+        const statsRow = (acLabel || hpLabel) ? `
+            <div class="monster-stats-row" style="display: flex; gap: 8px; font-size: 0.7rem; opacity: 0.7; margin-top: 2px;">
+                ${acLabel ? `<span>CA ${acLabel}</span>` : ''}
+                ${hpLabel ? `<span>PV ${hpLabel}</span>` : ''}
+            </div>
+        ` : '';
+
         return `
             <div class="item-card-wrapper">
                 <div class="item-card monster-card" data-id="${monster.id}">
@@ -520,6 +403,7 @@ export const MonsterModule = {
                         <div class="monster-info">
                             <span>${safeName}</span>
                             <div class="monster-type-label">${safeType}</div>
+                            ${statsRow}
                         </div>
                     </button>
                 </div>
@@ -550,8 +434,8 @@ export const MonsterModule = {
                 btn.onclick = (e) => {
                     e.stopPropagation();
                     const id = btn.dataset.id;
-                    const monster = this.cachedItems.find(m => m.id === id);
-                    if (monster) this.openCreatorModal(monster);
+                    // Open in Entity Sheet for editing
+                    EntitySheetModule.openExistingEntity('monster', id);
                 };
             }
         });
@@ -567,9 +451,8 @@ export const MonsterModule = {
     },
 
     async viewDetail(id) {
-        if (NavigationModule) {
-            await NavigationModule.viewMonster(id, window.app);
-        }
+        // Use the new standard entity sheet for both system and personal monsters
+        EntitySheetModule.openExistingEntity('monster', id, this.currentSource);
     },
 
     // --- CRUD ---
@@ -582,7 +465,6 @@ export const MonsterModule = {
         document.getElementById('ai-monster-prompt').value = '';
         modal.classList.remove('hidden');
     },
-
 
     async handleAIRequest() {
         const promptInput = document.getElementById('ai-monster-prompt');
@@ -599,11 +481,13 @@ export const MonsterModule = {
 
             const persona = window.app?.currentThemeName || 'lyra';
 
-            const { generateMonster } = await import('../ai.js');
-            const monster = await generateMonster(prompt, persona);
+            // Use the new entity generator
+            const entity = await generateEntity('monster', prompt, persona);
 
             this.closeModal('monster-ai-prompt-modal');
-            this.openCreatorModal(monster);
+            
+            // Open entity sheet pre-populated with AI data
+            EntitySheetModule.openEntityFromAI('monster', entity);
         } catch (error) {
             console.error(error);
             window.app.showAlert("A invocação falhou: " + error.message, "Erro Arcano");
@@ -613,154 +497,9 @@ export const MonsterModule = {
         }
     },
 
-    openCreatorModal(monster = null) {
-        const modal = document.getElementById('monster-creator-modal');
-        const form = document.getElementById('monster-creator-form');
-        const title = document.getElementById('monster-creator-title');
-
-        if (modal && form) {
-            form.reset();
-            this.editingItemId = monster && monster.id ? monster.id : null;
-            title.innerHTML = this.editingItemId ? `<i class="fas fa-pen"></i> Editar Criatura` : `<i class="fas fa-hammer"></i> Nova Criatura`;
-
-            if (monster) {
-                // Base Info
-                document.getElementById('create-monster-name').value = monster.name || '';
-                document.getElementById('create-monster-cr').value = monster.cr || monster.secoes?.ND || '';
-
-                // Normalize Type
-                const TYPE_MAP = {
-                    'aberration': 'Aberração', 'aberracao': 'Aberração', 'aberração': 'Aberração',
-                    'beast': 'Besta', 'besta': 'Besta',
-                    'celestial': 'Celestial',
-                    'construct': 'Constructo', 'constructo': 'Constructo',
-                    'dragon': 'Dragão', 'dragao': 'Dragão', 'dragão': 'Dragão',
-                    'elemental': 'Elemental',
-                    'fey': 'Fada', 'fada': 'Fada',
-                    'fiend': 'Ínfero', 'infero': 'Ínfero', 'ínfero': 'Ínfero',
-                    'giant': 'Gigante', 'gigante': 'Gigante',
-                    'humanoid': 'Humanoide', 'humanoide': 'Humanoide',
-                    'monstrosity': 'Monstruosidade', 'monstruosidade': 'Monstruosidade',
-                    'ooze': 'Gosma', 'gosma': 'Gosma',
-                    'plant': 'Planta', 'planta': 'Planta',
-                    'undead': 'Morto-Vivo', 'mortovivo': 'Morto-Vivo', 'morto-vivo': 'Morto-Vivo'
-                };
-                let typeVal = monster.type || monster.secoes?.Tipo || '';
-                if (typeVal && typeof typeVal === 'string') {
-                    const normalized = typeVal.toLowerCase().trim()
-                        .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // remove accents
-                        .replace(/ç/g, 'c');
-
-                    const baseType = normalized.split(' ')[0].replace(/[(),]/g, '');
-                    typeVal = TYPE_MAP[normalized] || TYPE_MAP[baseType] || typeVal.charAt(0).toUpperCase() + typeVal.slice(1);
-                }
-                const typeEl = document.getElementById('create-monster-type');
-                if (typeEl) {
-                    // Ensure the value exists or add it
-                    const exists = Array.from(typeEl.options).some(opt => opt.value === typeVal);
-                    if (!exists && typeVal) {
-                        const opt = new Option(typeVal, typeVal);
-                        typeEl.add(opt);
-                    }
-                    typeEl.value = typeVal;
-                }
-
-                // Normalize Size
-                const SIZE_MAP = {
-                    'miúdo': 'Tiny', 'tiny': 'Tiny',
-                    'pequeno': 'Small', 'small': 'Small',
-                    'médio': 'Medium', 'medium': 'Medium',
-                    'grande': 'Large', 'large': 'Large',
-                    'enorme': 'Huge', 'huge': 'Huge',
-                    'imenso': 'Gargantuan', 'gargantuan': 'Gargantuan'
-                };
-                let sizeVal = monster.size || monster.secoes?.Tamanho || 'Medium';
-                if (sizeVal && typeof sizeVal === 'string') {
-                    const normalized = sizeVal.toLowerCase().trim();
-                    sizeVal = SIZE_MAP[normalized] || sizeVal.charAt(0).toUpperCase() + sizeVal.slice(1).toLowerCase();
-                }
-                const sizeEl = document.getElementById('create-monster-size');
-                if (sizeEl) sizeEl.value = sizeVal;
-
-                // Stats & Description
-                document.getElementById('create-monster-hp').value = monster.hp || monster.secoes?.Status?.PV || '';
-                document.getElementById('create-monster-ac').value = monster.ac || monster.secoes?.Status?.CA || '';
-                document.getElementById('create-monster-description').value = monster.description || monster.secoes?.Descricao || '';
-
-                // Attributes
-                const attr = monster.attributes || monster.secoes?.Atributos || {};
-                document.getElementById('create-monster-for').value = attr.FOR || 10;
-                document.getElementById('create-monster-des').value = attr.DES || 10;
-                document.getElementById('create-monster-con').value = attr.CON || 10;
-                document.getElementById('create-monster-int').value = attr.INT || 10;
-                document.getElementById('create-monster-sab').value = attr.SAB || 10;
-                document.getElementById('create-monster-car').value = attr.CAR || 10;
-            }
-
-            modal.classList.remove('hidden');
-        }
-    },
-
     closeModal(id) {
         document.getElementById(id)?.classList.add('hidden');
     },
-
-    async handleCreate() {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const monsterData = {
-            name: document.getElementById('create-monster-name').value,
-            cr: document.getElementById('create-monster-cr').value,
-            type: document.getElementById('create-monster-type').value,
-            size: document.getElementById('create-monster-size').value,
-            hp: document.getElementById('create-monster-hp').value,
-            ac: document.getElementById('create-monster-ac').value,
-            description: document.getElementById('create-monster-description').value,
-            systemId: window.app?.currentSystem || 'dnd5e',
-            secoes: {
-                ND: document.getElementById('create-monster-cr').value,
-                Tipo: document.getElementById('create-monster-type').value,
-                Tamanho: document.getElementById('create-monster-size').value,
-                Status: {
-                    PV: document.getElementById('create-monster-hp').value,
-                    CA: document.getElementById('create-monster-ac').value
-                },
-                Atributos: {
-                    FOR: parseInt(document.getElementById('create-monster-for').value) || 10,
-                    DES: parseInt(document.getElementById('create-monster-des').value) || 10,
-                    CON: parseInt(document.getElementById('create-monster-con').value) || 10,
-                    INT: parseInt(document.getElementById('create-monster-int').value) || 10,
-                    SAB: parseInt(document.getElementById('create-monster-sab').value) || 10,
-                    CAR: parseInt(document.getElementById('create-monster-car').value) || 10
-                },
-                Descricao: document.getElementById('create-monster-description').value
-            }
-        };
-
-        this.openSummoning();
-        this.closeModal('monster-creator-modal');
-
-        try {
-            const nickname = SettingsModule.currentPrefs?.nickname || user.displayName || 'Viajante';
-
-            if (this.editingItemId) {
-                await DataModule.updateUserMonster(this.editingItemId, monsterData);
-                this.showSummoningSuccess("Criatura atualizada nos registros.", true);
-            } else {
-                await DataModule.saveUserMonster(user.uid, user.email, {
-                    ...monsterData,
-                    createdByNickname: nickname
-                });
-                this.showSummoningSuccess("Nova criatura registrada no bestiário.", false);
-            }
-            await this.render();
-        } catch (error) {
-            console.error(error);
-            this.showSummoningError("Erro ao salvar criatura: " + error.message);
-        }
-    },
-
 
     openSummoning() {
         const overlay = document.getElementById('summoning-overlay');
@@ -779,7 +518,6 @@ export const MonsterModule = {
 
         overlay.classList.remove('hidden');
 
-        // Reset icon to default dragon
         const iconEl = overlay.querySelector('.summoning-center-icon');
         if (iconEl) {
             iconEl.className = 'fas fa-dragon summoning-center-icon';
@@ -803,7 +541,6 @@ export const MonsterModule = {
         if (container) container.classList.add('success');
         if (successContent) successContent.classList.remove('hidden');
 
-        // Update icon - remains dragon for success
         const iconEl = overlay.querySelector('.summoning-center-icon');
         if (iconEl) {
             iconEl.className = 'fas fa-dragon summoning-center-icon';
@@ -824,7 +561,6 @@ export const MonsterModule = {
         if (container) container.classList.add('error');
         if (errorContent) errorContent.classList.remove('hidden');
 
-        // Update icon to burst
         const iconEl = overlay.querySelector('.summoning-center-icon');
         if (iconEl) {
             iconEl.className = 'fas fa-burst summoning-center-icon';
@@ -841,10 +577,15 @@ export const MonsterModule = {
 
         window.app.toggleLoading(true);
         try {
-            const success = await DataModule.deleteUserMonster(id, user.uid);
+            const success = await DataModule.deleteEntity('monster', id, user.uid);
             if (success) {
+                // Update local cache immediately to prevent persistence bug
+                this.cachedItems = this.cachedItems.filter(m => m.id !== id);
+                this.applyFilters();
+                
                 window.app.showAlert("Criatura banida dos seus registros.", "Banimento Concluído");
-                await this.render();
+                // Optional: fully re-render if needed, but applyFilters() already calls renderList()
+                // await this.render(); 
             } else {
                 window.app.showAlert("Somente o criador pode banir esta criatura.", "Acesso Negado");
             }

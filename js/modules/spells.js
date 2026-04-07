@@ -1,5 +1,6 @@
 
 import * as DataModule from '../data.js';
+import { getEmptyAbilityFromSpell } from '../data.js';
 import { generateSpell } from '../ai.js';
 import { sanitizeHTML as escapeHTML, translateFirebaseError } from './utils.js';
 import { SUPPORTED_SYSTEMS } from '../constants.js';
@@ -575,6 +576,9 @@ export const SpellModule = {
             systemId: window.app.currentSystem
         };
 
+        // Attach structured ability_data for the new unified schema
+        spellData.ability_data = getEmptyAbilityFromSpell(spellData);
+
         const btn = document.querySelector('#spell-creator-form button[type="submit"]');
         if (btn) {
             btn.disabled = true;
@@ -759,6 +763,64 @@ export const SpellModule = {
                 ? `<img src="${this.getSchoolIcon(spell.school)}" class="detail-icon-premium" onerror="this.onerror=null;this.replaceWith(document.createRange().createContextualFragment('<i class=\'fas fa-scroll fa-3x\'></i>'))">`
                 : `<i class="fas fa-scroll fa-3x"></i>`;
 
+            // Structured ability mechanics (from ability_data or lazy-converted)
+            const ab = spell.ability_data || null;
+            let mechanicsHtml = '';
+            if (ab) {
+                const em = ab.execution_mechanics || {};
+                const act = ab.activation || {};
+                const tl = ab.trigger_logic || {};
+
+                const actLabel = { 'Action': 'Ação', 'Bonus': 'Ação Bônus', 'Reaction': 'Reação', 'Passive': 'Passiva' };
+                const actText = actLabel[act.type] || act.type || '';
+
+                let dmgText = '';
+                if (em.damage && em.damage.length > 0) {
+                    dmgText = em.damage.map(d => {
+                        let s = `${d.dice_count || 1}d${d.dice_type || 6}`;
+                        if (d.fixed_modifier) s += `+${d.fixed_modifier}`;
+                        if (d.damage_type) s += ` ${d.damage_type}`;
+                        if (d.is_magical) s += ' ✦';
+                        return s;
+                    }).join(' + ');
+                }
+
+                let saveText = '';
+                if (em.has_save && em.save?.ability) {
+                    const successMap = { 'half_damage': 'metade do dano', 'no_damage': 'sem efeito', 'end_condition': 'encerra condição' };
+                    saveText = `CD ${em.save.dc_value || '?'} ${em.save.ability} (${successMap[em.save.on_success] || em.save.on_success})`;
+                }
+
+                let condText = '';
+                if (em.conditions && em.conditions.length > 0) {
+                    condText = em.conditions.map(c => {
+                        const durMap = { '1_round': '1 rodada', '1_minute': '1 minuto' };
+                        return `${c.id}${c.duration ? ` (${durMap[c.duration] || c.duration})` : ''}`;
+                    }).join(', ');
+                }
+
+                // Slot consumption info
+                let slotText = '';
+                if (act.slot?.consume && act.slot?.resource_id) {
+                    const resMap = { 'spell_slots': 'Slots de Magia', 'item_charges': 'Cargas', 'proficiency_uses': 'Usos de Proficiência' };
+                    slotText = `${resMap[act.slot.resource_id] || act.slot.resource_id}${act.slot.level_required > 0 ? ` (Nv. ${act.slot.level_required}+)` : ''}`;
+                }
+
+                mechanicsHtml = `
+                    <div class="detail-mechanics">
+                        <h3><i class="fas fa-cogs"></i> Mecânicas Arcanas</h3>
+                        <div class="detail-stats-grid">
+                            ${actText ? `<div class="detail-stat"><strong>Ativação</strong><span>${actText}</span></div>` : ''}
+                            ${slotText ? `<div class="detail-stat"><strong>Recurso</strong><span>${slotText}</span></div>` : ''}
+                            ${dmgText ? `<div class="detail-stat"><strong>Dano</strong><span>${dmgText}</span></div>` : ''}
+                            ${em.has_attack_roll ? `<div class="detail-stat"><strong>Ataque</strong><span>Rolagem de Ataque</span></div>` : ''}
+                            ${saveText ? `<div class="detail-stat"><strong>Salvaguarda</strong><span>${saveText}</span></div>` : ''}
+                            ${condText ? `<div class="detail-stat"><strong>Condições</strong><span>${condText}</span></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
             detailContainer.innerHTML = `
                 <div class="item-detail-view spell-detail-redesign">
                     <div class="detail-header">
@@ -797,6 +859,8 @@ export const SpellModule = {
                             <p><strong>Materiais:</strong> <em>${escapeHTML(spell.material)}</em></p>
                         </div>
                     ` : ''}
+
+                    ${mechanicsHtml}
 
                     <div class="detail-description">
                         <h3>Efeito Arcano</h3>

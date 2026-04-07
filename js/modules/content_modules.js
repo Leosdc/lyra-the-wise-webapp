@@ -1,7 +1,8 @@
 import * as DataModule from '../data.js';
 import { NavigationModule } from './navigation.js';
 import { auth } from '../auth.js';
-import { generateModuleContent } from '../ai.js';
+import { generateModuleContent, generateEntity } from '../ai.js';
+import { EntitySheetModule } from './entity-sheet.js';
 
 export const ContentModule = {
     // Current active config
@@ -10,13 +11,17 @@ export const ContentModule = {
     currentSource: 'personal',
     filters: { search: '' },
 
-    // Map of module keys to their configurations (using lowercase IDs from view)
+    // Entity types that use the sheet-based system (not generic name+desc)
+    SHEET_ENTITY_TYPES: ['villains', 'npcs'],
+    // Map of module keys to their configurations
     configs: {
         'villains': {
             id: 'villains',
             collection: DataModule.COLLECTIONS.VILLAINS,
             icon: 'fa-mask',
             title: 'Vilões',
+            entityType: 'villain',
+            sheetBased: true,
             aiPrompt: 'Descreva o vilão que deseja criar. A Magia tecerá sua história sombria e motivações.',
             aiPlaceholder: 'Ex: Um necromante que busca vingança contra o reino que o exilou...'
         },
@@ -25,6 +30,8 @@ export const ContentModule = {
             collection: DataModule.COLLECTIONS.NPCS,
             icon: 'fa-users-gear',
             title: 'NPCs',
+            entityType: 'npc',
+            sheetBased: true,
             aiPrompt: 'Descreva o personagem que deseja criar. A Magia moldará sua personalidade e história.',
             aiPlaceholder: 'Ex: Um ferreiro anão com um segredo sobre armas antigas...'
         },
@@ -107,8 +114,14 @@ export const ContentModule = {
 
     init() {
         this.injectHTML();
-        // Global listeners for specialized interactions
         this.bindGlobalEvents();
+
+        // Listen for entity-saved events to refresh sheet-based module lists
+        window.addEventListener('entity-saved', (e) => {
+            const type = e.detail?.type;
+            if (type === 'villain' && this.activeModule?.id === 'villains') this.render();
+            if (type === 'npc' && this.activeModule?.id === 'npcs') this.render();
+        });
     },
 
     injectSelectionHTML(moduleId) {
@@ -381,7 +394,12 @@ export const ContentModule = {
                 this.cachedItems = [];
             }
         } else if (user) {
-            this.cachedItems = await DataModule.getModuleItems(this.activeModule.collection, user.uid, systemId);
+            // For sheet-based modules (villains, npcs), use getEntities
+            if (this.activeModule.sheetBased && this.activeModule.entityType) {
+                this.cachedItems = await DataModule.getEntities(this.activeModule.entityType, user.uid, user.email);
+            } else {
+                this.cachedItems = await DataModule.getModuleItems(this.activeModule.collection, user.uid, systemId);
+            }
         } else {
             this.cachedItems = [];
         }
@@ -436,6 +454,7 @@ export const ContentModule = {
                 <button class="gallery-card">
                     <i class="fas ${this.activeModule.icon}"></i>
                     <span>${item.name || 'Sem nome'}</span>
+                    ${this.activeModule.sheetBased && item.bio ? `<div class="monster-type-label" style="font-size: 0.7rem; opacity: 0.7;">${item.bio.race || item.bio.creature_type || ''} ${item.bio.class || ''}</div>` : ''}
                 </button>
             </div>
         `;
@@ -465,7 +484,12 @@ export const ContentModule = {
                 e.stopPropagation();
                 const id = btn.dataset.id;
                 if (id) {
-                    this.openCreatorModal(id);
+                    // For sheet-based modules, open entity sheet
+                    if (this.activeModule.sheetBased && this.activeModule.entityType) {
+                        EntitySheetModule.openExistingEntity(this.activeModule.entityType, id);
+                    } else {
+                        this.openCreatorModal(id);
+                    }
                 } else {
                     console.error('ContentModule: No ID found on edit button');
                 }
@@ -484,7 +508,13 @@ export const ContentModule = {
                 const confirmed = await window.app.showConfirm('Deseja realmente excluir este registro?', 'Confirmação');
                 if (confirmed) {
                     try {
-                        await DataModule.deleteModuleItem(this.activeModule.collection, id);
+                        // For sheet-based modules, use deleteEntity
+                        if (this.activeModule.sheetBased && this.activeModule.entityType) {
+                            const user = auth.currentUser;
+                            await DataModule.deleteEntity(this.activeModule.entityType, id, user?.uid);
+                        } else {
+                            await DataModule.deleteModuleItem(this.activeModule.collection, id);
+                        }
                         await this.loadData();
                         this.applyFilters();
                     } catch (error) {
@@ -497,14 +527,38 @@ export const ContentModule = {
     },
 
     openChoiceModal() {
+        // For sheet-based modules (villains, npcs), route through entity sheet
+        if (this.activeModule.sheetBased) {
+            const modal = document.getElementById('generic-choice-modal');
+            if (!modal) return;
+
+            const titleSpan = document.getElementById('generic-choice-title');
+            if (titleSpan) titleSpan.innerText = `MÉTODO DE CRIAÇÃO - ${this.activeModule.title.toUpperCase()}`;
+
+            modal.classList.remove('hidden');
+
+            document.getElementById('generic-choice-manual').onclick = () => {
+                modal.classList.add('hidden');
+                EntitySheetModule.openNewEntity(this.activeModule.entityType);
+            };
+
+            document.getElementById('generic-choice-ai').onclick = () => {
+                modal.classList.add('hidden');
+                this.openAIPromptModal();
+            };
+
+            document.getElementById('close-generic-choice-modal').onclick = () => {
+                modal.classList.add('hidden');
+            };
+            return;
+        }
+
+        // Original generic flow for non-sheet modules
         const modal = document.getElementById('generic-choice-modal');
         if (!modal) return;
 
-        // Update title based on active module
         const titleSpan = document.getElementById('generic-choice-title');
-        if (titleSpan) {
-            titleSpan.innerText = `MÉTODO DE CRIAÇÃO - ${this.activeModule.title.toUpperCase()}`;
-        }
+        if (titleSpan) titleSpan.innerText = `MÉTODO DE CRIAÇÃO - ${this.activeModule.title.toUpperCase()}`;
 
         modal.classList.remove('hidden');
 
@@ -566,10 +620,17 @@ export const ContentModule = {
             try {
                 const persona = this.getCurrentPersona();
 
-                const { generateModuleContent } = await import('../ai.js');
-                const result = await generateModuleContent(this.activeModule.id.toUpperCase(), prompt, persona);
-                modal.classList.add('hidden');
-                this.openCreatorModal(null, result);
+                // For sheet-based modules, use generateEntity
+                if (this.activeModule.sheetBased && this.activeModule.entityType) {
+                    const entity = await generateEntity(this.activeModule.entityType, prompt, persona);
+                    modal.classList.add('hidden');
+                    EntitySheetModule.openEntityFromAI(this.activeModule.entityType, entity);
+                } else {
+                    const { generateModuleContent } = await import('../ai.js');
+                    const result = await generateModuleContent(this.activeModule.id.toUpperCase(), prompt, persona);
+                    modal.classList.add('hidden');
+                    this.openCreatorModal(null, result);
+                }
             } catch (e) {
                 window.app.showAlert(e.message);
             } finally {
@@ -705,6 +766,12 @@ export const ContentModule = {
         if (!item) {
             console.warn('ContentModule: Item not found in cache:', id);
             window.app.showAlert('Item não encontrado. Tente recarregar a página.');
+            return;
+        }
+
+        // For sheet-based modules, open entity sheet
+        if (this.activeModule.sheetBased && this.activeModule.entityType) {
+            EntitySheetModule.openExistingEntity(this.activeModule.entityType, id);
             return;
         }
 

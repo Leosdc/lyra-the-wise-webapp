@@ -12,10 +12,10 @@ export const NavigationModule = {
 
 
     init() {
-        // Setup scroll indicators logic
-        window.addEventListener('scroll', () => this.updateScrollIndicators());
+        // Scroll indicators disabled per user request
+        // window.addEventListener('scroll', () => this.updateScrollIndicators());
         // Initial check
-        this.updateScrollIndicators();
+        // this.updateScrollIndicators();
     },
 
     injectHTML() {

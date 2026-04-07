@@ -209,6 +209,12 @@ export function createSearchMixin(ctx) {
                     let val = el.value;
                     if (el.type === 'checkbox') {
                         val = el.checked;
+                    } else if (f === 'ability_data' || f === 'identity') {
+                        try {
+                            val = JSON.parse(val);
+                        } catch (e) {
+                            // Leave as string if invalid JSON though it shouldn't happen
+                        }
                     } else if (val === 'true') {
                         val = true;
                     } else if (val === 'false') {

@@ -38,6 +38,7 @@ import { SpellModule } from './modules/spells.js';
 import { MonsterModule } from './modules/monsters.js';
 import CommunityModule from './modules/community.js';
 import { ContentModule } from './modules/content_modules.js';
+import { EntitySheetModule } from './modules/entity-sheet.js';
 import { GMPanelModule } from './modules/gm-panel.js';
 import { PublicSessionsModule } from './modules/public-sessions.js';
 import { ChatUIModule } from './modules/chat_ui.js';
@@ -92,6 +93,7 @@ const app = {
         DiceModule.init();
         SpellModule.init();
         MonsterModule.init();
+        EntitySheetModule.init();
         ContentModule.init();
         NamesModule.init();
         GMPanelModule.init();
@@ -772,7 +774,7 @@ const app = {
         });
 
         // Sheet Tabs
-        document.querySelectorAll('.sheet-tab').forEach(tab => {
+        document.querySelectorAll('#character-sheet .sheet-tab').forEach(tab => {
             tab.addEventListener('click', (e) => SheetModule.switchSheetTab(e.currentTarget.dataset.tab, this.getSheetContext()));
         });
 

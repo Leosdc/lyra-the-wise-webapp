@@ -483,6 +483,23 @@ export const SheetModule = {
             ? `<img src="${iconPath}" alt="${sp.school}" class="school-icon-small">`
             : `<i class="fas fa-sparkles"></i>`;
 
+        // Structured mechanics from ability_data
+        const ab = sp.ability_data || null;
+        let mechanicsBadges = '';
+        if (ab) {
+            const em = ab.execution_mechanics || {};
+            const act = ab.activation || {};
+            const actLabel = { 'Action': 'Ação', 'Bonus': 'Bônus', 'Reaction': 'Reação' };
+            const badges = [];
+            if (act.type) badges.push(`<span class="card-v2-badge">${actLabel[act.type] || act.type}</span>`);
+            if (em.has_save && em.save?.ability) badges.push(`<span class="card-v2-badge save">CD ${em.save.dc_value || '?'} ${em.save.ability}</span>`);
+            if (em.damage && em.damage.length > 0) {
+                const dmg = em.damage[0];
+                badges.push(`<span class="card-v2-badge dmg">${dmg.dice_count||1}d${dmg.dice_type||6} ${dmg.damage_type||''}</span>`);
+            }
+            if (badges.length > 0) mechanicsBadges = `<div class="card-v2-badges">${badges.join('')}</div>`;
+        }
+
         return `
             <div class="sheet-card-v2 list-item-v2" data-index="${i}" data-list="spells.list">
                 <div class="card-v2-header">
@@ -499,6 +516,7 @@ export const SheetModule = {
                         <div class="card-v2-stat"><strong>Duração</strong> <span>${escapeHTML(sp.duration || '-')}</span></div>
                         <div class="card-v2-stat"><strong>Comp.</strong> <span>${escapeHTML(sp.components || '-')}</span></div>
                     </div>
+                    ${mechanicsBadges}
                     ${sp.description ? `<div class="card-v2-desc">${parseMarkdown(sp.description)}</div>` : ''}
                 </div>
                 <div class="card-v2-actions">
@@ -516,6 +534,7 @@ export const SheetModule = {
                     <input type="hidden" data-field="duration" value="${escapeHTML(sp.duration || '')}">
                     <input type="hidden" data-field="components" value="${escapeHTML(sp.components || '')}">
                     <input type="hidden" data-field="description" value="${escapeHTML(sp.description || '')}">
+                    ${ab ? `<input type="hidden" data-field="ability_data" value="${escapeHTML(JSON.stringify(ab))}">` : ''}
                 </div>
             </div>
         `;
@@ -535,6 +554,22 @@ export const SheetModule = {
         const rarity = rarityMap[rarityRaw] || rarityRaw.replace(' ', '_');
 
         const icon = (it.type === 'Weapon' || it.type === 'Arma') ? 'fa-hammer' : ((it.type === 'Armor' || it.type === 'Armadura') ? 'fa-shield-alt' : 'fa-bag-shopping');
+
+        // Structured mechanics from ability_data
+        const ab = it.ability_data || null;
+        let mechanicsBadges = '';
+        if (ab) {
+            const em = ab.execution_mechanics || {};
+            const badges = [];
+            if (em.has_attack_roll) badges.push(`<span class="card-v2-badge">Ataque</span>`);
+            if (em.damage && em.damage.length > 0) {
+                const dmg = em.damage[0];
+                badges.push(`<span class="card-v2-badge dmg">${dmg.dice_count||1}d${dmg.dice_type||6} ${dmg.damage_type||''}</span>`);
+            }
+            if (em.has_save && em.save?.ability) badges.push(`<span class="card-v2-badge save">CD ${em.save.dc_value||'?'} ${em.save.ability}</span>`);
+            if (badges.length > 0) mechanicsBadges = `<div class="card-v2-badges">${badges.join('')}</div>`;
+        }
+
         return `
             <div class="sheet-card-v2 list-item-v2 rarity-${rarity}" data-index="${i}" data-list="inventory.items">
                 <div class="card-v2-header">
@@ -549,6 +584,7 @@ export const SheetModule = {
                         <div class="card-v2-stat"><strong>Peso</strong> <span>${Number(it.weight) || 0} lbs</span></div>
                         <div class="card-v2-stat"><strong>Qtd</strong> <span>x${Number(it.quantity) || 1}</span></div>
                     </div>
+                    ${mechanicsBadges}
                     ${it.description ? `<div class="card-v2-desc">${parseMarkdown(it.description)}</div>` : ''}
                 </div>
                 <div class="card-v2-actions">
@@ -565,6 +601,7 @@ export const SheetModule = {
                     <input type="hidden" data-field="rarity" value="${escapeHTML(it.rarity || '')}">
                     <input type="hidden" data-field="description" value="${escapeHTML(it.description || '')}">
                     <input type="hidden" data-field="damage" value="${escapeHTML(it.damage || '')}">
+                    ${ab ? `<input type="hidden" data-field="ability_data" value="${escapeHTML(JSON.stringify(ab))}">` : ''}
                 </div>
             </div>
         `;
