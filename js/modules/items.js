@@ -1,4 +1,5 @@
 import * as DataModule from '../data.js';
+import { getEmptyAbilityFromItem } from '../data.js';
 import { NavigationModule } from './navigation.js';
 import { auth } from '../auth.js';
 import { SettingsModule } from './settings.js';
@@ -140,9 +141,15 @@ export const ItemsModule = {
                         </div>
 
                         <div class="form-row stats-row-dynamic">
-                            <div class="form-group creator-field-weapon">
-                                <label>Dano / Ataque</label>
-                                <input type="text" id="create-item-damage" class="medieval-input" placeholder="Ex: 1d8 cortante">
+                            <div class="form-group creator-field-weapon" style="display: flex; gap: 0.5rem; width: 100%;">
+                                <div style="flex: 1;">
+                                    <label>Dano</label>
+                                    <input type="text" id="create-item-damage" class="medieval-input" placeholder="Ex: 1d8">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>Tipo</label>
+                                    <input type="text" id="create-item-damage-type" class="medieval-input" placeholder="Ex: cortante">
+                                </div>
                             </div>
                             <div class="form-group creator-field-armor hidden">
                                 <label>Classe de Armadura (CA)</label>
@@ -572,6 +579,7 @@ export const ItemsModule = {
             document.getElementById('create-item-weight').value = prefilledData.weight || '';
             document.getElementById('create-item-cost').value = prefilledData.cost || '';
             document.getElementById('create-item-damage').value = prefilledData.damage || '';
+            document.getElementById('create-item-damage-type').value = prefilledData.damageType || '';
             document.getElementById('create-item-ac').value = prefilledData.ac || '';
             document.getElementById('create-item-props').value = (prefilledData.properties || []).join(', ');
             document.getElementById('create-item-desc').value = prefilledData.description || '';
@@ -612,6 +620,7 @@ export const ItemsModule = {
         document.getElementById('create-item-weight').value = item.weight || '';
         document.getElementById('create-item-cost').value = item.cost || '';
         document.getElementById('create-item-damage').value = item.damage || '';
+        document.getElementById('create-item-damage-type').value = item.damageType || '';
         document.getElementById('create-item-ac').value = item.ac || '';
         document.getElementById('create-item-props').value = (item.properties || []).join(', ');
         document.getElementById('create-item-desc').value = item.description || '';
@@ -645,6 +654,7 @@ export const ItemsModule = {
         const weight = document.getElementById('create-item-weight').value;
         const cost = document.getElementById('create-item-cost').value;
         const damage = document.getElementById('create-item-damage').value;
+        const damageType = document.getElementById('create-item-damage-type')?.value || '';
         const ac = document.getElementById('create-item-ac').value;
         const propsRaw = document.getElementById('create-item-props').value;
         const description = document.getElementById('create-item-desc').value;
@@ -653,12 +663,17 @@ export const ItemsModule = {
 
         try {
             const nickname = SettingsModule.currentPrefs?.nickname || user.displayName || 'Aventureiro Misterioso';
+
+            // Build flat item payload (backward compat)
             const itemPayload = {
                 name, type, rarity, description,
-                weight, cost, damage, ac, properties,
+                weight, cost, damage, damageType, ac, properties,
                 createdByNickname: nickname,
                 systemId: localStorage.getItem('lyra_current_system') || 'dnd5e'
             };
+
+            // Attach structured ability_data for the new unified schema
+            itemPayload.ability_data = getEmptyAbilityFromItem(itemPayload);
 
             this.openForge();
 
@@ -877,6 +892,66 @@ export const ItemsModule = {
 
         const badges = (item.properties || []).map(p => `<span class="detail-badge">${p}</span>`).join('');
 
+        // Structured ability mechanics (from ability_data or lazy-converted)
+        const ab = item.ability_data || (item.identity ? item : null);
+        let mechanicsHtml = '';
+        if (ab) {
+            const em = ab.execution_mechanics || {};
+            const act = ab.activation || {};
+            const tl = ab.trigger_logic || {};
+
+            // Activation badge
+            const actLabel = { 'Action': 'Ação', 'Bonus': 'Ação Bônus', 'Reaction': 'Reação', 'Passive': 'Passiva', 'Legendary': 'Lendária', 'Lair': 'Covil' };
+            const actText = actLabel[act.type] || act.type || '';
+
+            // Range
+            const rangeMax = tl.range?.max || 0;
+            const rangeUnit = tl.range?.unit || 'ft';
+            const rangeText = rangeMax > 0 ? `${rangeMax} ${rangeUnit}` : 'Corpo a corpo';
+
+            // Damage
+            let dmgText = '';
+            if (em.damage && em.damage.length > 0) {
+                dmgText = em.damage.map(d => {
+                    let s = `${d.dice_count || 1}d${d.dice_type || 6}`;
+                    if (d.fixed_modifier) s += `+${d.fixed_modifier}`;
+                    if (d.damage_type) s += ` ${d.damage_type}`;
+                    if (d.is_magical) s += ' ✦';
+                    return s;
+                }).join(' + ');
+            }
+
+            // Save
+            let saveText = '';
+            if (em.has_save && em.save?.ability) {
+                const successMap = { 'half_damage': 'metade do dano', 'no_damage': 'sem efeito', 'end_condition': 'encerra condição' };
+                saveText = `CD ${em.save.dc_value || '?'} ${em.save.ability} (${successMap[em.save.on_success] || em.save.on_success})`;
+            }
+
+            // Conditions
+            let condText = '';
+            if (em.conditions && em.conditions.length > 0) {
+                condText = em.conditions.map(c => {
+                    const durMap = { '1_round': '1 rodada', '1_minute': '1 minuto' };
+                    return `${c.id}${c.duration ? ` (${durMap[c.duration] || c.duration})` : ''}`;
+                }).join(', ');
+            }
+
+            mechanicsHtml = `
+                <div class="detail-mechanics">
+                    <h3><i class="fas fa-cogs"></i> Mecânicas de Uso</h3>
+                    <div class="detail-stats-grid">
+                        ${actText ? `<div class="detail-stat"><strong>Ativação</strong><span>${actText}</span></div>` : ''}
+                        ${rangeText ? `<div class="detail-stat"><strong>Alcance</strong><span>${rangeText}</span></div>` : ''}
+                        ${dmgText ? `<div class="detail-stat"><strong>Dano</strong><span>${dmgText}</span></div>` : ''}
+                        ${em.has_attack_roll ? `<div class="detail-stat"><strong>Ataque</strong><span>Rolagem de Ataque</span></div>` : ''}
+                        ${saveText ? `<div class="detail-stat"><strong>Salvaguarda</strong><span>${saveText}</span></div>` : ''}
+                        ${condText ? `<div class="detail-stat"><strong>Condições</strong><span>${condText}</span></div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
         return `
             <div class="item-detail-view">
                 <div class="detail-header">
@@ -897,6 +972,8 @@ export const ItemsModule = {
                 </div>
 
                 ${badges ? `<div class="detail-badges">${badges}</div>` : ''}
+
+                ${mechanicsHtml}
 
                 <div class="detail-description">
                     <h3>Crônica do Item</h3>
