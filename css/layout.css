@@ -188,18 +188,19 @@
 
 .tracker-info {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Permite quebrar em telas bem pequenas */
     justify-content: flex-start;
     align-items: center;
-    gap: 0.5rem 2rem;
+    gap: 0.5rem 1.5rem;
     font-family: var(--font-medieval);
     color: var(--gold);
     background: var(--header-tracker-bg);
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
     border: 1px solid var(--header-tracker-border);
     min-width: unset;
     max-width: fit-content;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
 }
 
 .header-name-row {
@@ -228,20 +229,25 @@
 
 .header-stats-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Não quebra as colunas internas do tracker */
     align-items: center;
     gap: 1rem;
-    margin-top: 2px;
+    margin-top: 0;
+    flex: 1; /* Força ocupar espaço em telas maiores */
+    min-width: 280px; /* Garante que a barra de HP tenha espaço */
 }
 
 .header-hp-container {
-    flex: 1;
+    flex: 1; /* Expandir para ocupar o resto do min-width */
+    min-width: 100px;
+    max-width: 180px;
     height: 14px;
     background: rgba(0, 0, 0, 0.8);
-    border-radius: 4px;
+    border-radius: 40px; /* Mais arredondado, visual premium */
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .header-hp-fill {
@@ -642,3 +648,75 @@
     animation: none;
     transform: scale(1.1);
 }
+
+/* Responsive Adjustments for Header Tracker */
+@media (max-width: 1600px), (max-height: 800px) {
+    /* Esconde os detalhes do personagem se a tela for menor que Desktop Full HD (compensando abas e barras) */
+    #header-char-tracker .tracker-info {
+        display: none !important;
+    }
+    .header-center {
+        justify-content: center;
+        flex: 1;
+    }
+    .header-token-wrapper {
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    .header-center {
+        margin: 0 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-logo {
+        height: 60px;
+    }
+    .header-stats-row {
+        flex: 1;
+        min-width: 200px;
+    }
+    .header-hp-container {
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-header {
+        padding: 0.5rem 0.5rem;
+        min-height: 70px;
+    }
+    .header-left {
+        gap: 0.5rem;
+    }
+    .header-logo {
+        height: 45px;
+    }
+    .tracker-info {
+        padding: 0.2rem 0.5rem;
+        gap: 0.2rem 0.5rem;
+    }
+    #header-name {
+        font-size: 0.85rem;
+    }
+    .header-sub {
+        font-size: 0.65rem;
+    }
+    .header-stats-row {
+        min-width: 150px;
+        gap: 0.4rem;
+    }
+    .header-hp-container {
+        max-width: 60px;
+        height: 10px;
+    }
+    .header-stat-badge {
+        font-size: 0.75rem;
+        gap: 2px;
+    }
+    .header-stat-badge .label {
+        display: none; /* Esconder labels em mobile extremo */
+    }
+}
