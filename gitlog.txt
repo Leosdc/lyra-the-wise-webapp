@@ -1,0 +1,40 @@
+88bb4db | refactor(modules): integrar nova engine de entity-sheets e remover dependências antigas de dano string
+75ed8d2 | style(ui): global ui tweaks and ability schema component layouts
+0fdc489 | fix(themes): remover bordas e blocos repetidos do detail-stats-grid sob temas Damien e Eldrin
+1bd9a2a | fix(css): redesenhar grid template do attack-row-v2 de 4 para 6 colunas para evitar esmagamento
+4b9c3b7 | feat(sheet): adicionar coluna de tipo de dano na grade de armas de jogadores e gerador custom
+3e6b593 | refactor(forja): separar formulários de criacao de itens para Dano vs Tipo no modal
+31ffe11 | feat(entity): introduzir nova ficha universal de entidades para monstros e npcs
+c4130e2 | fix(ui): corrigir oscilação da animação de loading ao forjar inimigos adicionando classe fa-fw
+12b2dde | refactor(combat): desacoplar lógica de dano e tipo nas rolagens do Atrium
+fd9cc2c | feat(ai): implementar geração estrita de AbilitySchema com damage_type isolado nos prompts
+8880d89 | refactor(data): unificar AbilitySchema e criar fallback de dano regex para legado
+6635e6d | feat: Grandes modificações no visual e CSS, refinamento de combate no .js, refatoração contínua do código.
+5505b7f | feat: Correção do botão de melhorar com magia.
+5670ecf | feat: Correção do atrium e do sistema de oráculo para sessões.
+b05a79c | feat: Adição de sistema de sessões manual e fix de bugs do atrium.
+ea1b88f | feat: Correção do sistema de combate do Atrium. Adição dos botões de sessão manual e contra oráculo. Porém, ainda não ativos.
+c14a06b | feat: Correção da seta de combate do atrium.
+4b0e789 | feat: Correção da IA no atrium.
+c09f609 | feat: Refatoração total do código, correção do atrium, mais fix de segurança.
+be865a4 | feat: Adição de perícias no atrium e sistema de vantagem/desvantagem. Sincronização com bônus da ficha.
+2c00098 | feat: Correção do menu lateral sobressaindo sobre as opções escolhidas.
+3e59b65 | feat: Correção de proxy para o App Mobile.
+16af691 | feat: Correção final do reCAPTCHA e validação do CSP para segurança da aplicação.
+8d37134 | feat: Correção de acesso a plataforma pós configuração de CSP.
+429c35e | feat: Correção devido a mudanças na CSP.
+2e8d9e4 | feat: Correção crítica de acesso ao sistema.
+6e17f16 | feat: Correção crítica de acesso ao sistema.
+e853480 | feat: CSP Update v2.
+3b604b0 | feat: Correção de reCAPTCHA.
+ef1e1df | feat: Correção de CSP.
+ac9386f | feat: Correção do DB Audit.
+5ea8fa2 | feat: Correção do Atrium de combate e painel do mestre.
+2ea3bd5 | feat: Correção do sessions creator e melhoras de segurança.
+499a3d8 | feat: Refatoração JS e CSS.
+4535cb4 | feat: Correção no botão fechar na dica de distribuição de pontos da ficha de personagem.
+3a0ef86 | feat: Atualização da GUI da ficha de personagem e organização da home page.
+b259924 | feat: Correção de botões legados.
+b2bca6b | feat: Correção de campos na ficha.
+9ede1fc | feat: Correção da API.
+4f4d79a | feat: migrada aplicacao e IA para infra do Firebase App Hosting com Node.js seguro
