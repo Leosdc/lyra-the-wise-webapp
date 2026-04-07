@@ -11,7 +11,8 @@ import { db } from '../auth.js';
 import { getAuth } from "firebase/auth";
 import {
     collection, addDoc, getDocs, query, where,
-    doc, getDoc, updateDoc, onSnapshot, serverTimestamp, setDoc, increment, deleteDoc
+    doc, getDoc, updateDoc, onSnapshot, serverTimestamp, setDoc, increment, deleteDoc,
+    query as firestoreQuery, updateDoc as firestoreUpdate
 } from "firebase/firestore";
 import { COLLECTIONS } from '../data.js';
 
@@ -30,6 +31,35 @@ export const GMPanelModule = {
         this.injectHTML();
         window.GMPanelModule = this;
         this.bindEvents();
+
+        // Mixing in sub-modules
+        Object.assign(this, createInvitesMixin(this));
+        Object.assign(this, createSessionMixin(this));
+    },
+
+    /**
+     * Toggles a player's inspiration state from the GM Panel.
+     * Updates both the character document and the session invite (for mirroring).
+     */
+    async togglePlayerInspiration(inviteId, charId, currentState) {
+        if (!charId) return;
+        const newState = !currentState;
+        
+        try {
+            const { updateCharacter } = await import('../data.js');
+            // 1. Update character truth
+            await updateCharacter(charId, { 'stats.inspiration': newState });
+            
+            // 2. Update invite mirror
+            if (inviteId) {
+                await updateDoc(doc(db, "session_invites", inviteId), {
+                    inspiration: newState
+                });
+            }
+        } catch (err) {
+            console.error("Erro ao alternar inspiração:", err);
+            window.app.showAlert("Falha ao conceder inspiração ao viajante.");
+        }
     },
 
     injectHTML() {
