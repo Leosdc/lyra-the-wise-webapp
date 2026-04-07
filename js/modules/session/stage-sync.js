@@ -62,10 +62,7 @@ export function createSyncMixin(ctx) {
 
                     if (!ctx.isGM && data.sessionStatus === 'concluded' && !ctx.conclusionShown) {
                         ctx.conclusionShown = true;
-                        ctx.showMysticAlert("📜 **O Mestre concluiu este capítulo.** Os ecos da jornada foram guardados nos anais do tempo.", "Jornada Concluída")
-                            .then(() => {
-                                window.close();
-                            });
+                        ctx.showMysticAlert("📜 **O Mestre concluiu este capítulo.** A sessão encontra-se em repouso. Aguarde o mestre iniciar o próximo no Atrium e não esqueça de escolher sua ficha.", "Jornada em Repouso");
                     }
 
                     // Real-time Chapter Transition Sync
