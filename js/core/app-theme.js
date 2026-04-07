@@ -261,6 +261,15 @@ export function createThemeMixin(ctx) {
                 });
             }
 
+            // Fechar o balão ao clicar fora dele
+            document.addEventListener('click', (e) => {
+                if (floatContainer && !floatContainer.classList.contains('collapsed')) {
+                    if (!floatContainer.contains(e.target)) {
+                        floatContainer.classList.add('collapsed');
+                    }
+                }
+            });
+
             ctx.updateMusicPlayerVisibility = () => {
                 const currentView = ctx.currentView || 'dashboard';
 
