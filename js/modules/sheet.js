@@ -95,7 +95,11 @@ export const SheetModule = {
                     </div>
 
                     <!-- Right: Level & Save -->
-                    <div class="header-meta-section">
+                    <div class="header-meta-section" style="flex-direction: row; align-items: center; gap: 1.5rem;">
+                        <button id="sheet-inspiration-btn" class="inspiration-toggle-btn" title="Inspiração D&D 5e">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <input type="checkbox" id="sheet-inspiration-input" data-field="stats.inspiration" style="display: none;">
                         <div class="level-display">
                             <label>Nível</label>
                             <span id="sheet-level-val" class="level-value">1</span>
@@ -388,14 +392,14 @@ export const SheetModule = {
         if (!character) return;
         const sheet = document.getElementById('character-sheet');
         const updates = {
-            bio: { ...character.bio },
-            attributes: { ...character.attributes },
-            stats: { ...character.stats },
-            story: { ...character.story },
-            combat: { ...character.combat || {} },
-            spells: { ...character.spells || {} },
-            inventory: { ...character.inventory || {} },
-            proficiencies_choice: { ...character.proficiencies_choice || {} }
+            bio: { ...(character.bio || {}) },
+            attributes: { ...(character.attributes || {}) },
+            stats: { ...(character.stats || {}) },
+            story: { ...(character.story || {}) },
+            combat: { ...(character.combat || {}) },
+            spells: { ...(character.spells || {}) },
+            inventory: { ...(character.inventory || {}) },
+            proficiencies_choice: { ...(character.proficiencies_choice || {}) }
         };
 
         // Gather basic inputs
