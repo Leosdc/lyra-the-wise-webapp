@@ -368,9 +368,13 @@ export function createPopulateMixin(ctx) {
                                    ${context.isInspection ? '' : `onclick="window.toggleAttackProfFor(${i})"`}></i>
                             </div>
                         </div>
-                        <div class="attack-field" style="flex: 1.5;">
+                        <div class="attack-field" style="flex: 1;">
                             <label>Dano</label>
                             <input type="text" value="${atk.damage || ''}" placeholder="1d8" data-list="combat.attacks" data-field="damage" title="${atk.isCustom ? 'Dano' : 'Gerenciado pelo Inventário'}" ${atk.isCustom && !context.isInspection ? '' : 'readonly'} class="${atk.isCustom && !context.isInspection ? '' : 'readonly-field'}" ${context.isInspection ? 'disabled' : ''}>
+                        </div>
+                        <div class="attack-field" style="flex: 1;">
+                            <label>Tipo</label>
+                            <input type="text" value="${atk.damageType || ''}" placeholder="cortante" data-list="combat.attacks" data-field="damageType" title="${atk.isCustom ? 'Tipo' : 'Gerenciado pelo Inventário'}" ${atk.isCustom && !context.isInspection ? '' : 'readonly'} class="${atk.isCustom && !context.isInspection ? '' : 'readonly-field'}" ${context.isInspection ? 'disabled' : ''}>
                         </div>
                          <div class="attack-actions" style="display: flex; align-items: flex-end; padding-bottom: 5px;">
                               ${atk.isCustom && !context.isInspection ? `<button class="icon-btn delete-list-item delete-btn" data-list="combat.attacks" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>` : ''}
@@ -398,6 +402,7 @@ export function createPopulateMixin(ctx) {
                                 name: "Novo Ataque",
                                 bonus: "+0",
                                 damage: "1d6",
+                                damageType: "",
                                 isCustom: true,
                                 isProf: false
                             });
