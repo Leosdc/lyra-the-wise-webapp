@@ -82,8 +82,8 @@ export const FLAVOR_MODULE = {
 // ─── Schemas dos Módulos de Conteúdo ───
 
 export const MODULE_SCHEMAS = {
-    'VILLAINS': { name: "Nome", race: "Raça", class: "Classe", motivation: "Motivação", scheme: "Plano Sugerido", description: "História e Detalhes" },
-    'NPCS': { name: "Nome", race: "Raça", class: "Classe", personality: "Personalidade", goal: "Objetivo", appearance: "Aparência", description: "Notas extras" },
+    'VILLAINS': { name: "Nome", entity_type: "villain", bio: { race: "Raça", class: "Classe", alignment: "Alinhamento", cr: "ND", size: "Tamanho", creature_type: "Tipo" }, attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, stats: { ac: 10, hp_max: 10, speed: "9m" }, story: { traits: "Personalidade", ideals: "Motivação", bonds: "Aliados/Servos", flaws: "Fraquezas", appearance: "Aparência", notes: "Plano e Detalhes" } },
+    'NPCS': { name: "Nome", entity_type: "npc", bio: { race: "Raça", class: "Classe", alignment: "Alinhamento", background: "Antecedente" }, attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, stats: { ac: 10, hp_max: 10, speed: "9m" }, story: { traits: "Personalidade", ideals: "Objetivo", bonds: "Vínculos", appearance: "Aparência", notes: "Notas extras" } },
     'CAMPAIGNS': { name: "Nome da Campanha", synopsis: "Sinopse do Arco", main_locations: "Locais Importantes", hooks: "Ganchos Iniciais", description: "Resumo Geral" },
     'ENCOUNTERS': { name: "Título do Encontro", cr: "Nível/ND Sugerido", monsters: "Lista de Criaturas", environment: "Ambiente", description: "Dinâmica do combate/cena" },
     'PUZZLES': { name: "Nome do Enigma", difficulty: "Fácil|Médio|Difícil", clue: "Pista Inicial", solution: "Solução", description: "Mecânicas e contexto" },
@@ -135,18 +135,49 @@ export const buildItemPrompt = (prompt, flavor) => `
     [ACT AS]: D&D 5e Item Generator.
     [TASK]: Generate a D&D 5e item based on the user prompt.
     [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
+    [LANGUAGE]: Portuguese (pt-BR).
     [JSON STRUCTURE]:
     {
-        "name": "Item Name",
-        "type": "weapon|armor|wondrous|potion",
-        "rarity": "common|uncommon|rare|very_rare|legendary",
-        "weight": "2 kg",
-        "cost": "100 po",
-        "damage": "1d8 cortante" (if weapon, else null),
-        "ac": "15" (if armor, else null),
-        "properties": ["Leve", "Versátil"],
-        "description": "Description in Portuguese. MUST end with this exact phrase: '${flavor}'"
+        "uid": "item_unique_id",
+        "identity": {
+            "name": "Nome do Item",
+            "origin": "Item",
+            "tags": ["Leve", "Versátil"],
+            "source": { "book": "", "page": "" }
+        },
+        "activation": {
+            "type": "Action",
+            "cost": 1,
+            "slot": { "resource_id": "item_charges", "level_required": 0, "consume": false }
+        },
+        "trigger_logic": {
+            "range": { "min": 0, "max": 1.5, "unit": "m" },
+            "target": { "type": "Entity", "quantity": 1 }
+        },
+        "execution_mechanics": {
+            "has_save": false,
+            "save": { "ability": "", "dc_type": "fixed", "dc_value": 0, "on_success": "no_damage" },
+            "has_attack_roll": true,
+            "damage": [{ "dice_count": 1, "dice_type": 8, "fixed_modifier": 0, "damage_type": "cortante", "is_magical": false, "scaling_type": "none" }],
+            "conditions": []
+        },
+        "description": "Descrição completa em português. MUST end with: '${flavor}'",
+        "equipment_details": {
+            "rarity": "common|uncommon|rare|very_rare|legendary",
+            "cost": "100 po",
+            "weight": 2,
+            "quantity": 1,
+            "item_type": "Weapon|Armor|Potion|Scroll|Wondrous|Ring|Staff|Wand",
+            "ac_bonus": null,
+            "properties": ["Leve", "Versátil"],
+            "equipped": false
+        }
     }
+    [RULES]:
+    - If weapon: set has_attack_roll=true and fill damage array.
+    - If armor: set ac_bonus and has_attack_roll=false.
+    - If potion/consumable: set activation.slot.resource_id="item_charges" and consume=true.
+    - If wondrous: fill description well and add relevant tags.
     
     [USER PROMPT]: ${prompt}
     `;
@@ -158,16 +189,46 @@ export const buildSpellPrompt = (prompt, flavor) => `
     [LANGUAGE]: Portuguese (pt-BR).
     [JSON STRUCTURE]:
     {
-        "name": "Spell Name",
-        "level": 3,
-        "school": "Evocação|Necromancia|...",
-        "casting_time": "1 ação",
-        "range": "30 metros",
-        "components": "V, S, M (enxofre)",
-        "duration": "Instantânea",
-        "description": "Full description of effects. MUST end with: '${flavor}'",
-        "classes": ["Mago", "Feiticeiro"]
+        "uid": "spell_unique_id",
+        "identity": {
+            "name": "Nome da Magia",
+            "origin": "Spell",
+            "tags": ["Damage", "Control", "Utility", "Healing"],
+            "source": { "book": "", "page": "" }
+        },
+        "activation": {
+            "type": "Action|Bonus|Reaction",
+            "cost": 1,
+            "slot": { "resource_id": "spell_slots", "level_required": 3, "consume": true }
+        },
+        "trigger_logic": {
+            "range": { "min": 0, "max": 30, "unit": "m" },
+            "target": { "type": "Entity|Place|Self", "quantity": 1, "matriz": { "shape": "Sphere|Cone|Line|Point", "value": 6, "unit": "m", "origin": "target_point" } }
+        },
+        "execution_mechanics": {
+            "has_save": true,
+            "save": { "ability": "DEX", "dc_type": "scaling", "dc_value": 0, "on_success": "half_damage" },
+            "has_attack_roll": false,
+            "damage": [{ "dice_count": 8, "dice_type": 6, "fixed_modifier": 0, "damage_type": "fogo", "is_magical": true, "scaling_type": "slot" }],
+            "conditions": []
+        },
+        "description": "Descrição em português. MUST end with: '${flavor}'",
+        "spell_details": {
+            "level": 3,
+            "school": "Evocação|Necromancia|Abjuração|Adivinhação|Conjuração|Encantamento|Ilusão|Transmutação",
+            "casting_time": "1 ação",
+            "duration": "Instantânea|Concentração, até 1 minuto",
+            "components": "V, S, M (enxofre)",
+            "classes": ["Mago", "Feiticeiro"],
+            "prepared": false,
+            "concentration": false
+        }
     }
+    [RULES]:
+    - If spell deals damage: fill damage array and set has_save or has_attack_roll accordingly.
+    - If spell applies conditions: fill conditions array (e.g. frightened, prone, poisoned).
+    - If cantrip (level 0): set slot.consume=false and slot.level_required=0.
+    - activation.type derives from casting_time: "1 ação"->"Action", "1 ação bônus"->"Bonus", "1 reação"->"Reaction".
     
     [USER PROMPT]: ${prompt}
     `;
@@ -177,20 +238,123 @@ export const buildMonsterPrompt = (prompt, flavor) => `
     [TASK]: Generate a D&D 5e monster based on the user prompt.
     [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
     [LANGUAGE]: Portuguese (pt-BR).
+    [CRITICAL]: Return the EXACT JSON structure below. All fields are required.
     [JSON STRUCTURE]:
     {
-        "name": "Monster Name",
-        "cr": "1/2",
-        "type": "Aberração|Besta|Dragão|...",
-        "size": "Tiny|Small|Medium|Large|Huge|Gargantuan",
-        "hp": "45 (7d8 + 14)",
-        "ac": 15,
-        "attributes": {
-            "FOR": 10, "DES": 10, "CON": 10, "INT": 10, "SAB": 10, "CAR": 10
+        "name": "Nome da Criatura",
+        "entity_type": "monster",
+        "bio": {
+            "race": "Tipo da criatura (ex: Morto-Vivo)",
+            "class": "Classe se aplicável (ex: Guerreiro) ou vazio",
+            "alignment": "Alinhamento (ex: Caótico e Mau)",
+            "level": 5,
+            "cr": "ND (ex: 5)",
+            "size": "Medium|Large|Huge|Gargantuan|Small|Tiny",
+            "creature_type": "Tipo D&D (Aberração|Besta|Celestial|Constructo|Dragão|Elemental|Fada|Ínfero|Gigante|Humanoide|Monstruosidade|Gosma|Planta|Morto-Vivo)"
         },
-        "description": "Full description of abilities, actions, and lore. Detailed in Portuguese. MUST end with: '${flavor}'"
+        "attributes": { "str": 16, "dex": 12, "con": 14, "int": 10, "wis": 12, "cha": 8 },
+        "stats": {
+            "ac": 15,
+            "hp_max": 45,
+            "hp_current": 45,
+            "speed": "9m",
+            "initiative": 1,
+            "hit_dice_total": "5d10 + 10"
+        },
+        "combat": {
+            "attacks": [
+                { "name": "Nome do Ataque", "bonus": "+6", "damage": "1d8+4 cortante", "isCustom": true }
+            ]
+        },
+        "abilities": [
+            {
+                "uid": "ability_1",
+                "identity": { "name": "Nome da Habilidade", "origin": "Custom_Attack", "tags": [] },
+                "activation": { "type": "Action" },
+                "description": "Descrição completa da habilidade em português."
+            }
+        ],
+        "story": {
+            "traits": "Traços de comportamento",
+            "appearance": "Descrição visual detalhada",
+            "notes": "Lore completo da criatura. MUST end with: '${flavor}'"
+        }
     }
     
+    [USER PROMPT]: ${prompt}
+    `;
+
+export const buildEntityPrompt = (entityType, prompt, flavor) => {
+    const typeLabels = { monster: 'Monstro/Criatura', villain: 'Vilão/Antagonista', npc: 'NPC/Personagem Não-Jogável' };
+    const label = typeLabels[entityType] || 'Entidade';
+
+    return `
+    [ACT AS]: D&D 5e ${label} Generator.
+    [TASK]: Generate a complete ${label} for D&D 5e based on the user prompt.
+    [OUTPUT]: Valid JSON Object ONLY. No markdown.
+    [LANGUAGE]: Portuguese (pt-BR).
+    [JSON STRUCTURE]:
+    {
+        "name": "Nome",
+        "entity_type": "${entityType}",
+        "bio": {
+            "race": "Raça ou tipo", "class": "Classe", "alignment": "Alinhamento",
+            "level": 5, "cr": "5", "size": "Medium", "creature_type": "Tipo D&D",
+            "background": "Antecedente"
+        },
+        "attributes": { "str": 10, "dex": 10, "con": 10, "int": 10, "wis": 10, "cha": 10 },
+        "stats": { "ac": 10, "hp_max": 10, "hp_current": 10, "speed": "9m", "initiative": 0, "hit_dice_total": "1d8" },
+        "combat": { "attacks": [{ "name": "Ataque", "bonus": "+3", "damage": "1d6+1", "isCustom": true }] },
+        "abilities": [
+            { 
+                "uid": "ab1", 
+                "identity": { "name": "Nome do Ataque/Habilidade", "origin": "Custom_Attack" }, 
+                "activation": { "type": "Action" }, 
+                "execution_mechanics": {
+                    "has_attack_roll": true,
+                    "has_save": false,
+                    "save": { "ability": "DEX", "dc_value": 15 },
+                    "damage": [{ "dice_count": 2, "dice_type": 6, "damage_type": "corte" }]
+                },
+                "description": "Texto descritivo do efeito" 
+            }
+        ],
+        "story": { "traits": "Personalidade", "ideals": "Motivações", "bonds": "Vínculos", "flaws": "Fraquezas", "appearance": "Visual", "notes": "Lore. End with: '${flavor}'" }
+    }
+
+    [USER PROMPT]: ${prompt}
+    `;
+};
+
+export const buildAbilityPrompt = (prompt, flavor) => `
+    [ACT AS]: D&D 5e Ability/Skill Generator.
+    [TASK]: Generate a detailed ability/skill for D&D 5e.
+    [OUTPUT]: Valid JSON Object ONLY. No markdown.
+    [LANGUAGE]: Portuguese (pt-BR).
+    [JSON STRUCTURE]:
+    {
+        "uid": "lyra_generated_id",
+        "identity": { "name": "Nome da Habilidade", "origin": "Custom_Attack|Spell|Class_Skill|Race|Item|Feat", "tags": ["Damage", "Utility", "Control", "Healing"], "source": { "book": "", "page": "" } },
+        "activation": { "type": "Action|Bonus|Reaction|Passive|Legendary|Lair", "cost": 1, "slot": { "resource_id": "proficiency_uses|superiority_dice", "level_required": 0, "consume": true } },
+        "trigger_logic": {
+            "range": { "min": 0, "max": 9, "unit": "m" },
+            "target": { "type": "Entity|Place|Self", "quantity": 1, "matriz": { "shape": "Point|Sphere|Cone|Line|Square", "value": 0, "unit": "m", "origin": "self" } }
+        },
+        "execution_mechanics": {
+            "has_save": false,
+            "save": { "ability": "DEX|CON|WIS|STR|INT|CHA", "dc_type": "scaling|fixed", "dc_value": 15, "on_success": "half_damage|no_damage|end_condition" },
+            "has_attack_roll": false,
+            "damage": [{ "dice_count": 2, "dice_type": 6, "fixed_modifier": 0, "damage_type": "fogo", "is_magical": true, "scaling_type": "level|slot|none" }],
+            "conditions": [{ "id": "frightened|poisoned|prone|stunned", "duration": "1_round|1_minute", "save_at_end": true }]
+        },
+        "description": "Descrição completa em português. MUST end with: '${flavor}'"
+    }
+    [RULES]:
+    - Choose origin based on source: Race for racial traits, Class_Skill for class features, Feat for feats, Custom_Attack for unique attacks.
+    - If ability deals damage: fill damage array.
+    - If ability requires a save: set has_save=true and fill save object.
+    - If ability is passive: set activation.type="Passive" and slot.consume=false.
+
     [USER PROMPT]: ${prompt}
     `;
 

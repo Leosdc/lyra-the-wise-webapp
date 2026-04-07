@@ -1,6 +1,7 @@
 import { logger } from './logger.js';
 import { debounce } from './modules/utils.js';
 import { getToken, auth as firebaseAuth } from './auth.js';
+import { flattenAbilityToItem, flattenAbilityToSpell } from './data.js';
 import {
     getIdentity, getFlavor, buildChatMessage, buildChatInstruction,
     buildCreateMonsterPrompt, buildCreateCharacterPrompt, buildProcessSessionPrompt,
@@ -8,6 +9,7 @@ import {
     buildModuleContentPrompt, buildSessionPrompt, buildSessionStoryPrompt,
     buildExtendStoryPrompt, buildCharacterEntryPrompt, buildTimelinePrompt,
     buildSessionGapsPrompt, buildSummarizeSessionPrompt, buildProlongTimelinePrompt,
+    buildEntityPrompt, buildAbilityPrompt,
     FLAVOR_ITEM, FLAVOR_SPELL, FLAVOR_MONSTER, FLAVOR_MODULE, MODULE_SCHEMAS
 } from './prompts.js';
 
@@ -244,7 +246,15 @@ export const generateItem = async (prompt, persona) => {
     const data = await callProxy({ message: buildItemPrompt(prompt, flavor), history: [] });
 
     try {
-        return safeParseJSON(data.response);
+        const parsed = safeParseJSON(data.response);
+        // AI returns new AbilitySchema — attach raw ability_data and flatten for compat
+        if (parsed && parsed.identity) {
+            const flat = flattenAbilityToItem(parsed);
+            flat.ability_data = parsed;
+            return flat;
+        }
+        // Fallback: AI returned legacy flat format
+        return parsed;
     } catch (e) {
         console.error("Generate Item Error:", e, data.response);
         throw new Error("O item se desvaneceu antes de ser forjado.");
@@ -259,7 +269,15 @@ export const generateSpell = async (prompt, persona) => {
     const data = await callProxy({ message: buildSpellPrompt(prompt, flavor), history: [] });
 
     try {
-        return safeParseJSON(data.response);
+        const parsed = safeParseJSON(data.response);
+        // AI returns new AbilitySchema — attach raw ability_data and flatten for compat
+        if (parsed && parsed.identity) {
+            const flat = flattenAbilityToSpell(parsed);
+            flat.ability_data = parsed;
+            return flat;
+        }
+        // Fallback: AI returned legacy flat format
+        return parsed;
     } catch (e) {
         console.error("Generate Spell Error:", e, data.response);
         throw new Error("O grimório etéreo está ilegível.");
@@ -277,6 +295,37 @@ export const generateMonster = async (prompt, persona) => {
     } catch (e) {
         console.error("Generate Monster Error:", e, data.response);
         throw new Error("A criatura se desfez em fumaça antes de tomar forma.");
+    }
+};
+
+export const generateEntity = async (entityType, prompt, persona) => {
+    await checkAiAvailability();
+    const finalPersona = persona || window.app?.currentThemeName || 'lyra';
+    const flavor = getFlavor(FLAVOR_MONSTER, finalPersona);
+
+    const message = buildEntityPrompt(entityType, prompt, flavor);
+    const data = await callProxy({ message, history: [] });
+    try {
+        const parsed = safeParseJSON(data.response);
+        if (parsed) parsed.entity_type = entityType;
+        return parsed;
+    } catch (e) {
+        console.error(`Generate Entity (${entityType}) Error:`, e, data.response);
+        throw new Error("A entidade se dispersou antes de se materializar.");
+    }
+};
+
+export const generateAbility = async (prompt, persona) => {
+    await checkAiAvailability();
+    const finalPersona = persona || window.app?.currentThemeName || 'lyra';
+    const flavor = getFlavor(FLAVOR_ITEM, finalPersona);
+
+    const data = await callProxy({ message: buildAbilityPrompt(prompt, flavor), history: [] });
+    try {
+        return safeParseJSON(data.response);
+    } catch (e) {
+        console.error("Generate Ability Error:", e, data.response);
+        throw new Error("A habilidade se fragmentou no plano etéreo.");
     }
 };
 
