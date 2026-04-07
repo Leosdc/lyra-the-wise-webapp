@@ -231,17 +231,29 @@ const CombatEngine = {
 
                                 // 2. Magias preparadas (+ truques) convertidas em ações
                                 const spellList = char.spells?.list || [];
+                                const dmgRegex = /(\d+d\d+)(?:\s*\+\s*\d+)?(?:\s+(?:de\s+)?(?:dano\s+)?(?:de\s+)?(\w+))?/i;
                                 const spellActions = spellList
                                     .filter(sp => sp.prepared === true || sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
                                     .map(sp => {
-                                        const dmg = extractSpellDamage(sp.description);
+                                        let dmg = '---';
+                                        let range = sp.range || '---';
+
+                                        if (sp.ability_data && sp.ability_data.execution_mechanics) {
+                                            const em = sp.ability_data.execution_mechanics;
+                                            const dmgObj = (em.damage && em.damage.length > 0) ? em.damage[0] : null;
+                                            if (dmgObj) dmg = `${dmgObj.dice_count||1}d${dmgObj.dice_type||6} ${dmgObj.damage_type||''}`.trim();
+                                        } else {
+                                            const m = sp.description ? sp.description.match(dmgRegex) : null;
+                                            if (m) dmg = (m[2] ? `${m[1]} ${m[2]}` : m[1]);
+                                        }
+
                                         const levelLabel = (sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
                                             ? 'Truque'
                                             : `Nv. ${sp.level}`;
                                         return {
                                             name: sp.name,
                                             damage: dmg,
-                                            range: sp.range || '---',
+                                            range: range,
                                             desc: sp.description ? sp.description.substring(0, 120) + '...' : '',
                                             category: 'Magias',
                                             spellLevel: sp.level,
@@ -251,7 +263,24 @@ const CombatEngine = {
                                         };
                                     });
 
-                                return [...weaponActions, ...spellActions];
+                                // 3. Itens mágicos com mecânicas equipados
+                                const itemList = char.inventory?.items || [];
+                                const itemActions = itemList
+                                    .filter(it => it.equipped && it.ability_data)
+                                    .map(it => {
+                                        const em = it.ability_data.execution_mechanics || {};
+                                        const dmgObj = (em.damage && em.damage.length > 0) ? em.damage[0] : null;
+                                        const damageStr = dmgObj ? `${dmgObj.dice_count||1}d${dmgObj.dice_type||6} ${dmgObj.damage_type||''}`.trim() : '---';
+                                        return {
+                                            name: it.name || 'Item', 
+                                            damage: damageStr, 
+                                            range: '---',
+                                            desc: it.description ? it.description.substring(0, 120) + '...' : '',
+                                            category: 'Itens'
+                                        };
+                                    });
+
+                                return [...weaponActions, ...spellActions, ...itemActions];
                             })()
                         });
                     }

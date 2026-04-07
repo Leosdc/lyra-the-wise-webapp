@@ -123,26 +123,57 @@ const CombatUI = {
                         ac: acVal ?? p.ac
                     });
 
-                    // Atualizar ações de magia reativamente quando o grimório muda
+                    // Atualizar ações de magia/itens reativamente quando o grimório/inventário muda
                     const participant = this.combatState?.turnOrder?.find(t => t.characterId === charId);
                     if (participant && data) {
-                        const weaponActions = (participant.actions || []).filter(a => !a.isSpell);
+                        const weaponActions = (data.combat?.attacks || []).map(atk => ({
+                            ...atk,
+                            category: 'Combate'
+                        }));
+
                         const spellList = data.spells?.list || [];
                         const dmgRegex = /(\d+d\d+)(?:\s*\+\s*\d+)?(?:\s+(?:de\s+)?(?:dano\s+)?(?:de\s+)?(\w+))?/i;
                         const spellActions = spellList
                             .filter(sp => sp.prepared === true || sp.level === 0 || sp.level === '0' || sp.level === 'Truque')
                             .map(sp => {
-                                const m = sp.description ? sp.description.match(dmgRegex) : null;
-                                const dmg = m ? (m[2] ? `${m[1]} ${m[2]}` : m[1]) : '---';
+                                let dmg = '---';
+                                let range = sp.range || '---';
+
+                                if (sp.ability_data && sp.ability_data.execution_mechanics) {
+                                    const em = sp.ability_data.execution_mechanics;
+                                    const dmgObj = (em.damage && em.damage.length > 0) ? em.damage[0] : null;
+                                    if (dmgObj) dmg = `${dmgObj.dice_count||1}d${dmgObj.dice_type||6} ${dmgObj.damage_type||''}`.trim();
+                                } else {
+                                    const m = sp.description ? sp.description.match(dmgRegex) : null;
+                                    if (m) dmg = (m[2] ? `${m[1]} ${m[2]}` : m[1]);
+                                }
+
                                 const levelLabel = (sp.level === 0 || sp.level === '0' || sp.level === 'Truque') ? 'Truque' : `Nv. ${sp.level}`;
                                 return {
-                                    name: sp.name, damage: dmg, range: sp.range || '---',
+                                    name: sp.name, damage: dmg, range: range,
                                     desc: sp.description ? sp.description.substring(0, 120) + '...' : '',
                                     category: 'Magias', spellLevel: sp.level, school: sp.school || '',
                                     isSpell: true, levelLabel
                                 };
                             });
-                        participant.actions = [...weaponActions, ...spellActions];
+                            
+                        const itemList = data.inventory?.items || [];
+                        const itemActions = itemList
+                            .filter(it => it.equipped && it.ability_data)
+                            .map(it => {
+                                const em = it.ability_data.execution_mechanics || {};
+                                const dmgObj = (em.damage && em.damage.length > 0) ? em.damage[0] : null;
+                                const damageStr = dmgObj ? `${dmgObj.dice_count||1}d${dmgObj.dice_type||6} ${dmgObj.damage_type||''}`.trim() : '---';
+                                return {
+                                    name: it.name || 'Item', 
+                                    damage: damageStr, 
+                                    range: '---',
+                                    desc: it.description ? it.description.substring(0, 120) + '...' : '',
+                                    category: 'Itens'
+                                };
+                            });
+
+                        participant.actions = [...weaponActions, ...spellActions, ...itemActions];
                     }
 
                     this.renderVerticalCombatList(this.combatState);
@@ -283,10 +314,42 @@ const CombatUI = {
         let attacks = [];
         const rawActions = attacker.actions || attacker.monsterData?.actions || [];
 
-        if (Array.isArray(rawActions)) {
+        if (Array.isArray(rawActions) && rawActions.length > 0) {
             attacks = rawActions;
         } else if (typeof rawActions === 'string' && rawActions.trim()) {
             attacks = rawActions.split(';').map(a => ({ name: a.trim(), damage: '', range: '', desc: '' })).filter(a => a.name);
+        }
+
+        // Support new AbilitySchema and legacy combat.attacks for monsters
+        if ((attacker.type === 'monster' || attacker.type === 'npc') && attacker.monsterData) {
+            const mData = attacker.monsterData;
+            
+            // Gather standard attacks
+            const standardAttacks = (mData.combat?.attacks || []).map(atk => ({
+                name: atk.name || 'Ataque',
+                damage: atk.damage || '1d6',
+                range: '---',
+                category: 'Combate',
+                desc: atk.description || ''
+            }));
+            
+            // Gather new AbilitySchema abilities
+            const schemaAbilities = (mData.abilities || []).map(ab => {
+                const em = ab.execution_mechanics || {};
+                const dmgObj = (em.damage && em.damage.length > 0) ? em.damage[0] : null;
+                const damageStr = dmgObj ? `${dmgObj.dice_count||1}d${dmgObj.dice_type||6} ${dmgObj.damage_type||''}` : '---';
+                return {
+                    name: ab.identity?.name || 'Habilidade',
+                    damage: damageStr,
+                    range: ab.trigger_logic?.range?.value ? `${ab.trigger_logic.range.value}${ab.trigger_logic.range.unit}` : '---',
+                    category: ab.identity?.origin === 'Spell' ? 'Magias' : 'Habilidades',
+                    desc: ab.description || ''
+                };
+            });
+            
+            if (standardAttacks.length > 0 || schemaAbilities.length > 0) {
+                 attacks = [...attacks, ...standardAttacks, ...schemaAbilities];
+            }
         }
 
         if (attacks.length === 0) attacks.push({ name: "Ataque Básico", damage: "1d6", range: "1,5m", desc: "" });
