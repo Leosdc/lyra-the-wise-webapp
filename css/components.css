@@ -1065,44 +1065,10 @@
     }
 }
 
-/* Scroll Indicators */
+/* Scroll Indicators — DISABLED per user request */
 #scroll-up,
 #scroll-down {
-    display: none;
-    /* Hidden by default */
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background: var(--dark-panel);
-    border: 2px solid var(--gold);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-    z-index: 800;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
-    animation: bounce 2s infinite;
-}
-
-
-#scroll-up {
-    top: 100px;
-}
-
-#scroll-down {
-    bottom: 20px;
-}
-
-#scroll-up.hidden,
-#scroll-down.hidden {
     display: none !important;
-    opacity: 0;
-    pointer-events: none;
 }
 
 /* Fix Textarea Scrollbars in General */

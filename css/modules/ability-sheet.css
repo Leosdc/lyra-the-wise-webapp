@@ -1,0 +1,174 @@
+/* ============================================================
+   ABILITY SHEET MODULE STYLES
+   Reuses character sheet foundation; extends for item/spell modal
+   ============================================================ */
+
+/* Ability Sheet Modal */
+.ability-sheet-modal-content {
+    max-width: 800px;
+    width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 0 !important;
+    border-radius: 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-glow);
+}
+
+.ability-sheet-modal-content .sheet-container {
+    padding: 0;
+}
+
+.ability-sheet-modal-content .sheet-header {
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ability-sheet-modal-content .sheet-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-panel);
+    padding: 0 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    gap: 1rem;
+}
+
+.ability-sheet-modal-content .sheet-content {
+    padding: 1.5rem;
+    min-height: 300px;
+}
+
+/* Base Inputs inside Ability Sheet */
+.ability-sheet-modal-content .header-title-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--gold);
+    font-size: 1.8rem;
+    font-family: var(--font-medieval);
+    width: 100%;
+}
+
+.ability-sheet-modal-content .header-title-input:focus {
+    outline: none;
+    border-bottom-color: var(--gold);
+}
+
+.ability-sheet-modal-content .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.ability-sheet-modal-content .form-group label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Card layout for Mechanics */
+.ability-sheet-modal-content .mechanics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ability-sheet-modal-content .mechanic-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.ability-sheet-modal-content .mechanic-box label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.ability-sheet-modal-content .mechanic-box input, 
+.ability-sheet-modal-content .mechanic-box select {
+    text-align: center;
+    font-size: 1.1rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+    color: var(--text);
+    width: 100%;
+}
+
+.ability-sheet-modal-content .damage-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ability-sheet-modal-content .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+/* Origin Badge */
+.ability-sheet-modal-content .origin-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ability-origin-Item { color: #f59e0b; border-color: rgba(245, 158, 11, 0.3) !important; background: rgba(245, 158, 11, 0.1); }
+.ability-origin-Spell { color: #8b5cf6; border-color: rgba(139, 92, 246, 0.3) !important; background: rgba(139, 92, 246, 0.1); }
+
+/* Footer */
+.ability-sheet-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 12px 12px;
+}
+
+@media (max-width: 768px) {
+    .ability-sheet-modal-content {
+        width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    
+    .ability-sheet-modal-content .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .ability-sheet-modal-content .mechanics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .ability-sheet-modal-content .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+}
