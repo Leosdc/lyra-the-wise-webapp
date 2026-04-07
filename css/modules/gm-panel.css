@@ -1203,3 +1203,43 @@
         border-top: 3px solid var(--gold);
     }
 }
+
+/* Inspiration Toggle in GM Panel */
+.inspiration-glow-btn {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-right: 5px;
+}
+
+.inspiration-glow-btn:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold-bright) !important;
+    background: rgba(212, 175, 55, 0.1) !important;
+    transform: scale(1.15);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.inspiration-glow-btn.active {
+    color: #fff !important;
+    background: var(--gold) !important;
+    border-color: var(--gold-bright) !important;
+    box-shadow: 0 0 15px var(--gold);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    opacity: 1 !important;
+    animation: gold-pulse 2.5s infinite;
+}
+
+@keyframes gold-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px var(--gold); }
+    50% { transform: scale(1.1); box-shadow: 0 0 20px var(--gold); }
+    100% { transform: scale(1); box-shadow: 0 0 5px var(--gold); }
+}
