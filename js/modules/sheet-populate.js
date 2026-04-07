@@ -301,6 +301,51 @@ export function createPopulateMixin(ctx) {
 
             // Combat Tab
             const s = char.stats || {};
+
+            // Inspiration Logic
+            const isInspiration = !!s.inspiration;
+            const inspBtn = document.getElementById('sheet-inspiration-btn');
+            const inspInput = document.getElementById('sheet-inspiration-input');
+            
+            if (inspBtn) {
+                inspBtn.classList.toggle('active', isInspiration);
+                if (inspInput) inspInput.checked = isInspiration;
+                inspBtn.title = isInspiration ? 'Inspirado! (Clique para remover)' : 'Sem Inspiração (Clique para conceder)';
+                
+                // Toggle radiant glow on the whole sheet
+                const sheetContainer = document.getElementById('character-sheet');
+                if (sheetContainer) {
+                    sheetContainer.classList.toggle('inspiration-active', isInspiration);
+                }
+
+                if (!context.isInspection) {
+                    inspBtn.onclick = async () => {
+                        // Toggle visual and input state
+                        const currentState = inspBtn.classList.contains('active');
+                        const newState = !currentState;
+                        
+                        inspBtn.classList.toggle('active', newState);
+                        if (inspInput) inspInput.checked = newState;
+                        
+                        const container = document.getElementById('character-sheet');
+                        if (container) container.classList.toggle('inspiration-active', newState);
+                        
+                        // IMPORTANT: Update local object in memory so the manual "Save" button picks up the latest state
+                        if (ctx.currentCharacter && ctx.currentCharacter.stats) {
+                            ctx.currentCharacter.stats.inspiration = newState;
+                        }
+                        
+                        try {
+                            const { updateCharacter } = await import('../data.js');
+                            await updateCharacter(char.id, { 'stats.inspiration': newState });
+                        } catch (err) {
+                            console.error("Erro ao atualizar inspiração:", err);
+                        }
+                    };
+                } else {
+                    inspBtn.style.cursor = 'default';
+                }
+            }
             document.getElementById('sheet-ca').innerHTML = mkInput(s.ac, 'stats.ac', 'number', 'Classe de Armadura');
             document.getElementById('sheet-inic').innerHTML = mkInput(s.initiative, 'stats.initiative', 'number', 'Iniciativa');
             document.getElementById('sheet-speed').innerHTML = mkInput(s.speed, 'stats.speed', 'text', 'Deslocamento');
