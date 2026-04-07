@@ -46,7 +46,9 @@ const COLLECTIONS = {
     MOTIVATIONS: "user_motivations",
     RULES: "user_rules",
     NAMES: "user_names",
-    TRAPS: "user_traps"
+    TRAPS: "user_traps",
+    // Entity System (v2 Sheet-based)
+    USER_ABILITIES: "user_abilities"
 };
 
 
@@ -272,6 +274,458 @@ export const shareMonster = async (monsterId, targetEmail) => {
         await updateDoc(docRef, { sharedWith });
     }
     return true;
+};
+
+// --- ENTITY SYSTEM (v2 Sheet-based for Monsters, Villains, NPCs) ---
+
+const ENTITY_COLLECTION_MAP = {
+    'monster': COLLECTIONS.USER_MONSTERS,
+    'villain': COLLECTIONS.VILLAINS,
+    'npc': COLLECTIONS.NPCS
+};
+
+export const getEmptyEntity = (entityType) => ({
+    name: "",
+    entity_type: entityType,
+    bio: {
+        race: "", class: "", subrace: "", archetype: "",
+        alignment: "Neutro", background: "", level: 1,
+        cr: "0", size: "Medium", creature_type: "", xp: "0", playerName: ""
+    },
+    attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+    stats: {
+        ac: 10, initiative: 0, speed: "9m",
+        hp_current: 10, hp_max: 10, hp_temp: 0,
+        hit_dice_current: 1, hit_dice_total: "1d8"
+    },
+    proficiencies_choice: { saves: [], skills: [], expertise: [] },
+    combat: { attacks: [] },
+    spells: { ability: "int", slots: {}, list: [] },
+    inventory: {
+        coins: { pc: 0, pp: 0, pe: 0, po: 0, pl: 0 },
+        items: [],
+        encumbrance: { current: 0, limit: 150 }
+    },
+    story: {
+        traits: "", ideals: "", bonds: "", flaws: "",
+        mannerisms: "", talents: "", appearance: "", notes: ""
+    },
+    abilities: [],
+    death_saves: { successes: 0, failures: 0 },
+    tokenUrl: "",
+    sharedWith: []
+});
+
+export const getEmptyAbility = (abilityOrigin) => ({
+    uid: "",
+    identity: {
+        name: "",
+        origin: abilityOrigin || "Item", // Item | Spell | Custom_Attack | Class_Skill | Race | Feat
+        tags: [],
+        source: { book: "", page: "" }
+    },
+    activation: {
+        type: "Action", // Action | Bonus | Reaction | No Action | Passive | Legendary | Lair
+        cost: 1,
+        slot: {
+            resource_id: "", // spell_slots | item_charges | proficiency_uses | superiority_dice
+            level_required: 0,
+            consume: false
+        }
+    },
+    trigger_logic: {
+        range: { min: 0, max: 0, unit: "ft" },
+        target: {
+            type: "Entity", // Entity | Place | Self
+            quantity: 1,
+            matriz: {
+                shape: "Point", // Sphere | Cone | Line | Square | Point
+                value: 0,
+                unit: "ft",
+                origin: "self" // self | target_point
+            }
+        }
+    },
+    execution_mechanics: {
+        has_save: false,
+        save: {
+            ability: "", // DEX | CON | WIS | STR | INT | CHA
+            dc_type: "fixed", // scaling | fixed
+            dc_value: 0,
+            on_success: "no_damage" // half_damage | no_damage | end_condition
+        },
+        has_attack_roll: false,
+        damage: [], // [{ dice_count: 1, dice_type: 6, fixed_modifier: 0, damage_type: "slashing", is_magical: false, scaling_type: "none" }]
+        conditions: [] // [{ id: "poisoned", duration: "1_round", save_at_end: false }]
+    },
+    description: "",
+    equipment_details: {
+        rarity: "common",
+        cost: "",
+        weight: 0,
+        quantity: 1,
+        item_type: "Weapon", // Weapon | Armor | Potion | Scroll | Wondrous | Ring | Staff | Wand
+        ac_bonus: null,
+        properties: [],
+        equipped: false
+    },
+    spell_details: {
+        level: 0,
+        school: "",
+        casting_time: "",
+        duration: "",
+        components: "",
+        classes: [],
+        prepared: false,
+        concentration: false
+    },
+    meta: {
+        visibility: "public",
+        is_native: false,
+        created_by: ""
+    }
+});
+
+/**
+ * Converts a legacy flat item object into the unified AbilitySchema.
+ * Used for lazy migration when displaying existing items.
+ */
+export const getEmptyAbilityFromItem = (item) => {
+    if (!item) return getEmptyAbility("Item");
+
+    const ability = getEmptyAbility("Item");
+    ability.uid = item.id || `item_${Date.now()}`;
+    ability.identity.name = item.name || "";
+    ability.identity.origin = "Item";
+    ability.identity.tags = (item.properties || []).slice();
+    ability.description = item.description || "";
+
+    // Equipment details
+    ability.equipment_details = {
+        rarity: (item.rarity || "common").toLowerCase(),
+        cost: item.cost || "",
+        weight: parseFloat(item.weight) || 0,
+        quantity: parseInt(item.quantity) || 1,
+        item_type: item.type || item.subtype || "Weapon",
+        ac_bonus: item.ac || null,
+        properties: (item.properties || []).slice(),
+        equipped: item.equipped || false
+    };
+
+    // Parse damage string if weapon (e.g. "1d8")
+    if (item.damage) {
+        ability.execution_mechanics.has_attack_roll = true;
+        
+        let diceCount = 1;
+        let diceType = 6;
+        let fixedMod = 0;
+        let dmgType = item.damageType ? item.damageType.trim() : "slashing";
+        
+        // If damageType wasn't explicitly given, maybe the user wrote it inside damage (legacy "1d8 cortante")
+        if (!item.damageType && item.damage.match(/(\d+)d(\d+)\s*(?:\+\s*(\d+))?\s*(.*)/i)) {
+            const dmgMatch = item.damage.match(/(\d+)d(\d+)\s*(?:\+\s*(\d+))?\s*(.*)/i);
+            diceCount = parseInt(dmgMatch[1]) || 1;
+            diceType = parseInt(dmgMatch[2]) || 6;
+            fixedMod = parseInt(dmgMatch[3]) || 0;
+            dmgType = dmgMatch[4]?.trim() || "slashing";
+        } else {
+            // Modern pure dice match
+            const dmgMatch = item.damage.match(/(\d+)d(\d+)\s*(?:\+\s*(\d+))?/i);
+            if (dmgMatch) {
+                diceCount = parseInt(dmgMatch[1]) || 1;
+                diceType = parseInt(dmgMatch[2]) || 6;
+                fixedMod = parseInt(dmgMatch[3]) || 0;
+            }
+        }
+
+        ability.execution_mechanics.damage = [{
+            dice_count: diceCount,
+            dice_type: diceType,
+            fixed_modifier: fixedMod,
+            damage_type: dmgType,
+            is_magical: (item.rarity && item.rarity !== "common" && item.rarity !== "comum") || false,
+            scaling_type: "none"
+        }];
+    }
+
+    // Activation — items typically don't consume slots
+    ability.activation.type = "Action";
+    ability.activation.cost = 1;
+
+    ability.meta.created_by = item.createdByNickname || "";
+
+    return ability;
+};
+
+/**
+ * Converts a legacy flat spell object into the unified AbilitySchema.
+ * Used for lazy migration when displaying existing spells.
+ */
+export const getEmptyAbilityFromSpell = (spell) => {
+    if (!spell) return getEmptyAbility("Spell");
+
+    const ability = getEmptyAbility("Spell");
+    ability.uid = spell.id || `spell_${Date.now()}`;
+    ability.identity.name = spell.name || "";
+    ability.identity.origin = "Spell";
+    ability.identity.tags = [];
+    ability.description = spell.description || "";
+
+    // Spell details
+    ability.spell_details = {
+        level: parseInt(spell.level) || 0,
+        school: spell.school || "",
+        casting_time: spell.castingTime || spell.casting_time || "",
+        duration: spell.duration || "",
+        components: spell.components || "",
+        classes: Array.isArray(spell.classes) ? spell.classes : (spell.classes || "").split(/,\s*/),
+        prepared: spell.prepared || false,
+        concentration: (spell.duration || "").toLowerCase().includes("concentração") || (spell.duration || "").toLowerCase().includes("concentration") || false
+    };
+
+    // Activation type from casting time
+    const ct = (spell.castingTime || spell.casting_time || "").toLowerCase();
+    if (ct.includes("bônus") || ct.includes("bonus")) {
+        ability.activation.type = "Bonus";
+    } else if (ct.includes("reação") || ct.includes("reaction")) {
+        ability.activation.type = "Reaction";
+    } else {
+        ability.activation.type = "Action";
+    }
+
+    // Slot consumption
+    const spellLevel = parseInt(spell.level) || 0;
+    if (spellLevel > 0) {
+        ability.activation.slot = {
+            resource_id: "spell_slots",
+            level_required: spellLevel,
+            consume: true
+        };
+    }
+
+    // Parse range  
+    const rangeStr = spell.range || "";
+    const rangeMatch = rangeStr.match(/(\d+)\s*(metro|m|ft|feet|pé)/i);
+    if (rangeMatch) {
+        const val = parseInt(rangeMatch[1]) || 0;
+        const unit = rangeMatch[2].toLowerCase().startsWith("m") ? "m" : "ft";
+        ability.trigger_logic.range = { min: 0, max: val, unit };
+    } else if (rangeStr.toLowerCase().includes("toque") || rangeStr.toLowerCase().includes("touch")) {
+        ability.trigger_logic.range = { min: 0, max: 1.5, unit: "m" };
+        ability.trigger_logic.target.type = "Entity";
+    } else if (rangeStr.toLowerCase().includes("pessoal") || rangeStr.toLowerCase().includes("self")) {
+        ability.trigger_logic.range = { min: 0, max: 0, unit: "m" };
+        ability.trigger_logic.target.type = "Self";
+    }
+
+    ability.meta.created_by = spell.createdByNickname || "";
+
+    return ability;
+};
+
+/**
+ * Flattens an AbilitySchema back to a legacy item object for backward compat.
+ */
+export const flattenAbilityToItem = (ability) => {
+    if (!ability) return {};
+    const eq = ability.equipment_details || {};
+    const dmg = (ability.execution_mechanics?.damage || [])[0];
+
+    let damageStr = "";
+    if (dmg) {
+        damageStr = `${dmg.dice_count || 1}d${dmg.dice_type || 6}`;
+        if (dmg.fixed_modifier) damageStr += ` + ${dmg.fixed_modifier}`;
+        if (dmg.damage_type) damageStr += ` ${dmg.damage_type}`;
+    }
+
+    return {
+        name: ability.identity?.name || "",
+        type: eq.item_type || "weapon",
+        rarity: eq.rarity || "common",
+        weight: eq.weight || "",
+        cost: eq.cost || "",
+        damage: damageStr || "",
+        ac: eq.ac_bonus || "",
+        properties: eq.properties || [],
+        description: ability.description || "",
+        quantity: eq.quantity || 1,
+        equipped: eq.equipped || false
+    };
+};
+
+/**
+ * Flattens an AbilitySchema back to a legacy spell object for backward compat.
+ */
+export const flattenAbilityToSpell = (ability) => {
+    if (!ability) return {};
+    const sp = ability.spell_details || {};
+
+    return {
+        name: ability.identity?.name || "",
+        level: sp.level || 0,
+        school: sp.school || "",
+        castingTime: sp.casting_time || "",
+        casting_time: sp.casting_time || "",
+        range: `${ability.trigger_logic?.range?.max || 0} ${ability.trigger_logic?.range?.unit || "m"}`,
+        duration: sp.duration || "",
+        components: sp.components || "",
+        classes: sp.classes || [],
+        description: ability.description || "",
+        prepared: sp.prepared || false
+    };
+};
+
+export const saveEntity = async (entityType, userId, userEmail, entityData) => {
+    const collectionName = ENTITY_COLLECTION_MAP[entityType];
+    if (!collectionName) throw new Error(`Tipo de entidade desconhecido: ${entityType}`);
+
+    const data = {
+        ...entityData,
+        entity_type: entityType,
+        userId,
+        createdByEmail: userEmail,
+        updatedAt: new Date().toISOString()
+    };
+
+    if (entityData.id) {
+        const id = entityData.id;
+        const docRef = doc(db, collectionName, id);
+        const cleanData = { ...data };
+        delete cleanData.id;
+        await updateDoc(docRef, cleanData);
+        return id;
+    } else {
+        data.createdAt = new Date().toISOString();
+        const cleanData = { ...data };
+        delete cleanData.id;
+        const docRef = await addDoc(collection(db, collectionName), cleanData);
+        return docRef.id;
+    }
+};
+
+export const getEntities = async (entityType, userId, userEmail) => {
+    const collectionName = ENTITY_COLLECTION_MAP[entityType];
+    if (!collectionName) return [];
+
+    try {
+        const qCreated = query(
+            collection(db, collectionName),
+            where("userId", "==", userId)
+        );
+
+        const qShared = query(
+            collection(db, collectionName),
+            where("sharedWith", "array-contains", userEmail)
+        );
+
+        const [snapCreated, snapShared] = await Promise.all([
+            getDocs(qCreated),
+            getDocs(qShared)
+        ]);
+
+        const created = snapCreated.docs.map(d => ({ ...d.data(), id: d.id, isOwner: true }));
+        const shared = snapShared.docs.map(d => ({ ...d.data(), id: d.id, isOwner: false }));
+
+        const all = [...created];
+        shared.forEach(item => {
+            if (!all.find(x => x.id === item.id)) all.push(item);
+        });
+
+        return all.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+    } catch (error) {
+        console.error(`Erro ao buscar entidades (${entityType}):`, error);
+        return [];
+    }
+};
+
+export const getEntityById = async (entityType, id, systemId = null) => {
+    const collectionName = ENTITY_COLLECTION_MAP[entityType];
+    if (!collectionName) return null;
+
+    try {
+        // 1. Try personal collection first
+        let docRef = doc(db, collectionName, id);
+        let snap = await getDoc(docRef);
+        if (snap.exists()) return { id: snap.id, ...snap.data() };
+
+        // 2. Try system collection as fallback
+        const sysId = systemId || localStorage.getItem('lyra_current_system') || 'dnd5e';
+        let systemCollection = null;
+        
+        if (entityType === 'monster') systemCollection = COLLECTIONS.GLOBAL_MONSTERS;
+        // else if (entityType === 'spell') systemCollection = COLLECTIONS.SPELLS;
+
+        if (systemCollection) {
+            docRef = doc(db, 'systems', sysId, systemCollection, id);
+            snap = await getDoc(docRef);
+            if (snap.exists()) return { id: snap.id, ...snap.data(), systemId: sysId };
+        }
+    } catch (e) {
+        console.error(`Erro ao buscar entidade (${entityType}/${id}):`, e);
+    }
+    return null;
+};
+
+export const deleteEntity = async (entityType, id, userId) => {
+    const collectionName = ENTITY_COLLECTION_MAP[entityType];
+    if (!collectionName) return false;
+
+    const docRef = doc(db, collectionName, id);
+    const snap = await getDoc(docRef);
+    if (snap.exists() && snap.data().userId === userId) {
+        await deleteDoc(docRef);
+        return true;
+    }
+    return false;
+};
+
+// --- ABILITIES CRUD ---
+export const saveAbility = async (userId, abilityData) => {
+    const data = {
+        ...abilityData,
+        userId,
+        updatedAt: new Date().toISOString()
+    };
+
+    if (abilityData.id) {
+        const id = abilityData.id;
+        const docRef = doc(db, COLLECTIONS.USER_ABILITIES, id);
+        const cleanData = { ...data };
+        delete cleanData.id;
+        await updateDoc(docRef, cleanData);
+        return id;
+    } else {
+        data.createdAt = new Date().toISOString();
+        const cleanData = { ...data };
+        delete cleanData.id;
+        const docRef = await addDoc(collection(db, COLLECTIONS.USER_ABILITIES), cleanData);
+        return docRef.id;
+    }
+};
+
+export const getUserAbilities = async (userId) => {
+    try {
+        const q = query(
+            collection(db, COLLECTIONS.USER_ABILITIES),
+            where("userId", "==", userId)
+        );
+        const snap = await getDocs(q);
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+    } catch (error) {
+        console.error("Erro ao buscar habilidades:", error);
+        return [];
+    }
+};
+
+export const deleteAbility = async (id, userId) => {
+    const docRef = doc(db, COLLECTIONS.USER_ABILITIES, id);
+    const snap = await getDoc(docRef);
+    if (snap.exists() && snap.data().userId === userId) {
+        await deleteDoc(docRef);
+        return true;
+    }
+    return false;
 };
 
 const TRAPS_COLLECTION = "armadilhas";
@@ -1133,5 +1587,43 @@ export const subscribeToOnlineUsers = (callback) => {
     }, (error) => {
         console.error("Erro ao sincronizar usuários online:", error);
     });
+};
+
+/**
+ * MIGRATION UTILITY
+ * Moves items from root 'itens_database' to systems/{systemId}/itens_database
+ */
+export const migrateItemsToSystem = async (systemId = 'dnd5e') => {
+    try {
+        console.log(`[Migration] Starting migration from root ${COLLECTIONS.GLOBAL_ITEMS} to systems/${systemId}/${COLLECTIONS.GLOBAL_ITEMS}...`);
+        
+        const rootRef = collection(db, COLLECTIONS.GLOBAL_ITEMS);
+        const q = query(rootRef, where("systemId", "==", systemId));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+            console.log("[Migration] No items found in root for system:", systemId);
+            return { success: true, count: 0 };
+        }
+        
+        console.log(`[Migration] Found ${snapshot.size} items to migrate.`);
+        
+        const targetRef = collection(db, 'systems', systemId, COLLECTIONS.GLOBAL_ITEMS);
+        
+        let successCount = 0;
+        for (const d of snapshot.docs) {
+            const data = d.data();
+            const id = d.id;
+            // Write to target (using same ID)
+            await setDoc(doc(targetRef, id), data);
+            successCount++;
+        }
+        
+        console.log(`[Migration] Successfully migrated ${successCount} items.`);
+        return { success: true, count: successCount };
+    } catch (error) {
+        console.error("[Migration] Error during items migration:", error);
+        throw error;
+    }
 };
 
