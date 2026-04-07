@@ -183,6 +183,11 @@ export function createInvitesMixin(ctx) {
                         </div>
                         <div class="player-actions">
                             ${invite.characterId ? `
+                                <button class="medieval-btn icon-only inspiration-glow-btn ${invite.inspiration ? 'active' : ''}" 
+                                        title="${invite.inspiration ? 'Retirar Inspiração' : 'Conceder Inspiração'}" 
+                                        onclick="GMPanelModule.togglePlayerInspiration('${invite.id}', '${invite.characterId}', ${!!invite.inspiration})">
+                                    <i class="fas fa-star"></i>
+                                </button>
                                 <button class="medieval-btn icon-only gold-glow" title="Visualizar Ficha" onclick="GMPanelModule.viewPlayerSheet('${invite.characterId}')">
                                     <i class="fas fa-eye"></i>
                                 </button>
