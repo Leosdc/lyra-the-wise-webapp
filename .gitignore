@@ -40,3 +40,6 @@ assets/lore/
 public/assets/systems/dnd5e/D&D 5e_ Combate Detalhado e Cálculos.md
 public/assets/systems/dnd5e/IA Mestre de RPG D&D 5e.md
 public/assets/systems/dnd5e/implementation_plan.md
+
+# Scripts de desenvolvimento locais
+auditor.mjs
