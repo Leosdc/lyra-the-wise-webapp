@@ -48,6 +48,7 @@ O coração do sistema pulsa com magia plena. Os seguintes recursos estão compl
 8.  **Geração Global de Conteúdo**: Ferramentas integradas para mestres criarem NPCs, tramas e masmorras instantaneamente com o Oráculo.
 9.  **Oracle AI Master System**: Assistente narrativo que provê imersão profunda, sugere rolagens de perícia e expande as cenas sob a coordenação do Mestre.
 10. **Comunidade & Notificações**: Taverna social com sistema de alertas em tempo real para novas mensagens.
+11. **Fluxo de Trabalho Dual-AI**: Sistema automatizado de desenvolvimento e auditoria (Builder/Auditor) para garantir máxima qualidade e segurança no código.
 
 ---
 
