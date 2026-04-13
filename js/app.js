@@ -42,6 +42,7 @@ import { EntitySheetModule } from './modules/entity-sheet.js';
 import { GMPanelModule } from './modules/gm-panel.js';
 import { PublicSessionsModule } from './modules/public-sessions.js';
 import { ChatUIModule } from './modules/chat_ui.js';
+import { AspectRatioWarning } from './ui/components/AspectRatioWarning.js';
 
 // Sub-module mixins
 import { createThemeMixin } from './core/app-theme.js';
@@ -98,6 +99,7 @@ const app = {
         NamesModule.init();
         GMPanelModule.init();
         ChatUIModule.init(this);
+        AspectRatioWarning.init();
 
         this.bindEvents(); // Bind events after all modules inject their HTML
 
