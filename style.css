@@ -26,6 +26,7 @@
 @import 'css/modules/gm-panel.css';
 @import 'css/modules/presence.css';
 @import 'css/modules/sessions.css';
+@import 'css/modules/aspect-ratio.css';
 
 /* Themes & Utils */
 @import 'css/themes.css';
