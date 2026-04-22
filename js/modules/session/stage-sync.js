@@ -313,7 +313,7 @@ export function createSyncMixin(ctx) {
                             <span class="ally-name-sml"><i class="fas fa-user-ninja"></i> ${escapeHTML(npc.name)}</span>
                             <div class="ally-meta-mini">
                                 <span class="ally-ac-mini"><i class="fas fa-shield-halved"></i> ${npc.ac || 10}</span>
-                                ${ctx.isGM ? `<i class="fas fa-trash-alt delete-npc-btn" title="Remover NPC" onclick="window.StageModule.deleteNPC('${npc.name}')"></i>` : ''}
+                                ${ctx.isGM ? `<i class="fas fa-trash-alt delete-npc-btn" title="Remover NPC" onclick="window.StageModule.deleteNPC(this.closest('.npc-ally').dataset.npcName)"></i>` : ''}
                             </div>
                         </div>
                         <div class="ally-hp-bar-container">
