@@ -10,7 +10,7 @@ import { escapeHTML } from './utils.js';
 
 const ENTITY_LABELS = {
     monster: { title: 'Criatura', icon: 'fa-dragon', singular: 'Monstro', color: '#ef4444' },
-    villain: { title: 'Vilão', icon: 'fa-mask', singular: 'Vilão', color: '#8b5cf6' },
+
     npc: { title: 'NPC', icon: 'fa-users-gear', singular: 'NPC', color: '#3b82f6' }
 };
 
@@ -599,7 +599,7 @@ export const EntitySheetModule = {
 
         const nameEl = document.getElementById('entity-sheet-name');
         if (nameEl) {
-            const labelStr = labels.singular === 'Criatura' ? 'da Criatura' : (labels.singular === 'Vilão' ? 'do Vilão' : (labels.singular === 'NPC' ? 'do NPC' : 'do Monstro'));
+            const labelStr = labels.singular === 'Criatura' ? 'da Criatura' : (labels.singular === 'NPC' ? 'do NPC' : 'do Monstro');
             nameEl.innerHTML = `<input type="text" value="${escapeHTML(entity.name || '')}" data-field="name" class="medieval-input seamless sheet-name-input" placeholder="Nome ${labelStr}">`;
         }
 
