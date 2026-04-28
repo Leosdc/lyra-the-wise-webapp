@@ -210,14 +210,10 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
             });
         }
 
-        const modelName = "gemini-2.0-flash";
-        console.log(`📡 Invocando Gemini (${modelName}). Key detectada (Len: ${apiKey.length}).`);
-
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: modelName,
-            systemInstruction: systemInstruction || "Você é Lyra, a Guardiã do Eco."
-        });
+        const modelsToTry = ["gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite-preview-02-05", "gemini-1.5-flash", "gemini-1.5-flash-8b"];
+        let responseText = "";
+        let finalModelUsed = "";
 
         const formattedHistory = (history || []).map(h => {
             if (h.parts) return h;
@@ -227,22 +223,67 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
             };
         });
 
-        const chat = model.startChat({ history: formattedHistory });
-        const result = await chat.sendMessage(message);
-        const responseText = result.response.text();
+        for (const currentModelName of modelsToTry) {
+            console.log(`📡 Tentando modelo: ${currentModelName}`);
+            
+            const model = genAI.getGenerativeModel({
+                model: currentModelName,
+                systemInstruction: (systemInstruction && systemInstruction.trim()) ? systemInstruction : "Você é Lyra, a Guardiã do Eco."
+            });
 
-        console.log("✅ Resposta gerada.");
-        res.json({ response: responseText });
+            const chat = model.startChat({ history: formattedHistory });
+            const MAX_RETRIES = 2; // Retries por modelo
+            let attempt = 0;
+            let success = false;
+
+            while (attempt <= MAX_RETRIES) {
+                try {
+                    const result = await chat.sendMessage(message);
+                    responseText = result.response.text();
+                    finalModelUsed = currentModelName;
+                    success = true;
+                    break;
+                } catch (error) {
+                    const errorMsg = error.message || "";
+                    const isRateLimit = errorMsg.includes("429") || errorMsg.includes("Resource exhausted");
+                    const isNotFound = errorMsg.includes("404") || errorMsg.includes("not found");
+
+                    if (isNotFound) {
+                        console.warn(`⚠️ Modelo ${currentModelName} não disponível (404). Tentando próxima opção...`);
+                        break; 
+                    }
+                    
+                    if (isRateLimit && attempt < MAX_RETRIES) {
+                        attempt++;
+                        const delay = Math.pow(2, attempt) * 1000 + (Math.random() * 1000);
+                        console.warn(`⚠️ [${currentModelName}] Rate Limit (429). Retry ${attempt}/${MAX_RETRIES} em ${Math.round(delay)}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        console.error(`❌ Falha no modelo ${currentModelName}:`, errorMsg);
+                        break; 
+                    }
+                }
+            }
+
+            if (success) break;
+        }
+
+        if (!responseText) {
+            throw new Error("Todos os modelos celestiais estão ocupados no momento.");
+        }
+
+        console.log(`✅ Resposta gerada com sucesso via: ${finalModelUsed}`);
+        res.json({ response: responseText, model: finalModelUsed });
+
 
     } catch (error) {
         console.error("❌ ERRO NO ORÁCULO DE LYRA:");
         console.error("Mensagem:", error.message);
-        if (error.stack) console.error("Stack:", error.stack);
-
-        // SECURITY: Não expor error.message ao cliente em produção
-        res.status(500).json({
-            error: "Falha na conexão com as estrelas.",
-            code: error.status || "UNKNOWN_ERROR"
+        
+        const isQuota = error.message.includes("429") || error.message.includes("Resource exhausted");
+        res.status(isQuota ? 429 : 500).json({ 
+            error: isQuota ? "O Oráculo está exausto (Limite de Cota). Tente novamente em alguns segundos." : "Falha na conexão com as estrelas.", 
+            details: error.message
         });
     }
 });
