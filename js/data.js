@@ -764,42 +764,149 @@ export const getSpells = async (systemId) => {
         let spells = [];
         const seenIds = new Set();
 
-        // 1. Try System Spells (Nested Structure)
+        // Helper to normalize spell data (promotes ability_data fields to root)
+        const normalizeSpell = (doc) => {
+            const data = doc.data();
+            const id = doc.id;
+            
+            // Log the first few documents to debug structure
+            if (seenIds.size < 3) {
+                console.log(`[DataModule] DEBUG Raw Doc (${id}):`, JSON.stringify(data).substring(0, 500));
+            }
+            
+            // Helper para buscar campo em qualquer lugar do objeto
+            const findField = (paths, fallback = '') => {
+                for (const path of paths) {
+                    const parts = path.split('.');
+                    let current = data;
+                    for (const part of parts) {
+                        current = current ? current[part] : undefined;
+                    }
+                    if (current !== undefined && current !== null) return current;
+                }
+                return fallback;
+            };
+
+            const ab = data.ability_data || {};
+            
+            // Busca exaustiva pelo nome (Ordem: Top Level > Identity > AbilityData > Identity aninhada > ID)
+            const name = data.name || data.identity?.name || ab.name || ab.identity?.name || id;
+            
+            // Busca exaustiva pelo nível (DnD5e costuma usar level_required ou level)
+            const level = findField([
+                'level',
+                'spell_details.level',
+                'activation.slot.level_required',
+                'ability_data.level',
+                'ability_data.spell_details.level',
+                'ability_data.activation.slot.level_required'
+            ], 0);
+
+            // Busca exaustiva pela escola
+            const school = findField([
+                'school',
+                'spell_details.school',
+                'ability_data.school',
+                'ability_data.spell_details.school'
+            ], 'Evocação');
+
+            // --- Campos de Detalhes (Correção para o Grimório) ---
+            
+            // Casting Time
+            const castingTime = findField([
+                'castingTime',
+                'casting_time',
+                'activation.type',
+                'ability_data.castingTime',
+                'ability_data.activation.type'
+            ], '-');
+
+            // Range (Tratamento para objeto ou string)
+            let range = findField(['range', 'ability_data.range'], null);
+            if (!range) {
+                const r = findField(['trigger_logic.range', 'ability_data.trigger_logic.range'], null);
+                if (r && typeof r === 'object') {
+                    range = `${r.max !== undefined ? r.max : (r.min || 0)}${r.unit || ''}`;
+                }
+            }
+            if (!range) range = '-';
+
+            // Duration
+            const duration = findField([
+                'duration',
+                'ability_data.duration',
+                'spell_details.duration',
+                'ability_data.spell_details.duration'
+            ], '-');
+
+            // Components
+            const components = findField([
+                'components',
+                'ability_data.components',
+                'spell_details.components',
+                'ability_data.spell_details.components'
+            ], '-');
+
+            // Classes
+            const classes = findField([
+                'classes',
+                'ability_data.classes',
+                'spell_details.classes',
+                'ability_data.spell_details.classes'
+            ], []);
+
+            return {
+                ...data,
+                id,
+                name,
+                level: parseInt(level) || 0,
+                school,
+                castingTime,
+                range,
+                duration,
+                components,
+                classes: Array.isArray(classes) ? classes : (classes ? classes.split(',').map(c => c.trim()) : []),
+                description: data.description || ab.description || ''
+            };
+        };
+
+        // 1. Try System Spells (Nested Structure: systems/{systemId}/spells)
         if (systemId) {
             try {
-                console.log(`[DataModule] Searching nested spells for system: ${systemId}...`);
+                const path = `systems/${systemId}/${COLLECTIONS.SPELLS}`;
+                console.log(`[DataModule] Buscando magias em: ${path}`);
                 const spellsRef = collection(db, 'systems', systemId, COLLECTIONS.SPELLS);
                 const qSnapshot = await getDocs(query(spellsRef));
-                console.log(`[DataModule] Nested result: ${qSnapshot.size} spells.`);
+                console.log(`[DataModule] Resultado aninhado: ${qSnapshot.size} magias encontradas.`);
 
                 qSnapshot.docs.forEach(doc => {
                     if (!seenIds.has(doc.id)) {
-                        spells.push({ id: doc.id, ...doc.data() });
+                        spells.push(normalizeSpell(doc));
                         seenIds.add(doc.id);
                     }
                 });
             } catch (e) {
-                console.warn("[DataModule] Nested spells fetch failed:", e);
+                console.warn("[DataModule] Falha na busca aninhada:", e);
             }
         }
 
         // 2. Fetch root 'spells' (Legacy/Global)
-        console.log(`[DataModule] Searching root spells for system: ${systemId}...`);
+        console.log(`[DataModule] Buscando magias na raiz (coleção: ${COLLECTIONS.SPELLS}) para sistema: ${systemId}`);
         const rootQ = query(
             collection(db, COLLECTIONS.SPELLS),
             where("systemId", "==", systemId)
         );
         const rootSnapshot = await getDocs(rootQ);
-        console.log(`[DataModule] Root result: ${rootSnapshot.size} spells.`);
+        console.log(`[DataModule] Resultado raiz: ${rootSnapshot.size} magias encontradas.`);
 
         rootSnapshot.docs.forEach(doc => {
             if (!seenIds.has(doc.id)) {
-                spells.push({ id: doc.id, ...doc.data() });
+                spells.push(normalizeSpell(doc));
                 seenIds.add(doc.id);
             }
         });
 
-        console.log(`[DataModule] Total spells merged: ${spells.length}`);
+        console.log(`[DataModule] Total de magias consolidadas: ${spells.length}`);
         return spells;
 
     } catch (error) {
@@ -810,9 +917,24 @@ export const getSpells = async (systemId) => {
 
 export const getSpell = async (systemId, spellId) => {
     try {
-        const docRef = doc(db, 'systems', systemId, COLLECTIONS.SPELLS, spellId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+        // 1. Try Nested
+        if (systemId) {
+            const nestedRef = doc(db, 'systems', systemId, COLLECTIONS.SPELLS, spellId);
+            const nestedSnap = await getDoc(nestedRef);
+            if (nestedSnap.exists()) {
+                const data = nestedSnap.data();
+                if (data.ability_data) {
+                    return { id: nestedSnap.id, ...data, name: data.name || data.ability_data.name || nestedSnap.id };
+                }
+                return { id: nestedSnap.id, ...data };
+            }
+        }
+
+        // 2. Try Root
+        const rootRef = doc(db, COLLECTIONS.SPELLS, spellId);
+        const rootSnap = await getDoc(rootRef);
+        if (rootSnap.exists()) return { id: rootSnap.id, ...rootSnap.data() };
+
         return null;
     } catch (error) {
         console.error("Erro ao buscar feitiço:", error);
