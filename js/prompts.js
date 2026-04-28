@@ -82,7 +82,7 @@ export const FLAVOR_MODULE = {
 // ─── Schemas dos Módulos de Conteúdo ───
 
 export const MODULE_SCHEMAS = {
-    'VILLAINS': { name: "Nome", entity_type: "villain", bio: { race: "Raça", class: "Classe", alignment: "Alinhamento", cr: "ND", size: "Tamanho", creature_type: "Tipo" }, attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, stats: { ac: 10, hp_max: 10, speed: "9m" }, story: { traits: "Personalidade", ideals: "Motivação", bonds: "Aliados/Servos", flaws: "Fraquezas", appearance: "Aparência", notes: "Plano e Detalhes" } },
+
     'NPCS': { name: "Nome", entity_type: "npc", bio: { race: "Raça", class: "Classe", alignment: "Alinhamento", background: "Antecedente" }, attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, stats: { ac: 10, hp_max: 10, speed: "9m" }, story: { traits: "Personalidade", ideals: "Objetivo", bonds: "Vínculos", appearance: "Aparência", notes: "Notas extras" } },
     'CAMPAIGNS': { name: "Nome da Campanha", synopsis: "Sinopse do Arco", main_locations: "Locais Importantes", hooks: "Ganchos Iniciais", description: "Resumo Geral" },
     'ENCOUNTERS': { name: "Título do Encontro", cr: "Nível/ND Sugerido", monsters: "Lista de Criaturas", environment: "Ambiente", description: "Dinâmica do combate/cena" },
@@ -285,7 +285,7 @@ export const buildMonsterPrompt = (prompt, flavor) => `
     `;
 
 export const buildEntityPrompt = (entityType, prompt, flavor) => {
-    const typeLabels = { monster: 'Monstro/Criatura', villain: 'Vilão/Antagonista', npc: 'NPC/Personagem Não-Jogável' };
+    const typeLabels = { monster: 'Monstro/Criatura', npc: 'NPC/Personagem Não-Jogável' };
     const label = typeLabels[entityType] || 'Entidade';
 
     return `
