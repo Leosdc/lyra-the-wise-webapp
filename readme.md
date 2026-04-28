@@ -45,7 +45,7 @@ O coração do sistema pulsa com magia plena. Os seguintes recursos estão compl
 4.  **Bestiário Completo**: Catálogo de monstros e criaturas com busca e criação manual/arcana.
 5.  **Rolagem de Dados**: Simulador de dados 3D integrado ao fluxo do jogo.
 6.  **Chat com os Heróis**: Interação direta com Lyra (Sábia), Damien (Mestre) e Eldrin (Bardo).
-7.  **Módulos de Conteúdo**: Sistema de criação assistida para Vilões, NPCs, Campanhas e mais.
+7.  **Módulos de Conteúdo**: Sistema de criação assistida para NPCs, Campanhas e mais.
 8.  **Oracle AI Master System**: Assistente narrativo com suporte a fallback automático e mitigação de erros 429.
 
 ---
