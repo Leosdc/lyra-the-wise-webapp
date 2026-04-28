@@ -2,6 +2,19 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
 
+## [3.4.2] - 2026-04-28
+### 🧹 Purga de Vilões & Limpeza de Interface
+- **Remoção do Módulo de Vilões**:
+    - Extinção completa da opção de criar e gerenciar "Vilões" no sistema para simplificação da experiência do usuário.
+    - Remoção de botões de navegação no menu lateral e cards de ação no dashboard.
+    - Limpeza de seções HTML (`villains-selection`, `villains`) e referências no CSS.
+- **Refatoração de Lógica de Módulos**:
+    - Atualização do `content_modules.js` para remover configurações e listeners do tipo `villain`.
+    - Ajuste no `entity-sheet.js` para remover labels e lógicas de título associadas a vilões.
+    - Limpeza de schemas e prompts de IA em `prompts.js`.
+- **Auditoria e Banco de Dados**:
+    - Remoção da categoria `VILLAINS` do seletor de auditoria de banco de dados.
+
 ## [3.4.0] - 2026-03-20
 ### 🧠 Separação dos Ecos & Polimento Arcano
 - **Refatoração de Prompts (Arquitetura)**:
