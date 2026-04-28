@@ -350,9 +350,14 @@ export const SpellModule = {
                 rawSpells = await DataModule.getUserSpells(user.uid, user.email);
             }
 
-            this.allSpells = rawSpells.sort((a, b) => {
-                if (a.level !== b.level) return a.level - b.level;
-                return a.name.localeCompare(b.name);
+            this.allSpells = rawSpells.filter(s => s && typeof s === 'object').sort((a, b) => {
+                const levelA = typeof a.level === 'number' ? a.level : 99;
+                const levelB = typeof b.level === 'number' ? b.level : 99;
+                if (levelA !== levelB) return levelA - levelB;
+                
+                const nameA = String(a.name || '');
+                const nameB = String(b.name || '');
+                return nameA.localeCompare(nameB);
             });
 
             this.applyFilters();
@@ -365,18 +370,25 @@ export const SpellModule = {
 
     applyFilters() {
         this.filteredSpells = this.allSpells.filter(spell => {
-            const matchesSearch = spell.name.toLowerCase().includes(this.filters.search) ||
-                (spell.description || '').toLowerCase().includes(this.filters.search);
+            const name = (spell.name || '').toLowerCase();
+            const desc = (spell.description || '').toLowerCase();
+            const searchTerm = (this.filters.search || '').toLowerCase();
 
-            const matchesLevel = this.filters.level === 'all' || spell.level.toString() === this.filters.level;
+            const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm);
 
-            const spellClasses = (Array.isArray(spell.classes) ? spell.classes : (spell.classes || '').split(/,\s*/));
-            const activeClassFilter = (this.filters.class === 'Guarda') ? 'Patrulheiro' : this.filters.class;
+            const matchesLevel = this.filters.level === 'all' || 
+                (spell.level !== undefined && spell.level.toString() === this.filters.level);
 
-            const matchesClass = this.filters.class === 'all' ||
-                spellClasses.some(c => c.trim().toLowerCase() === activeClassFilter.toLowerCase());
+            const spellClasses = Array.isArray(spell.classes) ? spell.classes : 
+                ((typeof spell.classes === 'string' ? spell.classes : '').split(/,\s*/));
+            
+            const activeClassFilter = (this.filters.class === 'Guarda') ? 'Patrulheiro' : (this.filters.class || 'all');
 
-            const matchesSchool = this.filters.school === 'all' || (spell.school || '').toLowerCase() === this.filters.school.toLowerCase();
+            const matchesClass = activeClassFilter === 'all' ||
+                spellClasses.some(c => (c || '').trim().toLowerCase() === activeClassFilter.toLowerCase());
+
+            const matchesSchool = this.filters.school === 'all' || 
+                (spell.school || '').toLowerCase() === (this.filters.school || '').toLowerCase();
 
             return matchesSearch && matchesLevel && matchesClass && matchesSchool;
         });
