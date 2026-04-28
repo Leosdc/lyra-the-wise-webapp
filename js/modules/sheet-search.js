@@ -153,7 +153,8 @@ export function createSearchMixin(ctx) {
                     casting_time: data.casting_time || data.castingTime,
                     duration: data.duration,
                     components: data.components,
-                    description: data.description
+                    description: data.description,
+                    ability_data: data.ability_data || null
                 });
                 context.showAlert(`Magia "${data.name}" memorizada com sucesso!`, "Grimório");
             } else {
@@ -171,7 +172,8 @@ export function createSearchMixin(ctx) {
                         description: data.description,
                         type: data.type,
                         rarity: data.rarity,
-                        damage: data.damage
+                        damage: data.damage,
+                        ability_data: data.ability_data || null
                     });
 
                     if (data.type === 'Weapon' || data.type === 'Arma' || data.damage) {
