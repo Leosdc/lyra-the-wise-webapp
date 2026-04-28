@@ -12,19 +12,10 @@ export const ContentModule = {
     filters: { search: '' },
 
     // Entity types that use the sheet-based system (not generic name+desc)
-    SHEET_ENTITY_TYPES: ['villains', 'npcs'],
+    SHEET_ENTITY_TYPES: ['npcs'],
     // Map of module keys to their configurations
     configs: {
-        'villains': {
-            id: 'villains',
-            collection: DataModule.COLLECTIONS.VILLAINS,
-            icon: 'fa-mask',
-            title: 'Vilões',
-            entityType: 'villain',
-            sheetBased: true,
-            aiPrompt: 'Descreva o vilão que deseja criar. A Magia tecerá sua história sombria e motivações.',
-            aiPlaceholder: 'Ex: Um necromante que busca vingança contra o reino que o exilou...'
-        },
+
         'npcs': {
             id: 'npcs',
             collection: DataModule.COLLECTIONS.NPCS,
@@ -119,7 +110,7 @@ export const ContentModule = {
         // Listen for entity-saved events to refresh sheet-based module lists
         window.addEventListener('entity-saved', (e) => {
             const type = e.detail?.type;
-            if (type === 'villain' && this.activeModule?.id === 'villains') this.render();
+
             if (type === 'npc' && this.activeModule?.id === 'npcs') this.render();
         });
     },
@@ -136,16 +127,16 @@ export const ContentModule = {
                 </div>
                 <div class="selection-grid">
                     <div class="selection-card" data-source="system">
-                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-users' : (config.id === 'armadilhas' || config.id === 'monstros' || config.id === 'villains' ? 'fa-skull' : 'fa-scroll')}"></i></div>
+                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-users' : (config.id === 'armadilhas' || config.id === 'monstros' ? 'fa-skull' : 'fa-scroll')}"></i></div>
                         <div class="selection-info">
                             <h3>Sistema</h3>
                             <p>${config.selectionDescSystem || 'Consulte os arquivos oficiais.'}</p>
                         </div>
                     </div>
                     <div class="selection-card" data-source="personal">
-                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-id-card' : (config.id === 'villains' ? 'fa-user-ninja' : 'fa-hammer')}"></i></div>
+                        <div class="selection-icon"><i class="fas ${config.id === 'npcs' ? 'fa-id-card' : 'fa-hammer'}"></i></div>
                         <div class="selection-info">
-                            <h3>${config.id === 'npcs' ? 'Meus NPCs' : (config.id === 'villains' ? 'Meus Vilões' : 'Minhas Criações')}</h3>
+                            <h3>${config.id === 'npcs' ? 'Meus NPCs' : 'Minhas Criações'}</h3>
                             <p>${config.selectionDescPersonal || 'Gerencie seu próprio arsenal.'}</p>
                         </div>
                     </div>
