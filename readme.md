@@ -10,26 +10,27 @@
 
 <p align="center">
   🧙 <strong>Taverna Digital de RPG</strong> • 🔮 <strong>Oráculo Arcano</strong> • 📜 <strong>Pergaminhos Automáticos</strong><br>
-  🚀 <strong>Versão Alfa 3.4.0 (Separação dos Ecos)</strong><br>
+  🚀 <strong>Versão Alfa 3.4.1 (Estabilização Arcana)</strong><br>
 </p>
 
 <p align="center"> <strong>Lyra the Wise</strong> não é apenas um app, é uma velha sábia que transformará seu navegador em uma <strong>mesa de RPG lendária</strong>. Ela tece histórias, calcula números e guia aventureiros novatos e veteranos.</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.4.0-gold?style=for-the-badge&logo=none" />
+  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.4.1-gold?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/Magia-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/Estilo-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/Lógica-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
   <img src="https://img.shields.io/badge/Memória-Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
-  <img src="https://img.shields.io/badge/Oráculo-Gemini%202.0-blue?style=for-the-badge&logo=google&logoColor=white" />
+  <img src="https://img.shields.io/badge/Oráculo-Gemini%202.5-blue?style=for-the-badge&logo=google&logoColor=white" />
 </p>
 
-> **Aviso do Escriba:** Os Ecos foram separados! O Oráculo Arcano agora possui uma mente dedicada (`prompts.js`), o combate foi refinado e a interface recebeu polimento visual em toda a extensão do Sanctum. Confira abaixo os recursos forjados.
+> **Aviso do Escriba:** O Oráculo Arcano agora opera com o poder do **Gemini 2.5 Flash Lite**, contando com um sistema de fallback inteligente e retries automáticos. O Grimório foi totalmente normalizado para exibir todos os detalhes das magias e suas respectivas classes.
 
 ---
 
 ## 🧭 **Mapa do Pergaminho**
 - [✅ Conquistas (100% Funcional)](#conquistas)
+- [📱 Versão Mobile](#mobile)
 - [🗺️ Roadmap Futuro](#roadmap)
 
 ---
@@ -40,15 +41,19 @@ O coração do sistema pulsa com magia plena. Os seguintes recursos estão compl
 
 1.  **Criação de Fichas**: Editor completo e imersivo para personagens D&D 5e.
 2.  **Criação e Uso de Itens**: Forja de itens personalizados e gestão de inventário integrada à ficha.
-3.  **Grimórios de Magia**: Biblioteca arcana com busca inteligente e gestão de slots de magia.
+3.  **Grimórios de Magia**: Biblioteca arcana com normalização exaustiva de dados e exibição de detalhes técnicos.
 4.  **Bestiário Completo**: Catálogo de monstros e criaturas com busca e criação manual/arcana.
 5.  **Rolagem de Dados**: Simulador de dados 3D integrado ao fluxo do jogo.
-6.  **Chat com os Heróis**: Interação direta com Lyra (Sábia), Damien (Mestre) e Eldrin (Bardo) para auxílio e narrativa imersiva.
-7.  **Módulos de Conteúdo (Alfa)**: Novos módulos para mestres criarem Vilões, NPCs, Campanhas, Encontros, Puzzles, Tesouros, Cenas, Tramas, Motivações e Regras com auxílio do Oráculo Arcano.
-8.  **Geração Global de Conteúdo**: Ferramentas integradas para mestres criarem NPCs, tramas e masmorras instantaneamente com o Oráculo.
-9.  **Oracle AI Master System**: Assistente narrativo que provê imersão profunda, sugere rolagens de perícia e expande as cenas sob a coordenação do Mestre.
-10. **Comunidade & Notificações**: Taverna social com sistema de alertas em tempo real para novas mensagens.
-11. **Fluxo de Trabalho Dual-AI**: Sistema automatizado de desenvolvimento e auditoria (Builder/Auditor) para garantir máxima qualidade e segurança no código.
+6.  **Chat com os Heróis**: Interação direta com Lyra (Sábia), Damien (Mestre) e Eldrin (Bardo).
+7.  **Módulos de Conteúdo**: Sistema de criação assistida para Vilões, NPCs, Campanhas e mais.
+8.  **Oracle AI Master System**: Assistente narrativo com suporte a fallback automático e mitigação de erros 429.
+
+---
+
+<div id="mobile"></div>
+
+## 📱 **Versão Mobile**
+A versão mobile oficial da Lyra the Wise será produzida utilizando o **Android Studio**, garantindo uma experiência nativa, fluida e otimizada para todos os viajantes que utilizam dispositivos Android.
 
 ---
 
