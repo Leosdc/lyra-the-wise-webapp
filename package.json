@@ -1,6 +1,6 @@
 {
   "name": "lyra-the-wise",
-  "version": "3.2.0",
+  "version": "3.4.2",
   "scripts": {
     "dev": "vite",
     "dev-total": "start node server.js & vite",
