@@ -385,7 +385,7 @@ export const MonsterModule = {
 
         // Show stats row for new format entities
         const statsRow = (acLabel || hpLabel) ? `
-            <div class="monster-stats-row" style="display: flex; gap: 8px; font-size: 0.7rem; opacity: 0.7; margin-top: 2px;">
+            <div class="monster-stats-row">
                 ${acLabel ? `<span>CA ${acLabel}</span>` : ''}
                 ${hpLabel ? `<span>PV ${hpLabel}</span>` : ''}
             </div>
@@ -401,7 +401,7 @@ export const MonsterModule = {
                             <i class="fas fa-dragon"></i>
                         </div>
                         <div class="monster-info">
-                            <span>${safeName}</span>
+                            <span class="monster-name">${safeName}</span>
                             <div class="monster-type-label">${safeType}</div>
                             ${statsRow}
                         </div>
