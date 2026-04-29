@@ -2,6 +2,15 @@
 
 Todas as grandes mudanças no Sanctum são registradas aqui para os historiadores futuros.
 
+## [3.4.3] - 2026-04-28
+### 🛡️ Estabilização do Bestiário & Polimento de UI
+- **Bestiário (Cards de Monstros)**:
+    - Correção de layout: PV e CA agora são exibidos lado a lado corretamente.
+    - Isolamento de estilos: Adicionada classe `.monster-name` para evitar conflitos de truncagem de texto.
+    - Neutralização de vazamento de CSS: Resolvido problema onde o PV era escondido por reticências herdadas dos módulos de Itens/Spells.
+- **Comunidade (Chat)**:
+    - Correção de contraste: Placeholder do chat global agora é visível em todos os temas, especialmente nos temas claros (Lyra/Eldrin).
+
 ## [3.4.2] - 2026-04-28
 ### 🧹 Purga de Vilões & Limpeza de Interface
 - **Remoção do Módulo de Vilões**:
