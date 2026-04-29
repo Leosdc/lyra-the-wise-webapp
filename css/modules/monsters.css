@@ -69,7 +69,7 @@
     gap: 4px;
 }
 
-.monster-card .gallery-card span {
+.monster-card .monster-name {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -93,18 +93,22 @@
     max-width: 200px;
 }
 
-.monster-hp-ac {
+.monster-stats-row {
     display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin-top: 8px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--gold-faded);
+    opacity: 0.8;
 }
 
-.monster-hp-ac i {
-    font-size: 0.7rem;
-    margin-right: 4px;
+.monster-stats-row span {
+    white-space: nowrap !important;
+    display: inline-block !important;
+    overflow: visible !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
 }
 
 
