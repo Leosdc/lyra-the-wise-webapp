@@ -243,8 +243,7 @@ body.damien-theme .guidance-bubble p {
     color: var(--gold-bright);
 }
 
-.eldrin-theme #chat-input::placeholder,
-.eldrin-theme #global-chat-input::placeholder {
+.eldrin-theme #chat-input::placeholder {
     color: rgba(249, 231, 159, 0.6) !important;
 }
 

@@ -178,7 +178,7 @@
 }
 
 #global-chat-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(44, 30, 22, 0.6);
     font-style: italic;
 }
 
