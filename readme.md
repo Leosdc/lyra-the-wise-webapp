@@ -10,13 +10,13 @@
 
 <p align="center">
   🧙 <strong>Taverna Digital de RPG</strong> • 🔮 <strong>Oráculo Arcano</strong> • 📜 <strong>Pergaminhos Automáticos</strong><br>
-  🚀 <strong>Versão Alfa 3.4.3 (Estabilização do Bestiário)</strong><br>
+  🚀 <strong>Versão Alfa 3.5.0 (Convocador Unificado)</strong><br>
 </p>
 
 <p align="center"> <strong>Lyra the Wise</strong> não é apenas um app, é uma velha sábia que transformará seu navegador em uma <strong>mesa de RPG lendária</strong>. Ela tece histórias, calcula números e guia aventureiros novatos e veteranos.</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.4.3-gold?style=for-the-badge&logo=none" />
+  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.5.0-gold?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/Magia-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/Estilo-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/Lógica-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
@@ -24,7 +24,7 @@
   <img src="https://img.shields.io/badge/Oráculo-Gemini%202.5-blue?style=for-the-badge&logo=google&logoColor=white" />
 </p>
 
-> **Aviso do Escriba:** O Oráculo Arcano agora opera com o poder do **Gemini 2.5 Flash Lite**, contando com um sistema de fallback inteligente e retries automáticos. O Grimório foi totalmente normalizado para exibir todos os detalhes das magias e suas respectivas classes.
+> **Aviso do Escriba:** O Convocador Unificado agora centraliza toda a criação de entidades (Monstros e NPCs) em um único fluxo persistente. NPCs possuem campo de **Disposição** (Aliado/Vilão/Neutro) para definição clara de papéis em combate e narrativa.
 
 ---
 
@@ -47,6 +47,7 @@ O coração do sistema pulsa com magia plena. Os seguintes recursos estão compl
 6.  **Chat com os Heróis**: Interação direta com Lyra (Sábia), Damien (Mestre) e Eldrin (Bardo).
 7.  **Módulos de Conteúdo**: Sistema de criação assistida para NPCs, Campanhas e mais.
 8.  **Oracle AI Master System**: Assistente narrativo com suporte a fallback automático e mitigação de erros 429.
+9.  **Convocador Unificado**: Fluxo centralizado para criação e convocação de Monstros e NPCs com persistência Firestore.
 
 ---
 
