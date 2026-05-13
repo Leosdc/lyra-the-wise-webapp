@@ -98,6 +98,12 @@ const safeParseJSON = (str) => {
     if (!str) return null;
     let jsonStr = str.trim();
 
+    // Extrair conteúdo de code fences (```json ... ```) antes de qualquer detecção
+    const codeFenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
+    if (codeFenceMatch) {
+        jsonStr = codeFenceMatch[1].trim();
+    }
+
     const firstBrace = jsonStr.indexOf('{');
     const firstBracket = jsonStr.indexOf('[');
 
