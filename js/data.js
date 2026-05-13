@@ -313,8 +313,115 @@ export const getEmptyEntity = (entityType) => ({
     abilities: [],
     death_saves: { successes: 0, failures: 0 },
     tokenUrl: "",
+    disposition: "",
     sharedWith: []
 });
+
+/**
+ * Cria uma entidade "lite" (campos mínimos) usando o schema completo getEmptyEntity().
+ * Persiste imediatamente no Firestore e retorna o ID gerado.
+ * @param {'npc'|'monster'} entityType - Tipo de entidade
+ * @param {string} userId - ID do usuário criador
+ * @param {string} userEmail - Email do usuário criador
+ * @param {Object} liteData - Dados mínimos: { name, ac, hp, initBonus, actions }
+ * @returns {Promise<{id: string, entity: Object}>} ID e entidade salva
+ */
+export const createLiteEntity = async (entityType, userId, userEmail, liteData) => {
+    const { name, ac = 10, hp = 30, initBonus = 0, actions = [], disposition = '' } = liteData;
+    if (!name) throw new Error('Nome da entidade é obrigatório.');
+
+    const entity = getEmptyEntity(entityType);
+    entity.name = name;
+    entity.stats.ac = parseInt(ac, 10);
+    entity.stats.hp_max = parseInt(hp, 10);
+    entity.stats.hp_current = parseInt(hp, 10);
+    entity.stats.initiative = parseInt(initBonus, 10);
+    entity.disposition = disposition;
+
+    // Mapear ações do formato simplificado da Forja para combat.attacks
+    entity.combat.attacks = actions.map(a => ({
+        name: a.name || '',
+        bonus: 0,
+        damage: a.damage || '',
+        range: a.range || '',
+        description: a.desc || ''
+    }));
+
+    const savedId = await saveEntity(entityType, userId, userEmail, entity);
+    return { id: savedId, entity: { ...entity, id: savedId } };
+};
+
+/**
+ * Busca uma entidade do banco e converte para o formato esperado pelo CombatEngine.
+ * Retorna um objeto plano com campos no nível raiz: { id, name, ac, hp, maxHp, initBonus, actions, type }
+ * @param {'npc'|'monster'} entityType
+ * @param {string} entityId
+ * @returns {Promise<Object|null>} Entidade em formato de combate ou null
+ */
+export const getEntityForCombat = async (entityType, entityId) => {
+    const entity = await getEntityById(entityType, entityId);
+    if (!entity) return null;
+
+    return {
+        id: entity.id,
+        name: entity.name || 'Entidade Desconhecida',
+        ac: entity.stats?.ac ?? entity.ac ?? 10,
+        hp: entity.stats?.hp_max ?? entity.hp ?? 10,
+        maxHp: entity.stats?.hp_max ?? entity.maxHp ?? 10,
+        initBonus: entity.stats?.initiative ?? entity.initBonus ?? 0,
+        actions: (entity.combat?.attacks || []).map(a => ({
+            name: a.name || '',
+            damage: a.damage || '',
+            range: a.range || '',
+            desc: a.description || a.desc || ''
+        })),
+        type: entityType,
+        sourceId: entity.id,
+        sourceType: entityType
+    };
+};
+
+/**
+ * Busca todas as entidades disponíveis para seleção no Convocador Unificado.
+ * Retorna um objeto com arrays separados: { npcs, userMonsters, globalMonsters }
+ * Cada entidade inclui um campo `_source` para rastreabilidade.
+ * @param {string} userId
+ * @param {string} userEmail
+ * @param {string} systemId - Sistema de jogo (ex: 'dnd5e')
+ * @returns {Promise<{npcs: Array, userMonsters: Array, globalMonsters: Array}>}
+ */
+export const getAllEntitiesForSelection = async (userId, userEmail, systemId = 'dnd5e') => {
+    const [npcs, userMons, globalMons] = await Promise.all([
+        getUserNPCs(userId, userEmail),
+        getUserMonsters(userId, userEmail),
+        getGlobalMonsters(systemId)
+    ]);
+
+    const toCombatFormat = (entity, source) => ({
+        id: entity.id,
+        name: entity.name || 'Sem Nome',
+        ac: entity.stats?.ac ?? entity.ac ?? 10,
+        hp: entity.stats?.hp_max ?? entity.hp ?? 10,
+        maxHp: entity.stats?.hp_max ?? entity.maxHp ?? 10,
+        initBonus: entity.stats?.initiative ?? entity.initBonus ?? 0,
+        actions: (entity.combat?.attacks || entity.actions || []).map(a => ({
+            name: a.name || '',
+            damage: a.damage || '',
+            range: a.range || '',
+            desc: a.description || a.desc || ''
+        })),
+        type: source === 'npc' ? 'npc' : 'monster',
+        _source: source
+    });
+
+    return {
+        npcs: npcs.map(n => toCombatFormat(n, 'npc')),
+        monstros: [
+            ...globalMons.map(m => toCombatFormat(m, 'global_monster')),
+            ...userMons.map(m => toCombatFormat(m, 'user_monster'))
+        ]
+    };
+};
 
 export const getEmptyAbility = (abilityOrigin) => ({
     uid: "",
