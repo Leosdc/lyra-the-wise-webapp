@@ -217,9 +217,9 @@ export function createActionsMixin(ctx) {
                     <p>O que você deseja manifestar nesta rodada da crônica?</p>
                     
                     <div class="master-actions-grid">
-                        <div class="master-action-btn" id="m-btn-npc">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Criar NPC</span>
+                        <div class="master-action-btn" id="m-btn-summon">
+                            <i class="fas fa-dungeon"></i>
+                            <span>Convocar Entidade</span>
                         </div>
                         <div class="master-action-btn" id="m-btn-combat">
                             <i class="fas fa-skull-crossbones"></i>
@@ -238,7 +238,7 @@ export function createActionsMixin(ctx) {
             `;
             document.body.appendChild(modal);
 
-            modal.querySelector('#m-btn-npc').addEventListener('click', () => {
+            modal.querySelector('#m-btn-summon').addEventListener('click', () => {
                 document.body.removeChild(modal);
                 if (window.CombatPrep) window.CombatPrep.openPrepModal('npc');
             });
