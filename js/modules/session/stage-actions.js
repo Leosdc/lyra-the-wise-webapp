@@ -349,14 +349,28 @@ export function createActionsMixin(ctx) {
             }
         },
 
-        async deleteNPC(npcName) {
+        async deleteNPC(npcId) {
             if (!ctx.isGM) return;
-            const confirmed = await ctx.showMysticConfirm(`Deseja remover ${npcName} do palco de aliados?`, "Eliminar Aliado");
+
+            // Encontrar o NPC para pegar o nome (para o confirm)
+            const npc = (ctx.activeSession.allies || []).find(n => n.instanceId === npcId || n.name === npcId)
+                || (ctx.activeSession.sessionNPCs || []).find(n => n.instanceId === npcId || n.name === npcId);
+
+            const displayName = npc ? npc.name : npcId;
+
+            const confirmed = await ctx.showMysticConfirm(`Deseja remover ${displayName} do palco de aliados?`, "Eliminar Aliado");
             if (confirmed) {
                 try {
                     const sessionRef = doc(db, COLLECTIONS.SESSIONS, ctx.sessionId);
-                    const newAllies = (ctx.activeSession.allies || []).filter(n => n.name !== npcName);
-                    const newSessionNPCs = (ctx.activeSession.sessionNPCs || []).filter(n => n.name !== npcName);
+
+                    // Filtrar por instanceId (se existir) ou nome (fallback para NPCs antigos)
+                    const filterFn = (n) => {
+                        if (npcId && n.instanceId) return n.instanceId !== npcId;
+                        return n.name !== npcId;
+                    };
+
+                    const newAllies = (ctx.activeSession.allies || []).filter(filterFn);
+                    const newSessionNPCs = (ctx.activeSession.sessionNPCs || []).filter(filterFn);
 
                     await updateDoc(sessionRef, {
                         allies: newAllies,
@@ -364,7 +378,7 @@ export function createActionsMixin(ctx) {
                         updatedAt: serverTimestamp()
                     });
 
-                    ctx.showMysticAlert(`${npcName} foi removido.`);
+                    ctx.showMysticAlert(`${displayName} foi removido.`);
                 } catch (err) {
                     console.error("Erro ao deletar NPC:", err);
                 }
