@@ -308,12 +308,12 @@ export function createSyncMixin(ctx) {
                 const { pct, color } = getHpStatus(hp, maxHp);
 
                 html += `
-                    <div class="ally-card-premium npc-ally" data-npc-name="${escapeHTML(npc.name)}">
+                    <div class="ally-card-premium npc-ally" data-npc-id="${npc.instanceId || ''}" data-npc-name="${escapeHTML(npc.name)}">
                         <div class="ally-header-sml">
                             <span class="ally-name-sml"><i class="fas fa-user-ninja"></i> ${escapeHTML(npc.name)}</span>
                             <div class="ally-meta-mini">
                                 <span class="ally-ac-mini"><i class="fas fa-shield-halved"></i> ${npc.ac || 10}</span>
-                                ${ctx.isGM ? `<i class="fas fa-trash-alt delete-npc-btn" title="Remover NPC" onclick="window.StageModule.deleteNPC(this.closest('.npc-ally').dataset.npcName)"></i>` : ''}
+                                ${ctx.isGM ? `<i class="fas fa-trash-alt delete-npc-btn" title="Remover NPC" onclick="window.StageModule.deleteNPC(this.closest('.npc-ally').dataset.npcId)"></i>` : ''}
                             </div>
                         </div>
                         <div class="ally-hp-bar-container">
