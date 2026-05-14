@@ -580,9 +580,9 @@ const CombatPrep = {
                     </div>
                 ` : ''}
                 <div class="card-qty-control">
-                    <button class="qty-btn" data-qty-id="${m.id}" data-qty-delta="-1">-</button>
+                    <button class="qty-btn" data-qty-id="${m.instanceId}" data-qty-delta="-1">-</button>
                     <span class="qty-display">${m.quantity}</span>
-                    <button class="qty-btn" data-qty-id="${m.id}" data-qty-delta="1">+</button>
+                    <button class="qty-btn" data-qty-id="${m.instanceId}" data-qty-delta="1">+</button>
                 </div>
             </div>
         `).join('');
@@ -636,6 +636,7 @@ const CombatPrep = {
                     const suffix = qty > 1 ? ` ${i}` : '';
                     entitiesToAdd.push({
                         id: m.id,
+                        instanceId: `inst_${Date.now()}_${Math.random().toString(36).substr(2, 5)}_${i}`,
                         name: `${m.name}${suffix}`,
                         ac: m.ac || 10,
                         hp: m.hp || 30,
