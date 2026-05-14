@@ -207,8 +207,8 @@ export const sendMessageToLyra = async (message, history = [], context = "", per
 
     const identity = getIdentity(persona);
     const safeHistory = history.slice(-15);
-    const systemInstruction = buildChatInstruction(history && history.length > 0);
-    const finalMessage = buildChatMessage(message, context, identity);
+    const systemInstruction = buildChatInstruction(identity, history && history.length > 0);
+    const finalMessage = buildChatMessage(message, context);
 
     const data = await callProxy({ message: finalMessage, systemInstruction, history: safeHistory });
     return data.response;
