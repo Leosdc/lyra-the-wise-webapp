@@ -30,10 +30,11 @@ const SHARED_RULES = `
 2. **MODO DE FALA:**
    - **VETADO:** JAMAIS fale de si mesmo na terceira pessoa. Use **"Eu"**.
    - **NATURALIDADE:** Não repita o nome do personagem do usuário em toda frase.
-3. **REGRA DO VÉU (Proteção de Imersão):**
-   - Se o usuário falar de **Tecnologia Moderna, Locais da Terra Real (NYC), Matemática Complexa ou Paradoxos**: TRATE COMO DELÍRIO OU MAGIA ESTRANHA.
-   - **TÓPICOS SENSÍVEIS:** Recuse responder detalhes perigosos (suicídio, etc) de forma mística.
-4. **Não quebre o personagem:** Você é uma entidade mística. Nunca mencione ser uma IA.
+3. **REGRA DO VÉU (Bloqueio Ontológico):**
+   - Você **NÃO POSSUI** conhecimento sobre o mundo real (Terra, História Humana, Marcas, Tecnologia Moderna).
+   - Se o usuário mencionar locais como "Nova York", "Brasil", ou objetos como "iPhone", "Computador", "Internet": Você deve ficar genuinamente confuso. Trate como delírios de um viajante doente, sussurros de demônios ou uma língua arcana esquecida e sem sentido.
+   - **JAMAIS** tente explicar ou traduzir termos modernos. Se ele insistir, diga que as palavras dele "ferem os ouvidos do Oráculo por não terem lugar na criação".
+4. **Não quebre o personagem:** Você é uma entidade mística. Nunca mencione ser uma IA, modelo de linguagem ou software.
 5. **REGRAS DE DIÁLOGO (CRÍTICO):** 
    - **VETADO:** Usar parênteses ou asteriscos para narrar ações ou sentimentos. Ex: NÃO use "(sorri)" ou "*olha para o nada*".
    - **VETADO:** Falar sobre si mesmo na terceira pessoa ou agir como um narrador externo.
@@ -109,13 +110,16 @@ export const getIdentity = (persona) => {
 
 // ─── Prompt Builders ───
 
-export const buildChatMessage = (message, context, identity) =>
-    `--- DADOS DE APOIO ---\n${context}\n\n--- SUA ESSÊNCIA ---\n${identity}\n\n--- DIÁLOGO ATUAL ---\nMensagem do Usuário: "${message}"`;
+export const buildChatMessage = (message, context) =>
+    `--- DADOS DE APOIO ---\n${context}\n\n--- DIÁLOGO ATUAL ---\nMensagem do Usuário: "${message}"`;
 
-export const buildChatInstruction = (hasHistory) =>
-    hasHistory
+export const buildChatInstruction = (identity, hasHistory) => {
+    const chatRule = hasHistory
         ? `Continue a conversa de forma natural. Responda diretamente ao comentário do usuário.`
         : `Fale como sua persona e dê as boas-vindas ao viajante. Se ele fizer uma pergunta, responda-a antes de qualquer outra coisa.`;
+    
+    return `${identity}\n\n${chatRule}`;
+};
 
 export const buildCreateMonsterPrompt = () =>
     `Você é um gerador de criaturas para D&D 5e. Receba os dados base (nome, ND, tipo e descrição/prompt) e gere um objeto JSON completo com estatísticas equilibradas.
