@@ -211,7 +211,7 @@ app.post('/api/ai', verifySecurity, async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const modelsToTry = ["gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite-preview-02-05", "gemini-1.5-flash", "gemini-1.5-flash-8b"];
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-8b"];
         let responseText = "";
         let finalModelUsed = "";
 
