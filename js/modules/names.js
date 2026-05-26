@@ -1,6 +1,7 @@
 import { generateNames } from '../ai.js';
 import { auth } from '../auth.js';
-import { SUPPORTED_SYSTEMS, RACES, CLASSES } from '../constants.js';
+import { SUPPORTED_SYSTEMS } from '../constants.js';
+import SystemRegistry from '../systems/system-registry.js';
 
 export const NamesModule = {
     names: [],
@@ -29,17 +30,22 @@ export const NamesModule = {
         const raceSelect = document.getElementById('names-race-filter');
         const classSelect = document.getElementById('names-class-filter');
 
+        const currentPlugin = SystemRegistry.getCurrent();
+        const creationData = currentPlugin?.getCreationData() || {};
+        const races = creationData.races || [];
+        const classes = creationData.classes || [];
+
         if (raceSelect) {
             const currentRace = raceSelect.value;
             raceSelect.innerHTML = '<option value="">Qualquer Raça</option>' +
-                RACES.map(r => `<option value="${r}">${r}</option>`).join('');
+                races.map(r => `<option value="${r}">${r}</option>`).join('');
             raceSelect.value = currentRace;
         }
 
         if (classSelect) {
             const currentClass = classSelect.value;
             classSelect.innerHTML = '<option value="">Qualquer Classe</option>' +
-                CLASSES.map(c => `<option value="${c}">${c}</option>`).join('');
+                classes.map(c => `<option value="${c}">${c}</option>`).join('');
             classSelect.value = currentClass;
         }
     },
