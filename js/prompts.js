@@ -4,6 +4,8 @@
  * sem tocar na lógica de rede/proxy.
  */
 
+import SystemRegistry from './systems/system-registry.js';
+
 // ─── Lore e Regras Compartilhadas ───
 
 const SHARED_LORE = `
@@ -126,16 +128,30 @@ export const buildCreateMonsterPrompt = () =>
     Retorne APENAS o JSON.
     Estrutura: { "name": "...", "cr": "...", "type": "...", "ac": 10, "hp": "10 (2d8 + 2)", "attributes": { "FOR": 10, ... }, "actions": [ { "name": "Ataque", "description": "..." } ], "description": "..." }`;
 
-export const buildCreateCharacterPrompt = () =>
-    `Você é a Guardiã do Eco. Sua tarefa é completar a história e detalhes de um personagem de D&D 5e.
+export const buildCreateCharacterPrompt = () => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getCharacterPrompt === 'function') {
+        const result = system.getCharacterPrompt();
+        if (result) return result;
+    }
+    // Fallback legado
+    return `Você é a Guardiã do Eco. Sua tarefa é completar a história e detalhes de um personagem de D&D 5e.
     Receba os dados básicos e gere: Traços de Personalidade, Ideais, Vínculos, Defeitos, Aparência e uma História (Backstory) envolvente.
     Retorne APENAS um objeto JSON com esses campos em português.`;
+};
 
 export const buildProcessSessionPrompt = () =>
     `Você é o Oráculo. Sua tarefa é analisar os dados de uma sessão de RPG e fornecer um gancho narrativo e uma introdução mística.
     Retorne um texto narrativo em português.`;
 
-export const buildItemPrompt = (prompt, flavor) => `
+export const buildItemPrompt = (prompt, flavor) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getItemPrompt === 'function') {
+        const result = system.getItemPrompt(prompt, flavor);
+        if (result) return result;
+    }
+    // Fallback legado
+    return `
     [ACT AS]: D&D 5e Item Generator.
     [TASK]: Generate a D&D 5e item based on the user prompt.
     [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
@@ -185,8 +201,16 @@ export const buildItemPrompt = (prompt, flavor) => `
     
     [USER PROMPT]: ${prompt}
     `;
+};
 
-export const buildSpellPrompt = (prompt, flavor) => `
+export const buildSpellPrompt = (prompt, flavor) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getSpellPrompt === 'function') {
+        const result = system.getSpellPrompt(prompt, flavor);
+        if (result) return result;
+    }
+    // Fallback legado
+    return `
     [ACT AS]: D&D 5e Spell Generator.
     [TASK]: Generate a D&D 5e spell based on the user prompt.
     [OUTPUT]: Valid JSON Object ONLY. No markdown.
@@ -236,8 +260,16 @@ export const buildSpellPrompt = (prompt, flavor) => `
     
     [USER PROMPT]: ${prompt}
     `;
+};
 
-export const buildMonsterPrompt = (prompt, flavor) => `
+export const buildMonsterPrompt = (prompt, flavor) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getMonsterPrompt === 'function') {
+        const result = system.getMonsterPrompt(prompt, flavor);
+        if (result) return result;
+    }
+    // Fallback legado
+    return `
     [ACT AS]: D&D 5e Monster Generator.
     [TASK]: Generate a D&D 5e monster based on the user prompt.
     [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
@@ -287,8 +319,15 @@ export const buildMonsterPrompt = (prompt, flavor) => `
     
     [USER PROMPT]: ${prompt}
     `;
+};
 
 export const buildEntityPrompt = (entityType, prompt, flavor) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getEntityPrompt === 'function') {
+        const result = system.getEntityPrompt(entityType, prompt, flavor);
+        if (result) return result;
+    }
+    // Fallback legado
     const typeLabels = { monster: 'Monstro/Criatura', npc: 'NPC/Personagem Não-Jogável' };
     const label = typeLabels[entityType] || 'Entidade';
 
@@ -330,7 +369,14 @@ export const buildEntityPrompt = (entityType, prompt, flavor) => {
     `;
 };
 
-export const buildAbilityPrompt = (prompt, flavor) => `
+export const buildAbilityPrompt = (prompt, flavor) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getAbilityPrompt === 'function') {
+        const result = system.getAbilityPrompt(prompt, flavor);
+        if (result) return result;
+    }
+    // Fallback legado
+    return `
     [ACT AS]: D&D 5e Ability/Skill Generator.
     [TASK]: Generate a detailed ability/skill for D&D 5e.
     [OUTPUT]: Valid JSON Object ONLY. No markdown.
@@ -361,17 +407,28 @@ export const buildAbilityPrompt = (prompt, flavor) => `
 
     [USER PROMPT]: ${prompt}
     `;
+};
 
-export const buildNamesPrompt = (race, clazz, gender) => `
+export const buildNamesPrompt = (race, clazz, gender) => {
+    const system = SystemRegistry.getCurrent();
+    if (system && typeof system.getNamesPrompt === 'function') {
+        const result = system.getNamesPrompt(race, clazz, gender);
+        if (result) return result;
+    }
+    // Fallback legado
+    return `
     [ACT AS]: D&D 5e Name Generator.
     [TASK]: Generate 10 names/surnames for a character.
     [FILTERS]: Race: ${race || 'Qualquer'}, Class: ${clazz || 'Qualquer'}, Gender: ${gender || 'Qualquer'}
     [OUTPUT]: Valid JSON Array of Strings ONLY. No markdown.
     [EXAMPLE]: ["Nome 1", "Nome 2", ...]
     `;
+};
 
-export const buildModuleContentPrompt = (type, prompt, flavor, schema) =>
-    `[ACT AS]: D&D 5e Content Generator. [TASK]: Generate ${type}. [OUTPUT]: Valid JSON. [LANGUAGE]: pt-BR. [JSON STRUCTURE]: ${JSON.stringify(schema)}. IMPORTANT: "description" MUST end with: '${flavor}'\n[USER]: ${prompt}`;
+export const buildModuleContentPrompt = (type, prompt, flavor, schema) => {
+    const systemName = SystemRegistry.getCurrent()?.getPromptContext() || "D&D 5e";
+    return `[ACT AS]: ${systemName} Content Generator. [TASK]: Generate ${type}. [OUTPUT]: Valid JSON. [LANGUAGE]: pt-BR. [JSON STRUCTURE]: ${JSON.stringify(schema)}. IMPORTANT: "description" MUST end with: '${flavor}'\n[USER]: ${prompt}`;
+};
 
 export const buildSessionPrompt = (prompt, systemId) => `
     [ACT AS]: Expert Game Master (Dungeon Master).
@@ -388,10 +445,12 @@ export const buildSessionPrompt = (prompt, systemId) => `
     [USER THEME/SEED]: ${prompt}
     `;
 
-export const buildSessionStoryPrompt = (aiName, context) => `
+export const buildSessionStoryPrompt = (aiName, context) => {
+    const systemName = SystemRegistry.getCurrent()?.getPromptContext() || "D&D 5e";
+    return `
     [ACT AS]: Expert Game Master and Storyteller.
     [IDENTITY]: You are the ${aiName}, an ancient and powerful arcane entity.
-    [TASK]: Generate a D&D 5e session story hook.
+    [TASK]: Generate a ${systemName} session story hook.
     [LANGUAGE]: Portuguese (pt-BR).
     [FORMAT]: Narrative text (3-5 paragraphs). No markdown tags like # or **. Just pure text.
     
@@ -409,6 +468,7 @@ export const buildSessionStoryPrompt = (aiName, context) => `
     
     [OUTPUT]: Pure narrative text starting with a hook and ending with: 'O destino está em suas mãos.'
     `;
+};
 
 export const buildExtendStoryPrompt = (context, gmRequest) => `
     [ACT AS]: Expert Game Master and Storyteller.
