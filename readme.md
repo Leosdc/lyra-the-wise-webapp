@@ -10,13 +10,13 @@
 
 <p align="center">
   🧙 <strong>Taverna Digital de RPG</strong> • 🔮 <strong>Oráculo Arcano</strong> • 📜 <strong>Pergaminhos Automáticos</strong><br>
-  🚀 <strong>Versão Alfa 3.5.0 (Convocador Unificado)</strong><br>
+  🚀 <strong>Versão Alfa 3.6.0 (Ritos de Auditoria e Storyteller)</strong><br>
 </p>
 
 <p align="center"> <strong>Lyra the Wise</strong> não é apenas um app, é uma velha sábia que transformará seu navegador em uma <strong>mesa de RPG lendária</strong>. Ela tece histórias, calcula números e guia aventureiros novatos e veteranos.</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.5.0-gold?style=for-the-badge&logo=none" />
+  <img src="https://img.shields.io/badge/Ciclo-Alfa%203.6.0-gold?style=for-the-badge&logo=none" />
   <img src="https://img.shields.io/badge/Magia-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/Estilo-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
   <img src="https://img.shields.io/badge/Lógica-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
@@ -48,6 +48,8 @@ O coração do sistema pulsa com magia plena. Os seguintes recursos estão compl
 7.  **Módulos de Conteúdo**: Sistema de criação assistida para NPCs, Campanhas e mais.
 8.  **Oracle AI Master System**: Assistente narrativo com suporte a fallback automático e mitigação de erros 429.
 9.  **Convocador Unificado**: Fluxo centralizado para criação e convocação de Monstros e NPCs com persistência Firestore.
+10. **Portal de Auditoria e Diagnóstico**: Interface em tela cheia dedicada com console em tempo real para ritos de verificação de integridade de sistemas RPG e código JS.
+11. **Suporte Multi-Sistemas (Storyteller)**: Arquitetura expansível baseada em plugins que implementa o sistema Vampire: The Masquerade V5 ao lado do D&D 5e original com recarga e isolamento estrito de dados.
 
 ---
 

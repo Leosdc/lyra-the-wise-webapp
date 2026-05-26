@@ -31,7 +31,7 @@ const LootModule = {
 
             modal.innerHTML = `
                 <div class="modal-stage-content parchment-mini">
-                    <h2 class="medieval-title">🎁 Item Encontrado!</h2>
+                    <h2 class="medieval-title"><i class="fas fa-gift" style="color: var(--gold); margin-right: 6px;"></i> Item Encontrado!</h2>
                     <div class="loot-item-display">
                         <h3>${escapeHTML(item.name)}</h3>
                         <p class="item-description">${escapeHTML(item.description || '')}</p>
@@ -95,7 +95,7 @@ const LootModule = {
                 <div class="roll-result ${isWinner ? 'winner' : ''}">
                     <span class="player-name">${escapeHTML(r.player.name)}</span>
                     <span class="roll-value">${r.roll}</span>
-                    ${isWinner ? '<span class="winner-badge">🏆 Vencedor!</span>' : ''}
+                    ${isWinner ? '<span class="winner-badge"><i class="fas fa-trophy" style="color: var(--gold); margin-right: 4px;"></i> Vencedor!</span>' : ''}
                 </div>
             `;
         });

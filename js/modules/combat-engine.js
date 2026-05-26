@@ -25,6 +25,7 @@ import { logger } from "../logger.js";
 import CombatOracle from "./combat-oracle.js";
 import { callGeminiAPI } from "../ai.js";
 import { escapeHTML } from "./utils.js";
+import SystemRegistry from '../systems/system-registry.js';
 
 import { createDamageMixin } from './combat-damage.js';
 
@@ -298,15 +299,23 @@ const CombatEngine = {
      */
     calculateInitiative(players, monsters) {
         const all = [];
+        const currentPlugin = SystemRegistry.getCurrent();
+        const combatConfig = currentPlugin?.getCombatConfig() || { usesInitiative: true };
 
         for (const player of players) {
-            const dexMod = Math.floor((player.dexterity - 10) / 2);
+            let initiativeBonus = 0;
+            if (currentPlugin && typeof currentPlugin.calculateInitiativeBonus === 'function') {
+                initiativeBonus = currentPlugin.calculateInitiativeBonus(player.characterData);
+            } else {
+                initiativeBonus = Math.floor((player.dexterity - 10) / 2);
+            }
+
             const roll = Math.floor(Math.random() * 20) + 1;
             all.push({
                 ...player,
-                initiative: dexMod + roll,
+                initiative: initiativeBonus + roll,
                 initiativeRoll: roll,
-                dexMod: dexMod,
+                dexMod: initiativeBonus,
                 conMod: Math.floor(((player.constitution || 10) - 10) / 2),
                 statusEffects: []
             });
@@ -544,7 +553,7 @@ const CombatEngine = {
 
                 if (nextIndex === 0 && originalIndex !== 0) {
                     this.combatState.round++;
-                    await this.sendCombatMessage(`\n🔄 **INÍCIO DA RODADA ${this.combatState.round}**`, 'system');
+                    await this.sendCombatMessage(`\n<i class="fas fa-sync" style="color: var(--gold); margin-right: 6px;"></i> **INÍCIO DA RODADA ${this.combatState.round}**`, 'system');
 
                     const players = this.combatState.turnOrder.filter(p => p.type === 'player');
                     this.combatState.playerActions = this.initializePlayerActions(players);
@@ -814,8 +823,8 @@ const CombatEngine = {
         });
 
         const message = winner === 'players'
-            ? '🏆 **VITÓRIA!** Os heróis triunfaram sobre seus adversários!'
-            : '💀 **DERROTA...** Fim da jornada. O mestre decide o que vai fazer agora.';
+            ? '<i class="fas fa-trophy" style="color: var(--gold); margin-right: 6px;"></i> **VITÓRIA!** Os heróis triunfaram sobre seus adversários!'
+            : '<i class="fas fa-skull" style="color: var(--crimson); margin-right: 6px;"></i> **DERROTA...** Fim da jornada. O mestre decide o que vai fazer agora.';
 
         await this.sendCombatMessage(message, 'system');
 

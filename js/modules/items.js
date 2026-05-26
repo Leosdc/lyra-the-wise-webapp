@@ -572,14 +572,26 @@ export const ItemsModule = {
 
         if (form) form.reset();
 
-        if (prefilledData) {
+                if (prefilledData) {
+            let dmg = prefilledData.damage || '';
+            let dmgType = prefilledData.damageType || '';
+
+            // Rede de segurança inteligente: se o tipo de dano estiver em branco, mas concatenado no dano puro (ex: "1d8 necrótico")
+            if (dmg && !dmgType) {
+                const match = dmg.trim().match(/^(\d+d\d+(?:\s*[\+\-]\s*\d+)?)\s+(?:de\s+)?(.+)$/i);
+                if (match) {
+                    dmg = match[1].trim();
+                    dmgType = match[2].trim();
+                }
+            }
+
             document.getElementById('create-item-name').value = prefilledData.name || '';
             document.getElementById('create-item-type').value = prefilledData.type || 'weapon';
             document.getElementById('create-item-rarity').value = prefilledData.rarity || 'common';
             document.getElementById('create-item-weight').value = prefilledData.weight || '';
             document.getElementById('create-item-cost').value = prefilledData.cost || '';
-            document.getElementById('create-item-damage').value = prefilledData.damage || '';
-            document.getElementById('create-item-damage-type').value = prefilledData.damageType || '';
+            document.getElementById('create-item-damage').value = dmg;
+            document.getElementById('create-item-damage-type').value = dmgType;
             document.getElementById('create-item-ac').value = prefilledData.ac || '';
             document.getElementById('create-item-props').value = (prefilledData.properties || []).join(', ');
             document.getElementById('create-item-desc').value = prefilledData.description || '';

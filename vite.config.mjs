@@ -18,6 +18,7 @@ export default defineConfig({
                 main: 'index.html',
                 sessionStage: 'session-stage.html',
                 audit: 'audit.html',
+                diagnose: 'diagnose.html',
             },
             output: {
                 manualChunks: {
