@@ -1,7 +1,7 @@
 
 import { createCharacterWithLyra, createMonsterWithLyra, processSessionWithLyra } from '../ai.js';
 import { saveCharacter, saveUserMonster, saveSession, saveTrap, getSystemData } from '../data.js';
-import { SYSTEM_TEMPLATES, RACES, CLASSES, SUBRACES, ARCHETYPES, BACKGROUNDS } from '../constants.js';
+import SystemRegistry from '../systems/system-registry.js';
 import { logger } from '../logger.js';
 
 /**
@@ -106,42 +106,14 @@ export const WizardModule = {
                 <div class="wizard-step hidden" data-step="2">
                     <h3>Atributos <i class="fas fa-book-open pointer-icon" id="open-attr-tips"
                             title="Dicas de Geração"></i></h3>
-                    <div class="attributes-grid">
-                        <div class="attr-input"><span>FOR</span><input type="number" id="wiz-str" value="10" min="0"
-                                max="25"></div>
-                        <div class="attr-input"><span>DES</span><input type="number" id="wiz-dex" value="10" min="0"
-                                max="25"></div>
-                        <div class="attr-input"><span>CON</span><input type="number" id="wiz-con" value="10" min="0"
-                                max="25"></div>
-                        <div class="attr-input"><span>INT</span><input type="number" id="wiz-int" value="10" min="0"
-                                max="25"></div>
-                        <div class="attr-input"><span>SAB</span><input type="number" id="wiz-wis" value="10" min="0"
-                                max="25"></div>
-                        <div class="attr-input"><span>CAR</span><input type="number" id="wiz-cha" value="10" min="0"
-                                max="25"></div>
+                    <div class="attributes-grid" id="wiz-attributes-grid">
+                        <!-- Populado dinamicamente pelo plugin do sistema -->
                     </div>
                 </div>
                 <div class="wizard-step hidden" data-step="3">
                     <h3>Perícias</h3>
-                    <div class="skills-selection">
-                        <label><input type="checkbox" value="Acrobacia"> Acrobacia</label>
-                        <label><input type="checkbox" value="Adestramento de Animais"> Adestramento</label>
-                        <label><input type="checkbox" value="Arcanismo"> Arcanismo</label>
-                        <label><input type="checkbox" value="Atletismo"> Atletismo</label>
-                        <label><input type="checkbox" value="Atuação"> Atuação</label>
-                        <label><input type="checkbox" value="Blefar"> Blefar</label>
-                        <label><input type="checkbox" value="Furtividade"> Furtividade</label>
-                        <label><input type="checkbox" value="História"> História</label>
-                        <label><input type="checkbox" value="Intimidação"> Intimidação</label>
-                        <label><input type="checkbox" value="Intuição"> Intuição</label>
-                        <label><input type="checkbox" value="Investigação"> Investigação</label>
-                        <label><input type="checkbox" value="Medicina"> Medicina</label>
-                        <label><input type="checkbox" value="Natureza"> Natureza</label>
-                        <label><input type="checkbox" value="Percepção"> Percepção</label>
-                        <label><input type="checkbox" value="Persuasão"> Persuasão</label>
-                        <label><input type="checkbox" value="Prestidigitação"> Prestidigitação</label>
-                        <label><input type="checkbox" value="Religião"> Religião</label>
-                        <label><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
+                    <div class="skills-selection" id="wiz-skills-selection">
+                        <!-- Populado dinamicamente pelo plugin do sistema -->
                     </div>
                 </div>
                 <div class="wizard-step hidden" data-step="4">
@@ -436,13 +408,12 @@ export const WizardModule = {
         });
 
         // Reset attributes
-        ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(attr => {
-            const el = document.getElementById(`wiz-${attr}`);
-            if (el) el.value = 10;
+        document.querySelectorAll('#wiz-attributes-grid input').forEach(input => {
+            input.value = 10;
         });
 
         // Reset Skills
-        document.querySelectorAll('#creation-wizard .skills-selection input[type="checkbox"]').forEach(cb => {
+        document.querySelectorAll('#wiz-skills-selection input[type="checkbox"]').forEach(cb => {
             cb.checked = false;
         });
 
@@ -467,21 +438,27 @@ export const WizardModule = {
         classSelect.innerHTML = '<option value="">Carregando...</option>';
 
         const currentSystem = context.currentSystem || 'dnd5e';
+        const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
+        const creationData = currentPlugin?.getCreationData() || {};
 
         try {
             const systemData = await getSystemData(currentSystem);
 
-            // Fallback for dnd5e if Firestore is empty/incomplete
             let races = systemData?.races || [];
             let classes = systemData?.classes || [];
 
-            if (currentSystem === 'dnd5e') {
-                if (races.length === 0) {
-                    races = RACES.map(r => ({ raca: r, subracas: SUBRACES[r] || [] }));
-                }
-                if (classes.length === 0) {
-                    classes = CLASSES.map(c => ({ nome: c, arquetipos: ARCHETYPES[c] || [] }));
-                }
+            // Fallback usando os dados do plugin registrado se o Firestore estiver vazio
+            if (races.length === 0 && creationData.races) {
+                races = creationData.races.map(r => ({
+                    raca: r,
+                    subracas: creationData.subraces?.[r] || []
+                }));
+            }
+            if (classes.length === 0 && creationData.classes) {
+                classes = creationData.classes.map(c => ({
+                    nome: c,
+                    arquetipos: creationData.archetypes?.[c] || []
+                }));
             }
 
             // Populate Races
@@ -506,12 +483,36 @@ export const WizardModule = {
 
             // Populate Backgrounds
             bgSelect.innerHTML = '<option value="">Selecione Antecedente...</option>';
-            BACKGROUNDS.forEach(bg => {
+            const backgrounds = creationData.backgrounds || [];
+            backgrounds.forEach(bg => {
                 const option = document.createElement('option');
                 option.value = bg;
                 option.innerText = bg;
                 bgSelect.appendChild(option);
             });
+
+            // Populate Attributes
+            const attrGrid = document.getElementById('wiz-attributes-grid');
+            if (attrGrid) {
+                const attrs = currentPlugin?.getAttributeConfig() || [];
+                attrGrid.innerHTML = attrs.map(a => `
+                    <div class="attr-input" title="${a.description || ''}">
+                        <span>${a.shortLabel}</span>
+                        <input type="number" id="wiz-${a.id}" value="10" min="0" max="25">
+                    </div>
+                `).join('');
+            }
+
+            // Populate Skills
+            const skillsSel = document.getElementById('wiz-skills-selection');
+            if (skillsSel) {
+                const skills = currentPlugin?.getSkillConfig() || [];
+                skillsSel.innerHTML = skills.map(sk => `
+                    <label title="${sk.description || ''}">
+                        <input type="checkbox" value="${sk.id}"> ${sk.label}
+                    </label>
+                `).join('');
+            }
 
             // Listeners for Sub-options
             this.bindSubOptions(races, classes);
@@ -832,7 +833,10 @@ export const WizardModule = {
 
         context.toggleLoading(true);
         try {
-            const template = JSON.parse(JSON.stringify(SYSTEM_TEMPLATES[context.currentSystem] || SYSTEM_TEMPLATES['dnd5e']));
+            const currentPlugin = SystemRegistry.get(context.currentSystem) || SystemRegistry.getCurrent();
+            const template = currentPlugin
+                ? JSON.parse(JSON.stringify(currentPlugin.getTemplate()))
+                : { bio: {}, attributes: {}, stats: {}, proficiencies_choice: {}, story: {}, inventory: {}, spells: {} };
 
             // Mapping values
             template.bio.name = name;
@@ -844,37 +848,20 @@ export const WizardModule = {
             template.bio.alignment = document.getElementById('wiz-alignment').value;
             template.bio.level = 1;
 
-            template.attributes.str = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-str').value) || 10));
-            template.attributes.dex = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-dex').value) || 10));
-            template.attributes.con = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-con').value) || 10));
-            template.attributes.int = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-int').value) || 10));
-            template.attributes.wis = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-wis').value) || 10));
-            template.attributes.cha = Math.min(25, Math.max(0, parseInt(document.getElementById('wiz-cha').value) || 10));
+            const attributes = {};
+            const attrConfig = currentPlugin?.getAttributeConfig() || [];
+            attrConfig.forEach(attr => {
+                const el = document.getElementById(`wiz-${attr.id}`);
+                if (el) {
+                    attributes[attr.id] = Math.min(25, Math.max(0, parseInt(el.value) || 10));
+                } else {
+                    attributes[attr.id] = 10;
+                }
+            });
+            template.attributes = attributes;
 
-            // Skill Normalization Map
-            const skillMap = {
-                "Acrobacia": "acrobacia",
-                "Adestramento de Animais": "adestrar_animais",
-                "Arcanismo": "arcanismo",
-                "Atletismo": "atletismo",
-                "Atuação": "atuacao",
-                "Blefar": "enganacao",
-                "Furtividade": "furtividade",
-                "História": "historia",
-                "Intimidação": "intimidacao",
-                "Intuição": "intuicao",
-                "Investigação": "investigacao",
-                "Medicina": "medicina",
-                "Natureza": "natureza",
-                "Percepção": "percepcao",
-                "Persuasão": "persuasao",
-                "Prestidigitação": "prestidigitacao",
-                "Religião": "religiao",
-                "Sobrevivência": "sobrevivencia"
-            };
-
-            const rawSkills = Array.from(document.querySelectorAll('.skills-selection input:checked')).map(i => i.value);
-            template.proficiencies_choice.skills = rawSkills.map(s => skillMap[s] || s.toLowerCase());
+            const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
+            template.proficiencies_choice.skills = rawSkills;
             template.stats.speed = document.getElementById('wiz-speed').value || "9m";
 
             // Story
