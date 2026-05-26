@@ -194,7 +194,7 @@ const CombatModule = {
 
         // Notify in chat
         await this.sendCombatMessage(
-            `🎲 **Rodada ${this.round} - Turno de ${current.name}**\n` +
+            `<i class="fas fa-dice-d20" style="color: var(--gold); margin-right: 6px;"></i> **Rodada ${this.round} - Turno de ${current.name}**\n` +
             `Iniciativa: ${current.initiative} (${current.initiativeRoll} + ${current.dexMod})\n` +
             `HP: ${current.hp}/${current.maxHp} | CA: ${current.ac}`
         );
@@ -212,7 +212,7 @@ const CombatModule = {
             await updateDoc(sessionRef, {
                 combatRound: this.round
             });
-            await this.sendCombatMessage(`\n🔄 **Rodada ${this.round}**\n`);
+            await this.sendCombatMessage(`\n<i class="fas fa-sync" style="color: var(--gold); margin-right: 6px;"></i> **Rodada ${this.round}**\n`);
             await this.startTurn(0);
         } else {
             await this.startTurn(nextIndex);
@@ -233,7 +233,7 @@ const CombatModule = {
         this.currentTurnIndex = 0;
         this.round = 1;
 
-        await this.sendCombatMessage("⚔️ **Combate Encerrado!**");
+        await this.sendCombatMessage('<i class="fas fa-swords" style="color: var(--gold); margin-right: 6px;"></i> **Combate Encerrado!**');
         logger.info("✅ Combat: Combate encerrado");
     },
 
@@ -328,7 +328,7 @@ Retorne um array JSON com os monstros.`;
                     ai_generated_monsters: validMonsters
                 });
 
-                await this.sendCombatMessage(`🔮 O Oráculo invocou ${validMonsters.length} adversários!`);
+                await this.sendCombatMessage(`<i class="fas fa-wand-sparkles" style="color: var(--gold); margin-right: 6px;"></i> O Oráculo invocou ${validMonsters.length} adversários!`);
                 return validMonsters;
             }
         } catch (error) {
