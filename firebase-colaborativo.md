@@ -104,4 +104,135 @@ Acesse a aplicação em `http://localhost:5173`.
 > **3. Evite Deploys Diretos:**
 > O comando `firebase deploy` destina-se **exclusivamente** à branch `main` após homologação de PRs (Pull Requests). Nunca faça deploy a partir de branches de testes.
 
+---
+
+## 🔮 5. Criação de Novos Sistemas de RPG (Plugins Arcanos)
+
+O motor do **Lyra the Wise** é modular e extensível. Para criar um novo sistema de RPG (como *Tormenta20*, *Call of Cthulhu* ou *Fate*), você deve criar um plugin JavaScript e registrá-lo no `SystemRegistry`.
+
+### 📂 Estrutura de Arquivos:
+1. Crie o arquivo do seu sistema em: `js/systems/seu-sistema.js`
+2. Importe-o no portal de auditoria (`js/modules/diagnose.js`) e no núcleo do app (`js/app.js`) para que ele seja carregado em tempo de execução.
+
+### 📐 Rito de Implementação (Scaffold Base):
+O seu plugin deve exportar um objeto com métodos e configurações específicas. Ele deve herdar da interface base e registrar-se ao final do arquivo. Veja o exemplo de scaffold mínimo estruturado:
+
+```javascript
+import SystemRegistry from './system-registry.js';
+import { escapeHTML } from '../modules/utils.js';
+
+export const SeuNovoSistemaPlugin = {
+    id: 'seu-sistema-id', // ID único em minúsculo
+    name: 'Nome do Seu RPG',
+    implemented: true,
+    version: '1.0.0',
+    icon: 'fa-dice-d20', // Ícone do FontAwesome
+
+    // 1. DADOS E TEMPLATES
+    getTemplate() {
+        return {
+            bio: { name: "", class: "", level: 1, alignment: "" },
+            attributes: { strength: 10, dexterity: 10 },
+            stats: { hp_max: 10, hp_current: 10, ac: 10 },
+            proficiencies_choice: { skills: [] }
+        };
+    },
+
+    getCreationData() {
+        return {
+            races: ["Humano", "Elfo"],
+            classes: ["Guerreiro", "Mago"],
+            alignments: ["Ordeiro", "Caótico"],
+            backgrounds: ["Ermitão", "Nobre"]
+        };
+    },
+
+    // 2. CONFIGURAÇÕES DE ATRIBUTOS E PERÍCIAS
+    getAttributeConfig() {
+        return [
+            { id: 'strength', label: 'Força', shortLabel: 'FOR', description: 'Poder físico' },
+            { id: 'dexterity', label: 'Destreza', shortLabel: 'DES', description: 'Agilidade' }
+        ];
+    },
+
+    getSkillConfig() {
+        return [
+            { id: 'atletismo', label: 'Atletismo', attribute: 'strength', description: 'Saltos e corrida' }
+        ];
+    },
+
+    getSaveConfig() {
+        return [
+            { id: 'strength', label: 'Resistência de Força', description: 'Resistir a efeitos físicos' }
+        ];
+    },
+
+    // 3. MOTOR DE CÁLCULO
+    calculateStats(char) {
+        const stats = { attributes: {}, skills: {}, saves: {}, general: {} };
+        // Faça as fórmulas de cálculo do seu sistema aqui
+        stats.general.hp_max = parseInt(char.stats?.hp_max || 10);
+        return stats;
+    },
+
+    // 4. RENDERS DE COMPONENTES VISUAIS (INTERFACE)
+    renderSheetScores(char, systemStats, helpers) {
+        return `<div>Cartões de Atributos com ${helpers.mkInput(char.attributes?.strength, 'attributes.strength')}</div>`;
+    },
+
+    renderSheetSaves(char, systemStats, helpers) {
+        return `<div>Resistências</div>`;
+    },
+
+    renderSheetSkills(char, systemStats, helpers) {
+        return `<div>Perícias</div>`;
+    },
+
+    renderSheetCombatTab(char, systemStats, helpers) {
+        return `<div>Painel de Combate</div>`;
+    },
+
+    // 5. INTEGRAÇÃO COM PROMPTS DO ORÁCULO (IA GEMINI)
+    getPromptContext() {
+        return 'Contexto detalhado das regras e cenário do Seu RPG para a IA';
+    },
+
+    getEntityPrompt(entityType, prompt, flavor) {
+        return `Gere um JSON para criatura no formato do Seu RPG.`;
+    },
+
+    getCharacterPrompt() {
+        return `Aja como o narrador do Seu RPG e descreva o histórico e ambições do personagem.`;
+    },
+
+    // 6. REGRAS DE COMBATE
+    getCombatConfig() {
+        return {
+            usesInitiative: true,
+            initiativeAttribute: 'dexterity',
+            usesDeathSaves: false,
+            healthLabel: 'Pontos de Vida',
+            defenseLabel: 'Defesa'
+        };
+    },
+
+    calculateInitiativeBonus(char) {
+        return 0; // Fórmula de bônus de iniciativa
+    }
+};
+
+// Auto-registro no Orquestrador
+SystemRegistry.register(SeuNovoSistemaPlugin);
+```
+
+### 🔬 Testando a Integridade (Auditoria de Sistemas):
+Após criar e registrar seu plugin, abra a tela **Auditoria de Sistemas** (`diagnose.html`) e clique em **"Iniciar Auditoria"** no card do seu sistema. 
+O console arcanum irá:
+1. Executar testes de tipo (`dry-run`) em tempo real em todas as funções obrigatórias.
+2. Validar o formato dos objetos de retorno.
+3. Verificar a ativação das extensões opcionais.
+Se tudo passar nos testes sem erros, seu sistema estará homologado para a mesa do mestre!
+
+---
+
 Que a harmonia das runas guie seu desenvolvimento! 🔮✨
