@@ -4,9 +4,9 @@
  */
 
 import { getSystemData } from '../data.js';
-import { RACES, CLASSES, ALIGNMENTS, SUBRACES, ARCHETYPES, BACKGROUNDS } from '../constants.js';
 import { escapeHTML, parseMarkdown } from './utils.js';
 import { logger } from '../logger.js';
+import SystemRegistry from '../systems/system-registry.js';
 
 /**
  * Returns populate-related methods to be mixed into SheetModule.
@@ -29,13 +29,24 @@ export function createPopulateMixin(ctx) {
                 systemData = await getSystemData(context.currentSystem || 'dnd5e');
             } catch (e) { logger.error("Error loading system data", e); }
 
-            const validRaces = systemData?.races || RACES;
+            // Dados de criação vêm do plugin ativo
+            const currentPlugin = SystemRegistry.getCurrent();
+            const creationData = currentPlugin?.getCreationData() || {};
+
+            const validRaces = systemData?.races || creationData.races || [];
             const raceOptions = validRaces.map(r => r.raca || r);
 
-            const validClasses = systemData?.classes || CLASSES;
+            const validClasses = systemData?.classes || creationData.classes || [];
             const classOptions = validClasses.map(c => c.nome || c);
 
-            const systemStats = ctx.calculateDND5eStats(char);
+            const systemAlignments = creationData.alignments || [];
+            const systemSubraces = creationData.subraces || {};
+            const systemArchetypes = creationData.archetypes || {};
+            const systemBackgrounds = creationData.backgrounds || [];
+
+            const systemStats = currentPlugin
+                ? currentPlugin.calculateStats(char)
+                : ctx.calculateDND5eStats(char);
 
             if (char.inventory?.items && char.combat?.attacks) {
                 const inventoryNames = new Set(char.inventory.items.map(i => i.name));
@@ -111,7 +122,7 @@ export function createPopulateMixin(ctx) {
             const raceEl = document.getElementById('sheet-race-display');
             const classEl = document.getElementById('sheet-class-display');
 
-            if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', ALIGNMENTS, 'Alinhamento', 'header-input-box');
+            if (alignmentEl) alignmentEl.innerHTML = mkSelect(alignment, 'bio.alignment', systemAlignments, 'Alinhamento', 'header-input-box');
 
             const currentRaceData = validRaces.find(r => (r.raca || r) === race);
             const currentClassData = validClasses.find(c => (c.nome || c) === clazz);
@@ -119,15 +130,15 @@ export function createPopulateMixin(ctx) {
             let subOptions = ["Padrão"];
             if (currentRaceData && currentRaceData.subracas && currentRaceData.subracas.length > 0) {
                 subOptions = currentRaceData.subracas;
-            } else if (SUBRACES[race]) {
-                subOptions = SUBRACES[race];
+            } else if (systemSubraces[race]) {
+                subOptions = systemSubraces[race];
             }
 
             let archOptions = ["Padrão"];
             if (currentClassData && currentClassData.arquetipos && currentClassData.arquetipos.length > 0) {
                 archOptions = currentClassData.arquetipos;
-            } else if (ARCHETYPES[clazz]) {
-                archOptions = ARCHETYPES[clazz];
+            } else if (systemArchetypes[clazz]) {
+                archOptions = systemArchetypes[clazz];
             }
 
             if (raceEl) {
@@ -137,7 +148,7 @@ export function createPopulateMixin(ctx) {
                     select.addEventListener('change', async (e) => {
                         const newRace = e.target.value;
                         const newRaceData = validRaces.find(r => (r.raca || r) === newRace);
-                        const newSubOptions = (newRaceData && newRaceData.subracas) ? newRaceData.subracas : (SUBRACES[newRace] || ["Padrão"]);
+                        const newSubOptions = (newRaceData && newRaceData.subracas) ? newRaceData.subracas : (systemSubraces[newRace] || ["Padrão"]);
                         const subSelect = document.querySelector('select[data-field="bio.subrace"]');
                         if (subSelect) {
                             subSelect.innerHTML = newSubOptions.map(opt => `<option value="${escapeHTML(opt)}">${escapeHTML(opt)}</option>`).join('');
@@ -161,7 +172,7 @@ export function createPopulateMixin(ctx) {
                     select.addEventListener('change', (e) => {
                         const newClass = e.target.value;
                         const newClassData = validClasses.find(c => (c.nome || c) === newClass);
-                        const newArchOptions = (newClassData && newClassData.arquetipos) ? newClassData.arquetipos : (ARCHETYPES[newClass] || ["Padrão"]);
+                        const newArchOptions = (newClassData && newClassData.arquetipos) ? newClassData.arquetipos : (systemArchetypes[newClass] || ["Padrão"]);
                         const archSelect = document.querySelector('select[data-field="bio.archetype"]');
                         if (archSelect) {
                             archSelect.innerHTML = newArchOptions.map(opt => `<option value="${escapeHTML(opt)}">${escapeHTML(opt)}</option>`).join('');
@@ -195,7 +206,7 @@ export function createPopulateMixin(ctx) {
 
                 if (id === 'sheet-background') {
                     const currentBG = b.background || "Acólito";
-                    const displayOpts = BACKGROUNDS.includes(currentBG) ? BACKGROUNDS : [currentBG, ...BACKGROUNDS];
+                    const displayOpts = systemBackgrounds.includes(currentBG) ? systemBackgrounds : [currentBG, ...systemBackgrounds];
                     const uniqueOpts = [...new Set(displayOpts)];
                     el.innerHTML = mkSelect(currentBG, 'bio.background', uniqueOpts, 'Antecedente', 'seamless');
                 } else {
@@ -205,8 +216,8 @@ export function createPopulateMixin(ctx) {
 
             const alignEl = document.getElementById('sheet-alignment');
             if (alignEl) {
-                const alignments = ["Leal e Bom", "Neutro e Bom", "Caótico e Bom", "Leal e Neutro", "Neutro", "Caótico e Neutro", "Leal e Mau", "Neutro e Mau", "Caótico e Mau"];
-                const currentAlign = b.alignment || "Neutro";
+                const alignments = systemAlignments.length > 0 ? systemAlignments : ["Neutro"];
+                const currentAlign = b.alignment || alignments[0] || "Neutro";
                 const options = alignments.map(a => `<option value="${a}" ${a === currentAlign ? 'selected' : ''}>${a}</option>`).join('');
                 alignEl.innerHTML = `<select data-field="bio.alignment" class="medieval-select seamless" style="width: 100%;" title="Alinhamento moral e ético">${options}</select>`;
             }
@@ -217,86 +228,104 @@ export function createPopulateMixin(ctx) {
             // Scores
             const scoresGrid = document.getElementById('sheet-scores');
             if (scoresGrid) {
-                const attrMap = [
-                    { id: 'str', l: 'FOR', v: char.attributes.str, m: mods.strMod, t: 'Força: Potência física e atletismo' },
-                    { id: 'dex', l: 'DES', v: char.attributes.dex, m: mods.dexMod, t: 'Destreza: Agilidade, reflexos e equilíbrio' },
-                    { id: 'con', l: 'CON', v: char.attributes.con, m: mods.conMod, t: 'Constituição: Saúde, vigor e força vital' },
-                    { id: 'int', l: 'INT', v: char.attributes.int, m: mods.intMod, t: 'Inteligência: Acuidade mental, memória e raciocínio' },
-                    { id: 'wis', l: 'SAB', v: char.attributes.wis, m: mods.wisMod, t: 'Sabedoria: Percepção, intuição e força de vontade' },
-                    { id: 'cha', l: 'CAR', v: char.attributes.cha, m: mods.chaMod, t: 'Carisma: Força de personalidade e liderança' }
-                ];
-                scoresGrid.innerHTML = attrMap.map(a => `
-                    <div class="score-card" title="${a.t}">
-                        <span class="score-label">${a.l}</span>
-                        ${mkInput(a.v, `attributes.${a.id}`, 'number', a.t, 'width: 50px; text-align: center; font-size: 1.4rem; font-weight: bold; background: transparent; border: none; padding: 0;')}
-                        <span class="score-mod">${a.m >= 0 ? `+${a.m}` : a.m}</span>
-                    </div>
-                `).join('');
+                const sheetHelpers = { mkInput, isInspection: context.isInspection };
+                if (currentPlugin && typeof currentPlugin.renderSheetScores === 'function') {
+                    scoresGrid.innerHTML = currentPlugin.renderSheetScores(char, systemStats, sheetHelpers);
+                } else {
+                    // Fallback legado para D&D 5e
+                    const attrMap = [
+                        { id: 'str', l: 'FOR', v: char.attributes.str, m: mods.strMod, t: 'Força: Potência física e atletismo' },
+                        { id: 'dex', l: 'DES', v: char.attributes.dex, m: mods.dexMod, t: 'Destreza: Agilidade, reflexos e equilíbrio' },
+                        { id: 'con', l: 'CON', v: char.attributes.con, m: mods.conMod, t: 'Constituição: Saúde, vigor e força vital' },
+                        { id: 'int', l: 'INT', v: char.attributes.int, m: mods.intMod, t: 'Inteligência: Acuidade mental, memória e raciocínio' },
+                        { id: 'wis', l: 'SAB', v: char.attributes.wis, m: mods.wisMod, t: 'Sabedoria: Percepção, intuição e força de vontade' },
+                        { id: 'cha', l: 'CAR', v: char.attributes.cha, m: mods.chaMod, t: 'Carisma: Força de personalidade e liderança' }
+                    ];
+                    scoresGrid.innerHTML = attrMap.map(a => `
+                        <div class="score-card" title="${a.t}">
+                            <span class="score-label">${a.l}</span>
+                            ${mkInput(a.v, `attributes.${a.id}`, 'number', a.t, 'width: 50px; text-align: center; font-size: 1.4rem; font-weight: bold; background: transparent; border: none; padding: 0;')}
+                            <span class="score-mod">${a.m >= 0 ? `+${a.m}` : a.m}</span>
+                        </div>
+                    `).join('');
+                }
             }
 
             // Saves
             const savesContainer = document.getElementById('sheet-saves');
             if (savesContainer) {
-                const saves = [
-                    { id: 'str', l: 'Força', t: 'Resistir a empurrões ou aprisionamentos' },
-                    { id: 'dex', l: 'Destreza', t: 'Esquivar de efeitos de área' },
-                    { id: 'con', l: 'Constituição', t: 'Suportar venenos e doenças' },
-                    { id: 'int', l: 'Inteligência', t: 'Desacreditar ilusões' },
-                    { id: 'wis', l: 'Sabedoria', t: 'Resistir a efeitos mentais' },
-                    { id: 'cha', l: 'Carisma', t: 'Resistir a possessão' }
-                ];
-                savesContainer.innerHTML = saves.map(s => {
-                    const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
-                    const val = mods[`${s.id}Mod`] + (isProf ? mods.profBonus : 0);
-                    return `
-                        <div class="save-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : s.t}">
-                            <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="saves" data-field="${s.id}" ${context.isInspection ? 'disabled' : ''}></i>
-                            <span>${s.l}</span>
-                            <span class="save-value">${val >= 0 ? `+${val}` : val}</span>
-                        </div>
-                    `;
-                }).join('');
+                const sheetHelpers = { mkInput, isInspection: context.isInspection };
+                if (currentPlugin && typeof currentPlugin.renderSheetSaves === 'function') {
+                    savesContainer.innerHTML = currentPlugin.renderSheetSaves(char, systemStats, sheetHelpers);
+                } else {
+                    // Fallback legado
+                    const saves = [
+                        { id: 'str', l: 'Força', t: 'Resistir a empurrões ou aprisionamentos' },
+                        { id: 'dex', l: 'Destreza', t: 'Esquivar de efeitos de área' },
+                        { id: 'con', l: 'Constituição', t: 'Suportar venenos e doenças' },
+                        { id: 'int', l: 'Inteligência', t: 'Desacreditar ilusões' },
+                        { id: 'wis', l: 'Sabedoria', t: 'Resistir a efeitos mentais' },
+                        { id: 'cha', l: 'Carisma', t: 'Resistir a possessão' }
+                    ];
+                    savesContainer.innerHTML = saves.map(s => {
+                        const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
+                        const val = mods[`${s.id}Mod`] + (isProf ? mods.profBonus : 0);
+                        return `
+                            <div class="save-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : s.t}">
+                                <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="saves" data-field="${s.id}" ${context.isInspection ? 'disabled' : ''}></i>
+                                <span>${s.l}</span>
+                                <span class="save-value">${val >= 0 ? `+${val}` : val}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
 
             // Skills
             const skillsContainer = document.getElementById('sheet-skills');
             if (skillsContainer) {
-                const skills = [
-                    { id: 'acrobacia', l: 'Acrobacia (Des)', t: 'Manter equilíbrio e realizar manobras' },
-                    { id: 'adestrar_animais', l: 'Adestrar Animais (Sab)', t: 'Acalmar ou controlar bestas' },
-                    { id: 'arcanismo', l: 'Arcanismo (Int)', t: 'Conhecimento sobre magia e planos' },
-                    { id: 'atletismo', l: 'Atletismo (For)', t: 'Escalar, nadar e pular' },
-                    { id: 'atuacao', l: 'Atuação (Car)', t: 'Entreter plateias' },
-                    { id: 'enganacao', l: 'Enganação (Car)', t: 'Mentir e ocultar a verdade' },
-                    { id: 'furtividade', l: 'Furtividade (Des)', t: 'Esconder-se e mover-se em silêncio' },
-                    { id: 'historia', l: 'História (Int)', t: 'Conhecimento sobre o passado' },
-                    { id: 'intimidacao', l: 'Intimidação (Car)', t: 'Ameaçar e coagir' },
-                    { id: 'intuicao', l: 'Intuição (Sab)', t: 'Detectar mentiras e emoções' },
-                    { id: 'investigacao', l: 'Investigação (Int)', t: 'Procurar pistas e deduzir' },
-                    { id: 'medicina', l: 'Medicina (Sab)', t: 'Estabilizar feridos e diagnosticar' },
-                    { id: 'natureza', l: 'Natureza (Int)', t: 'Conhecimento sobre flora e fauna' },
-                    { id: 'percepcao', l: 'Percepção (Sab)', t: 'Notar detalhes ao redor' },
-                    { id: 'persuasao', l: 'Persuasão (Car)', t: 'Convencer diplomaticamente' },
-                    { id: 'prestidigitacao', l: 'Prestidigitação (Des)', t: 'Mãos leves e truques manuais' },
-                    { id: 'religiao', l: 'Religião (Int)', t: 'Conhecimento sobre divindades' },
-                    { id: 'sobrevivencia', l: 'Sobrevivência (Sab)', t: 'Rastrear e caçar' }
-                ];
-                skillsContainer.innerHTML = skills.map(sk => {
-                    const isProf = (char.proficiencies_choice?.skills || []).includes(sk.id);
-                    const isExpert = (char.proficiencies_choice?.expertise || []).includes(sk.id);
-                    const match = sk.l.match(/\((.*?)\)/);
-                    const attrRaw = match ? match[1] : 'Sab';
-                    const attr = attrRaw.toLowerCase().replace('sab', 'wis').replace('des', 'dex').replace('for', 'str').replace('car', 'cha');
-                    const val = mods[`${attr}Mod`] + (isProf ? mods.profBonus : 0) + (isExpert ? mods.profBonus : 0);
+                const sheetHelpers = { mkInput, isInspection: context.isInspection };
+                if (currentPlugin && typeof currentPlugin.renderSheetSkills === 'function') {
+                    skillsContainer.innerHTML = currentPlugin.renderSheetSkills(char, systemStats, sheetHelpers);
+                } else {
+                    // Fallback legado
+                    const skills = [
+                        { id: 'acrobacia', l: 'Acrobacia (Des)', t: 'Manter equilíbrio e realizar manobras' },
+                        { id: 'adestrar_animais', l: 'Adestrar Animais (Sab)', t: 'Acalmar ou controlar bestas' },
+                        { id: 'arcanismo', l: 'Arcanismo (Int)', t: 'Conhecimento sobre magia e planos' },
+                        { id: 'atletismo', l: 'Atletismo (For)', t: 'Escalar, nadar e pular' },
+                        { id: 'atuacao', l: 'Atuação (Car)', t: 'Entreter plateias' },
+                        { id: 'enganacao', l: 'Enganação (Car)', t: 'Mentir e ocultar a verdade' },
+                        { id: 'furtividade', l: 'Furtividade (Des)', t: 'Esconder-se e mover-se em silêncio' },
+                        { id: 'historia', l: 'História (Int)', t: 'Conhecimento sobre o passado' },
+                        { id: 'intimidacao', l: 'Intimidação (Car)', t: 'Ameaçar e coagir' },
+                        { id: 'intuicao', l: 'Intuição (Sab)', t: 'Detectar mentiras e emoções' },
+                        { id: 'investigacao', l: 'Investigação (Int)', t: 'Procurar pistas e deduzir' },
+                        { id: 'medicina', l: 'Medicina (Sab)', t: 'Estabilizar feridos e diagnosticar' },
+                        { id: 'natureza', l: 'Natureza (Int)', t: 'Conhecimento sobre flora e fauna' },
+                        { id: 'percepcao', l: 'Percepção (Sab)', t: 'Notar detalhes ao redor' },
+                        { id: 'persuasao', l: 'Persuasão (Car)', t: 'Convencer diplomaticamente' },
+                        { id: 'prestidigitacao', l: 'Prestidigitação (Des)', t: 'Mãos leves e truques manuais' },
+                        { id: 'religiao', l: 'Religião (Int)', t: 'Conhecimento sobre divindades' },
+                        { id: 'sobrevivencia', l: 'Sobrevivência (Sab)', t: 'Rastrear e caçar' }
+                    ];
+                    skillsContainer.innerHTML = skills.map(sk => {
+                        const isProf = (char.proficiencies_choice?.skills || []).includes(sk.id);
+                        const isExpert = (char.proficiencies_choice?.expertise || []).includes(sk.id);
+                        const match = sk.l.match(/\((.*?)\)/);
+                        const attrRaw = match ? match[1] : 'Sab';
+                        const attr = attrRaw.toLowerCase().replace('sab', 'wis').replace('des', 'dex').replace('for', 'str').replace('car', 'cha');
+                        const val = mods[`${attr}Mod`] + (isProf ? mods.profBonus : 0) + (isExpert ? mods.profBonus : 0);
 
-                    return `
-                        <div class="skill-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : sk.t}">
-                            <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" style="font-size: 0.5rem; color: ${isProf || isExpert ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf || isExpert ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="skills" data-field="${sk.id}" ${context.isInspection ? 'disabled' : ''}></i>
-                            <span>${sk.l}</span>
-                            <span class="skill-value">${val >= 0 ? `+${val}` : val}</span>
-                        </div>
-                    `;
-                }).join('');
+                        return `
+                            <div class="skill-item ${isProf ? 'proficient' : ''}" title="${context.isInspection ? 'Apenas Visualização' : sk.t}">
+                                <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''} ${isExpert ? 'expert' : ''}" style="font-size: 0.5rem; color: ${isProf || isExpert ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf || isExpert ? 1 : 0.3}; cursor: ${context.isInspection ? 'default' : 'pointer'};" data-type="skills" data-field="${sk.id}" ${context.isInspection ? 'disabled' : ''}></i>
+                                <span>${sk.l}</span>
+                                <span class="skill-value">${val >= 0 ? `+${val}` : val}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
 
             // Combat Tab
