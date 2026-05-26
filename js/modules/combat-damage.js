@@ -254,8 +254,8 @@ export function createDamageMixin(ctx) {
                     await ctx.applyDamage(targetId, result.damage);
                 }
 
-                let systemMsg = `⚔️ **${escapeHTML(monster.name)}** ataca **${escapeHTML(target.name)}** com **${escapeHTML(attackName)}**!\n`;
-                systemMsg += `Acerto: **${result.hit ? 'ACERTOU' : 'ERROU'}**${hitNote}\n`;
+                let systemMsg = `<i class="fas fa-swords" style="color: var(--gold); margin-right: 6px;"></i> **${escapeHTML(monster.name)}** ataca **${escapeHTML(target.name)}** com **${escapeHTML(attackName)}**!\n`;
+                systemMsg += `Acerto: **${result.hit ? '<i class="fas fa-check-circle" style="color: #4caf50; margin-right: 4px;"></i> ACERTOU' : '<i class="fas fa-times-circle" style="color: #f44336; margin-right: 4px;"></i> ERROU'}**${hitNote}\n`;
                 if (result.hit && result.damage > 0) {
                     systemMsg += `Dano: **${escapeHTML(String(result.damage))}**`;
                 }
