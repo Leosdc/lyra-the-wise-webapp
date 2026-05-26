@@ -8,7 +8,7 @@
  */
 
 import { updateCharacter } from '../data.js';
-import { DND5eSystem } from '../systems/dnd5e.js';
+import SystemRegistry from '../systems/system-registry.js';
 import { escapeHTML, parseMarkdown } from './utils.js';
 import { logger } from '../logger.js';
 
@@ -359,7 +359,7 @@ export const SheetModule = {
     },
 
     calculateDND5eStats(char) {
-        return DND5eSystem.calculateStats(char);
+        return SystemRegistry.getCurrent().calculateStats(char);
     },
 
     toggleSheetEdit(enable, character, context) {
