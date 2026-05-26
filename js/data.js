@@ -1,5 +1,6 @@
 import { logger } from './logger.js';
 import { db, storage } from "./auth.js";
+import { migrateCharacter } from './systems/system-migrator.js';
 import {
     collection,
     addDoc,
@@ -75,19 +76,43 @@ export const uploadCharacterToken = async (userId, characterId, file) => {
 
 export const getCharacters = async (userId, systemId) => {
     try {
-        const q = query(
-            collection(db, COLLECTIONS.CHARACTERS),
-            where("userId", "==", userId),
-            where("systemId", "==", systemId)
-        );
+        // Se for dnd5e, buscamos todos os personagens do usuário para poder migrar as fichas legadas (que não possuem o campo systemId)
+        const useGlobalQuery = systemId === 'dnd5e';
+        const q = useGlobalQuery
+            ? query(
+                collection(db, COLLECTIONS.CHARACTERS),
+                where("userId", "==", userId)
+            )
+            : query(
+                collection(db, COLLECTIONS.CHARACTERS),
+                where("userId", "==", userId),
+                where("systemId", "==", systemId)
+            );
+
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        const characters = [];
+
+        for (const document of querySnapshot.docs) {
+            const data = { id: document.id, ...document.data() };
+            const { migratedChar, wasMigrated } = migrateCharacter(data);
+            
+            if (wasMigrated) {
+                // Executa a atualização no Firestore de forma assíncrona (não-bloqueante)
+                updateCharacter(data.id, migratedChar).catch(err => 
+                    logger.error(`SystemMigrator: Erro ao persistir migração da ficha "${data.id}":`, err)
+                );
+            }
+            
+            // Filtra em memória para que o retorno coincida com o systemId solicitado
+            if (migratedChar.systemId === systemId) {
+                characters.push(migratedChar);
+            }
+        }
+
+        return characters.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     } catch (error) {
         if (error.code === 'permission-denied') {
             logger.error('🔒 Acesso negado. Verifique suas permissões.');
-
             throw new Error('Permissão negada ao acessar os anais dos personagens.');
         }
         throw error;
@@ -639,10 +664,11 @@ export const flattenAbilityToItem = (ability) => {
     const dmg = (ability.execution_mechanics?.damage || [])[0];
 
     let damageStr = "";
+    let damageTypeStr = "";
     if (dmg) {
         damageStr = `${dmg.dice_count || 1}d${dmg.dice_type || 6}`;
         if (dmg.fixed_modifier) damageStr += ` + ${dmg.fixed_modifier}`;
-        if (dmg.damage_type) damageStr += ` ${dmg.damage_type}`;
+        if (dmg.damage_type) damageTypeStr = dmg.damage_type;
     }
 
     return {
@@ -652,6 +678,7 @@ export const flattenAbilityToItem = (ability) => {
         weight: eq.weight || "",
         cost: eq.cost || "",
         damage: damageStr || "",
+        damageType: damageTypeStr || "",
         ac: eq.ac_bonus || "",
         properties: eq.properties || [],
         description: ability.description || "",
