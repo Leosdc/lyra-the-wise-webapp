@@ -44,7 +44,7 @@ public/assets/systems/dnd5e/implementation_plan.md
 
 # Scripts de desenvolvimento locais
 auditor.mjs
-auditoria.md
+docs/auditoria.md
 
 # Gemini AI Agent Workspace & Tools
 .agents/
