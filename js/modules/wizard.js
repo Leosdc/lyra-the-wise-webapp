@@ -1128,12 +1128,10 @@ export const WizardModule = {
     },
 
     initGuidanceListeners() {
-        const inputs = document.querySelectorAll('#creation-wizard input, #creation-wizard select, #creation-wizard textarea');
         const container = document.getElementById('lyra-guidance');
         const textEl = document.getElementById('guidance-text');
         const portrait = container ? container.querySelector('img') : null;
-
-        const isDamien = document.body.classList.contains('damien-theme');
+        const wizard = document.getElementById('creation-wizard');
 
         // Damien's Tips
         this.damienTips = {
@@ -1207,55 +1205,24 @@ export const WizardModule = {
             'wiz-talents': "Pequenos truques para impressionar a plateia!"
         };
 
-        inputs.forEach(input => {
-            // Also handle checkboxes for Skills/Proficiencies generic tip
-            if (input.closest('.skills-selection')) {
-                input.addEventListener('mouseenter', () => {
-                    const isDamien = document.body.classList.contains('damien-theme');
-                    const isEldrin = document.body.classList.contains('eldrin-theme');
+        if (!wizard) return;
 
-                    let tip;
-                    if (isDamien) tip = "Do que você é capaz? Escolha o que lhe torna útil.";
-                    else if (isEldrin) tip = "Quais são seus talentos no palco da vida? Em que você brilha?";
-                    else tip = "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
+        const showTipForElement = (target) => {
+            if (!target) return;
+            const isDamien = document.body.classList.contains('damien-theme');
+            const isEldrin = document.body.classList.contains('eldrin-theme');
 
-                    if (container && textEl) {
-                        textEl.innerText = tip;
-                        container.classList.remove('hidden');
+            // Se for parte da seleção de perícias
+            if (target.closest('.skills-selection') || target.closest('#wiz-skills-selection')) {
+                let tip;
+                if (isDamien) tip = "Do que você é capaz? Escolha o que lhe torna útil.";
+                else if (isEldrin) tip = "Quais são seus talentos no palco da vida? Em que você brilha?";
+                else tip = "Seus talentos aprendidos. Escolha aqueles em que seu herói é perito!";
 
-                        // Icon Swap Logic
-                        if (portrait) {
-                            if (isDamien) {
-                                portrait.src = 'assets/Damien_Kael.png';
-                                portrait.style.borderColor = 'var(--damien-purple)';
-                            } else if (isEldrin) {
-                                portrait.src = 'assets/Eldrin_the_Bard.png';
-                                portrait.style.borderColor = 'var(--eldrin-blue)';
-                            } else {
-                                portrait.src = 'assets/Lyra_the_wise.png';
-                                portrait.style.borderColor = 'var(--gold)';
-                            }
-                        }
-                    }
-                });
-                return;
-            }
-
-            const showTip = () => {
-                const isDamien = document.body.classList.contains('damien-theme');
-                const isEldrin = document.body.classList.contains('eldrin-theme');
-
-                let currentTips;
-                if (isDamien) currentTips = this.damienTips;
-                else if (isEldrin) currentTips = this.eldrinTips;
-                else currentTips = this.guidanceTips;
-
-                const tip = currentTips[input.id];
-                if (tip && container && textEl) {
+                if (container && textEl) {
                     textEl.innerText = tip;
                     container.classList.remove('hidden');
 
-                    // Icon Swap Logic
                     if (portrait) {
                         if (isDamien) {
                             portrait.src = 'assets/Damien_Kael.png';
@@ -1269,12 +1236,57 @@ export const WizardModule = {
                         }
                     }
                 }
-            };
-            input.addEventListener('focus', showTip);
-            input.addEventListener('mouseenter', showTip);
+                return;
+            }
+
+            // Para outros inputs mapeados por ID
+            let currentTips;
+            if (isDamien) currentTips = this.damienTips;
+            else if (isEldrin) currentTips = this.eldrinTips;
+            else currentTips = this.guidanceTips;
+
+            const tip = currentTips[target.id];
+            if (tip && container && textEl) {
+                textEl.innerText = tip;
+                container.classList.remove('hidden');
+
+                if (portrait) {
+                    if (isDamien) {
+                        portrait.src = 'assets/Damien_Kael.png';
+                        portrait.style.borderColor = 'var(--damien-purple)';
+                    } else if (isEldrin) {
+                        portrait.src = 'assets/Eldrin_the_Bard.png';
+                        portrait.style.borderColor = 'var(--eldrin-blue)';
+                    } else {
+                        portrait.src = 'assets/Lyra_the_wise.png';
+                        portrait.style.borderColor = 'var(--gold)';
+                    }
+                }
+            }
+        };
+
+        // Delegação de focus (focusin borbulha)
+        wizard.addEventListener('focusin', (e) => {
+            const target = e.target;
+            if (target && (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA')) {
+                showTipForElement(target);
+            }
         });
 
-        // Hide when not focused on wizard inputs
+        // Delegação de mouseover (mouseover borbulha)
+        wizard.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('input, select, textarea, label');
+            if (target) {
+                if (target.tagName === 'LABEL' && target.closest('.skills-selection')) {
+                    const input = target.querySelector('input');
+                    showTipForElement(input || target);
+                } else if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA') {
+                    showTipForElement(target);
+                }
+            }
+        });
+
+        // Ocultar quando clicar fora
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#creation-wizard') && container) {
                 container.classList.add('hidden');
