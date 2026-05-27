@@ -305,6 +305,81 @@ const DiagnoseModule = {
                     }
                     return "Ignorado (Opcional)";
                 }
+            },
+            {
+                id: 'render_magic',
+                label: 'Dry-run: Renderizar Aba de Magia',
+                comment: '// Testando aba mística opcional de magias (renderSheetMagicTab)',
+                code: `system.renderSheetMagicTab(template, stats, helpers);`,
+                run: (ctx, helpers) => {
+                    if (typeof system.renderSheetMagicTab === 'function') {
+                        const res = system.renderSheetMagicTab(ctx.template, ctx.stats, helpers);
+                        if (!res) throw new Error("'renderSheetMagicTab' retornou um resultado nulo.");
+                        return res;
+                    }
+                    return "Ignorado (Opcional)";
+                }
+            },
+            {
+                id: 'wizard_steps',
+                label: 'Verificar Passos do Wizard de Criação',
+                comment: '// Validando a jornada opcional de criação do Wizard (getWizardSteps)',
+                code: `system.getWizardSteps();`,
+                run: (ctx) => {
+                    if (typeof system.getWizardSteps === 'function') {
+                        const steps = system.getWizardSteps();
+                        if (!Array.isArray(steps)) throw new Error("'getWizardSteps' não retornou um array de passos.");
+                        return steps;
+                    }
+                    return "Ignorado (Opcional)";
+                }
+            },
+            {
+                id: 'wizard_render',
+                label: 'Dry-run: Renderizar Primeiro Passo do Wizard',
+                comment: '// Validando renderização visual do primeiro passo do Wizard (renderWizardStep)',
+                code: `system.renderWizardStep(firstStep, template);`,
+                run: (ctx) => {
+                    if (typeof system.renderWizardStep === 'function') {
+                        if (typeof system.getWizardSteps !== 'function') throw new Error("renderWizardStep requer getWizardSteps implementado.");
+                        const steps = system.getWizardSteps();
+                        const firstStep = steps[0]?.id || 'step1';
+                        const html = system.renderWizardStep(firstStep, ctx.template);
+                        if (typeof html !== 'string' || html.trim() === '') throw new Error("'renderWizardStep' não retornou uma string HTML válida.");
+                        return "Sucesso (HTML OK)";
+                    }
+                    return "Ignorado (Opcional)";
+                }
+            },
+            {
+                id: 'ai_prompts',
+                label: 'Validar Prompts Arcanos da IA',
+                comment: '// Validando geração de prompts de suporte da IA (getItemPrompt, getSpellPrompt, etc.)',
+                code: `system.getItemPrompt("Espada", "Forte");`,
+                run: (ctx) => {
+                    const promptTests = [];
+                    if (typeof system.getItemPrompt === 'function') {
+                        const p = system.getItemPrompt("Espada", "Teste");
+                        if (!p || typeof p !== 'string') throw new Error("getItemPrompt não retornou string válida.");
+                        promptTests.push("ItemPrompt OK");
+                    }
+                    if (typeof system.getSpellPrompt === 'function') {
+                        const p = system.getSpellPrompt("Bola de Fogo", "Teste");
+                        if (!p || typeof p !== 'string') throw new Error("getSpellPrompt não retornou string válida.");
+                        promptTests.push("SpellPrompt OK");
+                    }
+                    if (typeof system.getAbilityPrompt === 'function') {
+                        const p = system.getAbilityPrompt("Fúria", "Teste");
+                        if (!p || typeof p !== 'string') throw new Error("getAbilityPrompt não retornou string válida.");
+                        promptTests.push("AbilityPrompt OK");
+                    }
+                    if (typeof system.getNamesPrompt === 'function') {
+                        const p = system.getNamesPrompt("Humano", "Guerreiro", "Masculino");
+                        if (!p || typeof p !== 'string') throw new Error("getNamesPrompt não retornou string válida.");
+                        promptTests.push("NamesPrompt OK");
+                    }
+                    return promptTests.length > 0 ? promptTests.join(', ') : "Ignorado (Opcional)";
+                }
             }
         ];
 
