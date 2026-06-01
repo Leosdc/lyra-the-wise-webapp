@@ -1,24 +1,22 @@
 env:
   - variable: NODE_ENV
-    value: production
+    value: development
   - variable: FORCE_REBUILD_CACHE
-    value: "v6"
+    value: "v6-dev"
   
-  # Frontend Keys (Public)
+  # Frontend Keys (Public Dev environment)
   - variable: VITE_FIREBASE_API_KEY
-    value: "AIzaSyBdymlRGmshBOgIKMWomn07Lf6SyAalR3E"
+    value: "AIzaSyDdSqw3dAWxun2J5A6ctVOFJXVnniDKB_c"
   - variable: VITE_FIREBASE_AUTH_DOMAIN
-    value: "lyrathewise.lat"
+    value: "lyra-the-wise-dev.firebaseapp.com"
   - variable: VITE_FIREBASE_PROJECT_ID
-    value: "lyra-the-wise"
+    value: "lyra-the-wise-dev"
   - variable: VITE_FIREBASE_STORAGE_BUCKET
-    value: "lyra-the-wise.firebasestorage.app"
+    value: "lyra-the-wise-dev.firebasestorage.app"
   - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
-    value: "870870220835"
+    value: "317685527799"
   - variable: VITE_FIREBASE_APP_ID
-    value: "1:870870220835:web:ccad45d2fa25caaf613196"
-  - variable: VITE_FIREBASE_MEASUREMENT_ID
-    value: "G-KLCQTRYGVL"
+    value: "1:317685527799:web:44b2f56a73241f4b98cff2"
   - variable: VITE_RECAPTCHA_SITE_KEY
     value: "6Lf7U1IsAAAAAHyTM7DQn89EaOd2eOQg1g20M_Nc"
 

@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 .env.production
+.env.development
 
 # Build
 dist/
@@ -49,3 +50,15 @@ docs/auditoria.md
 # Gemini AI Agent Workspace & Tools
 .agents/
 skills-lock.json
+
+# Motores compilados offline e executáveis gigantes (NIST SI-16)
+Lyra_VTT/
+*.exe
+*.dll
+*.pak
+*.bin
+*.dat
+
+# Subdependências locais de desenvolvimento
+public/vtt/node_modules/
+

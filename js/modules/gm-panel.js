@@ -188,7 +188,7 @@ export const GMPanelModule = {
                         <div class="gm-sidebar-content">
                             <ul class="player-list" id="gm-player-list"></ul>
                             <div class="gm-map-section">
-                                <div class="gm-sidebar-header"><h3>MAPA</h3><button class="medieval-btn icon-only" title="Configurar Mapa"><i class="fas fa-map"></i></button></div>
+                                <div class="gm-sidebar-header"><h3>MAPA</h3><button class="medieval-btn icon-only" data-action="gm-open-map" title="Configurar Mapa"><i class="fas fa-map"></i></button></div>
                                 <div id="gm-map-container" class="gm-map-container"><div class="map-grid-overlay"></div><div class="map-placeholder"><i class="fas fa-compass fa-spin"></i><p>Em breve: Mapas Táticos</p></div></div>
                             </div>
                         </div>
@@ -294,6 +294,26 @@ export const GMPanelModule = {
                     </div>
                 </div>
             </div>
+
+            <!-- VTT Map Modal -->
+            <div id="gm-map-modal" class="modal-overlay hidden" style="z-index: 9999;">
+                <div class="modal-content medieval-modal large allow-overflow" style="width: 98vw; max-width: 1600px; height: 92vh; padding: 10px; display: flex; flex-direction: column; background: rgba(20, 10, 5, 0.98); border: 2px solid var(--gold); box-shadow: 0 0 30px var(--gold-shadow); margin: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 8px; margin-bottom: 8px;">
+                        <h2 class="modal-title" style="margin: 0; font-size: 1.4rem; color: var(--gold);"><i class="fas fa-map-marked-alt"></i> Mapa Tático - Lyra VTT</h2>
+                        <button class="close-modal" data-action="gm-close-map" style="position: static; background: none; border: none; color: var(--gold); cursor: pointer; font-size: 1.2rem; margin-right: 10px;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div style="flex: 1; display: flex; gap: 12px; overflow: hidden; border-radius: 4px;">
+                        <!-- Coluna do VTT Iframe -->
+                        <div class="parchment-content" style="flex: 3; padding: 0; overflow: hidden; background: #000; position: relative; border: 1px solid rgba(212, 175, 55, 0.15);">
+                            <iframe id="gm-vtt-iframe" src="" style="width: 100%; height: 100%; border: none;" allow="clipboard-read; clipboard-write"></iframe>
+                        </div>
+                        <!-- Painel Lateral de Controle VTT -->
+                        <aside id="gm-vtt-control-sidebar" style="flex: 1; min-width: 280px; max-width: 360px; background: rgba(12, 6, 3, 0.95); border: 1px solid var(--gold); border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);">
+                            <!-- Conteúdo injetado dinamicamente via JavaScript -->
+                        </aside>
+                    </div>
+                </div>
+            </div>
         `;
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
@@ -329,6 +349,8 @@ export const GMPanelModule = {
                 case 'gm-send-invite': this.sendInvite(); break;
                 case 'gm-close-manual-session': document.getElementById('gm-manual-session-modal')?.classList.add('hidden'); break;
                 case 'gm-confirm-manual-session': this.confirmManualSession(); break;
+                case 'gm-open-map': this.openMapModal(); break;
+                case 'gm-close-map': this.closeMapModal(); break;
             }
         });
 
@@ -814,6 +836,259 @@ export const GMPanelModule = {
             console.error('Erro ao adicionar sessão manual:', err);
             window.app.showAlert('Falha ao registrar nos anais.', 'Erro');
         }
+    },
+
+    vttInvitesUnsubscribe: null,
+
+    openMapModal() {
+        const modal = document.getElementById('gm-map-modal');
+        const iframe = document.getElementById('gm-vtt-iframe');
+        
+        if (modal && iframe) {
+            modal.classList.remove('hidden');
+            iframe.src = '/vtt/app/index.html';
+            
+            // Inicializa a integração
+            import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                VTTIntegration.init(iframe);
+                
+                // Envia dados iniciais da sessão após o carregamento
+                VTTIntegration.waitForGame(async (game, scene) => {
+                    if (this.activeSession) {
+                        // 0. Envia a identidade do jogador (neste caso, o Mestre) para destravar a inicialização da cena
+                        try {
+                            const auth = getAuth();
+                            const user = auth.currentUser;
+                            if (user) {
+                                VTTIntegration.sendPlayerID(user.uid, true);
+                            }
+                        } catch (err) {
+                            console.error("[Lyra VTT] Erro ao sincronizar a identidade do mestre:", err);
+                        }
+
+                        // 1. Carrega o mapa da campanha/sessão
+                        const mapUrl = this.activeSession.mapUrl || "/assets/maps/default.jpg";
+                        const cellSize = this.activeSession.cellSize || 50;
+                        VTTIntegration.loadMap(mapUrl, cellSize);
+                        
+                        // 2. Conecta um Listener em Tempo Real para os participantes da sessão no Painel de Controle
+                        try {
+                            const { collection, query, where, onSnapshot } = await import("firebase/firestore");
+                            
+                            if (this.vttInvitesUnsubscribe) this.vttInvitesUnsubscribe();
+                            
+                            const q = query(
+                                collection(db, "session_invites"),
+                                where("sessionId", "==", this.activeSession.id)
+                            );
+                            
+                            this.vttInvitesUnsubscribe = onSnapshot(q, (snapshot) => {
+                                const players = snapshot.docs
+                                    .map(d => ({ id: d.id, ...d.data() }))
+                                    .filter(p => p.role !== 'gm' && !p.id.startsWith('self_'));
+                                
+                                this.renderVTTControlPanel(players);
+                            });
+                        } catch (err) {
+                            console.error("[Lyra VTT] Erro ao carregar ouvintes de tempo real para participantes:", err);
+                        }
+                    }
+                });
+            });
+        }
+    },
+
+    closeMapModal() {
+        const modal = document.getElementById('gm-map-modal');
+        const iframe = document.getElementById('gm-vtt-iframe');
+        
+        if (modal && iframe) {
+            modal.classList.add('hidden');
+            iframe.src = ''; // Libera recursos/memória do GDevelop
+            
+            if (this.vttInvitesUnsubscribe) {
+                this.vttInvitesUnsubscribe();
+                this.vttInvitesUnsubscribe = null;
+            }
+            
+            import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                VTTIntegration.destroy();
+            });
+        }
+    },
+
+    renderVTTControlPanel(players) {
+        const sidebar = document.getElementById('gm-vtt-control-sidebar');
+        if (!sidebar) return;
+
+        const currentCellSize = this.activeSession?.cellSize || 50;
+
+        let playersHtml = "";
+        if (players.length === 0) {
+            playersHtml = `
+                <div style="color: rgba(212, 175, 55, 0.6); text-align: center; font-size: 0.85rem; padding: 20px 0; border: 1px dashed rgba(212, 175, 55, 0.2); border-radius: 4px; background: rgba(0,0,0,0.3);">
+                    <i class="fas fa-ghost" style="font-size: 1.6rem; display: block; margin-bottom: 8px; color: rgba(212, 175, 55, 0.4);"></i>
+                    Nenhum viajante participante nesta sessão.
+                </div>
+            `;
+        } else {
+            players.forEach(p => {
+                const labelName = p.characterName || p.nickname || p.displayName || p.email;
+                const statusColor = p.status === 'online' ? '#2ecc71' : (p.status === 'accepted' ? '#f1c40f' : '#7f8c8d');
+                const statusLabel = p.status === 'online' ? 'Online' : (p.status === 'accepted' ? 'Aceito' : 'Convidado');
+                const hasSheet = !!p.characterId;
+
+                playersHtml += `
+                    <div style="background: rgba(30, 15, 8, 0.45); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.4);">
+                        <div style="display: flex; flex-direction: column; overflow: hidden; gap: 2px;">
+                            <strong style="color: var(--gold); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${labelName}">${labelName}</strong>
+                            <span style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.4); display: flex; align-items: center; gap: 4px;">
+                                <span style="width: 5px; height: 5px; border-radius: 50%; background: ${statusColor}; display: inline-block;"></span>
+                                ${statusLabel} ${p.nickname ? `(${p.nickname})` : ''}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="medieval-btn small gold-pulse" style="flex: 1; padding: 4px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;" 
+                                    ${hasSheet ? '' : 'disabled title="Aventureiro não escolheu ficha de personagem ainda"'} 
+                                    onclick="GMPanelModule.spawnPlayerToken('${p.characterId || p.id}')">
+                                <i class="fas fa-street-view"></i> Invocar Token
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        sidebar.innerHTML = `
+            <!-- Seção de Configuração do Tabuleiro/Mapa de Fundo -->
+            <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 14px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="medieval-subtitle" style="margin: 0 0 4px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-map"></i> Cenário da Grade
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label class="medieval-btn small gold-pulse" style="display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin: 0; padding: 6px 12px; font-size: 0.8rem; width: 100%;">
+                        <i class="fas fa-cloud-arrow-up"></i> Upload do Mapa
+                        <input type="file" id="vtt-map-upload-input" accept="image/*" style="display: none;">
+                    </label>
+                    <div style="font-size: 0.65rem; color: rgba(212, 175, 55, 0.5); text-align: center;">
+                        * Recomendado imagens de até 500KB
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+                        <input type="number" id="vtt-grid-size-input" class="medieval-input small" value="${currentCellSize}" min="20" max="200" style="width: 65px; text-align: center; font-size: 0.8rem; padding: 3px 6px; margin: 0;" title="Tamanho da Grade (px)">
+                        <button class="medieval-btn small secondary" id="vtt-apply-grid-btn" style="flex: 1; padding: 4px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;">
+                            <i class="fas fa-arrows-alt"></i> Redimensionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Aventureiros -->
+            <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="medieval-subtitle" style="margin: 0 0 10px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-shield-halved"></i> Convocação de Heróis
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; padding-right: 2px;" id="vtt-players-list-container">
+                    ${playersHtml}
+                </div>
+            </div>
+        `;
+
+        // Vincula eventos de mapa e upload
+        this.bindVTTMapControlEvents();
+    },
+
+    bindVTTMapControlEvents() {
+        const fileInput = document.getElementById('vtt-map-upload-input');
+        const gridInput = document.getElementById('vtt-grid-size-input');
+        const applyGridBtn = document.getElementById('vtt-apply-grid-btn');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 2 * 1024 * 1024) {
+                    window.app.showAlert("O arquivo selecionado excede 2MB. Selecione um mapa mais leve para garantir o carregamento em tempo real nos navegadores dos jogadores.", "Aviso de Limite");
+                    return;
+                }
+
+                window.app.toggleLoading(true, "Tecendo o novo cenário nas parcas...");
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64Url = event.target.result;
+                    const cellSize = parseInt(gridInput?.value || "50");
+
+                    try {
+                        // 1. Salva no Firestore
+                        await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                            mapUrl: base64Url,
+                            cellSize: cellSize,
+                            updatedAt: serverTimestamp()
+                        });
+
+                        // 2. Propaga imediatamente no VTT
+                        import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                            VTTIntegration.loadMap(base64Url, cellSize);
+                        });
+
+                        window.app.showAlert("O novo cenário de combate foi manifestado com sucesso!", "Saga Atualizada");
+                    } catch (err) {
+                        console.error("[Lyra VTT] Erro ao salvar mapa local no Firestore:", err);
+                        window.app.showAlert("Falha ao registrar novo tabuleiro no éter.");
+                    } finally {
+                        window.app.toggleLoading(false);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (applyGridBtn && gridInput) {
+            applyGridBtn.addEventListener('click', async () => {
+                const cellSize = parseInt(gridInput.value || "50");
+                if (isNaN(cellSize) || cellSize < 20 || cellSize > 200) {
+                    window.app.showAlert("O tamanho da grade deve ser entre 20 e 200 pixels.", "Aviso");
+                    return;
+                }
+
+                window.app.toggleLoading(true, "Redimensionando as teias da grade...");
+                try {
+                    const mapUrl = this.activeSession?.mapUrl || "/assets/maps/default.jpg";
+                    await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                        cellSize: cellSize,
+                        updatedAt: serverTimestamp()
+                    });
+
+                    import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                        VTTIntegration.loadMap(mapUrl, cellSize);
+                    });
+
+                    window.app.showAlert(`Tamanho do grid tático ajustado para ${cellSize}px.`, "Grade Sincronizada");
+                } catch (err) {
+                    console.error("[Lyra VTT] Erro ao atualizar cellSize:", err);
+                    window.app.showAlert("Erro ao propagar alteração de grade.");
+                } finally {
+                    window.app.toggleLoading(false);
+                }
+            });
+        }
+    },
+
+    spawnPlayerToken(characterId) {
+        if (!characterId) return;
+
+        import('./vtt-integration.js').then(({ VTTIntegration }) => {
+            // Instancia o token do herói em posição de entrada (x=4, y=4)
+            const playerPayload = [{
+                characterId: characterId,
+                id: characterId,
+                x: 4,
+                y: 4
+            }];
+
+            VTTIntegration.loadPlayers(playerPayload);
+            window.app.showAlert("O herói foi invocado no tabuleiro tático!", "Token Convocado");
+        });
     },
 
     async deleteTimelineEntry(index) {
