@@ -35,15 +35,17 @@ gitGraph
 *   **Deploy Automático:** Qualquer commit ou merge nesta branch dispara automaticamente a build do Firebase App Hosting de desenvolvimento (`lyra-the-wise-dev.web.app`).
 *   **Permissão:** Desenvolvedores parceiros podem fazer merge das suas respectivas branches de feature para a `dev` para liberar o link de testes aos amigos.
 
-### 🟩 Branches de Funcionalidades (Padrão `sistema/funcionalidade`)
-*   **Finalidade:** Ramificações onde as funcionalidades individuais são codificadas localmente pelos desenvolvedores de forma isolada.
-*   **Nomenclatura Recomendada:** Em vez de usar prefixos genéricos (como `feature/`), agrupamos as branches logicamente pelo **ID do Sistema de RPG** em que o desenvolvedor está trabalhando.
-    *   **Estrutura:** `[id-do-sistema]/[nome-da-funcionalidade]`
-    *   **Exemplos Práticos:**
-        *   `dnd5e/ficha-viajante`
-        *   `vampire/combate-disciplinas`
-        *   `vampire/ajuste-tokens`
-        *   `geral/melhoria-chat-ia` (para tarefas globais que afetam todo o portal)
+### 🟩 Branches de Funcionalidades e Novos Sistemas
+*   **Finalidade:** Ramificações onde as regras e componentes são codificados localmente pelos desenvolvedores de forma isolada.
+*   **Convenção de Nomenclatura Obrigatória:**
+    *   **Para novas funcionalidades (features) em sistemas existentes:**
+        *   **Estrutura:** `sistema/feature` (ou `sistema/funcionalidade`)
+        *   *Exemplos:* `vampire/combate-disciplinas`, `dnd5e/ficha-viajante`, `vampire/ajuste-tokens`
+    *   **Para novos sistemas de RPG criados do zero:**
+        *   **Estrutura:** `nome_sistema` (ID do sistema em minúsculo, com sublinhado/underscore se necessário)
+        *   *Exemplos:* `tormenta20`, `cyberpunk`, `call_of_cthulhu`
+    *   *Casos Globais:* `geral/melhoria-chat-ia` (para tarefas globais que afetam a plataforma como um todo)
+
 
 ---
 

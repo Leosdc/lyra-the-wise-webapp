@@ -4,47 +4,46 @@ Este tomo místico documenta o fluxo de trabalho colaborativo, controle de branc
 
 ---
 
-## 🗺️ 1. Arquitetura de Branches (Git Flow)
+## 🗺️ 1. Arquitetura de Branches (Git Flow & Multi-Ambiente)
 
-Para garantir que o código em produção esteja sempre estável e harmonizado, dividimos o multiverso do projeto em branches dedicadas:
+Para garantir que o código em produção esteja sempre estável e harmonizado, dividimos o multiverso do projeto em branches dedicadas integradas à nossa infraestrutura Firebase App Hosting:
 
 ```mermaid
 gitGraph
     commit id: "Ignition"
-    branch dnd5e
-    branch vampire
-    checkout dnd5e
-    commit id: "D&D Engine Work"
-    checkout vampire
-    commit id: "Vampire Engine Work"
-    checkout dnd5e
-    commit id: "D&D Rites Custom"
+    branch dev
+    checkout dev
+    commit id: "Setup Sandbox"
+    branch vampire/disciplinas
+    checkout vampire/disciplinas
+    commit id: "Novas Regras"
+    checkout dev
+    merge vampire/disciplinas tag: "Deploy em Dev"
     checkout main
-    merge dnd5e tag: "v3.6.0-dnd"
-    checkout vampire
-    commit id: "Vampire Custom UI"
-    checkout main
-    merge vampire tag: "v3.7.0-vampire"
+    merge dev tag: "Deploy Oficial"
 ```
 
-* **`main` (Produção):** Contém apenas versões consolidadas, testadas e prontas para o multiverso real. **NUNCA programe diretamente na main.**
-* **`dnd5e` (Desenvolvimento):** Branch dedicada à evolução, ritos e testes de regras do motor de *D&D 5ª Edição*.
-* **`vampire` (Desenvolvimento):** Branch dedicada à evolução e regras do motor de *Vampire: The Masquerade (V5)*.
+* **`main` (Produção Oficial):** Reflete o código sagrado e estável rodando na mesa oficial (`lyrathewise.lat`). **NUNCA programe diretamente na main.** Merges aqui são exclusivos do Dono do Projeto após validação.
+* **`dev` (Integração & Homologação):** Branch unificada de testes. Qualquer commit ou merge nesta branch dispara automaticamente o deploy no Firebase App Hosting de desenvolvimento (`lyra-the-wise-dev`).
+* **Branches Temáticas de Desenvolvimento:**
+    *   **Funcionalidades de sistemas existentes (`sistema/feature`):** Ramificações criadas a partir de `dev` para implementar regras específicas de um motor de RPG existente.
+        *   *Exemplos:* `vampire/disciplinas`, `dnd5e/ficha-viajante`, `vampire/ajuste-tokens`
+    *   **Novos sistemas criados do zero (`nome_sistema`):** Ramificações dedicadas a plugins ou RPGs novos construídos inteiramente do zero.
+        *   *Exemplos:* `tormenta20`, `cyberpunk`, `call_of_cthulhu`
 
 ### Comandos Úteis do Viajante:
 ```bash
-# Sincronizar repositório local
-git checkout main
-git pull origin main
+# 1. Sincronizar o repositório local com as branches oficiais
+git checkout dev
+git pull origin dev
 
-# Mudar para a branch de D&D 5e
-git checkout dnd5e
-git pull origin dnd5e
+# 2. Criar uma nova branch de funcionalidade para sistema existente
+git checkout -b vampire/nome-da-sua-funcionalidade
 
-# Mudar para a branch de Vampire
-git checkout vampire
-git pull origin vampire
+# 3. Criar uma nova branch para um sistema totalmente novo do zero
+git checkout -b tormenta20
 ```
+
 
 ---
 
