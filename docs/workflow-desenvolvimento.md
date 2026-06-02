@@ -124,3 +124,47 @@ Para garantir que ninguém quebre as branches oficiais por engano, o Dono do Pro
 *   **Produção (`.env`):** Contém as chaves oficiais conectadas ao banco principal. **Nunca** a altere na branch `main`.
 *   **Desenvolvimento (`.env.development`):** Criado para testes locais. Mantenha preenchido com as chaves do sandbox `lyra-the-wise-dev` geradas no console.
 *   **Protetor contra Conflitos de Merge:** Graças ao arquivo `.gitattributes` configurado na raiz, o Git foi instruído a manter o arquivo de compilação do Hosting (`apphosting.yaml`) intacto em cada branch em caso de fusão.
+
+---
+
+## 5. Ciclo de Vida e Consolidação de Branches Temáticas
+
+Quando uma funcionalidade ou sistema de RPG (como o branch histórico `vampire`) atinge maturidade, ele passa pelo processo de **consolidação na branch dev** para testes de multi-ambiente. Para manter a governança do repositório limpa e segura, adote as seguintes práticas de ciclo de vida de branches:
+
+### A. Verificação de Consolidação (Ancestralidade)
+Antes de tomar qualquer decisão sobre um branch temático, você deve verificar matematicamente se todas as suas modificações foram integradas na `dev`. O Git faz isso através do teste de ancestralidade:
+
+```bash
+# Retorna 0 (sucesso) se a branch temática estiver 100% contida em dev
+git merge-base --is-ancestor [nome-da-branch-tematica] dev
+```
+
+> [!NOTE]
+> **Caso Real de Sucesso:** A branch `vampire` (Vampire V5) foi validada por este método e está 100% integrada e contida em `dev`.
+
+### B. O Risco de Desenvolvimento Paralelo Desatualizado
+Nunca continue escrevendo código em uma branch de feature que já foi mesclada em `dev`. 
+A branch `dev` evolui constantemente com correções globais essenciais (como chaves de IA do Gemini, correções de reCAPTCHA, etc.) que não existem no seu branch de feature antigo. 
+
+*   **Regra de Ouro:** Se precisar continuar desenvolvendo novas features ou correções para o mesmo sistema, **abandone a branch antiga** e abra uma nova ramificação a partir da `dev` atualizada:
+    ```bash
+    git checkout dev
+    git pull origin dev
+    git checkout -b vampire/nova-feature
+    ```
+
+### C. Protocolo de Deleção Segura
+Branches temáticas consolidadas não devem permanecer eternamente no repositório. Para evitar poluição visual e confusão na equipe:
+1.  Mantenha a branch temática intacta até o deploy de homologação ser aprovado.
+2.  Após o **Merge Sagrado na main** (Produção Oficial) realizado pelo Dono do Projeto, delete com segurança a branch local e remota:
+
+```bash
+# 1. Mude para dev
+git checkout dev
+
+# 2. Delete a branch temática localmente
+git branch -d [nome-da-branch-tematica]
+
+# 3. Delete a branch temática no GitHub (remoto)
+git push origin --delete [nome-da-branch-tematica]
+```
