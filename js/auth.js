@@ -22,18 +22,29 @@ let _appCheckInitialized = false;
 function ensureAppCheck() {
     if (_appCheckInitialized) return;
     _appCheckInitialized = true;
-    if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+
+    // Detecta se estamos rodando em localhost, modo de dev do Vite, ou no domínio dinâmico do Firebase Dev
+    const isDevelopment = import.meta.env.DEV || 
+                          location.hostname === 'localhost' || 
+                          location.hostname === '127.0.0.1' ||
+                          location.hostname.includes('lyra-the-wise-dev') ||
+                          location.hostname.includes('hosted.app');
+
+    if (!isDevelopment) {
         try {
             appCheck = initializeAppCheck(app, {
                 provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
                 isTokenAutoRefreshEnabled: true
             });
-            console.log("✅ App Check inicializado.");
+            console.log("✅ App Check inicializado para produção.");
         } catch (error) {
             console.warn("⚠️ App Check falhou:", error.message);
         }
+    } else {
+        console.log("⚡ Ambiente de Desenvolvimento detectado: App Check ignorado (Bypass Local).");
     }
 }
+
 
 let _loginInProgress = false;
 
