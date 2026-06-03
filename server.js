@@ -63,8 +63,8 @@ app.use(helmet({
                 "https://cdn.jsdelivr.net",
                 "https://www.gstatic.com/recaptcha/",
                 "https://storage.ko-fi.com", // Ko-fi widget scripts
-                "'unsafe-inline'" // Vite inline scripts if any
-
+                "'unsafe-inline'", // Vite inline scripts if any
+                "'unsafe-eval'" // Permite que o motor PixiJS no GDevelop VTT compile shaders e execute
             ],
             "script-src-attr": ["'unsafe-inline'"], // Permite onclick em botõeslegados
             "connect-src": [

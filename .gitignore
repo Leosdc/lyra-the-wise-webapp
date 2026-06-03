@@ -62,3 +62,6 @@ Lyra_VTT/
 # Subdependências locais de desenvolvimento
 public/vtt/node_modules/
 
+# Permitir pastas 'dist' necessárias do motor VTT (GDevelop)
+!public/vtt/**/dist/
+
