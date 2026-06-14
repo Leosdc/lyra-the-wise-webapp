@@ -58,7 +58,7 @@ export const SUPPORTED_SYSTEMS = [
     { id: "dnd35", name: "D&D 3.5" },
     { id: "pathfinder", name: "Pathfinder 2ª Edição" },
     { id: "pathfinder1e", name: "Pathfinder 1ª Edição" },
-    { id: "vampire", name: "Vampire: The Masquerade (V5)" },
+    { id: "vampire", name: "Vampire: The Masquerade (V20)" },
     { id: "werewolf", name: "Werewolf: The Apocalypse" },
     { id: "mage", name: "Mage: The Ascension" },
     { id: "cofd", name: "Chronicles of Darkness" },

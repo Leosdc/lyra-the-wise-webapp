@@ -49,60 +49,139 @@ export const WizardModule = {
                     <div class="step-indicator" data-step="4">4</div>
                     <div class="step-indicator" data-step="5">5</div>
                 </div>
-                <!-- Steps content... same as before -->
+                 <!-- Steps content... same as before -->
                 <div class="wizard-step" data-step="1">
                     <h3>Origens</h3>
-                    <div class="form-group"><label>Nome do Herói</label><input type="text" id="wiz-name"
-                            placeholder="Ex: Valerius"></div>
-                    <div class="form-row">
+                    
+                    <!-- D&D 5e Fields -->
+                    <div id="dnd-step1-fields">
                         <div class="form-group">
-                            <label>Raça</label>
-                            <select id="wiz-race" class="medieval-select" required>
-                                <option value="">Carregando...</option> <!-- Will be populated by JS -->
+                            <label id="wiz-label-name">Nome do Herói</label>
+                            <input type="text" id="wiz-name" placeholder="Ex: Valerius">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label id="wiz-label-race">Raça</label>
+                                <select id="wiz-race" class="medieval-select" required>
+                                    <option value="">Carregando...</option>
+                                </select>
+                                <div id="wiz-subrace-container" class="hidden" style="margin-top: 5px;">
+                                    <select id="wiz-subrace" class="medieval-select small">
+                                        <option value="">Selecione Sub-raça</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="wiz-label-class">Classe</label>
+                                <select id="wiz-class" class="medieval-select" required>
+                                    <option value="">Carregando...</option>
+                                </select>
+                                <div id="wiz-archetype-container" class="hidden" style="margin-top: 5px;">
+                                    <label id="wiz-label-archetype" style="font-size: 0.85rem; margin-top: 5px; display: block;">Arquétipo</label>
+                                    <select id="wiz-archetype" class="medieval-select small">
+                                        <option value="">Selecione Arquétipo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="wiz-alignment-container">
+                                <label id="wiz-label-alignment">Alinhamento</label>
+                                <select id="wiz-alignment" class="medieval-select">
+                                    <option value="">Selecione Alinhamento...</option>
+                                    <option value="Leal e Bom">Leal e Bom</option>
+                                    <option value="Neutro e Bom">Neutro e Bom</option>
+                                    <option value="Caótico e Bom">Caótico e Bom</option>
+                                    <option value="Leal e Neutro">Leal e Neutro</option>
+                                    <option value="Neutro">Neutro</option>
+                                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                                    <option value="Leal e Mau">Leal e Mau</option>
+                                    <option value="Neutro e Mau">Neutro e Mau</option>
+                                    <option value="Caótico e Mau">Caótico e Mau</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="wiz-speed-container">
+                                <label>Velocidade (m)</label>
+                                <input type="text" id="wiz-speed" value="9m">
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="wiz-background-container">
+                            <label id="wiz-label-background">Antecedente</label>
+                            <select id="wiz-background" class="medieval-select">
+                                <option value="">Selecione Antecedente...</option>
                             </select>
-                            <div id="wiz-subrace-container" class="hidden" style="margin-top: 5px;">
-                                <select id="wiz-subrace" class="medieval-select small">
-                                    <option value="">Selecione Sub-raça</option>
+                        </div>
+                    </div>
+
+                    <!-- Vampire V20 Fields -->
+                    <div id="vampire-step1-fields" class="hidden">
+                        <div class="form-group">
+                            <label>Nome/Name</label>
+                            <input type="text" id="wiz-vamp-name" placeholder="Ex: Valerius">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Clã/Clan</label>
+                                <select id="wiz-vamp-clan" class="medieval-select" required>
+                                    <option value="">Selecione Clã...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Natureza/Nature</label>
+                                <select id="wiz-vamp-nature" class="medieval-select" required>
+                                    <option value="">Selecione Natureza...</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Classe</label>
-                            <select id="wiz-class" class="medieval-select" required>
-                                <option value="">Carregando...</option> <!-- Will be populated by JS -->
-                            </select>
-                            <div id="wiz-archetype-container" class="hidden" style="margin-top: 5px;">
-                                <select id="wiz-archetype" class="medieval-select small">
-                                    <option value="">Selecione Arquétipo</option>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Crônica/Chronicle</label>
+                                <input type="text" id="wiz-vamp-chronicle" placeholder="Ex: Crônicas de Nova York">
+                            </div>
+                            <div class="form-group">
+                                <label>Comportamento/Demeanor</label>
+                                <select id="wiz-vamp-demeanor" class="medieval-select" required>
+                                    <option value="">Selecione Comportamento...</option>
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Alinhamento</label>
-                            <select id="wiz-alignment" class="medieval-select">
-                                <option value="">Selecione Alinhamento...</option>
-                                <option value="Leal e Bom">Leal e Bom</option>
-                                <option value="Neutro e Bom">Neutro e Bom</option>
-                                <option value="Caótico e Bom">Caótico e Bom</option>
-                                <option value="Leal e Neutro">Leal e Neutro</option>
-                                <option value="Neutro">Neutro</option>
-                                <option value="Caótico e Neutro">Caótico e Neutro</option>
-                                <option value="Leal e Mau">Leal e Mau</option>
-                                <option value="Neutro e Mau">Neutro e Mau</option>
-                                <option value="Caótico e Mau">Caótico e Mau</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Conceito/Concept</label>
+                                <input type="text" id="wiz-vamp-concept" placeholder="Ex: Artista Decadente, Detetive Hardboiled">
+                            </div>
+                            <div class="form-group">
+                                <label>Senhor/Sire</label>
+                                <input type="text" id="wiz-vamp-sire" placeholder="Ex: Sebastian">
+                            </div>
                         </div>
-                        <div class="form-group"><label>Velocidade (m)</label><input type="text" id="wiz-speed"
-                                value="9m"></div>
-                    </div>
-                    <div class="form-group"><label>Antecedente</label>
-                        <select id="wiz-background" class="medieval-select">
-                            <option value="">Selecione Antecedente...</option>
-                        </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Geração/Generation</label>
+                                <select id="wiz-vamp-generation" class="medieval-select">
+                                    <option value="13ª Geração" selected>13ª Geração</option>
+                                    <option value="12ª Geração">12ª Geração</option>
+                                    <option value="11ª Geração">11ª Geração</option>
+                                    <option value="10ª Geração">10ª Geração</option>
+                                    <option value="9ª Geração">9ª Geração</option>
+                                    <option value="8ª Geração">8ª Geração</option>
+                                    <option value="7ª Geração">7ª Geração</option>
+                                    <option value="6ª Geração">6ª Geração</option>
+                                    <option value="5ª Geração">5ª Geração</option>
+                                    <option value="4ª Geração">4ª Geração</option>
+                                    <option value="14ª Geração">14ª Geração (Sangue-Fraco)</option>
+                                    <option value="15ª Geração">15ª Geração (Sangue-Fraco)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <!-- Empty layout balance column -->
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div class="wizard-step hidden" data-step="2">
                     <h3>Atributos <i class="fas fa-book-open pointer-icon" id="open-attr-tips"
                             title="Dicas de Geração"></i></h3>
@@ -400,7 +479,9 @@ export const WizardModule = {
             'wiz-name', 'wiz-race', 'wiz-subrace', 'wiz-class', 'wiz-archetype',
             'wiz-background', 'wiz-alignment', 'wiz-speed', 'wiz-traits',
             'wiz-ideals', 'wiz-bonds', 'wiz-flaws', 'wiz-mannerisms',
-            'wiz-talents', 'wiz-appearance', 'wiz-backstory'
+            'wiz-talents', 'wiz-appearance', 'wiz-backstory',
+            'wiz-vamp-name', 'wiz-vamp-clan', 'wiz-vamp-nature', 'wiz-vamp-demeanor',
+            'wiz-vamp-chronicle', 'wiz-vamp-concept', 'wiz-vamp-sire', 'wiz-vamp-generation'
         ];
         fields.forEach(id => {
             const el = document.getElementById(id);
@@ -425,21 +506,28 @@ export const WizardModule = {
     },
 
     async loadSystemData(context) {
-        const raceSelect = document.getElementById('wiz-race');
-        const classSelect = document.getElementById('wiz-class');
+        const currentSystem = context.currentSystem || 'dnd5e';
+        const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
+        const creationData = currentPlugin?.getCreationData() || {};
+        const isVampire = (currentSystem === 'vampire');
+
+        // Toggle visibility of the correct field containers
+        const dndContainer = document.getElementById('dnd-step1-fields');
+        const vampContainer = document.getElementById('vampire-step1-fields');
+        if (dndContainer) dndContainer.classList.toggle('hidden', isVampire);
+        if (vampContainer) vampContainer.classList.toggle('hidden', !isVampire);
+
+        const raceSelect = document.getElementById(isVampire ? 'wiz-vamp-clan' : 'wiz-race');
+        const classSelect = document.getElementById(isVampire ? 'wiz-vamp-nature' : 'wiz-class');
         const bgSelect = document.getElementById('wiz-background');
 
-        if (!raceSelect || !classSelect || !bgSelect) return;
+        if (!raceSelect || !classSelect) return;
 
         // Prevent reloading if already loaded with full data
         if (raceSelect.options.length > 30) return;
 
         raceSelect.innerHTML = '<option value="">Carregando...</option>';
         classSelect.innerHTML = '<option value="">Carregando...</option>';
-
-        const currentSystem = context.currentSystem || 'dnd5e';
-        const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
-        const creationData = currentPlugin?.getCreationData() || {};
 
         try {
             const systemData = await getSystemData(currentSystem);
@@ -461,8 +549,8 @@ export const WizardModule = {
                 }));
             }
 
-            // Populate Races
-            raceSelect.innerHTML = '<option value="">Selecione Raça...</option>';
+            // Populate Races / Clans
+            raceSelect.innerHTML = `<option value="">${isVampire ? 'Selecione Clã...' : 'Selecione Raça...'}</option>`;
             races.forEach(r => {
                 const name = r.raca || r;
                 const option = document.createElement('option');
@@ -471,8 +559,8 @@ export const WizardModule = {
                 raceSelect.appendChild(option);
             });
 
-            // Populate Classes
-            classSelect.innerHTML = '<option value="">Selecione Classe...</option>';
+            // Populate Classes / Natures
+            classSelect.innerHTML = `<option value="">${isVampire ? 'Selecione Natureza...' : 'Selecione Classe...'}</option>`;
             classes.forEach(c => {
                 const name = c.nome || c;
                 const option = document.createElement('option');
@@ -481,24 +569,49 @@ export const WizardModule = {
                 classSelect.appendChild(option);
             });
 
-            // Populate Backgrounds
-            bgSelect.innerHTML = '<option value="">Selecione Antecedente...</option>';
-            const backgrounds = creationData.backgrounds || [];
-            backgrounds.forEach(bg => {
-                const option = document.createElement('option');
-                option.value = bg;
-                option.innerText = bg;
-                bgSelect.appendChild(option);
-            });
+            // Populate Backgrounds (D&D only)
+            if (!isVampire && bgSelect) {
+                bgSelect.innerHTML = '<option value="">Selecione Antecedente...</option>';
+                const backgrounds = creationData.backgrounds || [];
+                backgrounds.forEach(bg => {
+                    const option = document.createElement('option');
+                    option.value = bg;
+                    option.innerText = bg;
+                    bgSelect.appendChild(option);
+                });
+            }
 
-            // Populate Attributes
+            // If vampire, populate Comportamento/Demeanor
+            if (isVampire) {
+                const archSelect = document.getElementById('wiz-vamp-demeanor');
+                if (archSelect) {
+                    archSelect.innerHTML = '<option value="">Selecione Comportamento...</option>';
+                    classes.forEach(c => {
+                        const name = c.nome || c;
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.innerText = name;
+                        archSelect.appendChild(option);
+                    });
+                }
+            }
+
+            // Populate Attributes & Virtues
             const attrGrid = document.getElementById('wiz-attributes-grid');
             if (attrGrid) {
                 const attrs = currentPlugin?.getAttributeConfig() || [];
-                attrGrid.innerHTML = attrs.map(a => `
+                // Append V20 virtues to attributes grid
+                const extraAttrs = isVampire ? (currentPlugin?.getSaveConfig() || []).map(s => ({
+                    ...s,
+                    shortLabel: s.id === 'conscience' ? 'CON' : (s.id === 'self_control' ? 'ATC' : 'COR')
+                })) : [];
+                const allAttrs = [...attrs, ...extraAttrs];
+
+                const startingVal = isVampire ? 1 : 10;
+                attrGrid.innerHTML = allAttrs.map(a => `
                     <div class="attr-input" title="${a.description || ''}">
                         <span>${a.shortLabel}</span>
-                        <input type="number" id="wiz-${a.id}" value="10" min="0" max="25">
+                        <input type="number" id="wiz-${a.id}" value="${startingVal}" min="0" max="25">
                     </div>
                 `).join('');
             }
@@ -515,8 +628,7 @@ export const WizardModule = {
             }
 
             // Listeners for Sub-options
-            this.bindSubOptions(races, classes);
-
+            this.bindSubOptions(races, classes, currentSystem);
         } catch (err) {
             logger.error("Erro ao carregar dados do sistema:", err);
             raceSelect.innerHTML = '<option value="">Erro ao carregar</option>';
@@ -524,7 +636,7 @@ export const WizardModule = {
         }
     },
 
-    bindSubOptions(races, classes) {
+    bindSubOptions(races, classes, currentSystem) {
         const raceSelect = document.getElementById('wiz-race');
         const subraceContainer = document.getElementById('wiz-subrace-container');
         const subraceSelect = document.getElementById('wiz-subrace');
@@ -534,6 +646,7 @@ export const WizardModule = {
         const archetypeSelect = document.getElementById('wiz-archetype');
 
         raceSelect.addEventListener('change', () => {
+            if (currentSystem === 'vampire') return;
             const selectedName = raceSelect.value;
             const raceData = races.find(r => r.raca === selectedName);
 
@@ -546,8 +659,7 @@ export const WizardModule = {
                     subraceSelect.appendChild(opt);
                 });
                 subraceContainer.classList.remove('hidden');
-                subraceSelect.required = true; // Enforce selection? Maybe optional? 
-                // Let's make it optional for now or the user might get stuck if data is partial
+                subraceSelect.required = true;
             } else {
                 subraceContainer.classList.add('hidden');
                 subraceSelect.value = "";
@@ -556,6 +668,7 @@ export const WizardModule = {
         });
 
         classSelect.addEventListener('change', () => {
+            if (currentSystem === 'vampire') return;
             const selectedName = classSelect.value;
             const classData = classes.find(c => c.nome === selectedName);
 
@@ -810,14 +923,30 @@ export const WizardModule = {
         if (!context.user) {
             if (!context.checkAuth()) return;
         }
-        const name = document.getElementById('wiz-name').value.trim();
-        const race = document.getElementById('wiz-race').value.trim();
-        const className = document.getElementById('wiz-class').value;
-        const alignment = document.getElementById('wiz-alignment').value;
+        const isVampire = (context.currentSystem === 'vampire');
+        const name = isVampire
+            ? document.getElementById('wiz-vamp-name').value.trim()
+            : document.getElementById('wiz-name').value.trim();
+        const race = isVampire
+            ? document.getElementById('wiz-vamp-clan').value.trim()
+            : document.getElementById('wiz-race').value.trim();
+        const className = isVampire
+            ? document.getElementById('wiz-vamp-nature').value
+            : document.getElementById('wiz-class').value;
+        const alignment = isVampire ? "" : document.getElementById('wiz-alignment').value;
+        const chronicle = isVampire ? document.getElementById('wiz-vamp-chronicle').value.trim() : "";
+        const demeanor = isVampire ? document.getElementById('wiz-vamp-demeanor').value : "";
 
-        if (!name || !race || !className || !alignment) {
-            context.showAlert("Nome, Raça, Classe e Alinhamento são obrigatórios para a jornada!", "Campos Faltando");
-            return;
+        if (isVampire) {
+            if (!name || !race || !className) {
+                context.showAlert("Nome/Name, Clã/Clan e Natureza/Nature são obrigatórios!", "Campos Faltando");
+                return;
+            }
+        } else {
+            if (!name || !race || !className || !alignment) {
+                context.showAlert("Nome, Raça, Classe e Alinhamento são obrigatórios para a jornada!", "Campos Faltando");
+                return;
+            }
         }
 
         // Security Validation
@@ -827,7 +956,7 @@ export const WizardModule = {
         }
         // Allow letters, spaces, apostrophes and hyphens (common in fantasy names)
         if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(name)) {
-            context.showAlert("O nome contém caracteres proibidos pelos deuses.", "Nome Inválido");
+            context.showAlert("O nome contém caracteres proibidos.", "Nome Inválido");
             return;
         }
 
@@ -839,30 +968,71 @@ export const WizardModule = {
                 : { bio: {}, attributes: {}, stats: {}, proficiencies_choice: {}, story: {}, inventory: {}, spells: {} };
 
             // Mapping values
+            template.name = name;
             template.bio.name = name;
             template.bio.race = race;
-            template.bio.subrace = document.getElementById('wiz-subrace')?.value || "";
+            template.bio.subrace = isVampire ? "" : (document.getElementById('wiz-subrace')?.value || "");
             template.bio.class = className;
-            template.bio.archetype = document.getElementById('wiz-archetype')?.value || "";
-            template.bio.background = document.getElementById('wiz-background').value;
-            template.bio.alignment = document.getElementById('wiz-alignment').value;
+            template.bio.archetype = isVampire ? demeanor : (document.getElementById('wiz-archetype')?.value || "");
+            template.bio.background = isVampire ? "" : (document.getElementById('wiz-background')?.value || "");
+            template.bio.alignment = isVampire ? chronicle : alignment;
             template.bio.level = 1;
+
+            if (isVampire) {
+                template.bio.clan = race;
+                template.bio.nature = className;
+                template.bio.demeanor = demeanor;
+                template.bio.chronicle = chronicle;
+                template.bio.concept = document.getElementById('wiz-vamp-concept')?.value.trim() || "";
+                template.bio.sire = document.getElementById('wiz-vamp-sire')?.value.trim() || "";
+                template.bio.generation = document.getElementById('wiz-vamp-generation')?.value || "13ª Geração";
+            }
 
             const attributes = {};
             const attrConfig = currentPlugin?.getAttributeConfig() || [];
-            attrConfig.forEach(attr => {
+            const extraAttrs = isVampire ? (currentPlugin?.getSaveConfig() || []) : [];
+            const allAttrConfigs = [...attrConfig, ...extraAttrs];
+
+            allAttrConfigs.forEach(attr => {
                 const el = document.getElementById(`wiz-${attr.id}`);
                 if (el) {
-                    attributes[attr.id] = Math.min(25, Math.max(0, parseInt(el.value) || 10));
+                    attributes[attr.id] = Math.min(25, Math.max(0, parseInt(el.value) || (isVampire ? 1 : 10)));
                 } else {
-                    attributes[attr.id] = 10;
+                    attributes[attr.id] = isVampire ? 1 : 10;
                 }
             });
             template.attributes = attributes;
 
             const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
             template.proficiencies_choice.skills = rawSkills;
-            template.stats.speed = document.getElementById('wiz-speed').value || "9m";
+
+            if (isVampire) {
+                template.proficiencies_choice.saves = ['conscience', 'self_control', 'courage'];
+                
+                // Perform V20 specific stats calculation
+                const calculated = currentPlugin.calculateStats(template);
+                template.stats.hp_max = calculated.general.hp_max || 7;
+                template.stats.hp_current = template.stats.hp_max;
+                template.stats.willpower_max = calculated.general.willpower_max || 5;
+                template.stats.willpower_current = template.stats.willpower_max;
+                
+                let bloodMax = 10;
+                const genStr = String(template.bio.generation || "13ª Geração");
+                if (genStr.includes("15ª") || genStr.includes("14ª") || genStr.includes("13ª")) bloodMax = 10;
+                else if (genStr.includes("12ª")) bloodMax = 11;
+                else if (genStr.includes("11ª")) bloodMax = 12;
+                else if (genStr.includes("10ª")) bloodMax = 15;
+                else if (genStr.includes("9ª")) bloodMax = 15;
+                else if (genStr.includes("8ª")) bloodMax = 20;
+                else if (genStr.includes("7ª")) bloodMax = 30;
+                else if (genStr.includes("6ª")) bloodMax = 50;
+
+                template.stats.blood_pool_max = bloodMax;
+                template.stats.blood_pool_current = bloodMax;
+                template.stats.speed = "Normal";
+            } else {
+                template.stats.speed = document.getElementById('wiz-speed').value || "9m";
+            }
 
             // Story
             template.story.traits = document.getElementById('wiz-traits').value;

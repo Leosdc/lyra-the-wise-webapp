@@ -22,6 +22,7 @@
 
 .form-group input,
 .form-group textarea,
+.form-group select,
 .attr-input input {
     width: 100%;
     background: rgba(255, 255, 255, 0.4);

@@ -1,37 +1,51 @@
 /**
- * Vampire: The Masquerade (V5) System Plugin
- * Plugin de exemplo e scaffold para o sistema de RPG Vampiro: A Máscara (5ª Edição).
- * Serve como base e guia para novos desenvolvedores expandirem a "engrenagem" de seus sistemas.
+ * Vampire: The Masquerade (V20) System Plugin
+ * Implementação do contrato SystemPlugin para a 20ª Edição Clássica (V20) de Vampiro: A Máscara.
  */
 
 import SystemRegistry from './system-registry.js';
 import { escapeHTML } from '../modules/utils.js';
 
 // ═══════════════════════════════════════════════════════════════
-//  DADOS ESTÁTICOS
+//  DADOS ESTÁTICOS V20
 // ═══════════════════════════════════════════════════════════════
 
 const CLANS = [
-    "Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue", "Caitiff", "Thin-Blood (Sangue-Fraco)", "Lasombra", "Hecata", "Banu Haqim", "Ravnos", "Tzimisce", "Salubri"
+    "Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue",
+    "Lasombra", "Tzimisce", "Giovanni", "Assamita", "Seguidores de Set", "Ravnos", "Caitiff"
 ];
 
 const SECTS = [
-    "Camarilla", "Movimento Anarquista", "Autarcas", "Sabbat", "Segunda Inquisição"
+    "Camarilla", "Sabá", "Anarquistas", "Independentes", "Autarcas"
 ];
 
 const PATHS = [
-    "Humanidade", "Caminho dos Reis", "Caminho do Acordo", "Caminho dos Sussurros", "Caminho dos Ossos"
+    "Humanidade", "Caminho de Caim", "Caminho das Feras", "Caminho dos Reis",
+    "Caminho do Acordo", "Caminho dos Sussurros", "Caminho dos Ossos"
+];
+
+const ARCHETYPES = [
+    "Arquiteto", "Autocrata", "Bon Vivant", "Caçador de Emoções", "Capitalista",
+    "Celebrante", "Competidor", "Conformista", "Diretor", "Excêntrico", "Fanático",
+    "Filantropo", "Inconformista", "Juiz", "Solitário", "Mártir", "Masoquista",
+    "Monstro", "Pedagogo", "Penitente", "Perfeccionista", "Protetor", "Rebelde",
+    "Ranzinza", "Sobrevivente", "Trapaceiro", "Visionário"
+];
+
+const BACKGROUNDS = [
+    "Aliados", "Contatos", "Fama", "Geração", "Influência",
+    "Mentores", "Rebanho", "Recursos", "Lacaios", "Status"
 ];
 
 // ═══════════════════════════════════════════════════════════════
-//  PLUGIN MTG V5
+//  PLUGIN VAMPIRE V20
 // ═══════════════════════════════════════════════════════════════
 
 export const VampirePlugin = {
     id: 'vampire',
-    name: 'Vampire: The Masquerade (V5)',
+    name: 'Vampire: The Masquerade (V20)',
     implemented: true,
-    version: '1.0.0',
+    version: '2.0.0',
     icon: 'fa-bat',
 
     // ── Dados ──────────────────────────────────────────────────
@@ -39,35 +53,40 @@ export const VampirePlugin = {
     getTemplate() {
         return {
             bio: {
-                name: "", clan: "", sect: "", level: 1, // 'level' representará Geração/Blood Potency
+                name: "", clan: "", sect: "", level: 1, // 'level' mapeado para nível de poder / Geração internamente
                 generation: "13ª Geração", concept: "",
                 sire: "", alignment: "Humanidade", xp: 0, playerName: ""
             },
             attributes: {
-                strength: 2, dexterity: 2, stamina: 2,       // Físicos
-                charisma: 2, manipulation: 2, composure: 2,   // Sociais
-                intelligence: 2, wits: 2, resolve: 2         // Mentais
+                // Físicos
+                strength: 1, dexterity: 1, stamina: 1,
+                // Sociais
+                charisma: 1, manipulation: 1, appearance: 1,
+                // Mentais
+                perception: 1, intelligence: 1, wits: 1,
+                // Virtudes
+                conscience: 1, self_control: 1, courage: 1
             },
             stats: {
-                hp_current: 5, hp_max: 5, hp_temp: 0, // No Storyteller, Vitality/Health = Stamina + 3
-                ac: 2, initiative: 4, speed: "Normal", // AC representará defesa base (Dexterity + Athletics)
+                hp_current: 7, hp_max: 7, hp_temp: 0, // Fixo 7 níveis de Vitalidade
+                ac: 1, initiative: 2, speed: "Normal", // AC usado como defesa base (Destreza)
                 willpower_max: 5, willpower_current: 5,
-                hunger: 1, blood_potency: 1
+                blood_pool_max: 10, blood_pool_current: 10
             },
             proficiencies_choice: {
-                saving_throws: [], // Não usado
-                skills: [],        // Habilidades (Athletics, Stealth, etc.)
+                saving_throws: [], // Não usado diretamente
+                skills: [],        // IDs de Habilidades habilitadas no Wizard
                 expertise: []
             },
             death_saves: { successes: 0, failures: 0 },
             attacks: [],
             spells: {
-                ability: "resolve", save_dc: 0, attack_bonus: 0,
-                slots: {}, // Não usa spell slots convencionais
-                list: []   // Listará "Disciplinas" ativas do Vampiro
+                ability: "perception", save_dc: 0, attack_bonus: 0,
+                slots: {},
+                list: []   // Disciplinas
             },
             inventory: {
-                coins: { pc: 0, pp: 0, pe: 0, po: 0, pl: 0 }, // Não usa sistema D&D de moedas
+                coins: { pc: 0, pp: 0, pe: 0, po: 0, pl: 0 },
                 items: [],
                 encumbrance: { current: 0, limit: 100 }
             },
@@ -76,65 +95,83 @@ export const VampirePlugin = {
                 appearance: "", mannerisms: "", talents: "",
                 languages: "", other_proficiencies: "", notes: ""
             },
-            conditions: [] // Fomes, Máculas, Frenesi
+            conditions: []
         };
     },
 
     getCreationData() {
         return {
-            races: CLANS,             // Mapeado para races para reaproveitar a UI
-            classes: SECTS,           // Mapeado para classes
-            alignments: PATHS,        // Mapeado para moralidade (Humanidade)
-            backgrounds: ["Cientista", "Artista", "Criminoso", "Aristocrata", "Detetive", "Soldado", "Sobrevivente Urbano", "Líder de Gangue"],
+            races: CLANS,             // Mapeado para races na UI
+            classes: ARCHETYPES,      // Mapeado para classes (Natureza)
+            alignments: PATHS,        // Mapeado para moralidade
+            backgrounds: BACKGROUNDS,
             subraces: {},
-            archetypes: {}
+            archetypes: {}            // Será preenchido na UI com Comportamento (mesmos arquétipos)
         };
     },
 
     getAttributeConfig() {
         return [
             // Físicos
-            { id: 'strength',     label: 'Força (Físico)',        shortLabel: 'FOR', description: 'Capacidade de levantar peso, causar impacto físico direto.' },
-            { id: 'dexterity',    label: 'Destreza (Físico)',     shortLabel: 'DES', description: 'Agilidade, reflexos manuais e velocidade de reação.' },
-            { id: 'stamina',      label: 'Vigor (Físico)',        shortLabel: 'VIG', description: 'Resistência a lesões, cansaço e venenos.' },
+            { id: 'strength',     label: 'Força (Físico)',        shortLabel: 'FOR', description: 'Poder muscular e capacidade de causar impacto físico.' },
+            { id: 'dexterity',    label: 'Destreza (Físico)',     shortLabel: 'DES', description: 'Agilidade, reflexos e coordenação motora.' },
+            { id: 'stamina',      label: 'Vigor (Físico)',        shortLabel: 'VIG', description: 'Resistência a dano, veneno e fadiga.' },
             // Sociais
-            { id: 'charisma',     label: 'Carisma (Social)',      shortLabel: 'CAR', description: 'Atração natural, charme pessoal e capacidade de encantar.' },
-            { id: 'manipulation', label: 'Manipulação (Social)',  shortLabel: 'MAN', description: 'Persuasão ativa, blefe e controle sobre os outros.' },
-            { id: 'composure',    label: 'Autocontrole (Social)', shortLabel: 'AUT', description: 'Resistência a insultos, blefes e controle emocional.' },
+            { id: 'charisma',     label: 'Carisma (Social)',      shortLabel: 'CAR', description: 'Charme natural, magnetismo e habilidade de inspirar.' },
+            { id: 'manipulation', label: 'Manipulação (Social)',  shortLabel: 'MAN', description: 'Persuasão ativa, blefe e comando indireto.' },
+            { id: 'appearance',   label: 'Aparência (Social)',    shortLabel: 'APA', description: 'Atratividade visual e primeira impressão.' },
             // Mentais
-            { id: 'intelligence', label: 'Inteligência (Mental)',  shortLabel: 'INT', description: 'Capacidade analítica, memória e retenção de fatos.' },
-            { id: 'wits',         label: 'Raciocínio (Mental)',   shortLabel: 'RAC', description: 'Velocidade de raciocínio lógico sob pressão direta.' },
-            { id: 'resolve',      label: 'Determinação (Mental)', shortLabel: 'DET', description: 'Força de vontade de focar na resolução de tarefas exaustivas.' }
+            { id: 'perception',   label: 'Percepção (Mental)',    shortLabel: 'PER', description: 'Atenção ao ambiente e intuição de detalhes.' },
+            { id: 'intelligence', label: 'Inteligência (Mental)',  shortLabel: 'INT', description: 'Raciocínio analítico, memória e erudição.' },
+            { id: 'wits',         label: 'Raciocínio (Mental)',   shortLabel: 'RAC', description: 'Velocidade de decisão sob pressão direta.' }
         ];
     },
 
     getSkillConfig() {
         return [
-            { id: 'atletismo',    label: 'Atletismo (Fís)',    attribute: 'dexterity', description: 'Correr, saltar e esquivar.' },
-            { id: 'briga',        label: 'Briga (Fís)',        attribute: 'strength',  description: 'Combate desarmado.' },
-            { id: 'furtividade',  label: 'Furtividade (Fís)',  attribute: 'dexterity', description: 'Mover-se sem ser visto ou ouvido.' },
-            { id: 'armas_brancas',label: 'Armas Brancas (Fís)',attribute: 'dexterity', description: 'Combate usando espadas, facas ou bastões.' },
-            { id: 'oficios',      label: 'Ofícios (Fís)',      attribute: 'dexterity', description: 'Consertos ou criação de itens físicos.' },
-            
-            { id: 'empatia',      label: 'Empatia (Soc)',      attribute: 'charisma',  description: 'Compreender emoções e mentiras alheias.' },
-            { id: 'intimidacao',  label: 'Intimidação (Soc)',  attribute: 'strength',  description: 'Coagir ou assustar os outros.' },
-            { id: 'persuasao',    label: 'Persuasão (Soc)',    attribute: 'charisma',  description: 'Diplomacia ativa e charme.' },
-            { id: 'manha',        label: 'Manha (Soc)',        attribute: 'manipulation', description: 'Conhecimento das ruas, gangues e crime.' },
-            { id: 'subterfugio',  label: 'Subterfúgio (Soc)',  attribute: 'manipulation', description: 'Blefe, intriga política ou mentiras convincentes.' },
+            // Talentos (Talents)
+            { id: 'alertness',     label: 'Prontidão (Talento)',        attribute: 'perception',   description: 'Notar o perigo ou mudanças ao redor.' },
+            { id: 'athletics',     label: 'Atletismo (Talento)',        attribute: 'dexterity',    description: 'Correr, saltar, escalada.' },
+            { id: 'awareness',     label: 'Percepção Extra-sens. (Tal)', attribute: 'perception',   description: 'Notar o sobrenatural ou a aura.' },
+            { id: 'brawl',         label: 'Briga (Talento)',            attribute: 'dexterity',    description: 'Combate corpo a corpo desarmado.' },
+            { id: 'empathy',       label: 'Empatia (Talento)',          attribute: 'perception',   description: 'Ler intenções e sentimentos.' },
+            { id: 'expression',    label: 'Expressão (Talento)',        attribute: 'charisma',     description: 'Escrever, discursar ou expressar ideias.' },
+            { id: 'intimidation',  label: 'Intimidação (Talento)',      attribute: 'strength',     description: 'Coagir ou assustar fisicamente ou mentalmente.' },
+            { id: 'leadership',    label: 'Liderança (Talento)',        attribute: 'charisma',     description: 'Inspirar ou comandar outras pessoas.' },
+            { id: 'streetwise',    label: 'Manha (Talento)',            attribute: 'wits',         description: 'Conhecimento das ruas, rumores e crime.' },
+            { id: 'subterfuge',    label: 'Subterfúgio (Talento)',      attribute: 'manipulation', description: 'Ocultar a verdade, mentir ou seduzir.' },
 
-            { id: 'academicos',   label: 'Acadêmicos (Men)',   attribute: 'intelligence', description: 'Humanidades, história e artes.' },
-            { id: 'investigacao', label: 'Investigação (Men)', attribute: 'wits',         description: 'Análise dedutiva e buscas por pistas.' },
-            { id: 'medicina',     label: 'Medicina (Men)',     attribute: 'intelligence', description: 'Tratamentos de saúde e primeiros socorros.' },
-            { id: 'ocultismo',    label: 'Ocultismo (Men)',    attribute: 'intelligence', description: 'Conhecimento de lendas e mitos sobrenaturais.' },
-            { id: 'tecnologia',   label: 'Tecnologia (Men)',   attribute: 'intelligence', description: 'Hacking, computadores e eletrônicos.' }
+            // Perícias (Skills)
+            { id: 'animal_ken',    label: 'Empatia c/ Animais (Per)',   attribute: 'charisma',     description: 'Entender ou acalmar animais.' },
+            { id: 'crafts',        label: 'Ofícios (Perícia)',          attribute: 'dexterity',    description: 'Fabricar ou reparar itens físicos.' },
+            { id: 'drive',         label: 'Condução (Perícia)',         attribute: 'dexterity',    description: 'Dirigir carros, motos ou pilotar.' },
+            { id: 'etiquette',     label: 'Etiqueta (Perícia)',         attribute: 'charisma',     description: 'Maneiras sociais na sociedade mortal ou cainita.' },
+            { id: 'firearms',      label: 'Armas de Fogo (Perícia)',    attribute: 'dexterity',    description: 'Atirar com pistolas, fuzis, etc.' },
+            { id: 'larceny',       label: 'Furtos (Perícia)',           attribute: 'dexterity',    description: 'Arrombar fechaduras, bater carteiras.' },
+            { id: 'melee',         label: 'Armas Brancas (Perícia)',    attribute: 'dexterity',    description: 'Combate usando espadas, facas, bastões.' },
+            { id: 'performance',   label: 'Performance (Perícia)',      attribute: 'charisma',     description: 'Atuar, cantar, dançar ou encenar.' },
+            { id: 'stealth',       label: 'Furtividade (Perícia)',      attribute: 'dexterity',    description: 'Mover-se silenciosamente ou se esconder.' },
+            { id: 'survival',      label: 'Sobrevivência (Perícia)',    attribute: 'wits',         description: 'Sobreviver em ambientes hostis/selvagens.' },
+
+            // Conhecimentos (Knowledges)
+            { id: 'academics',     label: 'Acadêmicos (Conh)',          attribute: 'intelligence', description: 'Conhecimento geral, artes, história.' },
+            { id: 'computer',      label: 'Informática (Conh)',         attribute: 'intelligence', description: 'Programar, hackear, usar computadores.' },
+            { id: 'finance',       label: 'Finanças (Conh)',            attribute: 'intelligence', description: 'Lidar com mercados, comércio e dinheiro.' },
+            { id: 'investigation', label: 'Investigação (Conh)',        attribute: 'perception',   description: 'Procurar pistas, deduzir crimes.' },
+            { id: 'law',           label: 'Direito (Conh)',             attribute: 'intelligence', description: 'Leis dos mortais e tradições vampíricas.' },
+            { id: 'medicine',      label: 'Medicina (Conh)',            attribute: 'intelligence', description: 'Tratar ferimentos, anatomia, doenças.' },
+            { id: 'occult',        label: 'Ocultismo (Conh)',           attribute: 'intelligence', description: 'Conhecimento de seitas, magia e mitos.' },
+            { id: 'politics',      label: 'Política (Conh)',            attribute: 'manipulation', description: 'Intriga governamental ou de seitas.' },
+            { id: 'science',       label: 'Ciências (Conh)',            attribute: 'intelligence', description: 'Química, física, biologia e pesquisa.' },
+            { id: 'technology',    label: 'Tecnologia (Conh)',          attribute: 'intelligence', description: 'Eletrônica básica, fiação, segurança.' }
         ];
     },
 
     getSaveConfig() {
         return [
-            { id: 'stamina',      label: 'Resistência Física',  description: 'Resistir a venenos e exaustão.' },
-            { id: 'composure',    label: 'Autocontrole',        description: 'Resistir a tentações e humilhações públicas.' },
-            { id: 'resolve',      label: 'Força Mental',        description: 'Foco inquebrável.' }
+            { id: 'conscience',  label: 'Consciência / Convicção', description: 'Adesão moral e remorso ante pecados do Caminho.' },
+            { id: 'self_control', label: 'Autocontrole / Instinto',  description: 'Controle de impulsos e do frenesi interno.' },
+            { id: 'courage',      label: 'Coragem',                 description: 'Resistência ao pavor da morte (Rötschreck).' }
         ];
     },
 
@@ -146,42 +183,59 @@ export const VampirePlugin = {
         // Copia atributos
         const attrs = this.getAttributeConfig();
         attrs.forEach(attr => {
-            const val = parseInt(char.attributes?.[attr.id] || 2);
+            const val = parseInt(char.attributes?.[attr.id] || 1);
             stats.attributes[attr.id] = { score: val, mod: val, formatted: String(val) };
+        });
+
+        // Copia Virtudes (que também estão em atributos)
+        const saves = this.getSaveConfig();
+        saves.forEach(s => {
+            const val = parseInt(char.attributes?.[s.id] || 1);
+            stats.attributes[s.id] = { score: val, mod: val, formatted: String(val) };
+            stats.saves[s.id] = { mod: val, formatted: String(val), isProf: true };
         });
 
         // Habilidades
         const skills = this.getSkillConfig();
         skills.forEach(sk => {
             const hasSkill = (char.proficiencies_choice?.skills || []).includes(sk.id);
-            const val = hasSkill ? 1 : 0; // Habilidades têm nível simples ou pontuação
+            const val = hasSkill ? 1 : 0;
             stats.skills[sk.id] = { mod: val, formatted: String(val), isProf: hasSkill };
         });
 
-        // Resistências (Saves)
-        const saves = this.getSaveConfig();
-        saves.forEach(s => {
-            const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
-            const val = isProf ? 1 : 0;
-            stats.saves[s.id] = { mod: val, formatted: String(val), isProf };
-        });
+        // Valores Derivados V20
+        const dexterity = stats.attributes.dexterity?.score ?? 1;
+        const wits = stats.attributes.wits?.score ?? 1;
+        const courage = stats.attributes.courage?.score ?? 1;
 
-        // Estatísticas do Storyteller
-        const stamina = stats.attributes.stamina?.score ?? 2;
-        const wits = stats.attributes.wits?.score ?? 2;
-        const resolve = stats.attributes.resolve?.score ?? 2;
-        const composure = stats.attributes.composure?.score ?? 2;
-
-        stats.general.hp_max = stamina + 3;
-        stats.general.willpower_max = resolve + composure;
-        stats.general.profBonus = 0; // Vampire não usa Bônus de Proficiência clássico
+        // Health Track V20 (Bruised a Incapacitated) é fixado em 7 níveis
+        stats.general.hp_max = 7;
+        
+        // Força de Vontade (Willpower) máxima no V20 começa igual à Coragem
+        stats.general.willpower_max = courage;
+        stats.general.profBonus = 0;
         stats.general.profBonusFormatted = "—";
-        stats.general.passivePerception = wits + resolve;
+        
+        // Percepção Passiva redefinida no Storyteller como Percepção + Raciocínio (Perception + Wits)
+        const perception = stats.attributes.perception?.score ?? 1;
+        stats.general.passivePerception = perception + wits;
+
+        // Limite da Reserva de Sangue com base na Geração
+        let bloodMax = 10;
+        const genStr = String(char.bio?.generation || "13ª Geração");
+        if (genStr.includes("15ª") || genStr.includes("14ª") || genStr.includes("13ª")) bloodMax = 10;
+        else if (genStr.includes("12ª")) bloodMax = 11;
+        else if (genStr.includes("11ª")) bloodMax = 12;
+        else if (genStr.includes("10ª")) bloodMax = 15;
+        else if (genStr.includes("9ª")) bloodMax = 15;
+        else if (genStr.includes("8ª")) bloodMax = 20;
+        else if (genStr.includes("7ª")) bloodMax = 30;
+        else if (genStr.includes("6ª")) bloodMax = 50;
 
         stats.defaults = {
-            hp_max: stamina + 3,
-            ac: (stats.attributes.dexterity?.score ?? 2),
-            initiative: wits + resolve
+            hp_max: 7,
+            ac: dexterity, // Defesa base é Destreza pura
+            initiative: dexterity + wits
         };
 
         return stats;
@@ -192,7 +246,7 @@ export const VampirePlugin = {
     renderSheetScores(char, systemStats, helpers) {
         const attrs = this.getAttributeConfig();
         return attrs.map(a => {
-            const score = char.attributes?.[a.id] || 2;
+            const score = char.attributes?.[a.id] || 1;
             return `
                 <div class="score-card vt5-score" title="${escapeHTML(a.description)}">
                     <span class="score-label">${a.shortLabel}</span>
@@ -206,14 +260,14 @@ export const VampirePlugin = {
     renderSheetSaves(char, systemStats, helpers) {
         const saves = this.getSaveConfig();
         return saves.map(s => {
-            const isProf = (char.proficiencies_choice?.saves || []).includes(s.id);
-            const attrVal = systemStats.attributes[s.id]?.score ?? 2;
-            const formatted = "★".repeat(attrVal) + "☆".repeat(Math.max(0, 5 - attrVal));
+            const val = parseInt(char.attributes?.[s.id] || 1);
+            const formatted = "★".repeat(val) + "☆".repeat(Math.max(0, 5 - val));
             return `
-                <div class="save-item ${isProf ? 'proficient' : ''}" title="${helpers.isInspection ? 'Apenas Visualização' : escapeHTML(s.description)}">
-                    <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: ${helpers.isInspection ? 'default' : 'pointer'};" data-type="saves" data-field="${s.id}" ${helpers.isInspection ? 'disabled' : ''}></i>
-                    <span>${escapeHTML(s.label)}</span>
-                    <span class="save-value" style="color: var(--crimson);">${formatted}</span>
+                <div class="save-item proficient" title="${helpers.isInspection ? 'Apenas Visualização' : escapeHTML(s.description)}">
+                    <span style="margin-left: 10px;">${escapeHTML(s.label)}</span>
+                    <span class="save-value" style="color: var(--crimson); font-size: 0.85rem; margin-left: auto;">${formatted}</span>
+                    <!-- Hidden input to allow updating virtue value through sheet save -->
+                    <input type="hidden" data-field="attributes.${s.id}" value="${val}">
                 </div>
             `;
         }).join('');
@@ -234,34 +288,27 @@ export const VampirePlugin = {
     },
 
     renderSheetCombatTab(char, systemStats, helpers) {
-        const hunger = char.stats?.hunger ?? 1;
-        const bloodPotency = char.stats?.blood_potency ?? 1;
+        const bpCurr = char.stats?.blood_pool_current ?? 10;
+        const bpMax = systemStats.defaults?.hp_max ?? 10; // Será recalculado dinamicamente
         const willpowerCurr = char.stats?.willpower_current ?? 5;
-        const willpowerMax = systemStats.general.willpower_max ?? 5;
+        const willpowerMax = systemStats.general?.willpower_max ?? 5;
 
         return `
             <div class="vt5-combat-box" style="display: flex; flex-direction: column; gap: 1.5rem; width: 100%;">
                 <div class="hunger-section">
-                    <h4><i class="fa-solid fa-droplet" style="color: var(--crimson);"></i> Fome (Hunger)</h4>
+                    <h4><i class="fa-solid fa-droplet" style="color: var(--crimson);"></i> Reserva de Sangue (Blood Pool)</h4>
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        ${helpers.mkInput(hunger, 'stats.hunger', 'range', 'Fome de Sangue', 'medieval-range', 'min="0" max="5" style="accent-color: var(--crimson); flex: 1;"')}
-                        <span class="hunger-value" style="font-size: 1.8rem; font-weight: bold; color: var(--crimson);">${hunger} / 5</span>
+                        ${helpers.mkInput(bpCurr, 'stats.blood_pool_current', 'number', 'Sangue Atual', 'medieval-input', 'style="width: 60px; text-align: center;"')}
+                        <span class="hunger-value" style="font-size: 1.8rem; font-weight: bold; color: var(--crimson);">${bpCurr} / ${bpMax}</span>
                     </div>
                 </div>
 
                 <div class="willpower-section">
                     <h4><i class="fa-solid fa-brain" style="color: var(--gold);"></i> Força de Vontade (Willpower)</h4>
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        ${helpers.mkInput(willpowerCurr, 'stats.willpower_current', 'number', 'Autocontrole Atual', 'medieval-input', 'style="width: 60px; text-align: center;"')}
+                        ${helpers.mkInput(willpowerCurr, 'stats.willpower_current', 'number', 'Força de Vontade Atual', 'medieval-input', 'style="width: 60px; text-align: center;"')}
                         <span class="willpower-separator">/</span>
                         <span class="willpower-max" style="font-size: 1.4rem; font-weight: bold;">${willpowerMax}</span>
-                    </div>
-                </div>
-
-                <div class="blood-potency-section">
-                    <h4>Potência do Sangue</h4>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        ${helpers.mkInput(bloodPotency, 'stats.blood_potency', 'number', 'Poder do Sangue', 'medieval-input', 'style="width: 60px; text-align: center;" min="1" max="10"')}
                     </div>
                 </div>
             </div>
@@ -269,17 +316,15 @@ export const VampirePlugin = {
     },
 
     renderSheetMagicTab(char, systemStats, helpers) {
-        // Vampire usa Disciplinas (Disciplines) em vez de Magias normais
         return `
             <div class="disciplines-section" style="width: 100%;">
-                <h4>Disciplinas Vampíricas</h4>
-                <p class="section-subtitle" style="font-style: italic; opacity: 0.7; margin-bottom: 1.5rem;">Sua herança sanguínea e poderes sobrenaturais ativos.</p>
+                <h4>Disciplinas Vampíricas (V20)</h4>
+                <p class="section-subtitle" style="font-style: italic; opacity: 0.7; margin-bottom: 1.5rem;">Poderes de sangue ativos no Membro.</p>
                 
                 <div class="disciplines-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <!-- Espaço reservado para Disciplinas criadas dinamicamente -->
                     <div class="discipline-card font-antique" style="border: 1px solid rgba(139,0,0,0.3); padding: 1rem; border-radius: 8px; background: rgba(139,0,0,0.05);">
-                        <strong style="color: var(--crimson); font-size: 1.2rem;">Potência Sanguínea (Sangue Ativo)</strong>
-                        <p style="font-size: 0.95rem; margin-top: 0.5rem; opacity: 0.9;">Gere poderes de clã usando a IA Lyira solicitando poderes temáticos de Vampiro.</p>
+                        <strong style="color: var(--crimson); font-size: 1.2rem;">Reserva de Sangue Vampírico</strong>
+                        <p style="font-size: 0.95rem; margin-top: 0.5rem; opacity: 0.9;">Gere disciplinas da Noite pedindo auxílio ao Damien.</p>
                     </div>
                 </div>
             </div>
@@ -291,15 +336,15 @@ export const VampirePlugin = {
             { id: 'main',      label: 'Atributos & Ficha', icon: 'fa-user-ninja' },
             { id: 'combat',    label: 'Reserva & Fome',     icon: 'fa-droplet' },
             { id: 'magic',     label: 'Disciplinas',       icon: 'fa-bat' },
-            { id: 'inventory', label: 'Posses',            icon: 'fa-briefcase' },
-            { id: 'story',     label: 'Histórico & Pacto', icon: 'fa-book-dead' }
+            { id: 'inventory', label: 'Mochila',           icon: 'fa-briefcase' },
+            { id: 'story',     label: 'Crônicas',          icon: 'fa-book-dead' }
         ];
     },
 
-    // ── AI Prompts ──────────────────────────────────────────────
+    // ── AI Prompts V20 ──────────────────────────────────────────
 
     getPromptContext() {
-        return 'Vampire: The Masquerade 5th Edition (World of Darkness)';
+        return 'Vampire: The Masquerade 20th Anniversary Edition (V20)';
     },
 
     getEntityPrompt(entityType, prompt, flavor) {
@@ -307,8 +352,8 @@ export const VampirePlugin = {
         const label = typeLabels[entityType] || 'Vampiro';
 
         return `
-        [ACT AS]: Vampire: The Masquerade V5 ${label} Generator.
-        [TASK]: Generate a complete ${label} for Vampire V5 based on the user prompt.
+        [ACT AS]: Vampire: The Masquerade V20 ${label} Generator.
+        [TASK]: Generate a complete ${label} for Vampire V20 based on the user prompt.
         [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
         [LANGUAGE]: Portuguese (pt-BR).
         [JSON STRUCTURE]:
@@ -316,28 +361,27 @@ export const VampirePlugin = {
             "name": "Nome",
             "entity_type": "${entityType}",
             "bio": {
-                "race": "Clã (ex: Toreador, Brujah)", "class": "Seita (Camarilla|Anarquista)", "alignment": "Humanidade",
+                "race": "Clã (ex: Toreador, Brujah)", "class": "Natureza (ex: Arquiteto, Rebelde)", "alignment": "Humanidade",
                 "level": 1, "cr": "2", "size": "Medium", "creature_type": "Vampiro",
-                "background": "Conceito do Personagem"
+                "concept": "Conceito do Personagem", "sire": "Senhor", "generation": "13ª Geração"
             },
-            "attributes": { "strength": 3, "dexterity": 3, "stamina: 2, "charisma": 2, "manipulation": 3, "composure": 2, "intelligence": 2, "wits": 3, "resolve": 2 },
-            "stats": { "ac": 3, "hp_max": 5, "hp_current": 5, "speed": "Normal", "initiative": 5, "hit_dice_total": "—" },
-            "combat": { "attacks": [{ "name": "Mordida Vampírica", "bonus": "+5", "damage": "2 Agravado", "isCustom": true }] },
+            "attributes": { 
+                "strength": 3, "dexterity": 3, "stamina": 2, 
+                "charisma": 2, "manipulation": 3, "appearance": 2, 
+                "perception": 2, "intelligence": 2, "wits": 3,
+                "conscience": 3, "self_control": 3, "courage": 4
+            },
+            "stats": { "ac": 3, "hp_max": 7, "hp_current": 7, "speed": "Normal", "initiative": 6, "willpower_max": 4, "willpower_current": 4, "blood_pool_max": 10, "blood_pool_current": 10 },
+            "combat": { "attacks": [{ "name": "Garras", "bonus": "+5", "damage": "2 Agravado", "isCustom": true }] },
             "abilities": [
                 { 
                     "uid": "ab1", 
-                    "identity": { "name": "Presença: Olhar Aterrorizante", "origin": "Discipline" }, 
+                    "identity": { "name": "Rapidez", "origin": "Discipline" }, 
                     "activation": { "type": "Action" }, 
-                    "execution_mechanics": {
-                        "has_attack_roll": false,
-                        "has_save": true,
-                        "save": { "ability": "composure", "dc_value": 3 },
-                        "damage": []
-                    },
-                    "description": "Causa pavor no alvo que cruza o olhar com o vampiro." 
+                    "description": "Gasta ponto de sangue para ações extras." 
                 }
             ],
-            "story": { "traits": "Personalidade da Noite", "ideals": "Ambição/Desejo", "bonds": "Côncavo/Vínculos de Sangue", "flaws": "Defeito/Fraqueza", "appearance": "Estética Visual e Roupas", "notes": "Lore do Personagem na Cidade. MUST end with: '${flavor}'" }
+            "story": { "traits": "Personalidade", "ideals": "Ideais/Motivos", "bonds": "Laços", "flaws": "Defeitos", "appearance": "Estética Visual", "notes": "Lore do Abraço. MUST end with: '${flavor}'" }
         }
 
         [USER PROMPT]: ${prompt}
@@ -345,129 +389,61 @@ export const VampirePlugin = {
     },
 
     getCharacterPrompt() {
-        return `Você é Damien, o intemperante mentor da Noite. Sua tarefa é completar os detalhes, as motivações sombrias e o histórico de um Vampiro em Vampire V5.
-        Receba as escolhas e gere: Traços de Personalidade, Ambição & Desejos, Vínculos de Sangue, Defeitos de Clã, Aparência Gótica/Urbana e uma Crônica de Abraço (História) fascinante.
-        Retorne APENAS um objeto JSON com esses campos em português.`;
+        return `Você é Damien, o rígido mentor da Noite no V20. Sua tarefa é completar as motivações góticas e a crônica de Abraço do Vampiro.
+        Retorne APENAS um objeto JSON com campos: traits (Traços), ideals (Ideais), bonds (Laços), flaws (Defeitos), appearance (Aparência) e backstory (Histórico do Abraço) em português.`;
     },
 
     getItemPrompt(prompt, flavor) {
         return `
-        [ACT AS]: Vampire V5 Relic/Item Generator.
-        [TASK]: Generate a dark/occult item for Vampire: The Masquerade based on the prompt.
-        [OUTPUT]: Valid JSON Object ONLY. No markdown formatting around it.
+        [ACT AS]: Vampire V20 Item/Relic Generator.
+        [TASK]: Generate an occult item for Vampire: The Masquerade V20.
+        [OUTPUT]: Valid JSON Object ONLY.
         [LANGUAGE]: Portuguese (pt-BR).
-        [JSON STRUCTURE]:
         {
-            "uid": "item_unique_id",
-            "identity": {
-                "name": "Nome da Relíquia",
-                "origin": "Item Oculto",
-                "tags": ["Sangue", "Sobrenatural", "Gótico"],
-                "source": { "book": "", "page": "" }
-            },
-            "activation": {
-                "type": "Action",
-                "cost": 1,
-                "slot": { "resource_id": "blood_rouse", "level_required": 0, "consume": false }
-            },
-            "trigger_logic": {
-                "range": { "min": 0, "max": 1.5, "unit": "m" },
-                "target": { "type": "Entity", "quantity": 1 }
-            },
-            "execution_mechanics": {
-                "has_save": false,
-                "save": { "ability": "", "dc_type": "fixed", "dc_value": 0, "on_success": "no_damage" },
-                "has_attack_roll": false,
-                "damage": [],
-                "conditions": []
-            },
-            "description": "Descrição envolvente em português detalhando a história da relíquia e seus efeitos sobrenaturais góticos. MUST end with: '${flavor}'",
-            "equipment_details": {
-                "rarity": "rare|very_rare|legendary",
-                "cost": "Recurso 2",
-                "weight": 1,
-                "quantity": 1,
-                "item_type": "Relic",
-                "ac_bonus": null,
-                "properties": ["Oculto", "Místico"],
-                "equipped": false
-            }
+            "uid": "item_id",
+            "identity": { "name": "Nome", "origin": "Item Oculto", "tags": ["Sangue", "Sobrenatural"] },
+            "description": "Descrição da relíquia. MUST end with: '${flavor}'",
+            "equipment_details": { "rarity": "rare", "cost": "Recursos 3", "weight": 1, "quantity": 1, "equipped": false }
         }
-        
         [USER PROMPT]: ${prompt}
         `;
     },
 
     getSpellPrompt(prompt, flavor) {
         return `
-        [ACT AS]: Vampire V5 Discipline/Power Generator.
-        [TASK]: Generate a Discipline Power for Vampire: The Masquerade V5 based on the user prompt.
-        [OUTPUT]: Valid JSON Object ONLY. No markdown.
+        [ACT AS]: Vampire V20 Discipline Power Generator.
+        [TASK]: Generate a Discipline Power for Vampire V20 based on the prompt.
+        [OUTPUT]: Valid JSON Object ONLY.
         [LANGUAGE]: Portuguese (pt-BR).
-        [JSON STRUCTURE]:
         {
-            "uid": "discipline_power_id",
-            "identity": {
-                "name": "Nome do Poder da Disciplina",
-                "origin": "Discipline",
-                "tags": ["Discipline", "Power", "Blood"],
-                "source": { "book": "", "page": "" }
-            },
-            "activation": {
-                "type": "Action|Bonus|Reaction|Passive",
-                "cost": 1,
-                "slot": { "resource_id": "hunger", "level_required": 1, "consume": true }
-            },
-            "trigger_logic": {
-                "range": { "min": 0, "max": 10, "unit": "m" },
-                "target": { "type": "Entity|Self", "quantity": 1 }
-            },
-            "execution_mechanics": {
-                "has_save": true,
-                "save": { "ability": "composure", "dc_type": "scaling", "dc_value": 3, "on_success": "no_effect" },
-                "has_attack_roll": false,
-                "damage": [],
-                "conditions": []
-            },
-            "description": "Descrição detalhada do efeito do poder da disciplina na noite. MUST end with: '${flavor}'",
-            "spell_details": {
-                "level": 1,
-                "school": "Diciplina Vampírica",
-                "casting_time": "1 turno",
-                "duration": "Cena",
-                "components": "Nenhum",
-                "classes": ["Qualquer"],
-                "prepared": true,
-                "concentration": false
-            }
+            "uid": "power_id",
+            "identity": { "name": "Nome do Poder", "origin": "Discipline" },
+            "description": "Descrição do poder da Disciplina. MUST end with: '${flavor}'",
+            "spell_details": { "level": 1, "school": "Disciplina", "casting_time": "1 turno", "duration": "Cena" }
         }
-        
         [USER PROMPT]: ${prompt}
         `;
     },
 
-    // ── Combat ─────────────────────────────────────────────────
-
     getCombatConfig() {
         return {
             usesInitiative: true,
-            initiativeAttribute: 'wits',
+            initiativeAttribute: 'dexterity',
             usesDeathSaves: false,
             deathSaveSuccesses: 0,
             deathSaveFailures: 0,
             usesHitDice: false,
             usesArmorClass: false,
             healthLabel: 'Vitalidade',
-            defenseLabel: 'Esquiva (Dex+Ath)'
+            defenseLabel: 'Defesa (Dex)'
         };
     },
 
     calculateInitiativeBonus(char) {
-        const stats = this.calculateStats(char);
-        // Em V5, iniciativa mística = Wits + Resolve (determinação)
-        return (stats.attributes.wits?.score ?? 2) + (stats.attributes.resolve?.score ?? 2);
+        const dex = parseInt(char.attributes?.dexterity || 1);
+        const wits = parseInt(char.attributes?.wits || 1);
+        return dex + wits;
     }
 };
 
-//  AUTO-REGISTRO no SystemRegistry
 SystemRegistry.register(VampirePlugin);
