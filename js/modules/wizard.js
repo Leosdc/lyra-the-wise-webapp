@@ -1593,18 +1593,6 @@ export const WizardModule = {
                         </div>
                     </div>
                 </div>
-
-                <div class="vamp-virtues-section parchment-card">
-                    <div class="column-header">
-                        <h4>Virtudes</h4>
-                        <div class="vamp-points-tracker" id="vamp-tracker-virtues">Pontos: 0/7</div>
-                    </div>
-                    <div class="vamp-virtues-grid">
-                        ${this.renderVampAttrRow('conscience', 'Consciência', 'Adesão moral e remorso ante pecados do Caminho.', getVal('conscience'), 5)}
-                        ${this.renderVampAttrRow('self_control', 'Autocontrole', 'Controle de impulsos e do frenesi interno.', getVal('self_control'), 5)}
-                        ${this.renderVampAttrRow('courage', 'Coragem', 'Resistência ao pavor da morte (Rötschreck).', getVal('courage'), 5)}
-                    </div>
-                </div>
             `;
             attrGrid.innerHTML = html;
 
@@ -1700,14 +1688,6 @@ export const WizardModule = {
             menTracker.classList.toggle('over-limit', menSpent > menMax);
             menTracker.classList.toggle('complete', menSpent === menMax && menMax > 0);
         }
-
-        const virtSpent = (getVal('conscience') - 1) + (getVal('self_control') - 1) + (getVal('courage') - 1);
-        const virtTracker = document.getElementById('vamp-tracker-virtues');
-        if (virtTracker) {
-            virtTracker.textContent = `Pontos: ${virtSpent} / 7`;
-            virtTracker.classList.toggle('over-limit', virtSpent > 7);
-            virtTracker.classList.toggle('complete', virtSpent === 7);
-        }
     },
 
     validateStep(step, context) {
@@ -1739,7 +1719,6 @@ export const WizardModule = {
             const physSpent = (getVal('strength') - 1) + (getVal('dexterity') - 1) + (getVal('stamina') - 1);
             const socSpent = (getVal('charisma') - 1) + (getVal('manipulation') - 1) + (getVal('appearance') - 1);
             const menSpent = (getVal('perception') - 1) + (getVal('intelligence') - 1) + (getVal('wits') - 1);
-            const virtSpent = (getVal('conscience') - 1) + (getVal('self_control') - 1) + (getVal('courage') - 1);
 
             if (physSpent !== physMax) {
                 context.showAlert(`Você distribuiu ${physSpent} pontos em atributos Físicos, mas escolheu a prioridade que exige exatamente ${physMax} pontos!`, "Distribuição Incorreta");
@@ -1753,11 +1732,6 @@ export const WizardModule = {
 
             if (menSpent !== menMax) {
                 context.showAlert(`Você distribuiu ${menSpent} pontos em atributos Mentais, mas escolheu a prioridade que exige exatamente ${menMax} pontos!`, "Distribuição Incorreta");
-                return false;
-            }
-
-            if (virtSpent !== 7) {
-                context.showAlert(`Você distribuiu ${virtSpent} pontos em Virtudes, mas deve distribuir exatamente 7 pontos!`, "Distribuição Incorreta");
                 return false;
             }
         }
