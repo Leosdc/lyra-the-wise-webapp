@@ -462,7 +462,7 @@ export const WizardModule = {
         if (!context.checkAuth()) return;
         logger.info("✨ Abrindo Criador de Personagem");
 
-        this.resetCharacterWizard();
+        this.resetCharacterWizard(context);
         this.updateThemeText();
 
         context.openModal('creation-wizard');
@@ -474,7 +474,7 @@ export const WizardModule = {
         this.loadSystemData(context);
     },
 
-    resetCharacterWizard() {
+    resetCharacterWizard(context) {
         // Reset basic fields
         const fields = [
             'wiz-name', 'wiz-race', 'wiz-subrace', 'wiz-class', 'wiz-archetype',
@@ -489,23 +489,21 @@ export const WizardModule = {
             if (el) el.value = (id === 'wiz-speed' ? '9m' : '');
         });
 
-        // Reset attributes
-        document.querySelectorAll('#wiz-attributes-grid input').forEach(input => {
-            input.value = 10;
-        });
+        const isVampire = (context?.currentSystem === 'vampire');
 
-        // Reset Vampire priorities
-        const phys = document.getElementById('vamp-priority-physical');
-        if (phys) phys.value = "";
-        const soc = document.getElementById('vamp-priority-social');
-        if (soc) soc.value = "";
-        const men = document.getElementById('vamp-priority-mental');
-        if (men) men.value = "";
+        if (isVampire) {
+            WizardVampire.resetVampireWizard();
+        } else {
+            // Reset attributes
+            document.querySelectorAll('#wiz-attributes-grid input').forEach(input => {
+                input.value = 10;
+            });
 
-        // Reset Skills
-        document.querySelectorAll('#wiz-skills-selection input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
+            // Reset Skills
+            document.querySelectorAll('#wiz-skills-selection input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
 
         // Hide sub-containers
         document.getElementById('wiz-subrace-container')?.classList.add('hidden');
@@ -513,6 +511,7 @@ export const WizardModule = {
 
         this.wizardStep = 0;
     },
+
 
     async loadSystemData(context) {
         const currentSystem = context.currentSystem || 'dnd5e';
@@ -609,15 +608,7 @@ export const WizardModule = {
             this.renderAttributesGrid(context);
 
             // Populate Skills
-            const skillsSel = document.getElementById('wiz-skills-selection');
-            if (skillsSel) {
-                const skills = currentPlugin?.getSkillConfig() || [];
-                skillsSel.innerHTML = skills.map(sk => `
-                    <label title="${sk.description || ''}">
-                        <input type="checkbox" value="${sk.id}"> ${sk.label}
-                    </label>
-                `).join('');
-            }
+            this.renderSkillsSelection(context);
 
             // Listeners for Sub-options
             this.bindSubOptions(races, classes, currentSystem);
@@ -843,6 +834,8 @@ export const WizardModule = {
             this.updateWizardUI();
             if (this.wizardStep === 2 && context) {
                 this.renderAttributesGrid(context);
+            } else if (this.wizardStep === 3 && context) {
+                this.renderSkillsSelection(context);
             }
         }
     },
@@ -1485,6 +1478,29 @@ export const WizardModule = {
                         <span>${a.shortLabel}</span>
                         <input type="number" id="wiz-${a.id}" value="${elVal}" min="0" max="25">
                     </div>
+                `;
+            }).join('');
+        }
+    },
+
+    renderSkillsSelection(context) {
+        const currentSystem = context.currentSystem || 'dnd5e';
+        const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
+        const isVampire = (currentSystem === 'vampire');
+        const skillsSel = document.getElementById('wiz-skills-selection');
+        if (!skillsSel) return;
+
+        if (isVampire) {
+            WizardVampire.renderVampireAbilitiesGrid(context);
+        } else {
+            skillsSel.className = "skills-selection";
+            const skills = currentPlugin?.getSkillConfig() || [];
+            skillsSel.innerHTML = skills.map(sk => {
+                const checked = (context.currentCharacter?.proficiencies_choice?.skills || []).includes(sk.id) ? 'checked' : '';
+                return `
+                    <label title="${sk.description || ''}">
+                        <input type="checkbox" value="${sk.id}" ${checked}> ${sk.label}
+                    </label>
                 `;
             }).join('');
         }
