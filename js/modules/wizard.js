@@ -1619,13 +1619,87 @@ export const WizardModule = {
     },
 
     bindVampireAttrEvents() {
-        // Step 1 stub: placeholder for interactivity
-        console.log("bindVampireAttrEvents placeholder called");
+        const selects = document.querySelectorAll('.vamp-priority-select');
+        selects.forEach(sel => {
+            sel.addEventListener('change', () => {
+                const val = sel.value;
+                if (val) {
+                    selects.forEach(otherSel => {
+                        if (otherSel !== sel && otherSel.value === val) {
+                            otherSel.value = "";
+                        }
+                    });
+                }
+                this.updateVampirePoints();
+            });
+        });
+
+        const dots = document.querySelectorAll('.vamp-dot');
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const attrId = dot.dataset.attr;
+                const value = parseInt(dot.dataset.value);
+                const hiddenInput = document.getElementById(`wiz-${attrId}`);
+                if (!hiddenInput) return;
+
+                hiddenInput.value = value;
+
+                const container = dot.parentElement;
+                const rowDots = container.querySelectorAll('.vamp-dot');
+                rowDots.forEach(d => {
+                    const val = parseInt(d.dataset.value);
+                    if (val <= value) {
+                        d.className = "fa-solid fa-circle active vamp-dot";
+                    } else {
+                        d.className = "fa-regular fa-circle vamp-dot";
+                    }
+                });
+
+                this.updateVampirePoints();
+            });
+        });
     },
 
     updateVampirePoints() {
-        // Step 1 stub: placeholder for points calculation
-        console.log("updateVampirePoints placeholder called");
+        const getVal = (id) => parseInt(document.getElementById(`wiz-${id}`)?.value || 1);
+
+        const physSpent = (getVal('strength') - 1) + (getVal('dexterity') - 1) + (getVal('stamina') - 1);
+        const physPrioritySelect = document.getElementById('vamp-priority-physical');
+        const physMax = physPrioritySelect ? (parseInt(physPrioritySelect.value) || 0) : 0;
+        const physTracker = document.getElementById('vamp-tracker-physical');
+        if (physTracker) {
+            physTracker.textContent = `Pontos: ${physSpent} / ${physMax}`;
+            physTracker.classList.toggle('over-limit', physSpent > physMax);
+            physTracker.classList.toggle('complete', physSpent === physMax && physMax > 0);
+        }
+
+        const socSpent = (getVal('charisma') - 1) + (getVal('manipulation') - 1) + (getVal('appearance') - 1);
+        const socPrioritySelect = document.getElementById('vamp-priority-social');
+        const socMax = socPrioritySelect ? (parseInt(socPrioritySelect.value) || 0) : 0;
+        const socTracker = document.getElementById('vamp-tracker-social');
+        if (socTracker) {
+            socTracker.textContent = `Pontos: ${socSpent} / ${socMax}`;
+            socTracker.classList.toggle('over-limit', socSpent > socMax);
+            socTracker.classList.toggle('complete', socSpent === socMax && socMax > 0);
+        }
+
+        const menSpent = (getVal('perception') - 1) + (getVal('intelligence') - 1) + (getVal('wits') - 1);
+        const menPrioritySelect = document.getElementById('vamp-priority-mental');
+        const menMax = menPrioritySelect ? (parseInt(menPrioritySelect.value) || 0) : 0;
+        const menTracker = document.getElementById('vamp-tracker-mental');
+        if (menTracker) {
+            menTracker.textContent = `Pontos: ${menSpent} / ${menMax}`;
+            menTracker.classList.toggle('over-limit', menSpent > menMax);
+            menTracker.classList.toggle('complete', menSpent === menMax && menMax > 0);
+        }
+
+        const virtSpent = (getVal('conscience') - 1) + (getVal('self_control') - 1) + (getVal('courage') - 1);
+        const virtTracker = document.getElementById('vamp-tracker-virtues');
+        if (virtTracker) {
+            virtTracker.textContent = `Pontos: ${virtSpent} / 7`;
+            virtTracker.classList.toggle('over-limit', virtSpent > 7);
+            virtTracker.classList.toggle('complete', virtSpent === 7);
+        }
     },
 
     validateStep(step, context) {
