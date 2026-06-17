@@ -4,6 +4,10 @@ import { bindVampireAttrEvents } from './bindVampireAttrEvents.js';
 import { renderVampireAttributesGrid } from './renderVampireAttributesGrid.js';
 import { validateVampireStep } from './validateVampireStep.js';
 import { calculateVampireStats } from './calculateVampireStats.js';
+import { renderVampAbilityRow } from './renderVampAbilityRow.js';
+import { renderVampireAbilitiesGrid } from './renderVampireAbilitiesGrid.js';
+import { bindVampireAbilityEvents } from './bindVampireAbilityEvents.js';
+import { updateVampireAbilityPoints } from './updateVampireAbilityPoints.js';
 
 export const WizardVampire = {
     renderVampAttrRow,
@@ -11,7 +15,12 @@ export const WizardVampire = {
     bindVampireAttrEvents,
     renderVampireAttributesGrid,
     validateVampireStep,
-    calculateVampireStats
+    calculateVampireStats,
+    renderVampAbilityRow,
+    renderVampireAbilitiesGrid,
+    bindVampireAbilityEvents,
+    updateVampireAbilityPoints
 };
 
 export default WizardVampire;
+

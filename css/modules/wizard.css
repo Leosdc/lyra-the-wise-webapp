@@ -572,3 +572,14 @@ input[type=number] {
     from { opacity: 0.8; }
     to { opacity: 1; text-shadow: 0 0 5px rgba(139, 0, 0, 0.5); }
 }
+
+/* Locked Vampire Dots */
+.vamp-dot.locked {
+    cursor: not-allowed !important;
+    opacity: 0.35;
+}
+
+.vamp-dot.locked:hover {
+    transform: none !important;
+    color: rgba(44, 30, 22, 0.2) !important;
+}
