@@ -432,14 +432,14 @@ export const WizardModule = {
         });
 
         // Navigation Buttons
-        document.getElementById('wiz-prev')?.addEventListener('click', () => this.updateWizardStep(-1));
-        document.getElementById('wiz-next')?.addEventListener('click', () => this.updateWizardStep(1));
+        document.getElementById('wiz-prev')?.addEventListener('click', () => this.updateWizardStep(-1, context));
+        document.getElementById('wiz-next')?.addEventListener('click', () => this.updateWizardStep(1, context));
         document.getElementById('wiz-finish')?.addEventListener('click', () => this.handleWizardFinish(context));
 
         document.getElementById('mon-finish-btn')?.addEventListener('click', () => this.handleMonsterFinish(context));
 
-        document.getElementById('sess-prev')?.addEventListener('click', () => this.updateWizardStep(-1));
-        document.getElementById('sess-next')?.addEventListener('click', () => this.updateWizardStep(1));
+        document.getElementById('sess-prev')?.addEventListener('click', () => this.updateWizardStep(-1, context));
+        document.getElementById('sess-next')?.addEventListener('click', () => this.updateWizardStep(1, context));
         document.getElementById('sess-finish-btn')?.addEventListener('click', () => this.handleSessionFinish(context));
         document.getElementById('sess-magic-fill')?.addEventListener('click', () => this.fillSessionBlanksWithAI(context));
 
@@ -597,24 +597,7 @@ export const WizardModule = {
             }
 
             // Populate Attributes & Virtues
-            const attrGrid = document.getElementById('wiz-attributes-grid');
-            if (attrGrid) {
-                const attrs = currentPlugin?.getAttributeConfig() || [];
-                // Append V20 virtues to attributes grid
-                const extraAttrs = isVampire ? (currentPlugin?.getSaveConfig() || []).map(s => ({
-                    ...s,
-                    shortLabel: s.id === 'conscience' ? 'CON' : (s.id === 'self_control' ? 'ATC' : 'COR')
-                })) : [];
-                const allAttrs = [...attrs, ...extraAttrs];
-
-                const startingVal = isVampire ? 1 : 10;
-                attrGrid.innerHTML = allAttrs.map(a => `
-                    <div class="attr-input" title="${a.description || ''}">
-                        <span>${a.shortLabel}</span>
-                        <input type="number" id="wiz-${a.id}" value="${startingVal}" min="0" max="25">
-                    </div>
-                `).join('');
-            }
+            this.renderAttributesGrid(context);
 
             // Populate Skills
             const skillsSel = document.getElementById('wiz-skills-selection');
@@ -837,13 +820,21 @@ export const WizardModule = {
         }
     },
 
-    updateWizardStep(dir) {
+    updateWizardStep(dir, context) {
+        if (dir === 1) {
+            if (context && !this.validateStep(this.wizardStep, context)) {
+                return;
+            }
+        }
         this.wizardStep += dir;
         const activeWizard = document.querySelector('.wizard-container:not(.hidden)');
         if (activeWizard && activeWizard.id === 'session-wizard') {
             this.updateSessionWizardUI();
         } else {
             this.updateWizardUI();
+            if (this.wizardStep === 2 && context) {
+                this.renderAttributesGrid(context);
+            }
         }
     },
 
@@ -1485,6 +1476,161 @@ export const WizardModule = {
         tipsModal?.addEventListener('click', (e) => {
             if (e.target === tipsModal) tipsModal.classList.add('hidden');
         });
+    },
+
+    renderVampAttrRow(id, name, desc, currentVal, maxVal) {
+        let dotsHtml = '';
+        for (let i = 1; i <= maxVal; i++) {
+            const isActive = i <= currentVal;
+            const iconClass = isActive ? "fa-solid fa-circle active" : "fa-regular fa-circle";
+            dotsHtml += `<i class="${iconClass} vamp-dot" data-value="${i}" data-attr="${id}"></i>`;
+        }
+        return `
+            <div class="vamp-attr-row" title="${desc || ''}">
+                <span class="vamp-attr-name">${name}</span>
+                <div class="vamp-dots-container">
+                    ${dotsHtml}
+                </div>
+                <input type="hidden" id="wiz-${id}" value="${currentVal}">
+            </div>
+        `;
+    },
+
+    renderAttributesGrid(context) {
+        const currentSystem = context.currentSystem || 'dnd5e';
+        const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
+        const isVampire = (currentSystem === 'vampire');
+        const attrGrid = document.getElementById('wiz-attributes-grid');
+        if (!attrGrid) return;
+
+        if (isVampire) {
+            const genStr = document.getElementById('wiz-vamp-generation')?.value || "13ª Geração";
+            const genNum = parseInt(genStr.match(/\d+/)?.[0]) || 13;
+            let maxAttr = 5;
+            if (genNum === 7) maxAttr = 6;
+            else if (genNum === 6) maxAttr = 7;
+            else if (genNum === 5) maxAttr = 8;
+            else if (genNum <= 4) maxAttr = 9;
+
+            attrGrid.className = "attributes-vampire-layout";
+
+            const getVal = (id, def = 1) => {
+                const el = document.getElementById(`wiz-${id}`);
+                return el ? (parseInt(el.value) || def) : def;
+            };
+
+            const physPriority = document.getElementById('vamp-priority-physical')?.value || "";
+            const socPriority = document.getElementById('vamp-priority-social')?.value || "";
+            const menPriority = document.getElementById('vamp-priority-mental')?.value || "";
+
+            const html = `
+                <div class="vamp-priorities-info">
+                    <p class="vamp-info-text">Defina a prioridade de cada categoria. Primário = 7 pts, Secundário = 5 pts, Terciário = 3 pts.</p>
+                </div>
+                <div class="vamp-attributes-columns">
+                    <!-- Físicos -->
+                    <div class="vamp-attr-column parchment-card">
+                        <div class="column-header">
+                            <h4>Físicos</h4>
+                            <select id="vamp-priority-physical" class="medieval-select vamp-priority-select">
+                                <option value="">Prioridade...</option>
+                                <option value="7" ${physPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
+                                <option value="5" ${physPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
+                                <option value="3" ${physPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
+                            </select>
+                        </div>
+                        <div class="vamp-points-tracker" id="vamp-tracker-physical">Pontos: 0/0</div>
+                        <div class="vamp-attr-list">
+                            ${this.renderVampAttrRow('strength', 'Força', 'Poder muscular e capacidade de causar impacto físico.', getVal('strength'), maxAttr)}
+                            ${this.renderVampAttrRow('dexterity', 'Destreza', 'Agilidade, reflexos e coordenação motora.', getVal('dexterity'), maxAttr)}
+                            ${this.renderVampAttrRow('stamina', 'Vigor', 'Resistência a dano, veneno e fadiga.', getVal('stamina'), maxAttr)}
+                        </div>
+                    </div>
+
+                    <!-- Sociais -->
+                    <div class="vamp-attr-column parchment-card">
+                        <div class="column-header">
+                            <h4>Sociais</h4>
+                            <select id="vamp-priority-social" class="medieval-select vamp-priority-select">
+                                <option value="">Prioridade...</option>
+                                <option value="7" ${socPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
+                                <option value="5" ${socPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
+                                <option value="3" ${socPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
+                            </select>
+                        </div>
+                        <div class="vamp-points-tracker" id="vamp-tracker-social">Pontos: 0/0</div>
+                        <div class="vamp-attr-list">
+                            ${this.renderVampAttrRow('charisma', 'Carisma', 'Charme natural, magnetismo e habilidade de inspirar.', getVal('charisma'), maxAttr)}
+                            ${this.renderVampAttrRow('manipulation', 'Manipulação', 'Persuasão ativa, blefe e comando indireto.', getVal('manipulation'), maxAttr)}
+                            ${this.renderVampAttrRow('appearance', 'Aparência', 'Atratividade visual e primeira impressão.', getVal('appearance'), maxAttr)}
+                        </div>
+                    </div>
+
+                    <!-- Mentais -->
+                    <div class="vamp-attr-column parchment-card">
+                        <div class="column-header">
+                            <h4>Mentais</h4>
+                            <select id="vamp-priority-mental" class="medieval-select vamp-priority-select">
+                                <option value="">Prioridade...</option>
+                                <option value="7" ${menPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
+                                <option value="5" ${menPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
+                                <option value="3" ${menPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
+                            </select>
+                        </div>
+                        <div class="vamp-points-tracker" id="vamp-tracker-mental">Pontos: 0/0</div>
+                        <div class="vamp-attr-list">
+                            ${this.renderVampAttrRow('perception', 'Percepção', 'Atenção ao ambiente e intuição de detalhes.', getVal('perception'), maxAttr)}
+                            ${this.renderVampAttrRow('intelligence', 'Inteligência', 'Raciocínio analítico, memória e erudição.', getVal('intelligence'), maxAttr)}
+                            ${this.renderVampAttrRow('wits', 'Raciocínio', 'Velocidade de decisão sob pressão direta.', getVal('wits'), maxAttr)}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vamp-virtues-section parchment-card">
+                    <div class="column-header">
+                        <h4>Virtudes</h4>
+                        <div class="vamp-points-tracker" id="vamp-tracker-virtues">Pontos: 0/7</div>
+                    </div>
+                    <div class="vamp-virtues-grid">
+                        ${this.renderVampAttrRow('conscience', 'Consciência', 'Adesão moral e remorso ante pecados do Caminho.', getVal('conscience'), 5)}
+                        ${this.renderVampAttrRow('self_control', 'Autocontrole', 'Controle de impulsos e do frenesi interno.', getVal('self_control'), 5)}
+                        ${this.renderVampAttrRow('courage', 'Coragem', 'Resistência ao pavor da morte (Rötschreck).', getVal('courage'), 5)}
+                    </div>
+                </div>
+            `;
+            attrGrid.innerHTML = html;
+
+            this.bindVampireAttrEvents();
+            this.updateVampirePoints();
+        } else {
+            attrGrid.className = "attributes-grid";
+            const attrs = currentPlugin?.getAttributeConfig() || [];
+            const startingVal = 10;
+            attrGrid.innerHTML = attrs.map(a => {
+                const elVal = document.getElementById(`wiz-${a.id}`)?.value || startingVal;
+                return `
+                    <div class="attr-input" title="${a.description || ''}">
+                        <span>${a.shortLabel}</span>
+                        <input type="number" id="wiz-${a.id}" value="${elVal}" min="0" max="25">
+                    </div>
+                `;
+            }).join('');
+        }
+    },
+
+    bindVampireAttrEvents() {
+        // Step 1 stub: placeholder for interactivity
+        console.log("bindVampireAttrEvents placeholder called");
+    },
+
+    updateVampirePoints() {
+        // Step 1 stub: placeholder for points calculation
+        console.log("updateVampirePoints placeholder called");
+    },
+
+    validateStep(step, context) {
+        // Step 1 stub: always valid for now
+        return true;
     },
 
     closeModal(id) {

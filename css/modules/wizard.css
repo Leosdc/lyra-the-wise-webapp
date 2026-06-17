@@ -381,3 +381,194 @@ input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
 }
+
+/* Vampire Attributes Screen Styles */
+.attributes-vampire-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.vamp-priorities-info {
+    background: rgba(244, 228, 188, 0.3);
+    border-left: 4px solid var(--crimson);
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+}
+
+.vamp-info-text {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+    font-family: var(--font-body);
+}
+
+.vamp-attributes-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .vamp-attributes-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vamp-attr-column {
+    background: rgba(0, 0, 0, 0.02);
+    border: 2px solid rgba(44, 30, 22, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.vamp-attr-column .column-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.1);
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.vamp-attr-column h4 {
+    margin: 0;
+    font-family: var(--font-medieval);
+    font-size: 1.3rem;
+    color: var(--crimson);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.vamp-priority-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(44, 30, 22, 0.3);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink);
+}
+
+.vamp-points-tracker {
+    font-family: var(--font-medieval);
+    font-size: 1.1rem;
+    color: #777;
+    text-align: right;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.vamp-points-tracker.over-limit {
+    color: var(--crimson);
+    animation: pulseRed 1s infinite alternate;
+}
+
+.vamp-points-tracker.complete {
+    color: #27ae60;
+}
+
+.vamp-attr-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.vamp-attr-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    border: 1px solid rgba(44, 30, 22, 0.05);
+    transition: all 0.2s;
+}
+
+.vamp-attr-row:hover {
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.vamp-attr-name {
+    font-family: var(--font-medieval);
+    font-size: 1rem;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.vamp-dots-container {
+    display: flex;
+    gap: 4px;
+}
+
+.vamp-dot {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: rgba(44, 30, 22, 0.2);
+    transition: all 0.2s;
+}
+
+.vamp-dot:hover {
+    transform: scale(1.25);
+    color: var(--crimson);
+}
+
+.vamp-dot.active {
+    color: var(--crimson);
+    filter: drop-shadow(0 0 2px rgba(139, 0, 0, 0.4));
+}
+
+/* Virtues specific */
+.vamp-virtues-section {
+    background: rgba(0, 0, 0, 0.02);
+    border: 2px solid rgba(44, 30, 22, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-top: 1rem;
+}
+
+.vamp-virtues-section .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(44, 30, 22, 0.1);
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.vamp-virtues-section h4 {
+    margin: 0;
+    font-family: var(--font-medieval);
+    font-size: 1.3rem;
+    color: var(--crimson);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.vamp-virtues-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .vamp-virtues-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes pulseRed {
+    from { opacity: 0.8; }
+    to { opacity: 1; text-shadow: 0 0 5px rgba(139, 0, 0, 0.5); }
+}
