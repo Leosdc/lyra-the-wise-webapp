@@ -3,6 +3,7 @@ import { createCharacterWithLyra, createMonsterWithLyra, processSessionWithLyra 
 import { saveCharacter, saveUserMonster, saveSession, saveTrap, getSystemData } from '../data.js';
 import SystemRegistry from '../systems/system-registry.js';
 import { logger } from '../logger.js';
+import WizardVampire from './wizardVampire/wizardVampireMain.js';
 
 /**
  * Wizard Module
@@ -1006,29 +1007,7 @@ export const WizardModule = {
             template.proficiencies_choice.skills = rawSkills;
 
             if (isVampire) {
-                template.proficiencies_choice.saves = ['conscience', 'self_control', 'courage'];
-                
-                // Perform V20 specific stats calculation
-                const calculated = currentPlugin.calculateStats(template);
-                template.stats.hp_max = calculated.general.hp_max || 7;
-                template.stats.hp_current = template.stats.hp_max;
-                template.stats.willpower_max = calculated.general.willpower_max || 5;
-                template.stats.willpower_current = template.stats.willpower_max;
-                
-                let bloodMax = 10;
-                const genStr = String(template.bio.generation || "13ª Geração");
-                if (genStr.includes("15ª") || genStr.includes("14ª") || genStr.includes("13ª")) bloodMax = 10;
-                else if (genStr.includes("12ª")) bloodMax = 11;
-                else if (genStr.includes("11ª")) bloodMax = 12;
-                else if (genStr.includes("10ª")) bloodMax = 15;
-                else if (genStr.includes("9ª")) bloodMax = 15;
-                else if (genStr.includes("8ª")) bloodMax = 20;
-                else if (genStr.includes("7ª")) bloodMax = 30;
-                else if (genStr.includes("6ª")) bloodMax = 50;
-
-                template.stats.blood_pool_max = bloodMax;
-                template.stats.blood_pool_current = bloodMax;
-                template.stats.speed = "Normal";
+                WizardVampire.calculateVampireStats(template, currentPlugin);
             } else {
                 template.stats.speed = document.getElementById('wiz-speed').value || "9m";
             }
@@ -1486,24 +1465,6 @@ export const WizardModule = {
         });
     },
 
-    renderVampAttrRow(id, name, desc, currentVal, maxVal) {
-        let dotsHtml = '';
-        for (let i = 1; i <= maxVal; i++) {
-            const isActive = i <= currentVal;
-            const iconClass = isActive ? "fa-solid fa-circle active" : "fa-regular fa-circle";
-            dotsHtml += `<i class="${iconClass} vamp-dot" data-value="${i}" data-attr="${id}"></i>`;
-        }
-        return `
-            <div class="vamp-attr-row" title="${desc || ''}">
-                <span class="vamp-attr-name">${name}</span>
-                <div class="vamp-dots-container">
-                    ${dotsHtml}
-                </div>
-                <input type="hidden" id="wiz-${id}" value="${currentVal}">
-            </div>
-        `;
-    },
-
     renderAttributesGrid(context) {
         const currentSystem = context.currentSystem || 'dnd5e';
         const currentPlugin = SystemRegistry.get(currentSystem) || SystemRegistry.getCurrent();
@@ -1512,92 +1473,7 @@ export const WizardModule = {
         if (!attrGrid) return;
 
         if (isVampire) {
-            const genStr = document.getElementById('wiz-vamp-generation')?.value || "13ª Geração";
-            const genNum = parseInt(genStr.match(/\d+/)?.[0]) || 13;
-            let maxAttr = 5;
-            if (genNum === 7) maxAttr = 6;
-            else if (genNum === 6) maxAttr = 7;
-            else if (genNum === 5) maxAttr = 8;
-            else if (genNum <= 4) maxAttr = 9;
-
-            attrGrid.className = "attributes-vampire-layout";
-
-            const getVal = (id, def = 1) => {
-                const el = document.getElementById(`wiz-${id}`);
-                return el ? (parseInt(el.value) || def) : def;
-            };
-
-            const physPriority = document.getElementById('vamp-priority-physical')?.value || "";
-            const socPriority = document.getElementById('vamp-priority-social')?.value || "";
-            const menPriority = document.getElementById('vamp-priority-mental')?.value || "";
-
-            const html = `
-                <div class="vamp-priorities-info">
-                    <p class="vamp-info-text">Defina a prioridade de cada categoria. Primário = 7 pts, Secundário = 5 pts, Terciário = 3 pts.</p>
-                </div>
-                <div class="vamp-attributes-columns">
-                    <!-- Físicos -->
-                    <div class="vamp-attr-column parchment-card">
-                        <div class="column-header">
-                            <h4>Físicos</h4>
-                            <select id="vamp-priority-physical" class="medieval-select vamp-priority-select">
-                                <option value="">Prioridade...</option>
-                                <option value="7" ${physPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
-                                <option value="5" ${physPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
-                                <option value="3" ${physPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
-                            </select>
-                        </div>
-                        <div class="vamp-points-tracker" id="vamp-tracker-physical">Pontos: 0/0</div>
-                        <div class="vamp-attr-list">
-                            ${this.renderVampAttrRow('strength', 'Força', 'Poder muscular e capacidade de causar impacto físico.', getVal('strength'), maxAttr)}
-                            ${this.renderVampAttrRow('dexterity', 'Destreza', 'Agilidade, reflexos e coordenação motora.', getVal('dexterity'), maxAttr)}
-                            ${this.renderVampAttrRow('stamina', 'Vigor', 'Resistência a dano, veneno e fadiga.', getVal('stamina'), maxAttr)}
-                        </div>
-                    </div>
-
-                    <!-- Sociais -->
-                    <div class="vamp-attr-column parchment-card">
-                        <div class="column-header">
-                            <h4>Sociais</h4>
-                            <select id="vamp-priority-social" class="medieval-select vamp-priority-select">
-                                <option value="">Prioridade...</option>
-                                <option value="7" ${socPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
-                                <option value="5" ${socPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
-                                <option value="3" ${socPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
-                            </select>
-                        </div>
-                        <div class="vamp-points-tracker" id="vamp-tracker-social">Pontos: 0/0</div>
-                        <div class="vamp-attr-list">
-                            ${this.renderVampAttrRow('charisma', 'Carisma', 'Charme natural, magnetismo e habilidade de inspirar.', getVal('charisma'), maxAttr)}
-                            ${this.renderVampAttrRow('manipulation', 'Manipulação', 'Persuasão ativa, blefe e comando indireto.', getVal('manipulation'), maxAttr)}
-                            ${this.renderVampAttrRow('appearance', 'Aparência', 'Atratividade visual e primeira impressão.', getVal('appearance'), maxAttr)}
-                        </div>
-                    </div>
-
-                    <!-- Mentais -->
-                    <div class="vamp-attr-column parchment-card">
-                        <div class="column-header">
-                            <h4>Mentais</h4>
-                            <select id="vamp-priority-mental" class="medieval-select vamp-priority-select">
-                                <option value="">Prioridade...</option>
-                                <option value="7" ${menPriority === "7" ? "selected" : ""}>Primário (7 pts)</option>
-                                <option value="5" ${menPriority === "5" ? "selected" : ""}>Secundário (5 pts)</option>
-                                <option value="3" ${menPriority === "3" ? "selected" : ""}>Terciário (3 pts)</option>
-                            </select>
-                        </div>
-                        <div class="vamp-points-tracker" id="vamp-tracker-mental">Pontos: 0/0</div>
-                        <div class="vamp-attr-list">
-                            ${this.renderVampAttrRow('perception', 'Percepção', 'Atenção ao ambiente e intuição de detalhes.', getVal('perception'), maxAttr)}
-                            ${this.renderVampAttrRow('intelligence', 'Inteligência', 'Raciocínio analítico, memória e erudição.', getVal('intelligence'), maxAttr)}
-                            ${this.renderVampAttrRow('wits', 'Raciocínio', 'Velocidade de decisão sob pressão direta.', getVal('wits'), maxAttr)}
-                        </div>
-                    </div>
-                </div>
-            `;
-            attrGrid.innerHTML = html;
-
-            this.bindVampireAttrEvents();
-            this.updateVampirePoints();
+            WizardVampire.renderVampireAttributesGrid(context);
         } else {
             attrGrid.className = "attributes-grid";
             const attrs = currentPlugin?.getAttributeConfig() || [];
@@ -1615,79 +1491,11 @@ export const WizardModule = {
     },
 
     bindVampireAttrEvents() {
-        const selects = document.querySelectorAll('.vamp-priority-select');
-        selects.forEach(sel => {
-            sel.addEventListener('change', () => {
-                const val = sel.value;
-                if (val) {
-                    selects.forEach(otherSel => {
-                        if (otherSel !== sel && otherSel.value === val) {
-                            otherSel.value = "";
-                        }
-                    });
-                }
-                this.updateVampirePoints();
-            });
-        });
-
-        const dots = document.querySelectorAll('.vamp-dot');
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const attrId = dot.dataset.attr;
-                const value = parseInt(dot.dataset.value);
-                const hiddenInput = document.getElementById(`wiz-${attrId}`);
-                if (!hiddenInput) return;
-
-                hiddenInput.value = value;
-
-                const container = dot.parentElement;
-                const rowDots = container.querySelectorAll('.vamp-dot');
-                rowDots.forEach(d => {
-                    const val = parseInt(d.dataset.value);
-                    if (val <= value) {
-                        d.className = "fa-solid fa-circle active vamp-dot";
-                    } else {
-                        d.className = "fa-regular fa-circle vamp-dot";
-                    }
-                });
-
-                this.updateVampirePoints();
-            });
-        });
+        WizardVampire.bindVampireAttrEvents();
     },
 
     updateVampirePoints() {
-        const getVal = (id) => parseInt(document.getElementById(`wiz-${id}`)?.value || 1);
-
-        const physSpent = (getVal('strength') - 1) + (getVal('dexterity') - 1) + (getVal('stamina') - 1);
-        const physPrioritySelect = document.getElementById('vamp-priority-physical');
-        const physMax = physPrioritySelect ? (parseInt(physPrioritySelect.value) || 0) : 0;
-        const physTracker = document.getElementById('vamp-tracker-physical');
-        if (physTracker) {
-            physTracker.textContent = `Pontos: ${physSpent} / ${physMax}`;
-            physTracker.classList.toggle('over-limit', physSpent > physMax);
-            physTracker.classList.toggle('complete', physSpent === physMax && physMax > 0);
-        }
-
-        const socSpent = (getVal('charisma') - 1) + (getVal('manipulation') - 1) + (getVal('appearance') - 1);
-        const socPrioritySelect = document.getElementById('vamp-priority-social');
-        const socMax = socPrioritySelect ? (parseInt(socPrioritySelect.value) || 0) : 0;
-        const socTracker = document.getElementById('vamp-tracker-social');
-        if (socTracker) {
-            socTracker.textContent = `Pontos: ${socSpent} / ${socMax}`;
-            socTracker.classList.toggle('over-limit', socSpent > socMax);
-            socTracker.classList.toggle('complete', socSpent === socMax && socMax > 0);
-        }
-
-        const menSpent = (getVal('perception') - 1) + (getVal('intelligence') - 1) + (getVal('wits') - 1);
-        const menPrioritySelect = document.getElementById('vamp-priority-mental');
-        const menMax = menPrioritySelect ? (parseInt(menPrioritySelect.value) || 0) : 0;
-        const menTracker = document.getElementById('vamp-tracker-mental');
-        if (menTracker) {
-            menTracker.textContent = `Pontos: ${menSpent} / ${menMax}`;
-            menTracker.classList.toggle('over-limit', menSpent > menMax);
-            menTracker.classList.toggle('complete', menSpent === menMax && menMax > 0);
-        }
+        WizardVampire.updateVampirePoints();
     },
 
     validateStep(step, context) {
@@ -1695,45 +1503,7 @@ export const WizardModule = {
         const isVampire = (currentSystem === 'vampire');
 
         if (step === 2 && isVampire) {
-            const getVal = (id) => parseInt(document.getElementById(`wiz-${id}`)?.value || 1);
-
-            const physSelect = document.getElementById('vamp-priority-physical');
-            const socSelect = document.getElementById('vamp-priority-social');
-            const menSelect = document.getElementById('vamp-priority-mental');
-
-            const physMax = physSelect ? (parseInt(physSelect.value) || 0) : 0;
-            const socMax = socSelect ? (parseInt(socSelect.value) || 0) : 0;
-            const menMax = menSelect ? (parseInt(menSelect.value) || 0) : 0;
-
-            if (!physMax || !socMax || !menMax) {
-                context.showAlert("Você deve definir a prioridade de todas as três colunas de atributos!", "Prioridade Necessária");
-                return false;
-            }
-
-            const uniquePriorities = new Set([physMax, socMax, menMax]);
-            if (uniquePriorities.size !== 3) {
-                context.showAlert("As prioridades de atributos devem ser únicas para cada coluna!", "Prioridades Duplicadas");
-                return false;
-            }
-
-            const physSpent = (getVal('strength') - 1) + (getVal('dexterity') - 1) + (getVal('stamina') - 1);
-            const socSpent = (getVal('charisma') - 1) + (getVal('manipulation') - 1) + (getVal('appearance') - 1);
-            const menSpent = (getVal('perception') - 1) + (getVal('intelligence') - 1) + (getVal('wits') - 1);
-
-            if (physSpent !== physMax) {
-                context.showAlert(`Você distribuiu ${physSpent} pontos em atributos Físicos, mas escolheu a prioridade que exige exatamente ${physMax} pontos!`, "Distribuição Incorreta");
-                return false;
-            }
-
-            if (socSpent !== socMax) {
-                context.showAlert(`Você distribuiu ${socSpent} pontos em atributos Sociais, mas escolheu a prioridade que exige exatamente ${socMax} pontos!`, "Distribuição Incorreta");
-                return false;
-            }
-
-            if (menSpent !== menMax) {
-                context.showAlert(`Você distribuiu ${menSpent} pontos em atributos Mentais, mas escolheu a prioridade que exige exatamente ${menMax} pontos!`, "Distribuição Incorreta");
-                return false;
-            }
+            return WizardVampire.validateVampireStep(step, context);
         }
         return true;
     },
