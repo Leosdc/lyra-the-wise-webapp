@@ -1518,7 +1518,7 @@ export const WizardModule = {
         const currentSystem = context.currentSystem || 'dnd5e';
         const isVampire = (currentSystem === 'vampire');
 
-        if (step === 2 && isVampire) {
+        if ((step === 2 || step === 3) && isVampire) {
             return WizardVampire.validateVampireStep(step, context);
         }
         return true;

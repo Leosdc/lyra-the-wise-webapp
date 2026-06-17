@@ -48,5 +48,65 @@ export function validateVampireStep(step, context) {
             return false;
         }
     }
+
+    if (step === 3) {
+        const getVal = (id) => parseInt(document.getElementById(`wiz-${id}`)?.value || 0);
+
+        const talentsSelect = document.getElementById('vamp-priority-talents');
+        const skillsSelect = document.getElementById('vamp-priority-skills');
+        const knowledgesSelect = document.getElementById('vamp-priority-knowledges');
+
+        const talentsMax = talentsSelect ? (parseInt(talentsSelect.value) || 0) : 0;
+        const skillsMax = skillsSelect ? (parseInt(skillsSelect.value) || 0) : 0;
+        const knowledgesMax = knowledgesSelect ? (parseInt(knowledgesSelect.value) || 0) : 0;
+
+        if (!talentsMax || !skillsMax || !knowledgesMax) {
+            context.showAlert("Você deve definir a prioridade de todas as três colunas de habilidades!", "Prioridade Necessária");
+            return false;
+        }
+
+        const uniquePriorities = new Set([talentsMax, skillsMax, knowledgesMax]);
+        if (uniquePriorities.size !== 3) {
+            context.showAlert("As prioridades de habilidades devem ser únicas para cada coluna!", "Prioridades Duplicadas");
+            return false;
+        }
+
+        // Talentos
+        const talentIds = [
+            'alertness', 'athletics', 'awareness', 'brawl', 'empathy',
+            'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'
+        ];
+        const talentsSpent = talentIds.reduce((sum, id) => sum + getVal(id), 0);
+
+        // Perícias
+        const skillIds = [
+            'animal_ken', 'crafts', 'drive', 'etiquette', 'firearms',
+            'larceny', 'melee', 'performance', 'stealth', 'survival'
+        ];
+        const skillsSpent = skillIds.reduce((sum, id) => sum + getVal(id), 0);
+
+        // Conhecimentos
+        const knowledgeIds = [
+            'academics', 'computer', 'finance', 'investigation', 'law',
+            'medicine', 'occult', 'politics', 'science', 'technology'
+        ];
+        const knowledgesSpent = knowledgeIds.reduce((sum, id) => sum + getVal(id), 0);
+
+        if (talentsSpent !== talentsMax) {
+            context.showAlert(`Você distribuiu ${talentsSpent} pontos em Talentos, mas escolheu a prioridade que exige exatamente ${talentsMax} pontos!`, "Distribuição Incorreta");
+            return false;
+        }
+
+        if (skillsSpent !== skillsMax) {
+            context.showAlert(`Você distribuiu ${skillsSpent} pontos em Perícias, mas escolheu a prioridade que exige exatamente ${skillsMax} pontos!`, "Distribuição Incorreta");
+            return false;
+        }
+
+        if (knowledgesSpent !== knowledgesMax) {
+            context.showAlert(`Você distribuiu ${knowledgesSpent} pontos em Conhecimentos, mas escolheu a prioridade que exige exatamente ${knowledgesMax} pontos!`, "Distribuição Incorreta");
+            return false;
+        }
+    }
     return true;
 }
+
