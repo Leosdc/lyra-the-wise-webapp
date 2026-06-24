@@ -67,6 +67,17 @@ export const VampirePlugin = {
                 // Virtudes
                 conscience: 1, self_control: 1, courage: 1
             },
+            skills: {
+                // Talentos
+                alertness: 0, athletics: 0, awareness: 0, brawl: 0, empathy: 0,
+                expression: 0, intimidation: 0, leadership: 0, streetwise: 0, subterfuge: 0,
+                // Perícias
+                animal_ken: 0, crafts: 0, drive: 0, etiquette: 0, firearms: 0,
+                larceny: 0, melee: 0, performance: 0, stealth: 0, survival: 0,
+                // Conhecimentos
+                academics: 0, computer: 0, finance: 0, investigation: 0, law: 0,
+                medicine: 0, occult: 0, politics: 0, science: 0, technology: 0
+            },
             stats: {
                 hp_current: 7, hp_max: 7, hp_temp: 0, // Fixo 7 níveis de Vitalidade
                 ac: 1, initiative: 2, speed: "Normal", // AC usado como defesa base (Destreza)
@@ -131,15 +142,15 @@ export const VampirePlugin = {
         return [
             // Talentos (Talents)
             { id: 'alertness',     label: 'Prontidão (Talento)',        attribute: 'perception',   description: 'Notar o perigo ou mudanças ao redor.' },
-            { id: 'athletics',     label: 'Atletismo (Talento)',        attribute: 'dexterity',    description: 'Correr, saltar, escalada.' },
-            { id: 'awareness',     label: 'Percepção Extra-sens. (Tal)', attribute: 'perception',   description: 'Notar o sobrenatural ou a aura.' },
+            { id: 'athletics',     label: 'Esportes (Talento)',        attribute: 'dexterity',    description: 'Correr, saltar, escalada.' },
+            { id: 'awareness',     label: 'Presciência. (Tal)', attribute: 'perception',   description: 'Notar o sobrenatural ou a aura.' },
             { id: 'brawl',         label: 'Briga (Talento)',            attribute: 'dexterity',    description: 'Combate corpo a corpo desarmado.' },
             { id: 'empathy',       label: 'Empatia (Talento)',          attribute: 'perception',   description: 'Ler intenções e sentimentos.' },
             { id: 'expression',    label: 'Expressão (Talento)',        attribute: 'charisma',     description: 'Escrever, discursar ou expressar ideias.' },
             { id: 'intimidation',  label: 'Intimidação (Talento)',      attribute: 'strength',     description: 'Coagir ou assustar fisicamente ou mentalmente.' },
             { id: 'leadership',    label: 'Liderança (Talento)',        attribute: 'charisma',     description: 'Inspirar ou comandar outras pessoas.' },
             { id: 'streetwise',    label: 'Manha (Talento)',            attribute: 'wits',         description: 'Conhecimento das ruas, rumores e crime.' },
-            { id: 'subterfuge',    label: 'Subterfúgio (Talento)',      attribute: 'manipulation', description: 'Ocultar a verdade, mentir ou seduzir.' },
+            { id: 'subterfuge',    label: 'Lábia (Talento)',      attribute: 'manipulation', description: 'Ocultar a verdade, mentir ou seduzir.' },
 
             // Perícias (Skills)
             { id: 'animal_ken',    label: 'Empatia c/ Animais (Per)',   attribute: 'charisma',     description: 'Entender ou acalmar animais.' },
@@ -147,7 +158,7 @@ export const VampirePlugin = {
             { id: 'drive',         label: 'Condução (Perícia)',         attribute: 'dexterity',    description: 'Dirigir carros, motos ou pilotar.' },
             { id: 'etiquette',     label: 'Etiqueta (Perícia)',         attribute: 'charisma',     description: 'Maneiras sociais na sociedade mortal ou cainita.' },
             { id: 'firearms',      label: 'Armas de Fogo (Perícia)',    attribute: 'dexterity',    description: 'Atirar com pistolas, fuzis, etc.' },
-            { id: 'larceny',       label: 'Furtos (Perícia)',           attribute: 'dexterity',    description: 'Arrombar fechaduras, bater carteiras.' },
+            { id: 'larceny',       label: 'Furto (Perícia)',           attribute: 'dexterity',    description: 'Arrombar fechaduras, bater carteiras.' },
             { id: 'melee',         label: 'Armas Brancas (Perícia)',    attribute: 'dexterity',    description: 'Combate usando espadas, facas, bastões.' },
             { id: 'performance',   label: 'Performance (Perícia)',      attribute: 'charisma',     description: 'Atuar, cantar, dançar ou encenar.' },
             { id: 'stealth',       label: 'Furtividade (Perícia)',      attribute: 'dexterity',    description: 'Mover-se silenciosamente ou se esconder.' },
@@ -155,7 +166,7 @@ export const VampirePlugin = {
 
             // Conhecimentos (Knowledges)
             { id: 'academics',     label: 'Acadêmicos (Conh)',          attribute: 'intelligence', description: 'Conhecimento geral, artes, história.' },
-            { id: 'computer',      label: 'Informática (Conh)',         attribute: 'intelligence', description: 'Programar, hackear, usar computadores.' },
+            { id: 'computer',      label: 'Computador (Conh)',         attribute: 'intelligence', description: 'Programar, hackear, usar computadores.' },
             { id: 'finance',       label: 'Finanças (Conh)',            attribute: 'intelligence', description: 'Lidar com mercados, comércio e dinheiro.' },
             { id: 'investigation', label: 'Investigação (Conh)',        attribute: 'perception',   description: 'Procurar pistas, deduzir crimes.' },
             { id: 'law',           label: 'Direito (Conh)',             attribute: 'intelligence', description: 'Leis dos mortais e tradições vampíricas.' },
@@ -198,9 +209,8 @@ export const VampirePlugin = {
         // Habilidades
         const skills = this.getSkillConfig();
         skills.forEach(sk => {
-            const hasSkill = (char.proficiencies_choice?.skills || []).includes(sk.id);
-            const val = hasSkill ? 1 : 0;
-            stats.skills[sk.id] = { mod: val, formatted: String(val), isProf: hasSkill };
+            const val = parseInt(char.skills?.[sk.id] ?? ((char.proficiencies_choice?.skills || []).includes(sk.id) ? 1 : 0));
+            stats.skills[sk.id] = { mod: val, score: val, formatted: String(val), isProf: val > 0 };
         });
 
         // Valores Derivados V20
@@ -276,12 +286,14 @@ export const VampirePlugin = {
     renderSheetSkills(char, systemStats, helpers) {
         const skills = this.getSkillConfig();
         return skills.map(sk => {
-            const isProf = (char.proficiencies_choice?.skills || []).includes(sk.id);
+            const val = parseInt(char.skills?.[sk.id] ?? ((char.proficiencies_choice?.skills || []).includes(sk.id) ? 1 : 0));
+            const stars = "★".repeat(val) + "☆".repeat(Math.max(0, 5 - val));
             return `
-                <div class="skill-item ${isProf ? 'proficient' : ''}" title="${helpers.isInspection ? 'Apenas Visualização' : escapeHTML(sk.description)}">
-                    <i class="fa-solid fa-circle prof-toggle ${isProf ? 'active' : ''}" style="font-size: 0.5rem; color: ${isProf ? 'var(--crimson)' : 'inherit'}; opacity: ${isProf ? 1 : 0.3}; cursor: ${helpers.isInspection ? 'default' : 'pointer'};" data-type="skills" data-field="${sk.id}" ${helpers.isInspection ? 'disabled' : ''}></i>
+                <div class="skill-item proficient" title="${helpers.isInspection ? 'Apenas Visualização' : escapeHTML(sk.description)}">
                     <span>${escapeHTML(sk.label)}</span>
-                    <span class="skill-value" style="color: var(--crimson);">${isProf ? 'Habilitada' : '—'}</span>
+                    <span class="skill-value font-stars" style="color: var(--crimson); font-size: 0.85rem; margin-left: auto; margin-right: 0.5rem;">${stars}</span>
+                    <!-- Input text/number hidden to enable editing during edit mode -->
+                    ${helpers.isInspection ? `<input type="hidden" data-field="skills.${sk.id}" value="${val}">` : `${helpers.mkInput(val, `skills.${sk.id}`, 'number', sk.description, 'width: 45px; text-align: center; font-size: 1rem; font-weight: bold; background: transparent; border: none; padding: 0; color: var(--crimson);')}`}
                 </div>
             `;
         }).join('');

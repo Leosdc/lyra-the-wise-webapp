@@ -996,12 +996,28 @@ export const WizardModule = {
             });
             template.attributes = attributes;
 
-            const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
-            template.proficiencies_choice.skills = rawSkills;
-
             if (isVampire) {
+                const abilities = [
+                    // Talentos
+                    'alertness', 'athletics', 'awareness', 'brawl', 'empathy',
+                    'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge',
+                    // Perícias
+                    'animal_ken', 'crafts', 'drive', 'etiquette', 'firearms',
+                    'larceny', 'melee', 'performance', 'stealth', 'survival',
+                    // Conhecimentos
+                    'academics', 'computer', 'finance', 'investigation', 'law',
+                    'medicine', 'occult', 'politics', 'science', 'technology'
+                ];
+                template.skills = {};
+                abilities.forEach(id => {
+                    const el = document.getElementById(`wiz-${id}`);
+                    template.skills[id] = el ? (parseInt(el.value) || 0) : 0;
+                });
+                template.proficiencies_choice.skills = abilities.filter(id => template.skills[id] > 0);
                 WizardVampire.calculateVampireStats(template, currentPlugin);
             } else {
+                const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
+                template.proficiencies_choice.skills = rawSkills;
                 template.stats.speed = document.getElementById('wiz-speed').value || "9m";
             }
 
