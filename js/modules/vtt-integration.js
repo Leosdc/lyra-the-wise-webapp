@@ -4,20 +4,34 @@
  */
 
 import { db } from '../auth.js';
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 
 export const VTTIntegration = {
     iframeEl: null,
     gameInstance: null,
     sessionUnsubscribe: null,
+    sessionId: null,
+    _messageListener: null,
 
     /**
      * Inicializa a integração e vincula o elemento do iframe
      */
-    init(iframeElement) {
+    init(iframeElement, sessionId = null) {
         if (!iframeElement) return;
         this.iframeEl = iframeElement;
         this.gameInstance = null;
+        this.sessionId = sessionId;
+
+        // Limpa event listener anterior para evitar duplicidade
+        if (this._messageListener) {
+            window.removeEventListener('message', this._messageListener);
+        }
+
+        // Registra o bound listener para escutar mensagens do GDevelop
+        this._messageListener = this.handleVTTMessage.bind(this);
+        window.addEventListener('message', this._messageListener);
+
+        console.log(`[Lyra VTT] Integração inicializada para a sessão: ${this.sessionId}`);
     },
 
     /**
@@ -157,8 +171,74 @@ export const VTTIntegration = {
             this.sessionUnsubscribe();
             this.sessionUnsubscribe = null;
         }
+        if (this._messageListener) {
+            window.removeEventListener('message', this._messageListener);
+            this._messageListener = null;
+        }
         this.gameInstance = null;
         this.iframeEl = null;
+        this.sessionId = null;
+        console.log("[Lyra VTT] Integração desfeita.");
+    },
+
+    /**
+     * Manipula as mensagens de postMessage vindas do GDevelop VTT
+     */
+    async handleVTTMessage(event) {
+        // Valida se a mensagem possui estrutura de dados esperada
+        if (!event.data || typeof event.data !== 'object') return;
+
+        const { type, content } = event.data;
+        if (!type) return;
+
+        // Aceita mensagens relacionadas a salvar, atualizar ou sincronizar dados de sessão
+        const isSessionUpdate = /session|vtt|sync/i.test(type);
+        if (isSessionUpdate) {
+            if (!this.sessionId) {
+                console.warn("[Lyra VTT] Mensagem recebida, mas nenhum sessionId ativo foi configurado.");
+                return;
+            }
+
+            console.log(`[Lyra VTT] Sincronizando variáveis de sessão no Firebase. Tipo: ${type}`);
+            try {
+                const sessionRef = doc(db, "sessoes", this.sessionId);
+                
+                // Sanitização estrita antes de gravar no Firestore
+                const sanitizedContent = this.sanitizeForFirestore(content || {});
+
+                await updateDoc(sessionRef, {
+                    vttVariables: sanitizedContent,
+                    updatedAt: serverTimestamp()
+                });
+
+                console.log(`[Lyra VTT] Variáveis salvas com sucesso para a sessão: ${this.sessionId}`);
+            } catch (err) {
+                console.error("[Lyra VTT] Falha ao gravar variáveis do GDevelop no Firestore:", err);
+            }
+        }
+    },
+
+    /**
+     * Valida e sanitiza objetos recursivamente para conformidade com tipos do Firestore
+     */
+    sanitizeForFirestore(obj) {
+        if (obj === null || obj === undefined) return null;
+        if (typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.sanitizeForFirestore(item));
+        }
+
+        const sanitized = {};
+        for (const [key, value] of Object.entries(obj)) {
+            // Remove caracteres proibidos em chaves do Firestore (. * [ ] /)
+            const cleanKey = key.replace(/[\.\*\[\]\/]/g, '_');
+            
+            // Descarta valores undefined
+            if (cleanKey && value !== undefined) {
+                sanitized[cleanKey] = this.sanitizeForFirestore(value);
+            }
+        }
+        return sanitized;
     }
 };
 

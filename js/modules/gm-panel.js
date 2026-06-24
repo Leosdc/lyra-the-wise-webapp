@@ -859,7 +859,8 @@ export const GMPanelModule = {
             
             // Inicializa a integração
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
-                VTTIntegration.init(iframe);
+                // Passa o ID da sessão ativa para a integração
+                VTTIntegration.init(iframe, this.activeSession?.id);
                 
                 // Envia dados iniciais da sessão após o carregamento
                 VTTIntegration.waitForGame(async (game, scene) => {
@@ -879,6 +880,15 @@ export const GMPanelModule = {
                         const mapUrl = this.activeSession.mapUrl || "/assets/maps/default.jpg";
                         const cellSize = this.activeSession.cellSize || 50;
                         VTTIntegration.loadMap(mapUrl, cellSize);
+
+                        // 1.5. Caso existam variáveis de sessão salvas (vttVariables) no Firebase, reinjeta-as para restaurar o estado do VTT
+                        if (this.activeSession.vttVariables) {
+                            console.log("[Lyra VTT] Enviando variáveis salvas no Firebase para restaurar o estado do VTT...");
+                            VTTIntegration.sendToVTT({
+                                type: "LoadSession",
+                                content: this.activeSession.vttVariables
+                            });
+                        }
                         
                         // 2. Conecta um Listener em Tempo Real para os participantes da sessão no Painel de Controle
                         try {
