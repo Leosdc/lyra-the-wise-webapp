@@ -58,4 +58,15 @@ export function resetVampireWizard() {
         const el = document.getElementById(`wiz-${v}`);
         if (el) el.value = 1;
     });
+
+    // Reset backgrounds to default 0
+    const backgrounds = [
+        'aliados', 'identidade_alternativa', 'mao_negra', 'contatos', 'dominio',
+        'fama', 'geracao', 'rebanho', 'influencia', 'mentor',
+        'recursos', 'lacaios', 'rituais', 'status'
+    ];
+    backgrounds.forEach(bg => {
+        const el = document.getElementById(`wiz-background-${bg}`);
+        if (el) el.value = 0;
+    });
 }

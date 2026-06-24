@@ -147,6 +147,33 @@ export function validateVampireStep(step, context) {
             context.showAlert(`Você distribuiu ${virtueSpent} pontos de Virtude, mas deve alocar exatamente 7 pontos extras!`, "Distribuição de Virtudes");
             return false;
         }
+
+        // Backgrounds validation
+        const backgrounds = [
+            'aliados', 'identidade_alternativa', 'mao_negra', 'contatos', 'dominio',
+            'fama', 'geracao', 'rebanho', 'influencia', 'mentor',
+            'recursos', 'lacaios', 'rituais', 'status'
+        ];
+        let bgTotal = 0;
+        let bgOverLimit = false;
+
+        for (const bg of backgrounds) {
+            const val = parseInt(document.getElementById(`wiz-background-${bg}`)?.value || 0);
+            bgTotal += val;
+            if (val > 3) {
+                bgOverLimit = true;
+            }
+        }
+
+        if (bgOverLimit) {
+            context.showAlert("Você não pode alocar mais de 3 pontos em qualquer antecedente individual durante a criação!", "Limite de Antecedente");
+            return false;
+        }
+
+        if (bgTotal !== 5) {
+            context.showAlert(`Você distribuiu ${bgTotal} pontos em Antecedentes, mas deve alocar exatamente 5 pontos!`, "Distribuição de Antecedentes");
+            return false;
+        }
     }
     return true;
 }

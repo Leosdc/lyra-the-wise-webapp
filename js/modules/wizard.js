@@ -246,6 +246,17 @@ export const WizardModule = {
                             <!-- Disciplinas serão geradas dinamicamente -->
                         </div>
 
+                        <h3>Vantagens: Antecedentes</h3>
+                        <div class="vamp-priorities-info" style="margin-bottom: 1.5rem;">
+                            <p class="vamp-info-text">Você tem <strong>5 pontos</strong> para distribuir livremente entre seus antecedentes (máximo de 3 bolinhas por antecedente).</p>
+                        </div>
+                        <div class="vamp-points-tracker" style="margin-bottom: 1.5rem; text-align: center;">
+                            Pontos de Antecedentes Gastos: <span id="vamp-backgrounds-spent" class="vamp-backgrounds-tracker">0</span> / 5
+                        </div>
+                        <div class="vamp-attr-column" id="wiz-vamp-backgrounds-container" style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                            <!-- Antecedentes serão gerados dinamicamente -->
+                        </div>
+
                         <h3>Vantagens: Virtudes</h3>
                         <div class="vamp-priorities-info" style="margin-bottom: 1.5rem;">
                             <p class="vamp-info-text">Todo personagem começa com <strong>1 ponto</strong> em cada virtude e tem <strong>7 pontos</strong> para distribuir entre elas.</p>
@@ -1075,6 +1086,24 @@ export const WizardModule = {
                         });
                     }
                 }
+
+                // Salvando os antecedentes
+                template.backgrounds = {
+                    aliados: parseInt(document.getElementById('wiz-background-aliados')?.value || 0),
+                    identidade_alternativa: parseInt(document.getElementById('wiz-background-identidade_alternativa')?.value || 0),
+                    mao_negra: parseInt(document.getElementById('wiz-background-mao_negra')?.value || 0),
+                    contatos: parseInt(document.getElementById('wiz-background-contatos')?.value || 0),
+                    dominio: parseInt(document.getElementById('wiz-background-dominio')?.value || 0),
+                    fama: parseInt(document.getElementById('wiz-background-fama')?.value || 0),
+                    geracao: parseInt(document.getElementById('wiz-background-geracao')?.value || 0),
+                    rebanho: parseInt(document.getElementById('wiz-background-rebanho')?.value || 0),
+                    influencia: parseInt(document.getElementById('wiz-background-influencia')?.value || 0),
+                    mentor: parseInt(document.getElementById('wiz-background-mentor')?.value || 0),
+                    recursos: parseInt(document.getElementById('wiz-background-recursos')?.value || 0),
+                    lacaios: parseInt(document.getElementById('wiz-background-lacaios')?.value || 0),
+                    rituais: parseInt(document.getElementById('wiz-background-rituais')?.value || 0),
+                    status: parseInt(document.getElementById('wiz-background-status')?.value || 0)
+                };
             } else {
                 const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
                 template.proficiencies_choice.skills = rawSkills;
@@ -1583,6 +1612,9 @@ export const WizardModule = {
     },
 
     renderAdvantagesSelection(context) {
+        if (typeof WizardVampire.renderVampireBackgroundsGrid === 'function') {
+            WizardVampire.renderVampireBackgroundsGrid(context);
+        }
         if (typeof WizardVampire.renderVampireAdvantagesGrid === 'function') {
             WizardVampire.renderVampireAdvantagesGrid(context);
         }

@@ -13,6 +13,9 @@ import { renderVampireAdvantagesGrid } from './renderVampireAdvantagesGrid.js';
 import { renderVampireVirtuesGrid } from './renderVampireVirtuesGrid.js';
 import { bindVampireVirtuesEvents } from './bindVampireVirtuesEvents.js';
 import { updateVampireVirtuesPoints } from './updateVampireVirtuesPoints.js';
+import { renderVampireBackgroundsGrid } from './renderVampireBackgroundsGrid.js';
+import { bindVampireBackgroundsEvents } from './bindVampireBackgroundsEvents.js';
+import { updateVampireBackgroundsPoints } from './updateVampireBackgroundsPoints.js';
 
 export const WizardVampire = {
     renderVampAttrRow,
@@ -29,7 +32,10 @@ export const WizardVampire = {
     renderVampireAdvantagesGrid,
     renderVampireVirtuesGrid,
     bindVampireVirtuesEvents,
-    updateVampireVirtuesPoints
+    updateVampireVirtuesPoints,
+    renderVampireBackgroundsGrid,
+    bindVampireBackgroundsEvents,
+    updateVampireBackgroundsPoints
 };
 
 export default WizardVampire;
