@@ -41,6 +41,7 @@ export const VTTIntegration = {
         if (!this.iframeEl) return;
 
         const check = () => {
+            if (!this.iframeEl) return;
             try {
                 const game = this.iframeEl.contentWindow?.gdjsGame;
                 const scene = game?.getSceneStack()?.getCurrentScene();
