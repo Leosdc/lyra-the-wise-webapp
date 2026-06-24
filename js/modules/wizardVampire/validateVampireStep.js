@@ -136,6 +136,17 @@ export function validateVampireStep(step, context) {
             context.showAlert(`Você distribuiu ${total} pontos em Disciplinas, mas deve alocar exatamente 3 pontos!`, "Distribuição de Pontos");
             return false;
         }
+
+        // Virtues validation
+        const conscience = parseInt(document.getElementById('wiz-conscience')?.value || 1);
+        const selfControl = parseInt(document.getElementById('wiz-self_control')?.value || 1);
+        const courage = parseInt(document.getElementById('wiz-courage')?.value || 1);
+        const virtueSpent = (conscience - 1) + (selfControl - 1) + (courage - 1);
+
+        if (virtueSpent !== 7) {
+            context.showAlert(`Você distribuiu ${virtueSpent} pontos de Virtude, mas deve alocar exatamente 7 pontos extras!`, "Distribuição de Virtudes");
+            return false;
+        }
     }
     return true;
 }

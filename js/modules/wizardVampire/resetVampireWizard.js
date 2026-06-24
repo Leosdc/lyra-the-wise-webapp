@@ -51,4 +51,11 @@ export function resetVampireWizard() {
         const nameEl = document.getElementById(`wiz-discipline-name-${slot}`);
         if (nameEl) nameEl.value = "";
     }
+
+    // Reset virtues to default 1
+    const virtues = ['conscience', 'self_control', 'courage'];
+    virtues.forEach(v => {
+        const el = document.getElementById(`wiz-${v}`);
+        if (el) el.value = 1;
+    });
 }
