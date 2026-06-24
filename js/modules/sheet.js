@@ -394,6 +394,7 @@ export const SheetModule = {
         const updates = {
             bio: { ...(character.bio || {}) },
             attributes: { ...(character.attributes || {}) },
+            backgrounds: { ...(character.backgrounds || {}) },
             stats: { ...(character.stats || {}) },
             story: { ...(character.story || {}) },
             combat: { ...(character.combat || {}) },

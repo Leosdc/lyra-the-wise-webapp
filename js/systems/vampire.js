@@ -33,8 +33,9 @@ const ARCHETYPES = [
 ];
 
 const BACKGROUNDS = [
-    "Aliados", "Contatos", "Fama", "Geração", "Influência",
-    "Mentores", "Rebanho", "Recursos", "Lacaios", "Status"
+    "Aliados", "Identidade Alternativa", "Mão Negra", "Contatos", "Domínio",
+    "Fama", "Geração", "Rebanho", "Influência", "Mentor",
+    "Recursos", "Aliados de Sangue (Lacaios)", "Rituais", "Status"
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -66,6 +67,22 @@ export const VampirePlugin = {
                 perception: 1, intelligence: 1, wits: 1,
                 // Virtudes
                 conscience: 1, self_control: 1, courage: 1
+            },
+            backgrounds: {
+                aliados: 0,
+                identidade_alternativa: 0,
+                mao_negra: 0,
+                contatos: 0,
+                dominio: 0,
+                fama: 0,
+                geracao: 0,
+                rebanho: 0,
+                influencia: 0,
+                mentor: 0,
+                recursos: 0,
+                lacaios: 0,
+                rituais: 0,
+                status: 0
             },
             skills: {
                 // Talentos
