@@ -43,4 +43,12 @@ export function resetVampireWizard() {
         const el = document.getElementById(`wiz-${id}`);
         if (el) el.value = 0;
     });
+
+    // Reset advantages/disciplines inputs to 0 / empty string
+    for (let slot = 1; slot <= 3; slot++) {
+        const valEl = document.getElementById(`wiz-discipline-${slot}`);
+        if (valEl) valEl.value = 0;
+        const nameEl = document.getElementById(`wiz-discipline-name-${slot}`);
+        if (nameEl) nameEl.value = "";
+    }
 }

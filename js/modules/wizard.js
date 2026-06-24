@@ -197,40 +197,54 @@ export const WizardModule = {
                     </div>
                 </div>
                 <div class="wizard-step hidden" data-step="4">
-                    <h3>Crônicas e Personalidade</h3>
-                    <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
-                            class="medieval-textarea"
-                            placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                    <div id="dnd-step4-fields">
+                        <h3>Crônicas e Personalidade</h3>
+                        <div class="form-group"><label>Traços de Personalidade</label><textarea id="wiz-traits"
                                 class="medieval-textarea"
-                                placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                                placeholder="Ex: Eu sempre tenho um plano para quando as coisas dão errado."></textarea>
                         </div>
-                        <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
-                                class="medieval-textarea"
-                                placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
-                    </div>
-                    <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
-                            class="medieval-textarea"
-                            placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
-                                class="medieval-textarea"
-                                placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                        <div class="form-row">
+                            <div class="form-group"><label>Ideais</label><textarea id="wiz-ideals"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Respeito. As pessoas merecem ser tratadas com dignidade."></textarea>
+                            </div>
+                            <div class="form-group"><label>Vínculos</label><textarea id="wiz-bonds"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Tudo o que faço é pela minha família."></textarea></div>
                         </div>
-                        <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                        <div class="form-group"><label>Defeitos</label><textarea id="wiz-flaws"
                                 class="medieval-textarea"
-                                placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                                placeholder="Ex: Eu me distraio facilmente com promessas de ouro."></textarea></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Maneirismos (Mestre)</label><textarea id="wiz-mannerisms"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Vive batendo os dedos na mesa ou puxando o lóbulo da orelha."></textarea>
+                            </div>
+                            <div class="form-group"><label>Talentos de Roleplay</label><textarea id="wiz-talents"
+                                    class="medieval-textarea"
+                                    placeholder="Ex: Sabe imitar perfeitamente o som de um pássaro regional."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
+                                class="medieval-textarea"
+                                placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
+                        </div>
+                        <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
+                                class="medieval-textarea"
+                                placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo Arcano)"></textarea>
                         </div>
                     </div>
-                    <div class="form-group"><label>Aparência do Personagem</label><textarea id="wiz-appearance"
-                            class="medieval-textarea"
-                            placeholder="Descreva traços físicos, vestimentas e itens marcantes."></textarea>
-                    </div>
-                    <div class="form-group"><label>História do Personagem</label><textarea id="wiz-backstory"
-                            class="medieval-textarea"
-                            placeholder="Sua jornada até aqui... (Lyra pode preencher se você escolher o modo Arcano)"></textarea>
+                    <div id="vampire-step4-fields" class="hidden">
+                        <h3>Vantagens: Disciplinas</h3>
+                        <div class="vamp-priorities-info" style="margin-bottom: 1.5rem;">
+                            <p class="vamp-info-text">Como um vampiro recém-criado, você tem <strong>3 pontos</strong> para distribuir entre suas disciplinas de sangue.</p>
+                        </div>
+                        <div class="vamp-points-tracker" style="margin-bottom: 1.5rem; text-align: center;">
+                            Pontos de Disciplina: <span id="vamp-advantages-spent" class="vamp-advantages-tracker">0</span> / 3
+                        </div>
+                        <div class="vamp-attr-column" id="wiz-vamp-advantages-container" style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Disciplinas serão geradas dinamicamente -->
+                        </div>
                     </div>
                 </div>
 
@@ -836,6 +850,16 @@ export const WizardModule = {
                 this.renderAttributesGrid(context);
             } else if (this.wizardStep === 3 && context) {
                 this.renderSkillsSelection(context);
+            } else if (this.wizardStep === 4 && context) {
+                const isVampire = (context.currentSystem === 'vampire');
+                const dndStep4 = document.getElementById('dnd-step4-fields');
+                const vampStep4 = document.getElementById('vampire-step4-fields');
+                if (dndStep4) dndStep4.classList.toggle('hidden', isVampire);
+                if (vampStep4) vampStep4.classList.toggle('hidden', !isVampire);
+
+                if (isVampire) {
+                    this.renderAdvantagesSelection(context);
+                }
             }
         }
     },
@@ -1519,6 +1543,12 @@ export const WizardModule = {
                     </label>
                 `;
             }).join('');
+        }
+    },
+
+    renderAdvantagesSelection(context) {
+        if (typeof WizardVampire.renderVampireAdvantagesGrid === 'function') {
+            WizardVampire.renderVampireAdvantagesGrid(context);
         }
     },
 
