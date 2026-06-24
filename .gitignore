@@ -50,9 +50,9 @@ docs/auditoria.md
 # Gemini AI Agent Workspace & Tools
 .agents/
 skills-lock.json
+.env.development
 
 # Motores compilados offline e executáveis gigantes (NIST SI-16)
-Lyra_VTT/
 *.exe
 *.dll
 *.pak
@@ -64,4 +64,3 @@ public/vtt/node_modules/
 
 # Permitir pastas 'dist' necessárias do motor VTT (GDevelop)
 !public/vtt/**/dist/
-

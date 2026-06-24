@@ -165,8 +165,9 @@ export const GMPanelModule = {
                                 <div class="medieval-subtitle"><i class="fas fa-feather"></i> RESUMO DA CRÔNICA</div>
                                 <textarea id="session-summary-display" class="gm-summary-area" readonly placeholder="O Oráculo ainda não teceu o resumo..."></textarea>
                             </div>
-                            <div id="gm-session-start-options" class="gm-session-start-options">
+                            <div id="gm-session-start-options" class="gm-session-start-options" style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
                                 <button class="medieval-btn primary large" id="btn-enter-session"><i class="fas fa-door-open"></i> ADENTRAR ATRIUM</button>
+                                <button class="medieval-btn primary large" id="btn-enter-vtt" style="background: linear-gradient(135deg, #2d5a27, #4a8c3f); border-color: #5dba50;"><i class="fas fa-map-location-dot"></i> ADENTRAR VTT</button>
                             </div>
                             <div id="gm-timeline-summary" class="gm-timeline-summary hidden">
                                 <div class="timeline-header-row">
@@ -410,6 +411,14 @@ export const GMPanelModule = {
         if (enterBtn) {
             enterBtn.addEventListener('click', () => {
                 this.openSessionSelectModal('enter');
+            });
+        }
+
+        // Enter VTT Button (Opens VTT map in new tab)
+        const enterVttBtn = document.getElementById('btn-enter-vtt');
+        if (enterVttBtn) {
+            enterVttBtn.addEventListener('click', () => {
+                window.open('Lyra_VTT/index.html', '_blank');
             });
         }
 
