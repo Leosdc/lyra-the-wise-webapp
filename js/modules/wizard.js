@@ -242,8 +242,19 @@ export const WizardModule = {
                         <div class="vamp-points-tracker" style="margin-bottom: 1.5rem; text-align: center;">
                             Pontos de Disciplina: <span id="vamp-advantages-spent" class="vamp-advantages-tracker">0</span> / 3
                         </div>
-                        <div class="vamp-attr-column" id="wiz-vamp-advantages-container" style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="vamp-attr-column" id="wiz-vamp-advantages-container" style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
                             <!-- Disciplinas serão geradas dinamicamente -->
+                        </div>
+
+                        <h3>Vantagens: Virtudes</h3>
+                        <div class="vamp-priorities-info" style="margin-bottom: 1.5rem;">
+                            <p class="vamp-info-text">Todo personagem começa com <strong>1 ponto</strong> em cada virtude e tem <strong>7 pontos</strong> para distribuir entre elas.</p>
+                        </div>
+                        <div class="vamp-points-tracker" style="margin-bottom: 1.5rem; text-align: center;">
+                            Pontos de Virtude Gastos: <span id="vamp-virtues-spent" class="vamp-virtues-tracker">0</span> / 7
+                        </div>
+                        <div class="vamp-attr-column" id="wiz-vamp-virtues-container" style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Virtudes serão geradas dinamicamente -->
                         </div>
                     </div>
                 </div>
@@ -1574,6 +1585,9 @@ export const WizardModule = {
     renderAdvantagesSelection(context) {
         if (typeof WizardVampire.renderVampireAdvantagesGrid === 'function') {
             WizardVampire.renderVampireAdvantagesGrid(context);
+        }
+        if (typeof WizardVampire.renderVampireVirtuesGrid === 'function') {
+            WizardVampire.renderVampireVirtuesGrid(context);
         }
     },
 
