@@ -455,6 +455,78 @@ export const VampirePlugin = {
         const dex = parseInt(char.attributes?.dexterity || 1);
         const wits = parseInt(char.attributes?.wits || 1);
         return dex + wits;
+    },
+
+    renderSheetMagicTab(char, systemStats, helpers) {
+        const list = char.spells?.list || [];
+        const isInspection = !!helpers.isInspection;
+
+        let listHtml = "";
+        if (list.length === 0) {
+            listHtml = `<p class="empty-hint" style="grid-column: 1/-1; text-align: center; opacity: 0.6; font-style: italic;">Nenhuma disciplina vinculada. Clique em "Adicionar Disciplina" abaixo para iniciar.</p>`;
+        } else {
+            list.forEach((sp, i) => {
+                const currentVal = parseInt(sp.level) || 0;
+
+                // Generate dots (1 to 5)
+                let dotsHtml = "";
+                for (let dotVal = 1; dotVal <= 5; dotVal++) {
+                    const isActive = dotVal <= currentVal;
+                    const iconClass = isActive ? "fa-solid fa-circle active" : "fa-regular fa-circle";
+                    dotsHtml += `<i class="${iconClass} vamp-dot vamp-sheet-discipline-dot" data-value="${dotVal}" data-index="${i}" style="cursor: ${isInspection ? 'default' : 'pointer'};"></i>`;
+                }
+
+                listHtml += `
+                    <div class="sheet-card-v2 list-item-v2" data-index="${i}" data-list="spells.list" style="background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(44, 30, 22, 0.12); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                        <input type="hidden" data-field="school" value="Disciplina">
+                        <input type="hidden" data-field="casting_time" value="Instantâneo">
+                        <input type="hidden" data-field="duration" value="Cena">
+                        <input type="hidden" data-field="range" value="Pessoal">
+                        <input type="hidden" data-field="components" value="Sangue">
+                        <input type="hidden" id="sheet-disc-level-${i}" data-field="level" value="${currentVal}">
+
+                        <div class="card-v2-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <input type="text" data-field="name" value="${escapeHTML(sp.name || '')}" class="medieval-input seamless font-medieval" style="font-size: 1.15rem; font-weight: bold; width: 60%; color: var(--crimson); border-bottom: 1px dashed rgba(44, 30, 22, 0.2);" placeholder="Nome da Disciplina" ${isInspection ? 'disabled' : ''}>
+                            
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="vamp-dots-container" style="display: flex; gap: 4px;">
+                                    ${dotsHtml}
+                                </div>
+                                ${!isInspection ? `
+                                <button type="button" class="delete-discipline-btn" data-index="${i}" style="background: none; border: none; color: var(--crimson); cursor: pointer; padding: 0.3rem;" title="Remover Disciplina">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="card-v2-content" style="width: 100%;">
+                            <textarea data-field="description" class="medieval-textarea" placeholder="Descrição da disciplina e de seus poderes..." style="width: 100%; min-height: 70px; font-size: 0.95rem; line-height: 1.4; padding: 0.5rem; border-radius: 4px;" ${isInspection ? 'disabled' : ''}>${escapeHTML(sp.description || '')}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        return `
+            <div class="vampire-disciplines-tab" style="padding: 1rem 0;">
+                <h4 class="section-title font-medieval" style="font-size: 1.4rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Disciplinas Cainitas</span>
+                    <span style="font-size: 0.9rem; font-family: var(--font-body); font-weight: normal; color: #666;">(Cada bolinha representa 1 nível)</span>
+                </h4>
+                
+                <div id="spells-body" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                    ${listHtml}
+                </div>
+
+                ${!isInspection ? `
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button type="button" id="add-discipline-btn" class="medieval-btn dashed" style="width: 100%; padding: 0.8rem; font-size: 1rem; border: 2px dashed var(--gold);">
+                        <i class="fas fa-plus"></i> Adicionar Disciplina
+                    </button>
+                </div>
+                ` : ''}
+            </div>
+        `;
     }
 };
 

@@ -12,6 +12,7 @@ import SystemRegistry from '../systems/system-registry.js';
  * Returns populate-related methods to be mixed into SheetModule.
  */
 export function createPopulateMixin(ctx) {
+    let defaultMagicTabHTML = null;
     return {
         async populateSheet(char, context) {
             if (!char) return;
@@ -30,8 +31,49 @@ export function createPopulateMixin(ctx) {
             } catch (e) { logger.error("Error loading system data", e); }
 
             // Dados de criação vêm do plugin ativo
-            const currentPlugin = SystemRegistry.getCurrent();
+            const currentPlugin = SystemRegistry.get(context.currentSystem || char.system || 'dnd5e') || SystemRegistry.getCurrent();
             const creationData = currentPlugin?.getCreationData() || {};
+
+            // Cache default D&D magic tab HTML
+            const magicTab = document.getElementById('sheet-magia');
+            if (magicTab && !defaultMagicTabHTML) {
+                defaultMagicTabHTML = magicTab.innerHTML;
+            }
+
+            // Dynamically update sheet tabs
+            if (currentPlugin && typeof currentPlugin.getSheetTabs === 'function') {
+                const tabs = currentPlugin.getSheetTabs();
+                const tabIdMap = {
+                    'main': 'geral',
+                    'combat': 'combate',
+                    'magic': 'magia',
+                    'inventory': 'inventario',
+                    'story': 'historia'
+                };
+                tabs.forEach(t => {
+                    const tabBtn = document.querySelector(`.sheet-tab[data-tab="${tabIdMap[t.id] || t.id}"]`);
+                    if (tabBtn) {
+                        const icon = t.icon ? `<i class="fa-solid ${t.icon}" style="margin-right: 6px;"></i>` : '';
+                        tabBtn.innerHTML = `${icon}${t.label}`;
+                    }
+                });
+            } else {
+                // Fallback to default D&D 5e tabs
+                const defaultTabs = [
+                    { id: 'geral', label: 'Principal', icon: 'fa-user-shield' },
+                    { id: 'combate', label: 'Combate', icon: 'fa-sword' },
+                    { id: 'magia', label: 'Grimório', icon: 'fa-book-sparkles' },
+                    { id: 'inventario', label: 'Mochila', icon: 'fa-backpack' },
+                    { id: 'historia', label: 'Crônicas', icon: 'fa-feather-pointed' }
+                ];
+                defaultTabs.forEach(t => {
+                    const tabBtn = document.querySelector(`.sheet-tab[data-tab="${t.id}"]`);
+                    if (tabBtn) {
+                        const icon = `<i class="fa-solid ${t.icon}" style="margin-right: 6px;"></i>`;
+                        tabBtn.innerHTML = `${icon}${t.label}`;
+                    }
+                });
+            }
 
             const validRaces = systemData?.races || creationData.races || [];
             const raceOptions = validRaces.map(r => r.raca || r);
@@ -509,134 +551,215 @@ export function createPopulateMixin(ctx) {
                 }, 0);
             }
 
-            const spellsContainer = document.getElementById('sheet-spell-slots');
-            if (spellsContainer) {
-                if (char.spells?.slots) {
-                    const slots = char.spells.slots;
-                    const levels = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9'];
+            if (magicTab) {
+                if (currentPlugin && typeof currentPlugin.renderSheetMagicTab === 'function') {
+                    // Custom system magic tab rendering
+                    const helpers = { mkInput, isInspection: context.isInspection };
+                    magicTab.innerHTML = currentPlugin.renderSheetMagicTab(char, systemStats, helpers);
 
-                    spellsContainer.innerHTML = levels.map(lvl => {
-                        const data = slots[lvl] || { total: 0, used: 0 };
-                        const lvlNum = lvl.replace('l', '');
+                    // Bind events for custom dynamic magic tab
+                    setTimeout(() => {
+                        // Bind add discipline button
+                        const addDiscBtn = document.getElementById('add-discipline-btn');
+                        if (addDiscBtn) {
+                            addDiscBtn.onclick = () => {
+                                if (context.isInspection) return;
+                                if (!char.spells) char.spells = {};
+                                if (!char.spells.list) char.spells.list = [];
+                                char.spells.list.push({
+                                    name: "Nova Disciplina",
+                                    level: "1",
+                                    school: "Disciplina",
+                                    description: "Nível 1 da disciplina.",
+                                    casting_time: "Instantâneo",
+                                    duration: "Cena",
+                                    range: "Pessoal",
+                                    components: "Sangue"
+                                });
+                                ctx.populateSheet(char, context);
+                            };
+                        }
 
-                        if (!data.total || data.total == 0) return '';
+                        // Bind dot clicks for each discipline row
+                        const dots = magicTab.querySelectorAll('.vamp-sheet-discipline-dot');
+                        dots.forEach(dot => {
+                            dot.onclick = (e) => {
+                                if (context.isInspection) return;
+                                const index = parseInt(dot.dataset.index);
+                                const clickedVal = parseInt(dot.dataset.value);
+                                const levelInput = document.getElementById(`sheet-disc-level-${index}`);
+                                if (!levelInput) return;
 
-                        return `
-                            <div class="slot-box" title="Círculo ${lvlNum}">
-                                <strong>Nível ${lvlNum}</strong>
-                                <div class="slot-inputs" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                                    <input 
-                                        type="number" 
-                                        value="${data.used}" 
-                                        data-field="spells.slots.${lvl}.used" 
-                                        min="0" 
-                                        max="${data.total}"
-                                        style="width: 40px; text-align: center; padding: 0.3rem;"
-                                        title="Gastos"
-                                    >
-                                    <span>/</span>
-                                    <span style="font-weight: bold;">${data.total}</span>
-                                </div>
-                                <div class="slot-circles" style="display: flex; gap: 4px; margin-top: 0.5rem;">
-                                    ${Array(parseInt(data.total)).fill(0).map((_, i) => `
-                                        <div 
-                                            class="slot-circle ${i < data.used ? 'used' : 'available'}" 
-                                            style="
-                                                width: 12px; 
-                                                height: 12px; 
-                                                border-radius: 50%; 
-                                                background: ${i < data.used ? '#666' : 'var(--gold)'}; 
-                                                border: 1px solid var(--ink);
-                                                cursor: ${context.isInspection ? 'default' : 'pointer'};
-                                            "
-                                            data-level="${lvl}"
-                                            data-index="${i}"
-                                            title="${i < data.used ? 'Gasto' : 'Disponível'}"
-                                        ></div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }).filter(Boolean).join('');
-
-                    spellsContainer.querySelectorAll('.slot-circle').forEach(circle => {
-                        circle.addEventListener('click', (e) => {
-                            if (ctx.isInspection) return;
-                            const lvl = e.target.dataset.level;
-                            const idx = parseInt(e.target.dataset.index);
-                            const input = spellsContainer.querySelector(`input[data-field="spells.slots.${lvl}.used"]`);
-                            if (!input) return;
-                            const current = parseInt(input.value) || 0;
-                            if (idx < current) {
-                                input.value = idx;
-                            } else {
-                                input.value = idx + 1;
-                            }
-                            input.dispatchEvent(new Event('input'));
-                        });
-                    });
-
-                    spellsContainer.querySelectorAll('input[data-field^="spells.slots"]').forEach(input => {
-                        input.addEventListener('input', (e) => {
-                            const lvl = e.target.dataset.field.split('.')[2];
-                            const used = parseInt(e.target.value) || 0;
-                            spellsContainer.querySelectorAll(`.slot-circle[data-level="${lvl}"]`).forEach((circle, i) => {
-                                if (i < used) {
-                                    circle.style.background = '#666';
-                                    circle.title = 'Gasto';
-                                    circle.classList.add('used');
-                                    circle.classList.remove('available');
-                                } else {
-                                    circle.style.background = 'var(--gold)';
-                                    circle.title = 'Disponível';
-                                    circle.classList.add('available');
-                                    circle.classList.remove('used');
+                                let currentVal = parseInt(levelInput.value) || 0;
+                                let newVal = clickedVal;
+                                if (currentVal === clickedVal) {
+                                    newVal = 0;
                                 }
-                            });
+                                levelInput.value = newVal;
+
+                                // Update visual dots
+                                const rowDots = dot.parentElement.querySelectorAll('.vamp-sheet-discipline-dot');
+                                rowDots.forEach(d => {
+                                    const val = parseInt(d.dataset.value);
+                                    if (val <= newVal) {
+                                        d.className = "fa-solid fa-circle active vamp-dot vamp-sheet-discipline-dot";
+                                    } else {
+                                        d.className = "fa-regular fa-circle vamp-dot vamp-sheet-discipline-dot";
+                                    }
+                                });
+
+                                // Dispatch change/input event
+                                levelInput.dispatchEvent(new Event('input'));
+                            };
                         });
-                    });
+
+                        // Bind delete button clicks
+                        const deleteBtns = magicTab.querySelectorAll('.delete-discipline-btn');
+                        deleteBtns.forEach(btn => {
+                            btn.onclick = () => {
+                                if (context.isInspection) return;
+                                const index = parseInt(btn.dataset.index);
+                                char.spells.list.splice(index, 1);
+                                ctx.populateSheet(char, context);
+                            };
+                        });
+                    }, 0);
                 } else {
-                    spellsContainer.innerHTML = '<p style="opacity:0.6; font-style:italic;">Sem slots de magia definidos.</p>';
+                    // Restore default D&D 5e tabs
+                    if (defaultMagicTabHTML && magicTab.innerHTML !== defaultMagicTabHTML) {
+                        magicTab.innerHTML = defaultMagicTabHTML;
+                    }
+
+                    const spellsContainer = document.getElementById('sheet-spell-slots');
+                    if (spellsContainer) {
+                        if (char.spells?.slots) {
+                            const slots = char.spells.slots;
+                            const levels = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l9'];
+
+                            spellsContainer.innerHTML = levels.map(lvl => {
+                                const data = slots[lvl] || { total: 0, used: 0 };
+                                const lvlNum = lvl.replace('l', '');
+
+                                if (!data.total || data.total == 0) return '';
+
+                                return `
+                                    <div class="slot-box" title="Círculo ${lvlNum}">
+                                        <strong>Nível ${lvlNum}</strong>
+                                        <div class="slot-inputs" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                            <input 
+                                                type="number" 
+                                                value="${data.used}" 
+                                                data-field="spells.slots.${lvl}.used" 
+                                                min="0" 
+                                                max="${data.total}"
+                                                style="width: 40px; text-align: center; padding: 0.3rem;"
+                                                title="Gastos"
+                                            >
+                                            <span>/</span>
+                                            <span style="font-weight: bold;">${data.total}</span>
+                                        </div>
+                                        <div class="slot-circles" style="display: flex; gap: 4px; margin-top: 0.5rem;">
+                                            ${Array(parseInt(data.total)).fill(0).map((_, i) => `
+                                                <div 
+                                                    class="slot-circle ${i < data.used ? 'used' : 'available'}" 
+                                                    style="
+                                                        width: 12px; 
+                                                        height: 12px; 
+                                                        border-radius: 50%; 
+                                                        background: ${i < data.used ? '#666' : 'var(--gold)'}; 
+                                                        border: 1px solid var(--ink);
+                                                        cursor: ${context.isInspection ? 'default' : 'pointer'};
+                                                    "
+                                                    data-level="${lvl}"
+                                                    data-index="${i}"
+                                                    title="${i < data.used ? 'Gasto' : 'Disponível'}"
+                                                ></div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }).filter(Boolean).join('');
+
+                            spellsContainer.querySelectorAll('.slot-circle').forEach(circle => {
+                                circle.addEventListener('click', (e) => {
+                                    if (ctx.isInspection) return;
+                                    const lvl = e.target.dataset.level;
+                                    const idx = parseInt(e.target.dataset.index);
+                                    const input = spellsContainer.querySelector(`input[data-field="spells.slots.${lvl}.used"]`);
+                                    if (!input) return;
+                                    const current = parseInt(input.value) || 0;
+                                    if (idx < current) {
+                                        input.value = idx;
+                                    } else {
+                                        input.value = idx + 1;
+                                    }
+                                    input.dispatchEvent(new Event('input'));
+                                });
+                            });
+
+                            spellsContainer.querySelectorAll('input[data-field^="spells.slots"]').forEach(input => {
+                                input.addEventListener('input', (e) => {
+                                    const lvl = e.target.dataset.field.split('.')[2];
+                                    const used = parseInt(e.target.value) || 0;
+                                    spellsContainer.querySelectorAll(`.slot-circle[data-level="${lvl}"]`).forEach((circle, i) => {
+                                        if (i < used) {
+                                            circle.style.background = '#666';
+                                            circle.title = 'Gasto';
+                                            circle.classList.add('used');
+                                            circle.classList.remove('available');
+                                        } else {
+                                            circle.style.background = 'var(--gold)';
+                                            circle.title = 'Disponível';
+                                            circle.classList.add('available');
+                                            circle.classList.remove('used');
+                                        }
+                                    });
+                                });
+                            });
+                        } else {
+                            spellsContainer.innerHTML = '<p style="opacity:0.6; font-style:italic;">Sem slots de magia definidos.</p>';
+                        }
+
+                        const spellAttr = char.spells?.ability || 'int';
+                        const attrMap2 = { int: mods.intMod, wis: mods.wisMod, cha: mods.chaMod };
+                        const spellMod = attrMap2[spellAttr] || 0;
+
+                        const spellDC = 8 + mods.profBonus + spellMod;
+                        const spellAtk = mods.profBonus + spellMod;
+
+                        const spellDCEl = document.getElementById('sheet-spell-dc');
+                        const spellAtkEl = document.getElementById('sheet-spell-atk');
+
+                        if (spellDCEl) spellDCEl.innerText = spellDC;
+                        if (spellAtkEl) spellAtkEl.innerText = spellAtk >= 0 ? `+${spellAtk}` : spellAtk;
+
+                        const spellSearch = document.getElementById('sheet-spell-search');
+                        if (spellSearch) spellSearch.disabled = context.isInspection;
+                    }
+
+                    // Spells List
+                    const spellsBody = document.getElementById('spells-body');
+                    if (spellsBody) {
+                        const hasCantrips = (char.spells?.list || []).some(s => s.level === '0' || s.level === 0 || s.level === 'Truque');
+                        const raceHint = (char.bio?.race === 'Elfo' || char.bio?.race === 'Gnomo' || char.bio?.race === 'Tiferino') && !hasCantrips
+                            ? `<div class="sheet-hint" style="width: 100%; text-align: center; padding: 1rem; background: rgba(212, 175, 55, 0.1); border: 1px dashed var(--gold); border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-info-circle"></i> Lembre-se de adicionar seus Truques Raciais (ex: Luz, Taumaturgia) usando a busca!
+                               </div>`
+                            : '';
+
+                        const spellsContainerParent = spellsBody.parentElement;
+                        let hintContainer = spellsContainerParent.querySelector('.dynamic-race-hint');
+                        if (!hintContainer) {
+                            hintContainer = document.createElement('div');
+                            hintContainer.className = 'dynamic-race-hint';
+                            spellsBody.insertAdjacentElement('beforebegin', hintContainer);
+                        }
+                        hintContainer.innerHTML = raceHint;
+
+                        spellsBody.innerHTML = (char.spells?.list || []).map((sp, i) => ctx.renderSpellCard(sp, i)).join('') ||
+                            '<p class="empty-hint" style="grid-column: 1/-1;">Nenhuma magia vinculada. Use a busca acima para adicionar do Grande Grimório e não esqueça de salvar após realizar alterações!</p>';
+                    }
                 }
-
-                const spellAttr = char.spells?.ability || 'int';
-                const attrMap2 = { int: mods.intMod, wis: mods.wisMod, cha: mods.chaMod };
-                const spellMod = attrMap2[spellAttr] || 0;
-
-                const spellDC = 8 + mods.profBonus + spellMod;
-                const spellAtk = mods.profBonus + spellMod;
-
-                const spellDCEl = document.getElementById('sheet-spell-dc');
-                const spellAtkEl = document.getElementById('sheet-spell-atk');
-
-                if (spellDCEl) spellDCEl.innerText = spellDC;
-                if (spellAtkEl) spellAtkEl.innerText = spellAtk >= 0 ? `+${spellAtk}` : spellAtk;
-
-                const spellSearch = document.getElementById('sheet-spell-search');
-                if (spellSearch) spellSearch.disabled = context.isInspection;
-            }
-
-            // Spells List
-            const spellsBody = document.getElementById('spells-body');
-            if (spellsBody) {
-                const hasCantrips = (char.spells?.list || []).some(s => s.level === '0' || s.level === 0 || s.level === 'Truque');
-                const raceHint = (char.bio?.race === 'Elfo' || char.bio?.race === 'Gnomo' || char.bio?.race === 'Tiferino') && !hasCantrips
-                    ? `<div class="sheet-hint" style="width: 100%; text-align: center; padding: 1rem; background: rgba(212, 175, 55, 0.1); border: 1px dashed var(--gold); border-radius: 8px; margin-bottom: 1rem;">
-                        <i class="fas fa-info-circle"></i> Lembre-se de adicionar seus Truques Raciais (ex: Luz, Taumaturgia) usando a busca!
-                       </div>`
-                    : '';
-
-                const spellsContainerParent = spellsBody.parentElement;
-                let hintContainer = spellsContainerParent.querySelector('.dynamic-race-hint');
-                if (!hintContainer) {
-                    hintContainer = document.createElement('div');
-                    hintContainer.className = 'dynamic-race-hint';
-                    spellsBody.insertAdjacentElement('beforebegin', hintContainer);
-                }
-                hintContainer.innerHTML = raceHint;
-
-                spellsBody.innerHTML = (char.spells?.list || []).map((sp, i) => ctx.renderSpellCard(sp, i)).join('') ||
-                    '<p class="empty-hint" style="grid-column: 1/-1;">Nenhuma magia vinculada. Use a busca acima para adicionar do Grande Grimório e não esqueça de salvar após realizar alterações!</p>';
             }
 
             // Items List
