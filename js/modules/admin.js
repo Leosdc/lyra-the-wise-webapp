@@ -5,6 +5,7 @@ import { spellsData } from '../../public/assets/systems/dnd5e/spells_data.js';
 import { sanitizeHTML as escapeHTML } from './utils.js';
 import { db } from '../auth.js';
 import { collection, doc, writeBatch } from "firebase/firestore";
+import SystemRegistry from '../systems/system-registry.js';
 
 export const AdminModule = {
     users: [],
@@ -80,9 +81,9 @@ export const AdminModule = {
                                 <a href="audit.html" target="_blank" rel="noopener noreferrer" class="medieval-btn gold-pulse" style="text-decoration:none;">
                                     <i class="fas fa-database"></i> Auditoria de Banco
                                 </a>
-                                <button class="medieval-btn" id="admin-migrate-items-btn">
-                                    <i class="fas fa-truck-ram-box"></i> Migrar Itens (Root -> System)
-                                </button>
+                                <a href="diagnose.html" target="_blank" rel="noopener noreferrer" class="medieval-btn gold-pulse" style="text-decoration:none;">
+                                    <i class="fas fa-microchip"></i> Auditoria de Sistemas
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -155,11 +156,6 @@ export const AdminModule = {
         const toggleMaintenanceBtn = document.getElementById('admin-toggle-maintenance-btn');
         if (toggleMaintenanceBtn) {
             toggleMaintenanceBtn.addEventListener('click', () => this.handleToggleMaintenance());
-        }
-
-        const migrateItemsBtn = document.getElementById('admin-migrate-items-btn');
-        if (migrateItemsBtn) {
-            migrateItemsBtn.addEventListener('click', () => this.handleMigrateItems());
         }
     },
 
@@ -371,7 +367,7 @@ export const AdminModule = {
                 window.app.showAlert("Falha na translação: " + error.message, "Erro Arcano");
             }
         }
-    },
+    }
 };
 
 window.AdminModule = AdminModule; // Export for onclick handlers

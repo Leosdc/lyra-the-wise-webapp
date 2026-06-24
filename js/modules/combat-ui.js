@@ -768,35 +768,35 @@ const CombatUI = {
         // === DEFENDER: +2 CA até o próximo turno ===
         if (attackObj.name === "Defender") {
             actionVerb = "assume uma postura defensiva";
-            icon = "🛡️";
+            icon = '<i class="fas fa-shield-halved" style="color: var(--gold); margin-right: 6px;"></i>';
             const acBonus = 2;
             attacker.ac = (attacker.ac || 10) + acBonus;
             attacker.statusEffects.push({ type: 'defend', acBonus: acBonus });
-            resultMsg = `\n🛡️ **Sucesso!** CA aumentada para **${attacker.ac}** (+${acBonus}) até o próximo turno.`;
+            resultMsg = `\n<i class="fas fa-shield-halved" style="color: #4caf50; margin-right: 6px;"></i> **Sucesso!** CA aumentada para **${attacker.ac}** (+${acBonus}) até o próximo turno.`;
         }
 
         // === ESQUIVAR: impõe desvantagem nos ataques até o próximo turno ===
         if (attackObj.name === "Esquivar") {
             actionVerb = "toma posição evasiva";
-            icon = "💨";
+            icon = '<i class="fas fa-wind" style="color: var(--gold); margin-right: 6px;"></i>';
             attacker.statusEffects.push({ type: 'dodge' });
-            resultMsg = `\n💨 **Sucesso!** Ataques contra **${attacker.name}** terão **desvantagem** até o próximo turno.`;
+            resultMsg = `\n<i class="fas fa-wind" style="color: #4caf50; margin-right: 6px;"></i> **Sucesso!** Ataques contra **${attacker.name}** terão **desvantagem** até o próximo turno.`;
         }
 
         // === FUGIR: CD 10 para escapar do combate ===
         if (attackObj.name === "Fugir") {
             actionVerb = "tenta fugir do combate";
-            icon = "🏃";
+            icon = '<i class="fas fa-person-running" style="color: var(--gold); margin-right: 6px;"></i>';
             const dc = 10;
             if (total >= dc) {
-                resultMsg = `\n✅ **Fuga bem-sucedida!** (${total} ≥ CD ${dc}) **${attacker.name}** escapa do campo de batalha!`;
+                resultMsg = `\n<i class="fas fa-check-circle" style="color: #4caf50; margin-right: 6px;"></i> **Fuga bem-sucedida!** (${total} ≥ CD ${dc}) **${attacker.name}** escapa do campo de batalha!`;
             } else {
-                resultMsg = `\n❌ **Fuga fracassada!** (${total} < CD ${dc}) **${attacker.name}** não conseguiu escapar.`;
+                resultMsg = `\n<i class="fas fa-times-circle" style="color: #f44336; margin-right: 6px;"></i> **Fuga fracassada!** (${total} < CD ${dc}) **${attacker.name}** não conseguiu escapar.`;
             }
         }
 
         let msg = `${icon} **${attacker.name}** ${actionVerb} (**${attackObj.name}**)!`;
-        msg += `\n🎲 Rolagem: **${total}** (d20: ${d20} ${modString} ${modType})`;
+        msg += `\n<i class="fas fa-dice-d20" style="color: var(--gold); margin-right: 6px;"></i> Rolagem: **${total}** (d20: ${d20} ${modString} ${modType})`;
         msg += resultMsg;
 
         // Send to chat

@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 .env.production
+.env.development
 
 # Build
 dist/
@@ -44,9 +45,22 @@ public/assets/systems/dnd5e/implementation_plan.md
 
 # Scripts de desenvolvimento locais
 auditor.mjs
-auditoria.md
+docs/auditoria.md
 
-# Agentes e configurações locais de desenvolvimento
+# Gemini AI Agent Workspace & Tools
 .agents/
 skills-lock.json
 .env.development
+
+# Motores compilados offline e executáveis gigantes (NIST SI-16)
+*.exe
+*.dll
+*.pak
+*.bin
+*.dat
+
+# Subdependências locais de desenvolvimento
+public/vtt/node_modules/
+
+# Permitir pastas 'dist' necessárias do motor VTT (GDevelop)
+!public/vtt/**/dist/

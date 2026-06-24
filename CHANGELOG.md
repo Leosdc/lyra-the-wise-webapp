@@ -7,6 +7,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ---
 
+## [3.6.0] - 2026-05-26
+
+### Adicionado
+- **Portal de Auditoria e Diagnósticos Dedicado** — Criação de página dedicada `diagnose.html` em tela cheia com console simulado que exibe códigos e logs de teste em tempo real.
+- **Múltiplos Sistemas RPG (Arquitetura de Plugins)** — Implementação de interfaces estruturadas de controle (`system-interface.js`, `system-registry.js`, `system-migrator.js`).
+- **Plugin Vampire: The Masquerade V5** — Novo módulo nativo de regras e visualização adaptada de fichas em `vampire.js` ao lado do D&D 5e original.
+- **Guia de Colaboração Local** — Criação de `firebase-colaborativo.md` com instruções completas para emulador do Firebase local e offline.
+
+### Corrigido
+- **Vazamento de Estado entre Sistemas** — SPA recarrega dados (`window.location.reload()`) limpando cache do wizard e datalists ao alternar sistemas RPG.
+- **Ícones Orbitando e Giratórios no Diagnóstico** — Remoção da classe redundante `.spinning` nos ícones após finalização dos ritos.
+- **Proteção do Histórico do Git** — Atualização do `.gitignore` para bloquear rastreamento de logs e histórico da IA de agentes.
+- **Limpeza Recursiva do Sistema** — Eliminação completa de arquivos indesejados `desktop.ini` no repositório.
+
+---
+
 ## [3.5.0] - 2026-05-13
 
 ### Adicionado

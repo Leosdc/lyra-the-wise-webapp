@@ -1,0 +1,3 @@
+# Configuração de Governança Git para Multi-Ambientes
+# Define que o arquivo apphosting.yaml deve manter sua respectiva versão em cada branch nas fusões.
+apphosting.yaml merge=ours

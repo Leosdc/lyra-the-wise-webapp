@@ -173,6 +173,7 @@ export function createSearchMixin(ctx) {
                         type: data.type,
                         rarity: data.rarity,
                         damage: data.damage,
+                        damageType: data.damageType || '',
                         ability_data: data.ability_data || null
                     });
 
@@ -183,6 +184,7 @@ export function createSearchMixin(ctx) {
                                 name: data.name,
                                 bonus: '',
                                 damage: data.damage || '',
+                                damageType: data.damageType || '',
                                 isCustom: false
                             });
                         }

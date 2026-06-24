@@ -1,0 +1,11 @@
+{
+  "name": "map_45lyra_32_45_32copy",
+  "main": "main.js",
+  "productName": "Map-Lyra - Copy",
+  "description": "Map-Lyra - Copy",
+  "author": "",
+  "version": "1.0.0",
+  "dependencies": {
+    "@electron/remote": "2.1.2"
+  }
+}

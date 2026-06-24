@@ -19,6 +19,11 @@ import {
     createUserProfile, getGlobalConfig, getUserItems, updateUserPresence
 } from './data.js';
 import { RPG_TRIVIA, SUPPORTED_SYSTEMS, APP_VERSION } from './constants.js';
+import SystemRegistry from './systems/system-registry.js';
+
+// Side-effect imports: registram plugins no SystemRegistry ao serem carregados
+import './systems/dnd5e.js';
+import './systems/vampire.js';
 
 import { NavigationModule } from './modules/navigation.js';
 import { NamesModule } from './modules/names.js';
@@ -74,6 +79,9 @@ const app = {
         } else {
             this.setTheme('lyra');
         }
+
+        // Ativar o sistema de RPG salvo (ou fallback dnd5e)
+        SystemRegistry.setCurrent(this.currentSystem);
 
         initAuth(async (user) => {
             await this.handleAuthStateChange(user);
@@ -154,11 +162,18 @@ const app = {
         const hiddenInput = document.getElementById('system-selector');
 
         if (optionsContainer) {
-            optionsContainer.innerHTML = SUPPORTED_SYSTEMS.map(s => `
-                <div class="custom-select-option ${s.id === this.currentSystem ? 'selected' : ''}" data-value="${s.id}">
-                    ${s.name}
-                </div>
-            `).join('');
+            optionsContainer.innerHTML = SUPPORTED_SYSTEMS.map(s => {
+                const isImplemented = SystemRegistry.isImplemented(s.id);
+                const badge = isImplemented
+                    ? '<span class="system-badge implemented" title="Sistema implementado"><i class="fas fa-check-circle" style="color: var(--gold); margin-right: 4px;"></i></span>'
+                    : '<span class="system-badge coming-soon" title="Em breve"><i class="fas fa-clock" style="opacity: 0.5; margin-right: 4px;"></i></span>';
+                const disabledClass = isImplemented ? '' : 'system-not-implemented';
+                return `
+                    <div class="custom-select-option ${s.id === this.currentSystem ? 'selected' : ''} ${disabledClass}" data-value="${s.id}" data-implemented="${isImplemented}">
+                        ${badge} ${s.name}
+                    </div>
+                `;
+            }).join('');
 
             const currentSystem = SUPPORTED_SYSTEMS.find(s => s.id === this.currentSystem);
             if (textDisplay && currentSystem) textDisplay.textContent = currentSystem.name;
@@ -166,6 +181,16 @@ const app = {
             optionsContainer.querySelectorAll('.custom-select-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const value = option.dataset.value;
+                    const isImplemented = option.dataset.implemented === 'true';
+
+                    if (!isImplemented) {
+                        this.showAlert(
+                            `O sistema "${option.textContent.trim()}" ainda não está implementado. Em breve estará disponível!`,
+                            'Sistema em Desenvolvimento'
+                        );
+                        return;
+                    }
+
                     textDisplay.textContent = option.textContent.trim();
                     if (hiddenInput) hiddenInput.value = value;
                     document.getElementById('system-selector-container').classList.remove('open');
@@ -179,9 +204,9 @@ const app = {
     populateDataLists() {
         const raceList = document.getElementById('races-list');
         if (raceList) {
-            import('./constants.js').then(({ RACES }) => {
-                raceList.innerHTML = RACES.map(r => `<option value="${r}">`).join('');
-            });
+            const currentPlugin = SystemRegistry.getCurrent();
+            const races = currentPlugin?.getCreationData()?.races || [];
+            raceList.innerHTML = races.map(r => `<option value="${r}">`).join('');
         }
     },
 
@@ -250,7 +275,10 @@ const app = {
             closeModal: () => this.closeModal(),
             showAlert: (msg, title) => this.showAlert(msg, title),
             toggleLoading: (show) => this.toggleLoading(show),
-            calculateStats: (char) => SheetModule.calculateDND5eStats(char),
+            calculateStats: (char) => {
+                const plugin = SystemRegistry.getCurrent();
+                return plugin ? plugin.calculateStats(char) : SheetModule.calculateDND5eStats(char);
+            },
             refreshList: () => this.loadCharacters(),
             refreshMonsters: () => this.loadMonsters(),
             refreshTraps: () => this.loadTraps(),
@@ -531,35 +559,15 @@ const app = {
     async handleSystemChange(systemId) {
         if (this.currentCharacter && this.currentSystem) {
             localStorage.setItem(`lyra_char_${this.currentSystem}`, this.currentCharacter.id);
-        }
-
-        this.currentSystem = systemId;
-        localStorage.setItem('lyra_current_system', systemId);
-
-        const savedCharId = localStorage.getItem(`lyra_char_${systemId}`);
-        if (savedCharId && this.user) {
-            try {
-                const char = await getCharacter(savedCharId);
-                if (char) this.selectCharacter(char);
-                else {
-                    this.currentCharacter = null;
-                    NavigationModule.updateHeaderTracker(null, this.isDamien);
-                }
-            } catch {
-                this.currentCharacter = null;
-                NavigationModule.updateHeaderTracker(null, this.isDamien);
+            if (this.user) {
+                localStorage.setItem(`lyra_char_${this.user.uid}_${this.currentSystem}`, this.currentCharacter.id);
             }
-        } else {
-            this.currentCharacter = null;
-            NavigationModule.updateHeaderTracker(null, this.isDamien);
         }
 
-        if (this.user) {
-            this.switchView('dashboard');
-            this.populateCharSwitcher();
-        }
-
-        this.populateSystems();
+        localStorage.setItem('lyra_current_system', systemId);
+        
+        // Força o F5/reload suave da SPA para limpar caches, datalists e evitar vazamentos de estado entre sistemas
+        window.location.reload();
     },
 
     selectCharacter(char) {
