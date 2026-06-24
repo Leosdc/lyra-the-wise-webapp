@@ -107,6 +107,36 @@ export function validateVampireStep(step, context) {
             return false;
         }
     }
+    if (step === 4) {
+        const val1 = parseInt(document.getElementById('wiz-discipline-1')?.value || 0);
+        const val2 = parseInt(document.getElementById('wiz-discipline-2')?.value || 0);
+        const val3 = parseInt(document.getElementById('wiz-discipline-3')?.value || 0);
+        const total = val1 + val2 + val3;
+
+        const name1 = document.getElementById('wiz-discipline-name-1')?.value || "";
+        const name2 = document.getElementById('wiz-discipline-name-2')?.value || "";
+        const name3 = document.getElementById('wiz-discipline-name-3')?.value || "";
+
+        const clan = document.getElementById('wiz-vamp-clan')?.value || "";
+        const isCaitiff = clan === "Caitiff";
+
+        if (isCaitiff) {
+            if (!name1 || !name2 || !name3) {
+                context.showAlert("Você deve selecionar as 3 disciplinas para o seu vampiro Caitiff!", "Seleção Incompleta");
+                return false;
+            }
+            const uniqueNames = new Set([name1, name2, name3]);
+            if (uniqueNames.size !== 3) {
+                context.showAlert("As 3 disciplinas selecionadas devem ser diferentes!", "Disciplinas Duplicadas");
+                return false;
+            }
+        }
+
+        if (total !== 3) {
+            context.showAlert(`Você distribuiu ${total} pontos em Disciplinas, mas deve alocar exatamente 3 pontos!`, "Distribuição de Pontos");
+            return false;
+        }
+    }
     return true;
 }
 
