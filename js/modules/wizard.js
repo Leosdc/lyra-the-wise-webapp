@@ -1039,6 +1039,31 @@ export const WizardModule = {
                 });
                 template.proficiencies_choice.skills = abilities.filter(id => template.skills[id] > 0);
                 WizardVampire.calculateVampireStats(template, currentPlugin);
+
+                // Salvando as disciplinas na spells.list
+                template.spells = {
+                    ability: "perception",
+                    save_dc: 0,
+                    attack_bonus: 0,
+                    slots: {},
+                    list: []
+                };
+                for (let slot = 1; slot <= 3; slot++) {
+                    const nameVal = document.getElementById(`wiz-discipline-name-${slot}`)?.value || "";
+                    const ptsVal = parseInt(document.getElementById(`wiz-discipline-${slot}`)?.value || 0);
+                    if (nameVal && ptsVal > 0) {
+                        template.spells.list.push({
+                            name: nameVal,
+                            level: String(ptsVal),
+                            school: "Disciplina",
+                            description: `Nível ${ptsVal} da disciplina ${nameVal}.`,
+                            casting_time: "Instantâneo",
+                            duration: "Cena",
+                            range: "Pessoal",
+                            components: "Sangue"
+                        });
+                    }
+                }
             } else {
                 const rawSkills = Array.from(document.querySelectorAll('#wiz-skills-selection input:checked')).map(i => i.value);
                 template.proficiencies_choice.skills = rawSkills;
