@@ -114,6 +114,7 @@ export const SheetModule = {
                     <button class="sheet-tab" data-tab="magia">Grimório</button>
                     <button class="sheet-tab" data-tab="inventario">Mochila</button>
                     <button class="sheet-tab" data-tab="historia">Crônicas</button>
+                    <button class="sheet-tab" data-tab="talentos">Talentos</button>
                 </div>
                 <div class="sheet-content">
                     <!-- Aba Geral: Bio, Atributos, Resistências e Perícias -->
@@ -316,6 +317,33 @@ export const SheetModule = {
                                 placeholder="Suas crônicas escritas nas estrelas..."></textarea>
                         </div>
                     </div>
+
+                    <!-- Aba Talentos: Raciais, Classe, Outros -->
+                    <div id="sheet-talentos" class="sheet-section hidden">
+                        <div class="talents-filter-row">
+                            <button class="talent-filter-btn active" data-talent-filter="all">Todos</button>
+                            <button class="talent-filter-btn" data-talent-filter="racial">Raciais</button>
+                            <button class="talent-filter-btn" data-talent-filter="classe">Classe</button>
+                            <button class="talent-filter-btn" data-talent-filter="outros">Outros</button>
+                        </div>
+                        <div class="talents-sections-container">
+                            <div class="talents-category" data-category="racial">
+                                <h4 class="section-title talents-category-title"><i class="fas fa-dna"></i> Raciais</h4>
+                                <div id="talents-racial-body" class="talents-list"></div>
+                                <button class="medieval-btn small dashed add-talent-btn" data-talent-type="racial" style="width: 100%; margin-top: 10px;"><i class="fas fa-plus"></i> Adicionar Talento Racial</button>
+                            </div>
+                            <div class="talents-category" data-category="classe">
+                                <h4 class="section-title talents-category-title"><i class="fas fa-shield-halved"></i> Classe</h4>
+                                <div id="talents-classe-body" class="talents-list"></div>
+                                <button class="medieval-btn small dashed add-talent-btn" data-talent-type="classe" style="width: 100%; margin-top: 10px;"><i class="fas fa-plus"></i> Adicionar Talento de Classe</button>
+                            </div>
+                            <div class="talents-category" data-category="outros">
+                                <h4 class="section-title talents-category-title"><i class="fas fa-scroll"></i> Outros</h4>
+                                <div id="talents-outros-body" class="talents-list"></div>
+                                <button class="medieval-btn small dashed add-talent-btn" data-talent-type="outros" style="width: 100%; margin-top: 10px;"><i class="fas fa-plus"></i> Adicionar Outro Talento</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -399,7 +427,8 @@ export const SheetModule = {
             combat: { ...(character.combat || {}) },
             spells: { ...(character.spells || {}) },
             inventory: { ...(character.inventory || {}) },
-            proficiencies_choice: { ...(character.proficiencies_choice || {}) }
+            proficiencies_choice: { ...(character.proficiencies_choice || {}) },
+            talents: { ...(character.talents || { racial: [], classe: [], outros: [] }) }
         };
 
         // Gather basic inputs
@@ -441,6 +470,11 @@ export const SheetModule = {
         updates.combat.attacks = this.gatherList('#attacks-body', 'combat.attacks');
         updates.spells.list = this.gatherList('#spells-body', 'spells.list');
         updates.inventory.items = this.gatherList('#inventory-body', 'inventory.items');
+        updates.talents = {
+            racial: this.gatherList('#talents-racial-body', 'talents.racial'),
+            classe: this.gatherList('#talents-classe-body', 'talents.classe'),
+            outros: this.gatherList('#talents-outros-body', 'talents.outros')
+        };
 
         logger.debug("[SheetModule:Save] Configuração de Magias antes de salvar:", updates.spells.list.map(s => `${s.name}: prepared=${s.prepared} (type:${typeof s.prepared})`));
         logger.debug("[SheetModule:Save] Objeto de atualização final:", updates);
@@ -519,6 +553,10 @@ export const SheetModule = {
                         <div class="card-v2-stat"><strong>Conjunção</strong> <span>${escapeHTML(sp.casting_time || sp.castingTime || '-')}</span></div>
                         <div class="card-v2-stat"><strong>Duração</strong> <span>${escapeHTML(sp.duration || '-')}</span></div>
                         <div class="card-v2-stat"><strong>Comp.</strong> <span>${escapeHTML(sp.components || '-')}</span></div>
+                    </div>
+                    <div class="card-v2-damage-row">
+                        <strong>Dano</strong>
+                        <input type="text" value="${escapeHTML(sp.damage || '')}" data-field="damage" placeholder="ex: 8d6 fogo" class="medieval-input seamless spell-damage-input" title="Dano da magia">
                     </div>
                     ${mechanicsBadges}
                     ${sp.description ? `<div class="card-v2-desc">${parseMarkdown(sp.description)}</div>` : ''}

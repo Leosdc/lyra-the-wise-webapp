@@ -424,6 +424,10 @@ export function createPopulateMixin(ctx) {
                          <div class="attack-actions" style="display: flex; align-items: flex-end; padding-bottom: 5px;">
                               ${atk.isCustom && !context.isInspection ? `<button class="icon-btn delete-list-item delete-btn" data-list="combat.attacks" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>` : ''}
                         </div>
+                        <div class="attack-description-row" style="grid-column: 1 / -1; width: 100%;">
+                            <label>Descrição</label>
+                            <textarea data-field="description" class="medieval-textarea attack-desc-textarea" placeholder="Propriedades, efeitos especiais..." ${context.isInspection ? 'disabled' : ''}>${escapeHTML(atk.description || '')}</textarea>
+                        </div>
                         <input type="hidden" data-field="isCustom" value="${atk.isCustom || false}">
                         <input type="hidden" data-field="isProf" value="${isProf}">
                     </div>
@@ -448,6 +452,7 @@ export function createPopulateMixin(ctx) {
                                 bonus: "+0",
                                 damage: "1d6",
                                 damageType: "",
+                                description: "",
                                 isCustom: true,
                                 isProf: false
                             });
@@ -721,6 +726,71 @@ export function createPopulateMixin(ctx) {
             }
 
             ctx.toggleSheetEdit(true, char, context);
+
+            // Talents Tab
+            const renderTalentCard = (talent, i, type) => {
+                return `
+                    <div class="talent-card list-item-v2" data-index="${i}">
+                        <div class="talent-card-left">
+                            <div class="talent-field">
+                                <label>Título</label>
+                                <input type="text" value="${escapeHTML(talent.title || '')}" data-field="title" class="medieval-input seamless" placeholder="Nome do Talento" ${context.isInspection ? 'disabled' : ''}>
+                            </div>
+                            <div class="talent-field">
+                                <label>Origem</label>
+                                <input type="text" value="${escapeHTML(talent.origin || '')}" data-field="origin" class="medieval-input seamless" placeholder="Ex: Elfo, Guerreiro nível 3..." ${context.isInspection ? 'disabled' : ''}>
+                            </div>
+                        </div>
+                        <div class="talent-card-right">
+                            <label>Descrição</label>
+                            <textarea data-field="description" class="medieval-textarea talent-desc-textarea" placeholder="Efeitos e regras do talento..." ${context.isInspection ? 'disabled' : ''}>${escapeHTML(talent.description || '')}</textarea>
+                        </div>
+                        <div class="talent-card-actions">
+                            ${!context.isInspection ? `<button class="icon-btn delete-list-item delete-btn" data-list="talents.${type}" data-index="${i}" title="Remover"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+            };
+
+            const talents = char.talents || { racial: [], classe: [], outros: [] };
+            ['racial', 'classe', 'outros'].forEach(type => {
+                const body = document.getElementById(`talents-${type}-body`);
+                if (body) {
+                    const list = talents[type] || [];
+                    body.innerHTML = list.map((t, i) => renderTalentCard(t, i, type)).join('') ||
+                        `<p class="empty-hint">Nenhum talento ${type === 'racial' ? 'racial' : type === 'classe' ? 'de classe' : ''} adicionado.</p>`;
+                }
+            });
+
+            // Talent filter buttons
+            document.querySelectorAll('.talent-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.talent-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const filter = btn.dataset.talentFilter;
+                    document.querySelectorAll('.talents-category').forEach(cat => {
+                        if (filter === 'all') {
+                            cat.style.display = '';
+                        } else {
+                            cat.style.display = cat.dataset.category === filter ? '' : 'none';
+                        }
+                    });
+                });
+            });
+
+            // Add talent buttons
+            document.querySelectorAll('.add-talent-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (context.isInspection) return;
+                    const type = btn.dataset.talentType;
+                    if (!char.talents) char.talents = { racial: [], classe: [], outros: [] };
+                    if (!char.talents[type]) char.talents[type] = [];
+                    char.talents[type].push({ title: '', origin: '', description: '' });
+                    ctx.populateSheet(char, context);
+                    // Switch to talentos tab to see the new entry
+                    ctx.switchSheetTab('talentos', context);
+                });
+            });
 
             const textareas = document.querySelectorAll('#character-sheet .medieval-textarea');
             textareas.forEach(ta => {

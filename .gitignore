@@ -45,3 +45,8 @@ public/assets/systems/dnd5e/implementation_plan.md
 # Scripts de desenvolvimento locais
 auditor.mjs
 auditoria.md
+
+# Agentes e configurações locais de desenvolvimento
+.agents/
+skills-lock.json
+.env.development

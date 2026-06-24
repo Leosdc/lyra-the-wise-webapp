@@ -106,8 +106,9 @@ const ContentParser = {
         if (!text) return "";
 
         // 0. Protect legitimate <i> tags (like FontAwesome icons) before escaping HTML
+        // Handles <i class="..." style="..."></i> and <i class="..."></i>
         const iconPlaceholders = [];
-        let rawText = text.replace(/<i\s+class=['"][^'"]+['"]\s*><\/i>/gi, (match) => {
+        let rawText = text.replace(/<i\b[^>]*>(?:\s*)<\/i>/gi, (match) => {
             iconPlaceholders.push(match);
             return `__ICON_PLACEHOLDER_${iconPlaceholders.length - 1}__`;
         });
@@ -180,7 +181,7 @@ const ContentParser = {
 
         return DOMPurify.sanitize(decorated, {
             ALLOWED_TAGS: ['strong', 'em', 'span', 'i', 'br'],
-            ALLOWED_ATTR: ['class', 'data-name', 'data-desc', 'data-props', 'data-race', 'data-details', 'title']
+            ALLOWED_ATTR: ['class', 'style', 'data-name', 'data-desc', 'data-props', 'data-race', 'data-details', 'title']
         });
     }
 };
