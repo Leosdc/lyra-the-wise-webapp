@@ -710,7 +710,7 @@ export function createPopulateMixin(ctx) {
 
             const inventoryInputs = document.querySelectorAll('#inventory-body input[data-field], .coin-item input');
             inventoryInputs.forEach(input => {
-                input.addEventListener('input', updateEncumbrance);
+                input.oninput = updateEncumbrance;
             });
 
             if (inventoryBody) updateEncumbrance();
@@ -739,7 +739,6 @@ export function createPopulateMixin(ctx) {
                     txt.title = context.isInspection ? "Visualização apenas" : (insights[field] || "Insite sua história");
 
                     ctx.autoResizeTextarea(txt);
-                    txt.addEventListener('input', () => ctx.autoResizeTextarea(txt));
                 });
             }
 
@@ -793,7 +792,7 @@ export function createPopulateMixin(ctx) {
 
             // Talent filter buttons
             document.querySelectorAll('.talent-filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.onclick = () => {
                     document.querySelectorAll('.talent-filter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     const filter = btn.dataset.talentFilter;
@@ -804,12 +803,12 @@ export function createPopulateMixin(ctx) {
                             cat.style.display = cat.dataset.category === filter ? '' : 'none';
                         }
                     });
-                });
+                };
             });
 
             // Add talent buttons
             document.querySelectorAll('.add-talent-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.onclick = () => {
                     if (context.isInspection) return;
                     const type = btn.dataset.talentType;
                     if (!char.talents) char.talents = { racial: [], classe: [], outros: [] };
@@ -818,7 +817,7 @@ export function createPopulateMixin(ctx) {
                     ctx.populateSheet(char, context);
                     // Switch to talentos tab to see the new entry
                     ctx.switchSheetTab('talentos', context);
-                });
+                };
             });
 
             const textareas = document.querySelectorAll('#character-sheet .medieval-textarea');

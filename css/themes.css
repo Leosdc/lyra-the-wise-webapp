@@ -216,6 +216,14 @@ body.damien-theme .guidance-bubble p {
     color: var(--ink) !important;
 }
 
+.eldrin-theme .sheet-container textarea::placeholder,
+.eldrin-theme .sheet-container input::placeholder,
+.eldrin-theme .sheet-container .medieval-input::placeholder,
+.eldrin-theme .sheet-container .medieval-textarea::placeholder {
+    color: rgba(214, 234, 248, 0.5) !important;
+}
+
+
 
 .eldrin-theme .msg.user {
     background: rgba(241, 196, 15, 0.15);
