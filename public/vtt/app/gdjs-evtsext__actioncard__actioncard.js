@@ -9,7 +9,6 @@ gdjs.evtsExt__ActionCard__ActionCard.ActionCard = class ActionCard extends gdjs.
     super(parentInstanceContainer, objectData, instanceData);
     this._parentInstanceContainer = parentInstanceContainer;
 
-    this._onceTriggers = new gdjs.OnceTriggers();
     this._objectData = {};
     
     this._objectData.LV = objectData.content.LV !== undefined ? objectData.content.LV : Number("") || 0;
@@ -288,7 +287,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.IMGContext.GDObjectObjects1.length = 0;
@@ -509,7 +508,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetIMGContext.GDObjectObjects1.length = 0;
@@ -724,7 +723,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.DurationContext.GDObjectObjects1.length = 0;
@@ -946,7 +945,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetDurationContext.GDObjectObjects1.length = 0;
@@ -1161,7 +1160,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.CastingTimeContext.GDObjectObjects1.length = 0;
@@ -1383,7 +1382,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetCastingTimeContext.GDObjectObjects1.length = 0;
@@ -1598,7 +1597,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.ComponentsContext.GDObjectObjects1.length = 0;
@@ -1820,7 +1819,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetComponentsContext.GDObjectObjects1.length = 0;
@@ -2035,7 +2034,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.RangeContext.GDObjectObjects1.length = 0;
@@ -2257,7 +2256,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetRangeContext.GDObjectObjects1.length = 0;
@@ -2472,7 +2471,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SchoolContext.GDObjectObjects1.length = 0;
@@ -2932,7 +2931,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetSchoolContext.GDObjectObjects1.length = 0;
@@ -3147,7 +3146,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.LVContext.GDObjectObjects1.length = 0;
@@ -3369,7 +3368,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetLVContext.GDObjectObjects1.length = 0;
@@ -3584,7 +3583,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.DescriptionContext.GDObjectObjects1.length = 0;
@@ -3806,7 +3805,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetDescriptionContext.GDObjectObjects1.length = 0;
@@ -4021,7 +4020,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.EventContext.GDObjectObjects1.length = 0;
@@ -4525,7 +4524,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetEventContext.GDObjectObjects1.length = 0;
@@ -4740,7 +4739,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.NameContext.GDObjectObjects1.length = 0;
@@ -4962,7 +4961,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetNameContext.GDObjectObjects1.length = 0;
@@ -5177,7 +5176,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.TargetTypeContext.GDObjectObjects1.length = 0;
@@ -5399,7 +5398,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.SetTargetTypeContext.GDObjectObjects1.length = 0;
@@ -5462,7 +5461,7 @@ return;
 }
 
 gdjs.evtsExt__ActionCard__ActionCard.ActionCard.prototype.doStepPreEvents = function() {
-  this._onceTriggers.startNewFrame();
+  this._instanceContainer.getOnceTriggers().startNewFrame();
 };
 
 

@@ -9,7 +9,6 @@ gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteCont
     super(parentInstanceContainer, objectData, instanceData);
     this._parentInstanceContainer = parentInstanceContainer;
 
-    this._onceTriggers = new gdjs.OnceTriggers();
     this._objectData = {};
     
     this._objectData.MaxValue = objectData.content.MaxValue !== undefined ? objectData.content.MaxValue : Number("3") || 0;
@@ -370,7 +369,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.onCreatedContext.GDObjectObjects1.length = 0;
@@ -569,7 +568,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.onHotReloadingContext.GDObjectObjects1.length = 0;
@@ -686,7 +685,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteCo
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.doStepPostEventsContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(16634324);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(17452556);
 }
 }
 if (isConditionTrue_0) {
@@ -832,7 +831,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.doStepPostEventsContext.GDObjectObjects1.length = 0;
@@ -977,7 +976,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.UpdateLayoutContext.GDObjectObjects1.length = 0;
@@ -1113,7 +1112,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.ValueContext.GDObjectObjects1.length = 0;
@@ -1333,7 +1332,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.SetValueContext.GDObjectObjects1.length = 0;
@@ -1469,7 +1468,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.MaxValueContext.GDObjectObjects1.length = 0;
@@ -1618,7 +1617,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.SetMaxValueContext.GDObjectObjects1.length = 0;
@@ -1763,7 +1762,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.IsEmptyContext.GDObjectObjects1.length = 0;
@@ -1908,7 +1907,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.IsFullContext.GDObjectObjects1.length = 0;
@@ -2044,7 +2043,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.PreviousValueDurationContext.GDObjectObjects1.length = 0;
@@ -2220,7 +2219,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.SetPreviousValueDurationContext.GDObjectObjects1.length = 0;
@@ -2365,7 +2364,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.IsChangingContext.GDObjectObjects1.length = 0;
@@ -2502,7 +2501,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.WidthForValueContext.GDObjectObjects1.length = 0;
@@ -2638,7 +2637,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.FullBarWidthContext.GDObjectObjects1.length = 0;
@@ -2776,7 +2775,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.IsLabelShownContext.GDObjectObjects1.length = 0;
@@ -2941,7 +2940,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.SetLabelShownContext.GDObjectObjects1.length = 0;
@@ -3081,7 +3080,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.UpdateLabelContext.GDObjectObjects1.length = 0;
@@ -3112,7 +3111,7 @@ return;
 }
 
 gdjs.evtsExt__PanelSpriteContinuousBar__PanelSpriteContinuousBar.PanelSpriteContinuousBar.prototype.doStepPreEvents = function() {
-  this._onceTriggers.startNewFrame();
+  this._instanceContainer.getOnceTriggers().startNewFrame();
 };
 
 

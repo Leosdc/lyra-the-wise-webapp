@@ -1,32 +1,47 @@
 
-if (typeof gdjs.evtsExt__PanelSpriteButton__IsInGameEdition !== "undefined") {
-  gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks.forEach(callback =>
+if (typeof gdjs.evtsExt__ScrollableViewport__MoveToZero !== "undefined") {
+  gdjs.evtsExt__ScrollableViewport__MoveToZero.registeredGdjsCallbacks.forEach(callback =>
     gdjs._unregisterCallback(callback)
   );
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition = {};
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.idToCallbackMap = new Map();
+gdjs.evtsExt__ScrollableViewport__MoveToZero = {};
+gdjs.evtsExt__ScrollableViewport__MoveToZero.idToCallbackMap = new Map();
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
-"use strict";
-const game = runtimeScene.getGame();
-eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();
-};
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0 = function(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__ScrollableViewport__MoveToZero.eventsList0 = function(runtimeScene, eventsFunctionContext) {
 
 {
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0(runtimeScene, eventsFunctionContext);
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+{isConditionTrue_0 = (eventsFunctionContext.getArgument("Value") > 0);
+}
+if (isConditionTrue_0) {
+{eventsFunctionContext.returnValue = Math.max(0, eventsFunctionContext.getArgument("Value") - eventsFunctionContext.getArgument("Step"));}
+}
+
+}
+
+
+{
+
+
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+{isConditionTrue_0 = (eventsFunctionContext.getArgument("Value") < 0);
+}
+if (isConditionTrue_0) {
+{eventsFunctionContext.returnValue = Math.min(0, eventsFunctionContext.getArgument("Value") + eventsFunctionContext.getArgument("Step"));}
+}
 
 }
 
 
 };
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.func = function(runtimeScene, parentEventsFunctionContext) {
+gdjs.evtsExt__ScrollableViewport__MoveToZero.func = function(runtimeScene, Value, Step, parentEventsFunctionContext) {
 let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
@@ -35,8 +50,8 @@ var eventsFunctionContext = {
 },
   _behaviorNamesMap: {
 },
-  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("PanelSpriteButton"),
-  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("PanelSpriteButton"),
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("ScrollableViewport"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("ScrollableViewport"),
   localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
@@ -78,16 +93,18 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
     return runtimeScene.getLayer(layerName);
   },
   getArgument: function(argName) {
+if (argName === "Value") return Value;
+if (argName === "Step") return Step;
     return "";
   },
   getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__ScrollableViewport__MoveToZero.eventsList0(runtimeScene, eventsFunctionContext);
 
 
-return !!eventsFunctionContext.returnValue;
+return Number(eventsFunctionContext.returnValue) || 0;
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks = [];
+gdjs.evtsExt__ScrollableViewport__MoveToZero.registeredGdjsCallbacks = [];
