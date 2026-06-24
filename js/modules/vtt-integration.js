@@ -4,7 +4,7 @@
  */
 
 import { db } from '../auth.js';
-import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export const VTTIntegration = {
     iframeEl: null,
@@ -206,12 +206,20 @@ export const VTTIntegration = {
                 // Sanitização estrita antes de gravar no Firestore
                 const sanitizedContent = this.sanitizeForFirestore(content || {});
 
+                // Mantém compatibilidade com o painel do mestre
                 await updateDoc(sessionRef, {
                     vttVariables: sanitizedContent,
                     updatedAt: serverTimestamp()
                 });
 
-                console.log(`[Lyra VTT] Variáveis salvas com sucesso para a sessão: ${this.sessionId}`);
+                // Salva na coleção 'vtt' no campo 'Data' para consumo do VTT (GDevelop)
+                const vttRef = doc(db, "vtt", this.sessionId);
+                await setDoc(vttRef, {
+                    Data: sanitizedContent,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                console.log(`[Lyra VTT] Variáveis salvas com sucesso para a sessão: ${this.sessionId} (sessoes e vtt)`);
             } catch (err) {
                 console.error("[Lyra VTT] Falha ao gravar variáveis do GDevelop no Firestore:", err);
             }
