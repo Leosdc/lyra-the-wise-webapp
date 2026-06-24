@@ -126,6 +126,7 @@
 	<script src="gdjs-evtsext__loadimagefromurl__loadurlintoimageresource-func.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__loadimagefromurl__loadurlintosprite-func.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__loadimagefromurl__loadurlintospriteimgsize-func.js" crossorigin="anonymous"></script>
+	<script src="gdjs-evtsext__logbattle__logbutton.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__panelspritebutton__bitmaptextstylestate.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__panelspritebutton__buttonfsm.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__panelspritebutton__isingameedition-func.js" crossorigin="anonymous"></script>
@@ -133,6 +134,10 @@
 	<script src="gdjs-evtsext__panelspritebutton__textstylestate.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__panelspritecontinuousbar__panelspritecontinuousbar.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__panelspritecontinuousbar__resourcebar.js" crossorigin="anonymous"></script>
+	<script src="gdjs-evtsext__scrollableviewport__movetozero-func.js" crossorigin="anonymous"></script>
+	<script src="gdjs-evtsext__spritemasking__mask-func.js" crossorigin="anonymous"></script>
+	<script src="gdjs-evtsext__spritemasking__maskwithshapepainter-func.js" crossorigin="anonymous"></script>
+	<script src="gdjs-evtsext__spritemasking__unmask-func.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__sticker__definehelperclasses-func.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__sticker__isstuck-func.js" crossorigin="anonymous"></script>
 	<script src="gdjs-evtsext__sticker__sticker.js" crossorigin="anonymous"></script>
@@ -204,7 +209,6 @@
     (function() {
         //Initialization
         var game = new gdjs.RuntimeGame(gdjs.projectData, {});
-        window.gdjsGame = game;
 
         //Create a renderer
         game.getRenderer().createStandardCanvas(document.body);

@@ -418,7 +418,7 @@ export const GMPanelModule = {
         const enterVttBtn = document.getElementById('btn-enter-vtt');
         if (enterVttBtn) {
             enterVttBtn.addEventListener('click', () => {
-                window.open('Lyra_VTT/index.html', '_blank');
+                window.open('vtt/app/index.html', '_blank');
             });
         }
 
@@ -1705,8 +1705,7 @@ export const GMPanelModule = {
                 );
 
                 if (withoutSheet.length > 0) {
-                    window.app.showAlert(`Faltam aventureiros escolherem suas fichas (${withoutSheet.length} pendentes).`, "Acesso Negado");
-                    return;
+                    window.app.showAlert(`Aviso: Faltam aventureiros escolherem suas fichas (${withoutSheet.length} pendentes).`, "Preparação pendente");
                 }
 
                 localStorage.setItem('lyra_active_session', sessionId);

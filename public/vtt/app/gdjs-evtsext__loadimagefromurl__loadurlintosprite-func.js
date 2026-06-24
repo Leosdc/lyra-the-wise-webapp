@@ -10,7 +10,7 @@ gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.idToCallbackMap = new Map();
 gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.GDObjectObjects1= [];
 
 
-gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.userFunc0xdd0cc0 = function GDJSInlineCode(runtimeScene, objects, eventsFunctionContext) {
+gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.userFunc0xecbe28 = function GDJSInlineCode(runtimeScene, objects, eventsFunctionContext) {
 "use strict";
 // Armazena o tamanho que o objeto tinha ANTES da troca de textura
 const targetWidth = objects[0].getWidth();
@@ -56,7 +56,7 @@ gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.eventsList0 = function(runtime
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.GDObjectObjects1);
 
 const objects = gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.GDObjectObjects1;
-gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.userFunc0xdd0cc0(runtimeScene, objects, eventsFunctionContext);
+gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.userFunc0xecbe28(runtimeScene, objects, eventsFunctionContext);
 
 }
 

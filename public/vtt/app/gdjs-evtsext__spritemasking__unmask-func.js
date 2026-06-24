@@ -1,42 +1,50 @@
 
-if (typeof gdjs.evtsExt__PanelSpriteButton__IsInGameEdition !== "undefined") {
-  gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks.forEach(callback =>
+if (typeof gdjs.evtsExt__SpriteMasking__Unmask !== "undefined") {
+  gdjs.evtsExt__SpriteMasking__Unmask.registeredGdjsCallbacks.forEach(callback =>
     gdjs._unregisterCallback(callback)
   );
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition = {};
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.idToCallbackMap = new Map();
+gdjs.evtsExt__SpriteMasking__Unmask = {};
+gdjs.evtsExt__SpriteMasking__Unmask.idToCallbackMap = new Map();
+gdjs.evtsExt__SpriteMasking__Unmask.GDMaskedObjects1= [];
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Unmask.userFunc0xe243f0 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
 "use strict";
-const game = runtimeScene.getGame();
-eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();
+const maskedObjects = eventsFunctionContext.getObjects("Masked");
+
+for (const maskedObject of maskedObjects) {
+    const maskedRenderer = maskedObject.getRendererObject(); 
+    maskedRenderer.mask = null;
+}
+
 };
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0 = function(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Unmask.eventsList0 = function(runtimeScene, eventsFunctionContext) {
 
 {
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__SpriteMasking__Unmask.userFunc0xe243f0(runtimeScene, eventsFunctionContext);
 
 }
 
 
 };
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.func = function(runtimeScene, parentEventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Unmask.func = function(runtimeScene, Masked, parentEventsFunctionContext) {
 let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
+"Masked": Masked
 },
   _objectArraysMap: {
+"Masked": gdjs.objectsListsToArray(Masked)
 },
   _behaviorNamesMap: {
 },
-  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("PanelSpriteButton"),
-  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("PanelSpriteButton"),
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("SpriteMasking"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("SpriteMasking"),
   localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
@@ -83,11 +91,13 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
+gdjs.evtsExt__SpriteMasking__Unmask.GDMaskedObjects1.length = 0;
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__SpriteMasking__Unmask.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__SpriteMasking__Unmask.GDMaskedObjects1.length = 0;
 
 
-return !!eventsFunctionContext.returnValue;
+return;
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks = [];
+gdjs.evtsExt__SpriteMasking__Unmask.registeredGdjsCallbacks = [];

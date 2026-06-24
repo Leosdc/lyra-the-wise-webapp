@@ -1,42 +1,57 @@
 
-if (typeof gdjs.evtsExt__PanelSpriteButton__IsInGameEdition !== "undefined") {
-  gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks.forEach(callback =>
+if (typeof gdjs.evtsExt__SpriteMasking__Mask !== "undefined") {
+  gdjs.evtsExt__SpriteMasking__Mask.registeredGdjsCallbacks.forEach(callback =>
     gdjs._unregisterCallback(callback)
   );
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition = {};
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.idToCallbackMap = new Map();
+gdjs.evtsExt__SpriteMasking__Mask = {};
+gdjs.evtsExt__SpriteMasking__Mask.idToCallbackMap = new Map();
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskedObjects1= [];
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskObjects1= [];
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0 = function GDJSInlineCode(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Mask.userFunc0xb8cd00 = function GDJSInlineCode(runtimeScene, objects, eventsFunctionContext) {
 "use strict";
-const game = runtimeScene.getGame();
-eventsFunctionContext.returnValue = game.isInGameEdition && game.isInGameEdition();
+const maskObject = eventsFunctionContext.getObjects("Mask")[0];
+if (!maskObject) return;
+
+const maskedObjects = eventsFunctionContext.getObjects("Masked");
+for (const maskedObject of maskedObjects) {
+    const maskedRenderer = maskedObject.getRendererObject(); 
+    maskedRenderer.mask = maskObject.getRendererObject();
+}
+
+
 };
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0 = function(runtimeScene, eventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Mask.eventsList0 = function(runtimeScene, eventsFunctionContext) {
 
 {
 
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.userFunc0xd006b0(runtimeScene, eventsFunctionContext);
+const objects = [];
+gdjs.evtsExt__SpriteMasking__Mask.userFunc0xb8cd00(runtimeScene, objects, eventsFunctionContext);
 
 }
 
 
 };
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.func = function(runtimeScene, parentEventsFunctionContext) {
+gdjs.evtsExt__SpriteMasking__Mask.func = function(runtimeScene, Masked, Mask, parentEventsFunctionContext) {
 let scopeInstanceContainer = null;
 var eventsFunctionContext = {
   _objectsMap: {
+"Masked": Masked
+, "Mask": Mask
 },
   _objectArraysMap: {
+"Masked": gdjs.objectsListsToArray(Masked)
+, "Mask": gdjs.objectsListsToArray(Mask)
 },
   _behaviorNamesMap: {
 },
-  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("PanelSpriteButton"),
-  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("PanelSpriteButton"),
+  globalVariablesForExtension: runtimeScene.getGame().getVariablesForExtension("SpriteMasking"),
+  sceneVariablesForExtension: runtimeScene.getScene().getVariablesForExtension("SpriteMasking"),
   localVariables: [],
   getObjects: function(objectName) {
     return eventsFunctionContext._objectArraysMap[objectName] || [];
@@ -83,11 +98,15 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskedObjects1.length = 0;
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskObjects1.length = 0;
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__SpriteMasking__Mask.eventsList0(runtimeScene, eventsFunctionContext);
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskedObjects1.length = 0;
+gdjs.evtsExt__SpriteMasking__Mask.GDMaskObjects1.length = 0;
 
 
-return !!eventsFunctionContext.returnValue;
+return;
 }
 
-gdjs.evtsExt__PanelSpriteButton__IsInGameEdition.registeredGdjsCallbacks = [];
+gdjs.evtsExt__SpriteMasking__Mask.registeredGdjsCallbacks = [];

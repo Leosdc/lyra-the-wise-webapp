@@ -9,7 +9,6 @@ gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton = class Pan
     super(parentInstanceContainer, objectData, instanceData);
     this._parentInstanceContainer = parentInstanceContainer;
 
-    this._onceTriggers = new gdjs.OnceTriggers();
     this._objectData = {};
     
     this._objectData.LabelText = objectData.content.LabelText !== undefined ? objectData.content.LabelText : "";
@@ -235,7 +234,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.onCreatedContext.GDObjectObjects1.length = 0;
@@ -414,7 +413,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.onHotReloadingContext.GDObjectObjects1.length = 0;
@@ -567,7 +566,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.Pa
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPostEventsContext.GDObjectObjects2.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(16933012);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(17718068);
 }
 }
 if (isConditionTrue_0) {
@@ -649,7 +648,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.Pa
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPostEventsContext.GDObjectObjects2.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(16939788);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(17725012);
 }
 }
 if (isConditionTrue_0) {
@@ -707,7 +706,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.Pa
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPostEventsContext.GDObjectObjects2.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(16944228);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(17729452);
 }
 }
 if (isConditionTrue_0) {
@@ -762,7 +761,7 @@ for (var i = 0, k = 0, l = gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.Pa
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPostEventsContext.GDObjectObjects1.length = k;
 if (isConditionTrue_0) {
 isConditionTrue_0 = false;
-{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(16947756);
+{isConditionTrue_0 = eventsFunctionContext.getOnceTriggers().triggerOnce(17732980);
 }
 }
 if (isConditionTrue_0) {
@@ -893,7 +892,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPostEventsContext.GDObjectObjects1.length = 0;
@@ -1072,7 +1071,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsIdleContext.GDObjectObjects1.length = 0;
@@ -1227,7 +1226,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsClickedContext.GDObjectObjects1.length = 0;
@@ -1382,7 +1381,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsHoveredContext.GDObjectObjects1.length = 0;
@@ -1537,7 +1536,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsFocusedContext.GDObjectObjects1.length = 0;
@@ -1692,7 +1691,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsPressedContext.GDObjectObjects1.length = 0;
@@ -1846,7 +1845,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.SetLabelTextContext.GDObjectObjects1.length = 0;
@@ -2000,7 +1999,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.SetLabelTextOpContext.GDObjectObjects1.length = 0;
@@ -2147,7 +2146,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.LabelTextContext.GDObjectObjects1.length = 0;
@@ -2318,7 +2317,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "ShouldActivate") return ShouldActivate;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.ActivateContext.GDObjectObjects1.length = 0;
@@ -2473,7 +2472,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.IsActivatedContext.GDObjectObjects1.length = 0;
@@ -2618,7 +2617,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
   getArgument: function(argName) {
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.LabelOffsetContext.GDObjectObjects1.length = 0;
@@ -2774,7 +2773,7 @@ parentEventsFunctionContext.getInstancesCountOnScene(objectName) :
 if (argName === "Value") return Value;
     return "";
   },
-  getOnceTriggers: function() { return that._onceTriggers; }
+  getOnceTriggers: function() { return runtimeScene.getOnceTriggers(); }
 };
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.SetLabelOffsetContext.GDObjectObjects1.length = 0;
@@ -2809,7 +2808,7 @@ return;
 }
 
 gdjs.evtsExt__PanelSpriteButton__PanelSpriteButton.PanelSpriteButton.prototype.doStepPreEvents = function() {
-  this._onceTriggers.startNewFrame();
+  this._instanceContainer.getOnceTriggers().startNewFrame();
 };
 
 
