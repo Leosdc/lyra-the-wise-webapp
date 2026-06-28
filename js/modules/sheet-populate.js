@@ -613,6 +613,39 @@ export function createPopulateMixin(ctx) {
                             };
                         });
 
+                        // Bind dot clicks for each background row
+                        const bgDots = magicTab.querySelectorAll('.vamp-sheet-background-dot');
+                        bgDots.forEach(dot => {
+                            dot.onclick = (e) => {
+                                if (context.isInspection) return;
+                                const bgId = dot.dataset.background;
+                                const clickedVal = parseInt(dot.dataset.value);
+                                const levelInput = document.getElementById(`sheet-background-${bgId}`);
+                                if (!levelInput) return;
+
+                                let currentVal = parseInt(levelInput.value) || 0;
+                                let newVal = clickedVal;
+                                if (currentVal === clickedVal) {
+                                    newVal = 0;
+                                }
+                                levelInput.value = newVal;
+
+                                // Update visual dots
+                                const rowDots = dot.parentElement.querySelectorAll('.vamp-sheet-background-dot');
+                                rowDots.forEach(d => {
+                                    const val = parseInt(d.dataset.value);
+                                    if (val <= newVal) {
+                                        d.className = "fa-solid fa-circle active vamp-dot vamp-sheet-background-dot";
+                                    } else {
+                                        d.className = "fa-regular fa-circle vamp-dot vamp-sheet-background-dot";
+                                    }
+                                });
+
+                                // Dispatch change/input event
+                                levelInput.dispatchEvent(new Event('input'));
+                            };
+                        });
+
                         // Bind delete button clicks
                         const deleteBtns = magicTab.querySelectorAll('.delete-discipline-btn');
                         deleteBtns.forEach(btn => {

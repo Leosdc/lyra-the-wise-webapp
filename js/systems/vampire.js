@@ -524,6 +524,58 @@ export const VampirePlugin = {
             });
         }
 
+        // Backgrounds (Antecedentes)
+        const BACKGROUNDS = [
+            { id: 'aliados', name: 'Aliados', desc: 'Confederações de mortais (amigos, família) que ajudam o personagem de boa vontade.' },
+            { id: 'identidade_alternativa', name: 'Identidade Alternativa', desc: 'Uma identidade falsa estabelecida no mundo mortal, completa com documentação oficial.' },
+            { id: 'mao_negra', name: 'Mão Negra', desc: 'O número de membros da Mão Negra que o personagem pode convocar ou sua influência na seita.' },
+            { id: 'contatos', name: 'Contatos', desc: 'Fontes de informação, informantes e "olhos nas ruas" que o personagem possui.' },
+            { id: 'dominio', name: 'Domínio', desc: 'Áreas de caça, alimentação e residência reconhecidas e respeitadas pela sociedade vampírica local.' },
+            { id: 'fama', name: 'Fama', desc: 'Quão conhecido, célebre e reconhecido o personagem é no mundo dos mortais (celebridades, políticos).' },
+            { id: 'geracao', name: 'Geração', desc: 'Define a pureza do sangue do vampiro.' },
+            { id: 'rebanho', name: 'Rebanho', desc: 'Mortais aos quais o vampiro tem acesso livre, seguro e regular para se alimentar sem causar alarde.' },
+            { id: 'influencia', name: 'Influência', desc: 'O poder político, burocrático ou social que o personagem exerce ativamente dentro da sociedade mortal.' },
+            { id: 'mentor', name: 'Mentor', desc: 'Um vampiro mais velho e experiente que aconselha, protege e apoia o personagem na sociedade cainita.' },
+            { id: 'recursos', name: 'Recursos', desc: 'Dinheiro líquido, investimentos, bens, propriedades e a renda mensal estável do personagem.' },
+            { id: 'lacaios', name: 'Aliados de Sangue (Lacaios)', desc: 'Seguidores totalmente leais, guarda-costas ou servos.' },
+            { id: 'rituais', name: 'Rituais', desc: 'Quantos rituais místicos (ritae) o Cainita conhece, sabe guiar e executar.' },
+            { id: 'status', name: 'Status', desc: 'A posição social, reputação, respeito e prestígio do personagem na sociedade dos vampiros de sua seita.' }
+        ];
+
+        const bgsData = char.backgrounds || {};
+        let filteredBgs = BACKGROUNDS;
+        if (isInspection) {
+            // No modo de inspeção (ficha de visualização estática), mostramos apenas os antecedentes com valor > 0
+            filteredBgs = BACKGROUNDS.filter(bg => (parseInt(bgsData[bg.id]) || 0) > 0);
+        }
+
+        let bgsHtml = "";
+        if (filteredBgs.length === 0) {
+            bgsHtml = `<p class="empty-hint" style="grid-column: 1/-1; text-align: center; opacity: 0.6; font-style: italic;">Nenhum antecedente adquirido.</p>`;
+        } else {
+            filteredBgs.forEach(bg => {
+                const currentVal = parseInt(bgsData[bg.id]) || 0;
+
+                // Generate dots (1 to 5)
+                let dotsHtml = "";
+                for (let dotVal = 1; dotVal <= 5; dotVal++) {
+                    const isActive = dotVal <= currentVal;
+                    const iconClass = isActive ? "fa-solid fa-circle active" : "fa-regular fa-circle";
+                    dotsHtml += `<i class="${iconClass} vamp-dot vamp-sheet-background-dot" data-value="${dotVal}" data-background="${bg.id}" style="cursor: ${isInspection ? 'default' : 'pointer'};"></i>`;
+                }
+
+                bgsHtml += `
+                    <div class="vamp-attr-row" title="${escapeHTML(bg.desc)}" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.3); padding: 0.8rem 1.2rem; border-radius: 6px; border: 1px solid rgba(44, 30, 22, 0.08);">
+                        <span class="vamp-attr-name font-medieval" style="font-size: 1.1rem; color: var(--ink);">${bg.name}</span>
+                        <div class="vamp-dots-container" style="display: flex; gap: 6px;">
+                            ${dotsHtml}
+                        </div>
+                        <input type="hidden" id="sheet-background-${bg.id}" data-field="backgrounds.${bg.id}" value="${currentVal}">
+                    </div>
+                `;
+            });
+        }
+
         return `
             <div class="vampire-disciplines-tab" style="padding: 1rem 0;">
                 <h4 class="section-title font-medieval" style="font-size: 1.4rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
@@ -542,6 +594,17 @@ export const VampirePlugin = {
                     </button>
                 </div>
                 ` : ''}
+            </div>
+
+            <div class="vampire-backgrounds-tab" style="padding: 1rem 0; margin-top: 2rem; border-top: 1px dashed rgba(44, 30, 22, 0.15);">
+                <h4 class="section-title font-medieval" style="font-size: 1.4rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gold); padding-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Antecedentes</span>
+                    <span style="font-size: 0.9rem; font-family: var(--font-body); font-weight: normal; color: #666;">(Cada bolinha representa 1 nível)</span>
+                </h4>
+                
+                <div id="backgrounds-body" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                    ${bgsHtml}
+                </div>
             </div>
         `;
     }
