@@ -79,7 +79,8 @@ app.use(helmet({
                 "https://google-analytics.com",
                 "https://ko-fi.com", // Ko-fi connection for widgets
                 "https://apis.google.com", // Google Sign-In API calls
-                "https://www.google.com" // reCAPTCHA verification
+                "https://www.google.com", // reCAPTCHA verification
+                "https://*.gdevelop-app.com" // Telemetria/Analytics do GDevelop VTT
             ],
             "style-src": [
                 "'self'",
