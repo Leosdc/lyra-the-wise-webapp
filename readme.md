@@ -1,4 +1,4 @@
-# 🔮 Lyra the Wise WebApp — Taverna Digital de RPG
+# 🔮 Lyra the Wise WebApp — Taverna Digital de RPG (Dev Mode) 🛠️
 
 <p align="center">
   <img src="./public/assets/tokens/lyra.png" width="240" alt="Lyra the Wise">
@@ -12,29 +12,68 @@
 
 <p align="center">
   🧙 <strong>Taverna Digital de RPG</strong> • 🔮 <strong>Oráculo Arcano</strong> • 📜 <strong>Pergaminhos Automáticos</strong><br>
-  🚀 <strong>Versão Alfa 3.6.0 (Arquitetura Unificada e Ritos de Auditoria)</strong><br>
+  🚀 <strong>Branch `dev` • Modo de Desenvolvimento (Dev Mode)</strong><br>
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Branch-dev-orange?style=for-the-badge&logo=git&logoColor=white" />
+  <img src="https://img.shields.io/badge/Modo-Dev%20Mode-purple?style=for-the-badge&logo=powershell" />
+  <img src="https://img.shields.io/badge/VTT%20Build-v0.0.7D2-blueviolet?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Ciclo-Alfa%203.6.0-gold?style=for-the-badge&logo=none" />
-  <img src="https://img.shields.io/badge/Magia-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
-  <img src="https://img.shields.io/badge/Estilo-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
-  <img src="https://img.shields.io/badge/Lógica-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/Memória-Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Memória-Firebase%20Emulators-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
   <img src="https://img.shields.io/badge/Oráculo-Gemini%202.5-blue?style=for-the-badge&logo=google&logoColor=white" />
 </p>
 
 ---
 
-## 📖 Sobre o Projeto
+## 📖 Sobre o Projeto (`dev` branch)
 
 **Lyra the Wise** é uma plataforma imersiva e inteligente que transforma o navegador em uma verdadeira mesa de RPG lendária. O ecossistema é projetado com foco em alta flexibilidade (arquitetura modular multi-sistemas), cálculos automatizados precisos e IA de ponta para auxiliar narradores e jogadores a forjarem crônicas, NPCs, monstros e itens instantaneamente.
+
+> [!NOTE]
+> Você está visualizando a branch **`dev`** (Dev Mode). Esta branch contém as funcionalidades ativas de desenvolvimento, integração recente do motor VTT (`VTT_Lyra-0.0.7D2`) e suporte completo a testes com o Firebase Local Emulator Suite.
+
+---
+
+## ⚡ Guia Rápido — Modo de Desenvolvimento (Dev Mode)
+
+Para rodar a aplicação localmente no ambiente de desenvolvimento:
+
+### 1. Pré-requisitos
+- **Node.js**: v18+ e `npm` instalado.
+- **Firebase CLI**: `npm install -g firebase-tools` (opcional, para rodar os emuladores).
+
+### 2. Configuração de Ambiente
+Crie um arquivo `.env.development` baseado no `.env.example`:
+```bash
+cp .env.example .env.development
+```
+
+### 3. Iniciar Servidor de Desenvolvimento
+```bash
+npm run dev
+```
+Acesse a aplicação em `http://localhost:5173` ou na porta configurada pelo Vite.
+
+### 4. Executar Firebase Emulators (Opcional)
+```bash
+firebase emulators:start
+```
+As portas configuradas dos emuladores são:
+- **Auth**: `9099`
+- **Firestore**: `8080`
+- **Storage**: `9199`
+- **UI Dashboard**: `http://localhost:4000`
+
+### 5. Ferramentas de Diagnóstico e Auditoria em Dev
+- 🔍 `http://localhost:5173/diagnose.html`: Diagnóstico de integridade dos motores de RPG (Plugins D&D 5e e Vampire V5).
+- 📊 `http://localhost:5173/audit.html`: Painel de auditoria de dados e sanidade de coleções do Firestore.
 
 ---
 
 ## 🛠️ Arquitetura do Sistema
 
-O portal do Lyra utiliza uma arquitetura baseada em plugins isolados para dar suporte a múltiplos motores de jogo.
+O portal do Lyra utiliza uma arquitetura baseada em plugins isolados para dar suporte a múltiplos motores de jogo e integração com o motor VTT (GDevelop).
 
 ```mermaid
 graph TD
@@ -42,6 +81,9 @@ graph TD
     B --> C[Módulos da Ficha: js/sheet.js]
     B --> D[Criador Assistido: js/modules/wizard.js]
     B --> E[Validador Arcano: js/modules/diagnose.js]
+    B --> V[VTT Integration: js/modules/vtt-integration.js]
+    
+    V --> VTT[Motor GDevelop: public/vtt/app]
     
     D --> F[AI Oracle: js/ai.js]
     F --> G[Prompts Estáticos: js/prompts.js]
@@ -84,6 +126,7 @@ Lyra the Wise WebApp/
 │   │   ├── monsters.js         # Bestiário e invocação de monstros
 │   │   ├── oracle.js           # Oráculo de IA integrado à narrativa
 │   │   ├── spells.js           # Grimório e bibliotecas de feitiços
+│   │   ├── vtt-integration.js  # Integração e comunicação com motor GDevelop VTT
 │   │   └── wizard.js           # Fluxo assistido de criação de fichas e campanhas
 │   ├── systems/                # Motores de RPG (Plugins arcanos)
 │   │   ├── dnd5e.js            # Motor de regras Dungeons & Dragons 5ª Edição
@@ -97,6 +140,7 @@ Lyra the Wise WebApp/
 │   └── prompts.js              # Estruturas e schemas JSON de prompts de IA
 ├── public/                     # Recursos estáticos servidos diretamente
 │   ├── assets/                 # Mídias, portraits, mapas e tokens
+│   ├── vtt/                    # Motor GDevelop VTT (Build v0.0.7D2)
 │   └── index.html              # HTML estático de fallback
 ├── .env.example                # Molde de configuração de ambiente local
 ├── apphosting.yaml             # Configuração para Firebase App Hosting
@@ -122,12 +166,13 @@ Para estender a magia do portal a todos os dispositivos móveis, o futuro aplica
 
 ---
 
-## 🗺️ **Roadmap Futuro**
+## 🗺️ **Roadmap Futuro (Dev Branch)**
 
-As brumas escondem novos horizontes que em breve serão desbravados:
+As brumas escondem novos horizons que em breve serão desbravados:
 
-1.  **Sistema de Amigos:** Adicionar laços entre aventureiros no portal, permitindo buscar e gerenciar listas de amigos no multiverso.
-2.  **Grupos de Chat:** Criação de salas e chats integrados para que grupos de jogadores e mestres possam planejar suas jornadas e rolar dados juntos em tempo real.
+1.  **VTT 0.0.7D2 Synchronization**: Ajustes finais na comunicação bidirecional via Firestore entre o painel do mestre e o motor GDevelop VTT.
+2.  **Sistema de Amigos**: Adicionar laços entre aventureiros no portal, permitindo buscar e gerenciar listas de amigos no multiverso.
+3.  **Grupos de Chat**: Criação de salas e chats integrados para que grupos de jogadores e mestres possam planejar suas jornadas e rolar dados juntos em tempo real.
 
 ---
 

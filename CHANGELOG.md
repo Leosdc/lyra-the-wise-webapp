@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ---
 
+## [Unreleased / Dev] - 2026-07-22
+
+### Adicionado
+- **Atualização do VTT Lyra (v0.0.7D2)** — Integração da nova build exportada do motor GDevelop VTT em `public/vtt/app/` com suporte a novas máscaras de sprites, botões e extensões de sistema.
+- **Documentação de Dev Mode** — Atualização completa do `README.md` na branch `dev` com guia rápido para execução em ambiente de desenvolvimento, Firebase Local Emulator Suite e ferramentas de auditoria/diagnóstico.
+
+### Alterado / Manutenção
+- **Limpeza de Arquivos de Sistema** — Exclusão recursiva de arquivos `desktop.ini` do Windows em todo o repositório e consolidação das regras de bloqueio no `.gitignore`.
+- **Sincronização da Branch `dev`** — Rebase e alinhamento do repositório local e remoto (`origin/dev`).
+
+---
+
 ## [3.6.0] - 2026-05-26
 
 ### Adicionado
