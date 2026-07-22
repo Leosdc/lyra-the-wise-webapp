@@ -857,6 +857,9 @@ export const GMPanelModule = {
             modal.classList.remove('hidden');
             iframe.src = '/vtt/app/index.html';
             
+            // Renderiza imediatamente a barra lateral de controles (Upload do Mapa, Tamanho da Grade, etc)
+            this.renderVTTControlPanel([]);
+            
             // Inicializa a integração
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
                 // Passa o ID da sessão ativa para a integração
