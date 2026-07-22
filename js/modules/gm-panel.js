@@ -310,7 +310,51 @@ export const GMPanelModule = {
                         </div>
                         <!-- Painel Lateral de Controle VTT -->
                         <aside id="gm-vtt-control-sidebar" style="flex: 1; min-width: 280px; max-width: 360px; background: rgba(12, 6, 3, 0.95); border: 1px solid var(--gold); border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);">
-                            <!-- Conteúdo injetado dinamicamente via JavaScript -->
+                            <!-- Seção de Configuração do Tabuleiro/Mapa de Fundo -->
+                            <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 14px; display: flex; flex-direction: column; gap: 8px;">
+                                <div class="medieval-subtitle" style="margin: 0 0 4px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-map"></i> Cenário da Grade
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <label class="medieval-btn small gold-pulse" style="display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin: 0; padding: 6px 12px; font-size: 0.8rem; width: 100%;">
+                                        <i class="fas fa-cloud-arrow-up"></i> Upload do Mapa
+                                        <input type="file" id="vtt-map-upload-input" accept="image/*" style="display: none;">
+                                    </label>
+                                    <div style="font-size: 0.65rem; color: rgba(212, 175, 55, 0.5); text-align: center;">
+                                        * Recomendado imagens de até 500KB
+                                    </div>
+                                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+                                        <input type="number" id="vtt-grid-size-input" class="medieval-input small" value="50" min="20" max="200" style="width: 65px; text-align: center; font-size: 0.8rem; padding: 3px 6px; margin: 0;" title="Tamanho da Grade (px)">
+                                        <button class="medieval-btn small secondary" id="vtt-apply-grid-btn" style="flex: 1; padding: 4px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;">
+                                            <i class="fas fa-arrows-alt"></i> Redimensionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção de Invocação de Ameaça/NPC -->
+                            <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 14px; display: flex; flex-direction: column; gap: 8px;">
+                                <div class="medieval-subtitle" style="margin: 0 0 4px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-dragon"></i> Invocador de Ameaça / NPC
+                                </div>
+                                <label class="medieval-btn small secondary" style="display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin: 0; padding: 6px 12px; font-size: 0.8rem; width: 100%;">
+                                    <i class="fas fa-mask"></i> Upload Token de NPC
+                                    <input type="file" id="vtt-npc-upload-input" accept="image/*" style="display: none;">
+                                </label>
+                            </div>
+
+                            <!-- Seção de Aventureiros -->
+                            <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                                <div class="medieval-subtitle" style="margin: 0 0 10px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-shield-halved"></i> Convocação de Heróis
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; padding-right: 2px;" id="vtt-players-list-container">
+                                    <div style="color: rgba(212, 175, 55, 0.6); text-align: center; font-size: 0.85rem; padding: 20px 0; border: 1px dashed rgba(212, 175, 55, 0.2); border-radius: 4px; background: rgba(0,0,0,0.3);">
+                                        <i class="fas fa-ghost" style="font-size: 1.6rem; display: block; margin-bottom: 8px; color: rgba(212, 175, 55, 0.4);"></i>
+                                        Nenhum viajante participante nesta sessão.
+                                    </div>
+                                </div>
+                            </div>
                         </aside>
                     </div>
                 </div>
@@ -1092,6 +1136,34 @@ export const GMPanelModule = {
                 } finally {
                     window.app.toggleLoading(false);
                 }
+            });
+        }
+
+        const npcFileInput = document.getElementById('vtt-npc-upload-input');
+        if (npcFileInput) {
+            npcFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 2 * 1024 * 1024) {
+                    window.app.showAlert("O arquivo selecionado excede 2MB.", "Aviso de Limite");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const base64Url = event.target.result;
+                    const npcName = file.name.replace(/\.[^/.]+$/, "");
+                    import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                        VTTIntegration.loadNPCs([{
+                            name: npcName,
+                            tokenUrl: base64Url,
+                            position: { x: 5, y: 5 }
+                        }]);
+                    });
+                    window.app.showAlert(`Token de "${npcName}" invocado no mapa!`, "Invocação");
+                };
+                reader.readAsDataURL(file);
             });
         }
     },
