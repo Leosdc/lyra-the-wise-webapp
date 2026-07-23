@@ -1069,43 +1069,34 @@ export const GMPanelModule = {
         const applyGridBtn = document.getElementById('vtt-apply-grid-btn');
 
         if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
+            fileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                if (file.size > 2 * 1024 * 1024) {
-                    window.app.showAlert("O arquivo selecionado excede 2MB. Selecione um mapa mais leve para garantir o carregamento em tempo real nos navegadores dos jogadores.", "Aviso de Limite");
-                    return;
-                }
-
-                window.app.toggleLoading(true, "Tecendo o novo cenário nas parcas...");
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    const base64Url = event.target.result;
+                window.app.toggleLoading(true, "Tecendo o novo cenário de combate...");
+                try {
+                    const base64Url = await this.compressImage(file, 1200, 1200, 0.75);
                     const cellSize = parseInt(gridInput?.value || "50");
 
-                    try {
-                        // 1. Salva no Firestore
-                        await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
-                            mapUrl: base64Url,
-                            cellSize: cellSize,
-                            updatedAt: serverTimestamp()
-                        });
+                    // 1. Salva no Firestore
+                    await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                        mapUrl: base64Url,
+                        cellSize: cellSize,
+                        updatedAt: serverTimestamp()
+                    });
 
-                        // 2. Propaga imediatamente no VTT
-                        import('./vtt-integration.js').then(({ VTTIntegration }) => {
-                            VTTIntegration.loadMap(base64Url, cellSize);
-                        });
+                    // 2. Propaga imediatamente no VTT
+                    import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                        VTTIntegration.loadMap(base64Url, cellSize);
+                    });
 
-                        window.app.showAlert("O novo cenário de combate foi manifestado com sucesso!", "Saga Atualizada");
-                    } catch (err) {
-                        console.error("[Lyra VTT] Erro ao salvar mapa local no Firestore:", err);
-                        window.app.showAlert("Falha ao registrar novo tabuleiro no éter.");
-                    } finally {
-                        window.app.toggleLoading(false);
-                    }
-                };
-                reader.readAsDataURL(file);
+                    window.app.showAlert("O novo cenário de combate foi otimizado e manifestado com sucesso!", "Saga Atualizada");
+                } catch (err) {
+                    console.error("[Lyra VTT] Erro ao salvar mapa local no Firestore:", err);
+                    window.app.showAlert("Falha ao registrar novo tabuleiro no éter.");
+                } finally {
+                    window.app.toggleLoading(false);
+                }
             });
         }
 
@@ -1141,18 +1132,13 @@ export const GMPanelModule = {
 
         const npcFileInput = document.getElementById('vtt-npc-upload-input');
         if (npcFileInput) {
-            npcFileInput.addEventListener('change', (e) => {
+            npcFileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                if (file.size > 2 * 1024 * 1024) {
-                    window.app.showAlert("O arquivo selecionado excede 2MB.", "Aviso de Limite");
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const base64Url = event.target.result;
+                window.app.toggleLoading(true, "Otimizando token da ameaça...");
+                try {
+                    const base64Url = await this.compressImage(file, 400, 400, 0.8);
                     const npcName = file.name.replace(/\.[^/.]+$/, "");
                     import('./vtt-integration.js').then(({ VTTIntegration }) => {
                         VTTIntegration.loadNPCs([{
@@ -1162,10 +1148,50 @@ export const GMPanelModule = {
                         }]);
                     });
                     window.app.showAlert(`Token de "${npcName}" invocado no mapa!`, "Invocação");
-                };
-                reader.readAsDataURL(file);
+                } catch (err) {
+                    console.error("[Lyra VTT] Erro ao otimizar token de NPC:", err);
+                    window.app.showAlert("Falha ao invocar token da ameaça.");
+                } finally {
+                    window.app.toggleLoading(false);
+                }
             });
         }
+    },
+
+    compressImage(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        if (width > height) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        } else {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(dataUrl);
+                };
+                img.onerror = reject;
+                img.src = event.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     },
 
     spawnPlayerToken(characterId) {
