@@ -15,12 +15,14 @@ export const VTTIntegration = {
     _messageListener: null,
     _lastRemoteTime: 0,
     _lastLocalTime: 0,
+    _isDestroyed: false,
 
     /**
      * Inicializa a integração e vincula o elemento do iframe
      */
     init(iframeElement, sessionId = null, options = {}) {
         if (!iframeElement) return;
+        this._isDestroyed = false;
         this.iframeEl = iframeElement;
         this.gameInstance = null;
         this.sessionId = sessionId;
@@ -109,10 +111,15 @@ export const VTTIntegration = {
      * Aguarda o GDevelop e a cena ativa estarem prontos antes de injetar comandos
      */
     waitForGame(callback) {
-        if (!this.iframeEl) return;
+        if (!this.iframeEl || this._isDestroyed) return;
+
+        let attempts = 0;
+        const maxAttempts = 150; // ~22.5s limite seguro
 
         const check = () => {
-            if (!this.iframeEl) return;
+            if (this._isDestroyed || !this.iframeEl) return;
+            attempts++;
+
             try {
                 const game = this.iframeEl.contentWindow?.gdjsGame;
                 const scene = game?.getSceneStack()?.getCurrentScene();
@@ -139,7 +146,10 @@ export const VTTIntegration = {
             } catch (err) {
                 // Cross-origin ou carregamento em andamento
             }
-            setTimeout(check, 150);
+
+            if (attempts < maxAttempts && !this._isDestroyed) {
+                setTimeout(check, 150);
+            }
         };
         check();
     },
@@ -212,15 +222,17 @@ export const VTTIntegration = {
      * Envia o mapa (URL, tamanho da grade e dimensões) para o VTT
      */
     loadMap(urlMap, cellSize = 64, customSize = { on: "true", x: "1280", y: "720" }) {
+        let safeUrl = (typeof urlMap === 'string' && urlMap.trim()) ? urlMap.trim() : "/assets/maps/default.jpg";
+        
         const payload = {
             type: "LoadMap",
             content: {
-                urlMap: urlMap,
+                urlMap: safeUrl,
                 CellSize: Number(cellSize) || 64,
                 CustonSize: {
-                    on: String(customSize.on || "true"),
-                    x: String(customSize.x || "1280"),
-                    y: String(customSize.y || "720")
+                    on: String(customSize?.on || "true"),
+                    x: String(customSize?.x || "1280"),
+                    y: String(customSize?.y || "720")
                 }
             }
         };
@@ -274,6 +286,7 @@ export const VTTIntegration = {
      * Limpa o estado da integração
      */
     destroy() {
+        this._isDestroyed = true;
         if (this.sessionUnsubscribe) {
             this.sessionUnsubscribe();
             this.sessionUnsubscribe = null;

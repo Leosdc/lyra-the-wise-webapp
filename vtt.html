@@ -327,7 +327,14 @@
                         ? sessionData.fullTimeline[chapterIdx] 
                         : null;
                     
-                    const mapUrl = chapterData?.mapUrl || sessionData.mapUrl || "/assets/maps/default.jpg";
+                    let mapUrl = (chapterData?.mapUrl && chapterData.mapUrl.trim()) 
+                        || (sessionData.mapUrl && sessionData.mapUrl.trim()) 
+                        || "/assets/maps/default.jpg";
+
+                    if (!mapUrl || !mapUrl.trim()) {
+                        mapUrl = "/assets/maps/default.jpg";
+                    }
+
                     const cellSize = Number(chapterData?.cellSize || sessionData.cellSize || 64);
 
                     if (chapterData?.title) {

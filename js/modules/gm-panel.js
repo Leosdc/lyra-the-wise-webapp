@@ -1424,9 +1424,11 @@ export const GMPanelModule = {
             // 6. Atualiza miniatura na barra lateral do painel do mestre
             this.updateSidebarMapPreview(base64Url);
 
-            // 7. Se o modal do VTT estiver aberto, propaga imediatamente para a cena
+            // 7. Se o VTT estiver aberto na mesma janela, propaga imediatamente para a cena
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
-                VTTIntegration.loadMap(base64Url, cellSize);
+                if (VTTIntegration && VTTIntegration.iframeEl) {
+                    VTTIntegration.loadMap(base64Url, cellSize);
+                }
             });
 
             this.closeMapLinkModal();
