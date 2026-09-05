@@ -343,7 +343,7 @@
                         || (sessionData.mapUrl && sessionData.mapUrl.trim()) 
                         || VTT_CONSTANTS.DEFAULT_MAP_PATH;
 
-                    if (!mapUrl || !mapUrl.trim()) {
+                    if (!mapUrl || !mapUrl.trim() || mapUrl.startsWith('data:') || mapUrl.length > 2048) {
                         mapUrl = VTT_CONSTANTS.DEFAULT_MAP_PATH;
                     }
 

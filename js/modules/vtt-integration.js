@@ -42,7 +42,11 @@ export const VTT_CONSTANTS = Object.freeze({
  * @returns {string} URL absoluta iniciada por http/https
  */
 export function resolveAbsoluteAssetUrl(pathOrUrl, fallbackPath = VTT_CONSTANTS.DEFAULT_TOKEN_PATH) {
-    const raw = (typeof pathOrUrl === 'string' && pathOrUrl.trim()) ? pathOrUrl.trim() : fallbackPath;
+    let raw = (typeof pathOrUrl === 'string' && pathOrUrl.trim()) ? pathOrUrl.trim() : fallbackPath;
+    if (raw.startsWith('data:') || raw.length > 2048) {
+        console.warn("[Lyra VTT] URL de asset inválida ou em Base64 descartada. Aplicando fallback seguro:", fallbackPath);
+        raw = fallbackPath;
+    }
     if (raw.startsWith('http://') || raw.startsWith('https://')) {
         return raw;
     }
