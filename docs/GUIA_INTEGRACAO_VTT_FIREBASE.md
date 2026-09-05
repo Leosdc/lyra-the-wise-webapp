@@ -49,7 +49,11 @@ Cada documento representa a ficha completa do aventureiro. Quando o VTT recebe u
   "stats": {
     "ac": 13,
     "hp": 24,
-    "speed": 9
+    "hp_current": 24,
+    "hp_max": 24,
+    "speed": 9,
+    "initiative": "+2",
+    "hit_dice_current": "1d8"
   },
 
   "attributes": {
@@ -256,7 +260,28 @@ service cloud.firestore {
 
 ---
 
-## 5. Como Testar e Validar Diretamente no GDevelop
+## 5. Regras do Firebase Storage (`storage.rules`)
+
+Anteriormente, alguns cenários eram salvos temporariamente como strings Base64 no banco de dados, o que causava estouro de payload (erro `413`) e bloqueios no PixiJS.  
+Agora, todos os mapas e tokens são armazenados diretamente no bucket do **Firebase Storage**, gerando URLs HTTPS públicas persistentes (`https://firebasestorage.googleapis.com/...`).
+
+As regras em `storage.rules` liberam a leitura para o runtime do VTT e protegem a escrita via autenticação:
+
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+
+---
+
+## 6. Como Testar e Validar Diretamente no GDevelop
 
 1. **Testar Busca da Ficha:**
    - No GDevelop, crie uma ação `FirebaseTools::GetDocument("fichas", "zZGB25awR8g6NlmBKwRH", VariavelCena, VariavelErro)`.

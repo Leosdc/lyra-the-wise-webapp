@@ -1400,8 +1400,22 @@ export const GMPanelModule = {
             const user = getAuth().currentUser;
             if (!user) throw new Error("Usuário não autenticado.");
 
-            // 1. Otimiza a imagem em Base64 através do Canvas
-            const base64Url = await this.compressImage(this._pendingMapFile, 1280, 1280, 0.8);
+            // 1. Envio do mapa para o Firebase Storage (produzindo URL HTTPS nativa compatível com PixiJS/GDevelop)
+            let uploadedMapUrl = null;
+            try {
+                const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
+                const cleanName = this._pendingMapFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const storagePath = `maps/${user.uid}/${Date.now()}_${cleanName}`;
+                const storageRef = ref(storage, storagePath);
+                
+                const snapshot = await uploadBytes(storageRef, this._pendingMapFile);
+                uploadedMapUrl = await getDownloadURL(snapshot.ref);
+                console.log("[Lyra VTT] Cenário salvo com sucesso no Firebase Storage:", uploadedMapUrl);
+            } catch (storageErr) {
+                console.warn("[Lyra VTT] Falha ao enviar para o Firebase Storage, usando fallback otimizado:", storageErr);
+            }
+
+            const mapUrlToSave = uploadedMapUrl || await this.compressImage(this._pendingMapFile, 1280, 1280, 0.8);
             const cellSize = Number(this.activeSession?.cellSize) || 64;
 
             // Extrai IDs selecionados
@@ -1418,11 +1432,12 @@ export const GMPanelModule = {
                 }
             });
 
-            // 2. Salva no Firestore como IMAGEM na coleção 'images'
+            // 2. Salva metadados da imagem no Firestore
             const { collection, addDoc, serverTimestamp, updateDoc, doc } = await import("firebase/firestore");
             const imageDoc = await addDoc(collection(db, "images"), {
                 name: this._pendingMapFile.name,
-                imageData: base64Url,
+                url: mapUrlToSave,
+                storagePath: uploadedMapUrl ? true : false,
                 type: this._pendingMapFile.type || "image/jpeg",
                 userId: user.uid,
                 systemId: this.activeSession?.system || "dnd5e",
@@ -1433,11 +1448,11 @@ export const GMPanelModule = {
 
             console.log(`[Lyra VTT] Imagem salva na coleção 'images' com ID: ${imageDoc.id}`);
 
-            // 3. Salva o link da imagem nos dados de cada sessão selecionada
+            // 3. Salva a URL nos dados de cada sessão selecionada
             for (const sessId of selectedSessionIds) {
                 try {
                     await updateDoc(doc(db, COLLECTIONS.SESSIONS, sessId), {
-                        mapUrl: base64Url,
+                        mapUrl: mapUrlToSave,
                         mapImageId: imageDoc.id,
                         cellSize: cellSize,
                         updatedAt: serverTimestamp()
@@ -1452,7 +1467,7 @@ export const GMPanelModule = {
                 const updatedTimeline = [...this.activeSession.fullTimeline];
                 selectedChapterIndices.forEach(idx => {
                     if (updatedTimeline[idx]) {
-                        updatedTimeline[idx].mapUrl = base64Url;
+                        updatedTimeline[idx].mapUrl = mapUrlToSave;
                         updatedTimeline[idx].mapImageId = imageDoc.id;
                     }
                 });
@@ -1465,22 +1480,22 @@ export const GMPanelModule = {
 
             // 5. Atualiza estado da sessão ativa na memória
             if (this.activeSession) {
-                this.activeSession.mapUrl = base64Url;
+                this.activeSession.mapUrl = mapUrlToSave;
                 this.activeSession.mapImageId = imageDoc.id;
             }
 
             // 6. Atualiza miniatura na barra lateral do painel do mestre
-            this.updateSidebarMapPreview(base64Url);
+            this.updateSidebarMapPreview(mapUrlToSave);
 
             // 7. Se o VTT estiver aberto na mesma janela, propaga imediatamente para a cena
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
                 if (VTTIntegration && VTTIntegration.iframeEl) {
-                    VTTIntegration.loadMap(base64Url, cellSize);
+                    VTTIntegration.loadMap(mapUrlToSave, cellSize);
                 }
             });
 
             this.closeMapLinkModal();
-            window.app.showAlert("O cenário foi salvo como IMAGEM no Firestore e vinculado com sucesso às sessões selecionadas!", "Mapa Vinculado");
+            window.app.showAlert("O cenário foi salvo com sucesso e vinculado às sessões selecionadas!", "Mapa Vinculado");
 
         } catch (err) {
             console.error("[Lyra VTT] Erro ao salvar imagem e vincular:", err);

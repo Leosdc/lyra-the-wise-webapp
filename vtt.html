@@ -356,17 +356,18 @@
                     VTTIntegration.loadMap(mapUrl, cellSize);
 
                     // 4. Carrega os aventureiros vinculados à sessão
+                    let playersList = [];
                     try {
                         const q = query(collection(db, "session_invites"), where("sessionId", "==", sessionId));
                         const invitesSnap = await getDocs(q);
-                        const playersList = [];
 
                         invitesSnap.forEach(docSnap => {
                             const p = docSnap.data();
                             if (p.characterId) {
                                 playersList.push({
                                     fichaId: p.characterId,
-                                    characterName: p.characterName || p.nickname || "Aventureiro"
+                                    characterName: p.characterName || p.nickname || "Aventureiro",
+                                    userId: p.userId || ""
                                 });
                             }
                         });
@@ -380,50 +381,59 @@
                     }
 
                     // 5. Restaura estado de AttSession salvo no documento da sessão (com sanitização rigorosa de mapa e dados)
-                    let savedAttContent = sessionData.AttSession || sessionData.vttVariables || null;
-                    if (!savedAttContent && (sessionData.Tile_Matriz || sessionData.Players)) {
-                        savedAttContent = {
-                            Act_Scene_State: sessionData.Act_Scene_State || "LOAD",
-                            Att: sessionData.Att !== undefined ? sessionData.Att : true,
-                            Iniciative: sessionData.Iniciative || {},
-                            Itens: sessionData.Itens || {},
-                            Objects: sessionData.Objects || {},
-                            Players: sessionData.Players || {},
-                            SCENE_STATES: sessionData.SCENE_STATES || {},
-                            Tile_Matriz: sessionData.Tile_Matriz || [],
-                            Time: sessionData.Time || Date.now()
-                        };
-                    }
+                    try {
+                        let savedAttContent = sessionData.AttSession || sessionData.vttVariables || null;
+                        if (!savedAttContent && (sessionData.Tile_Matriz || sessionData.Players)) {
+                            savedAttContent = {
+                                Act_Scene_State: sessionData.Act_Scene_State || "FREE",
+                                Att: sessionData.Att !== undefined ? sessionData.Att : true,
+                                Iniciative: sessionData.Iniciative || {},
+                                Itens: sessionData.Itens || {},
+                                Objects: sessionData.Objects || {},
+                                Players: sessionData.Players || {},
+                                SCENE_STATES: sessionData.SCENE_STATES || {},
+                                Tile_Matriz: sessionData.Tile_Matriz || [],
+                                Time: sessionData.Time || Date.now()
+                            };
+                        }
 
-                    if (savedAttContent) {
-                        const restored = VTTIntegration.restoreArraysFromFirestore(savedAttContent);
+                        if (savedAttContent) {
+                            const restored = VTTIntegration.restoreArraysFromFirestore(savedAttContent);
 
-                        // Protege contra URLs de mapas corrompidas salvas no histórico (ex: "2Q==")
-                        if (restored.Map) {
-                            if (!restored.Map.Img || typeof restored.Map.Img !== 'string' || !restored.Map.Img.startsWith('http')) {
-                                restored.Map.Img = mapUrl;
+                            // Protege contra URLs de mapas corrompidas salvas no histórico (ex: "2Q==")
+                            if (restored.Map) {
+                                if (!restored.Map.Img || typeof restored.Map.Img !== 'string' || !restored.Map.Img.startsWith('http')) {
+                                    restored.Map.Img = mapUrl;
+                                }
                             }
-                        }
 
-                        // Preserva integridade de Players caso o snapshot salvo esteja vazio
-                        if ((!restored.Players || Object.keys(restored.Players).length === 0) && playersList.length > 0) {
-                            delete restored.Players;
-                        }
+                            // Preserva integridade de Players caso o snapshot salvo esteja vazio
+                            if ((!restored.Players || Object.keys(restored.Players).length === 0) && playersList.length > 0) {
+                                delete restored.Players;
+                            }
 
-                        console.log("[Lyra VTT] Restaurando AttSession da sessão no motor:", restored);
-                        VTTIntegration.sendToVTT({
-                            type: "AttSession",
-                            content: restored
-                        });
+                            // Garante estado interativo FREE
+                            restored.Act_Scene_State = "FREE";
+
+                            console.log("[Lyra VTT] Restaurando AttSession da sessão no motor:", restored);
+                            VTTIntegration.sendToVTT({
+                                type: "AttSession",
+                                content: restored
+                            });
+                        }
+                    } catch (attErr) {
+                        console.warn("[Lyra VTT] Erro ao restaurar AttSession:", attErr);
                     }
 
                     // Remove tela de carregamento suavemente
                     setTimeout(() => {
                         if (loadingOverlay) {
                             loadingOverlay.style.opacity = '0';
-                            setTimeout(() => loadingOverlay.style.display = 'none', 400);
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'none';
+                            }, 400);
                         }
-                    }, 800);
+                    }, 600);
                 });
 
             } catch (err) {

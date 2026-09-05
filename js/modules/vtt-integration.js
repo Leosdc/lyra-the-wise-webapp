@@ -284,8 +284,7 @@ export const VTTIntegration = {
                             const existingHud = scene.getObjects("Master_Head");
                             if (!existingHud || existingHud.length === 0) {
                                 win.gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout(scene, "Master_HUD", 0, 0, 0);
-                                win.gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout(scene, "RollDice", 0, 0, 0);
-                                console.log("[Lyra VTT] Master_HUD e RollDice instanciados para o Mestre!");
+                                console.log("[Lyra VTT] Master_HUD instanciado para o Mestre!");
                             }
                         } catch (hudErr) {
                             console.warn("[Lyra VTT] Falha ao instanciar Master_HUD:", hudErr);
@@ -347,9 +346,36 @@ export const VTTIntegration = {
             try {
                 const win = this.iframeEl?.contentWindow;
                 const mapObjects = scene.getObjects("Map");
-                if (win && mapObjects && mapObjects.length > 0 && win.gdjs?.evtsExt__LoadImageFromURL__LoadURLIntoSprite) {
-                    win.gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.func(scene, safeUrl, mapObjects, true, null);
-                    console.log("[Lyra VTT] Cenário do mapa carregado diretamente no objeto Map!");
+                if (win && mapObjects && mapObjects.length > 0) {
+                    // 1. Carrega a imagem nativa e aplica como textura PixiJS direta
+                    try {
+                        const img = new Image();
+                        img.crossOrigin = "anonymous";
+                        img.onload = () => {
+                            try {
+                                const PIXI = win.PIXI;
+                                if (PIXI && PIXI.Texture) {
+                                    const texture = PIXI.Texture.from(img);
+                                    mapObjects.forEach(m => {
+                                        if (m.getRendererObject) {
+                                            m.getRendererObject().texture = texture;
+                                            m.getBehavior("Resizable")?.setSize(resolvedWidth, resolvedHeight);
+                                        }
+                                    });
+                                    console.log("[Lyra VTT] Textura do mapa aplicada com sucesso ao PixiJS!");
+                                }
+                            } catch (pixiErr) {
+                                console.warn("[Lyra VTT] Aviso ao aplicar textura Pixi:", pixiErr);
+                            }
+                        };
+                        img.src = safeUrl;
+                    } catch (imgErr) {}
+
+                    // 2. Aciona o loader nativo do GDevelop para compatibilidade com eventos da engine
+                    if (safeUrl.startsWith("http") && win.gdjs?.evtsExt__LoadImageFromURL__LoadURLIntoSprite) {
+                        win.gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.func(scene, safeUrl, mapObjects, true, null);
+                        console.log("[Lyra VTT] Cenário do mapa carregado diretamente no objeto Map!");
+                    }
                 }
 
                 const varUrl = scene.getVariables().get("Map_URL") || scene.getVariables().getFromIndex(4);
@@ -425,11 +451,24 @@ export const VTTIntegration = {
                     fichaData.stats.speed = VTT_CONSTANTS.DEFAULT_HERO_STATS.speed;
                 }
 
-                // d. CA e HP
-                fichaData.stats.ac = Number(fichaData.stats.ac || fichaData.combat?.ac || VTT_CONSTANTS.DEFAULT_HERO_STATS.ac);
-                if (!fichaData.stats.hp && fichaData.combat?.hp) {
-                    fichaData.stats.hp = fichaData.combat.hp.current || VTT_CONSTANTS.DEFAULT_HERO_STATS.hp;
-                }
+                // d. Estatísticas completas esperadas pelos eventos de HUD e ActionCards do GDevelop
+                const currentHp = Number(fichaData.stats.hp_current || fichaData.combat?.hp?.current || fichaData.stats.hp || 20);
+                const maxHp = Number(fichaData.stats.hp_max || fichaData.combat?.hp?.max || fichaData.stats.hp || 20);
+                const armorClass = Number(fichaData.stats.ac || fichaData.combat?.ac || VTT_CONSTANTS.DEFAULT_HERO_STATS.ac);
+                const speedVal = Number(fichaData.stats.speed || VTT_CONSTANTS.DEFAULT_HERO_STATS.speed);
+                const initiativeVal = String(fichaData.stats.initiative || fichaData.combat?.initiative || "+2");
+                const hitDiceVal = String(fichaData.stats.hit_dice_current || fichaData.combat?.hit_dice?.current || "1d8");
+
+                fichaData.stats = {
+                    ...fichaData.stats,
+                    ac: armorClass,
+                    hp: currentHp,
+                    hp_current: currentHp,
+                    hp_max: maxHp,
+                    speed: speedVal,
+                    initiative: initiativeVal,
+                    hit_dice_current: hitDiceVal
+                };
 
                 // f. Normalização e mapeamento completo de Ataques (combat.attacks) para geração de Action Cards no GDevelop
                 const rawAttacks = fichaData.combat?.attacks || fichaData.attacks || [];
@@ -464,7 +503,6 @@ export const VTTIntegration = {
                     description: String(sp.description || sp.descricao || sp.effect || sp.efeito || "Efeito mágico concentrado.")
                 })) : [];
 
-                // Caso o personagem seja conjurador ou a lista esteja vazia, garante ações arcanas básicas disponíveis
                 if (normalizedSpells.length === 0) {
                     normalizedSpells.push(
                         { 
@@ -517,7 +555,22 @@ export const VTTIntegration = {
                             if (win && win.gdjs?.MapaCode?.eventsList149) {
                                 win.gdjs.MapaCode.eventsList149(scene);
                             }
-                            console.log(`[Lyra VTT] Ficha ${fichaId} (${fichaData.name}) instanciada com sucesso no runtime da cena!`);
+
+                            // 1. Libera permissão de interação e movimentação nos tokens (variável 3 do objeto Char)
+                            const charObjects = scene.getObjects("Char");
+                            if (charObjects) {
+                                charObjects.forEach(charInst => {
+                                    try {
+                                        charInst.returnVariable(charInst.getVariables().getFromIndex(3)).setBoolean(true);
+                                    } catch (e) {}
+                                });
+                            }
+
+                            // 2. Coloca o estado da cena em FREE para liberar interatividade total
+                            const varState = scene.getVariables().get("Act_Scene_State") || scene.getVariables().getFromIndex(2);
+                            if (varState) varState.setString("FREE");
+
+                            console.log(`[Lyra VTT] Ficha ${fichaId} (${fichaData.name}) instanciada e liberada para movimento na cena!`);
                         }
                     } catch (injErr) {
                         console.warn("[Lyra VTT] Falha na injeção direta de ficha:", injErr);
