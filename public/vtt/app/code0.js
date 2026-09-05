@@ -12588,8 +12588,7 @@ gdjs.MapaCode.eventsList220 = function(runtimeScene) {
 
 
 let isConditionTrue_0 = false;
-isConditionTrue_0 = false;
-isConditionTrue_0 = gdjs.evtTools.input.wasKeyReleased(runtimeScene, "m");
+isConditionTrue_0 = false; // Desativado atalho de depuração 'm' (LoadDebug)
 if (isConditionTrue_0) {
 gdjs.copyArray(runtimeScene.getObjects("ChatLog"), gdjs.MapaCode.GDChatLogObjects2);
 {runtimeScene.getScene().getVariables().getFromIndex(29).setString(runtimeScene.getGame().getVariables().getFromIndex(6).getChild("ID").getAsString());
@@ -12612,8 +12611,7 @@ gdjs.MapaCode.eventsList216(runtimeScene);} //End of subevents
 
 
 let isConditionTrue_0 = false;
-isConditionTrue_0 = false;
-isConditionTrue_0 = gdjs.evtTools.input.wasKeyReleased(runtimeScene, "n");
+isConditionTrue_0 = false; // Desativado atalho de depuração 'n' (LoadDebug)
 if (isConditionTrue_0) {
 gdjs.copyArray(runtimeScene.getObjects("ChatLog"), gdjs.MapaCode.GDChatLogObjects2);
 {runtimeScene.getScene().getVariables().getFromIndex(29).setString(runtimeScene.getGame().getVariables().getFromIndex(6).getChild("ID").getAsString());
