@@ -10,7 +10,7 @@ gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.idToCallbackMap = new M
 gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.GDObjectObjects1= [];
 
 
-gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.userFunc0x161ebb0 = function GDJSInlineCode(runtimeScene, objects, eventsFunctionContext) {
+gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.userFunc0xf697e0 = function GDJSInlineCode(runtimeScene, objects, eventsFunctionContext) {
 "use strict";
 const url = eventsFunctionContext.getArgument("URL");
 const isBase = eventsFunctionContext.getArgument("ChangeResource");
@@ -58,7 +58,7 @@ gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.eventsList0 = function(
 gdjs.copyArray(eventsFunctionContext.getObjects("Object"), gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.GDObjectObjects1);
 
 const objects = gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.GDObjectObjects1;
-gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.userFunc0x161ebb0(runtimeScene, objects, eventsFunctionContext);
+gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSpriteImgSize.userFunc0xf697e0(runtimeScene, objects, eventsFunctionContext);
 
 }
 

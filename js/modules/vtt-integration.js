@@ -128,8 +128,12 @@ export const VTTIntegration = {
                 if (game && scene) {
                     this.gameInstance = game;
                     
-                    // Oculta textos de depuração visual ("Deu errado", logs de mapa, etc.) para visual limpo
-                    const debugObjects = ["LoadIDTx", "LoadPlayerTx", "LoadMapTx", "TimeTxt", "TesteConsole"];
+                    // Oculta textos de depuração visual ("Deu errado", logs de mapa, etc.) para visual limpo e imersivo
+                    const debugObjects = [
+                        "LoadIDTx", "LoadPlayerTx", "LoadMapTx", "TimeTxt", 
+                        "TesteConsole", "LoadToFire", "LoadSessionTx", "LoadNPCTx",
+                        "NewBBText2"
+                    ];
                     debugObjects.forEach(objName => {
                         try {
                             const instances = scene.getObjects(objName);
@@ -225,6 +229,13 @@ export const VTTIntegration = {
     loadMap(urlMap, cellSize = 64, customSize = { on: "true", x: "1280", y: "720" }) {
         let safeUrl = (typeof urlMap === 'string' && urlMap.trim()) ? urlMap.trim() : "/assets/maps/default.jpg";
         
+        this._currentMapData = {
+            Img: safeUrl,
+            CellSize: Number(cellSize) || 64,
+            x: Number(customSize?.x) || 1280,
+            y: Number(customSize?.y) || 720
+        };
+
         const payload = {
             type: "LoadMap",
             content: {
@@ -238,12 +249,25 @@ export const VTTIntegration = {
             }
         };
         this.sendToVTT(payload);
+
+        // Injeta também diretamente nas variáveis da cena para resposta imediata
+        this.waitForGame((game, scene) => {
+            try {
+                const varUrl = scene.getVariables().get("Map_URL") || scene.getVariables().getFromIndex(4);
+                const varCell = scene.getVariables().get("CellSize") || scene.getVariables().getFromIndex(13);
+                if (varUrl) varUrl.setString(safeUrl);
+                if (varCell) {
+                    varCell.getChild("X").setNumber(Number(cellSize) || 64);
+                    varCell.getChild("Y").setNumber(Number(cellSize) || 64);
+                }
+            } catch (e) {}
+        });
     },
 
     /**
-     * Envia os tokens dos jogadores (viajantes) para o VTT
+     * Envia os tokens dos jogadores (viajantes) para o VTT com resolução de dados completa (ataques, magias, PV, CA, atributos e token)
      */
-    loadPlayers(players = []) {
+    async loadPlayers(players = []) {
         const validPlayers = Array.isArray(players) ? players : [players];
         const payload = {
             type: "LoadPlayer",
@@ -252,13 +276,105 @@ export const VTTIntegration = {
                 players: validPlayers.map(p => ({
                     fichaId: String(p.fichaId || p.characterId || p.id || ""),
                     position: {
-                        x: Number(p.x !== undefined ? p.x : (p.position?.x ?? 2)),
-                        y: Number(p.y !== undefined ? p.y : (p.position?.y ?? 2))
+                        x: Number(p.x !== undefined ? p.x : (p.position?.x ?? 6)),
+                        y: Number(p.y !== undefined ? p.y : (p.position?.y ?? 5))
                     }
                 }))
             }
         };
+
+        // 1. Envia via canal de mensagens JSON estruturado
         this.sendToVTT(payload);
+
+        // 2. Injeção direta de ficha e cartas no runtime da cena para confiabilidade máxima
+        for (const p of validPlayers) {
+            const fichaId = String(p.fichaId || p.characterId || p.id || "");
+            if (!fichaId) continue;
+
+            try {
+                const fichaRef = doc(db, "fichas", fichaId);
+                const snap = await getDoc(fichaRef);
+                let fichaData = snap.exists() ? snap.data() : null;
+
+                if (!fichaData) {
+                    fichaData = {
+                        name: p.characterName || p.name || "Aventureiro",
+                        tokenUrl: p.tokenUrl || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png",
+                        stats: { ac: 12, hp: 20, speed: 9 },
+                        attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+                        combat: { attacks: [] },
+                        spells: { list: [] },
+                        proficiencies_choice: { skills: [] }
+                    };
+                }
+
+                // Normalizações cruciais exigidas pelo motor do GDevelop:
+                // a. Imagem de token com URL 'http' válida (para checagem startsWith 'ht' do GDevelop)
+                if (!fichaData.tokenUrl || !fichaData.tokenUrl.startsWith("http")) {
+                    fichaData.tokenUrl = fichaData.avatar || fichaData.portraitUrl || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png";
+                }
+
+                // b. Nome do herói
+                fichaData.name = fichaData.name || fichaData.bio?.name || p.characterName || "Herói";
+
+                // c. stats.speed como número para divisão matemática no grid
+                if (!fichaData.stats) fichaData.stats = {};
+                if (typeof fichaData.stats.speed === 'string') {
+                    fichaData.stats.speed = parseFloat(fichaData.stats.speed) || 9;
+                } else if (!fichaData.stats.speed) {
+                    fichaData.stats.speed = 9;
+                }
+
+                // d. CA e HP
+                fichaData.stats.ac = Number(fichaData.stats.ac || fichaData.combat?.ac || 10);
+                if (!fichaData.stats.hp && fichaData.combat?.hp) {
+                    fichaData.stats.hp = fichaData.combat.hp.current || 20;
+                }
+
+                // e. Atributos
+                if (!fichaData.attributes) {
+                    fichaData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+                }
+
+                // f. Magias, ataques e perícias para geração de Action Cards
+                if (!fichaData.combat) fichaData.combat = { attacks: [] };
+                if (!fichaData.combat.attacks) fichaData.combat.attacks = [];
+                if (!fichaData.spells) fichaData.spells = { list: [] };
+                if (!fichaData.spells.list) fichaData.spells.list = [];
+                if (!fichaData.proficiencies_choice) fichaData.proficiencies_choice = { skills: [] };
+
+                // Injeta diretamente na cena em runtime
+                this.waitForGame((game, scene) => {
+                    try {
+                        const varNewChar = scene.getVariables().get("NewChar_FireBase") || scene.getVariables().getFromIndex(24);
+                        const varError = scene.getVariables().get("NewChar_FireBase_Error") || scene.getVariables().getFromIndex(25);
+                        const varList = scene.getVariables().get("LoadPlayer_List") || scene.getVariables().getFromIndex(38);
+                        const varLoadOn = scene.getVariables().get("PlayerLoadOn") || scene.getVariables().getFromIndex(41);
+
+                        if (varNewChar && varError) {
+                            varNewChar.fromJSObject(fichaData);
+                            varError.setString("ok");
+
+                            const listData = [{
+                                fichaId: fichaId,
+                                position: {
+                                    x: Number(p.x !== undefined ? p.x : (p.position?.x ?? 6)),
+                                    y: Number(p.y !== undefined ? p.y : (p.position?.y ?? 5))
+                                }
+                            }];
+                            if (varList) varList.fromJSObject(listData);
+                            if (varLoadOn) varLoadOn.setBoolean(true);
+                            console.log(`[Lyra VTT] Ficha ${fichaId} (${fichaData.name}) injetada com sucesso no runtime da cena!`);
+                        }
+                    } catch (injErr) {
+                        console.warn("[Lyra VTT] Falha na injeção direta de ficha:", injErr);
+                    }
+                });
+
+            } catch (err) {
+                console.warn(`[Lyra VTT] Erro ao carregar ficha ${fichaId} do Firestore:`, err);
+            }
+        }
     },
 
     /**
@@ -343,7 +459,14 @@ export const VTTIntegration = {
 
                 // 1. Atualiza diretamente o documento da sessão em 'sessoes' com merge: true
                 const sessionRef = doc(db, "sessoes", this.sessionId);
+                
+                // Incorpora dados do mapa em data.Map para atender à checagem do GDevelop
+                if (this._currentMapData && sanitizedContent && !sanitizedContent.Map) {
+                    sanitizedContent.Map = this._currentMapData;
+                }
+
                 const sessionPayload = {
+                    data: sanitizedContent, // Campo aninhado 'data' exigido pelo LoadSessionFirebase do GDevelop
                     AttSession: sanitizedContent,
                     vttVariables: sanitizedContent,
                     updatedAt: serverTimestamp()

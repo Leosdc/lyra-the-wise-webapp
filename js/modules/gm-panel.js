@@ -1053,8 +1053,15 @@ export const GMPanelModule = {
                         // 1. Envia o ID da sessão com carregamento ativado
                         VTTIntegration.sendSessionID(this.activeSession.id, "on");
 
-                        // 2. Carrega o mapa da campanha/sessão
-                        const mapUrl = this.activeSession.mapUrl || "/assets/maps/default.jpg";
+                        // 2. Carrega o mapa da campanha/sessão (com fallback para mapa de capítulo se houver)
+                        let mapUrl = this.activeSession.mapUrl;
+                        if (!mapUrl && this.activeSession.fullTimeline && this.activeSession.fullTimeline.length > 0) {
+                            const chapterWithMap = this.activeSession.fullTimeline.find(c => c && c.mapUrl);
+                            if (chapterWithMap) {
+                                mapUrl = chapterWithMap.mapUrl;
+                            }
+                        }
+                        if (!mapUrl) mapUrl = "/assets/maps/default.jpg";
                         const cellSize = Number(this.activeSession.cellSize) || 64;
                         VTTIntegration.loadMap(mapUrl, cellSize);
 
@@ -1508,11 +1515,15 @@ export const GMPanelModule = {
     spawnPlayerToken(characterId) {
         if (!characterId) return;
 
+        const invite = this._currentInvites?.find(p => p.characterId === characterId || p.id === characterId);
+
         import('./vtt-integration.js').then(({ VTTIntegration }) => {
             // Instancia o token do herói com os dados esperados pelo GDevelop (LoadPlayer)
             const playerPayload = [{
                 fichaId: String(characterId),
                 id: String(characterId),
+                characterName: invite?.characterName || invite?.nickname || "Herói",
+                tokenUrl: invite?.avatar || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png",
                 x: 6,
                 y: 5
             }];
