@@ -20,6 +20,19 @@ import { createSessionMixin } from './gm-session.js';
 import { createInvitesMixin } from './gm-invites.js';
 import { WizardModule } from './wizard.js';
 
+/**
+ * Sanitiza strings para prevenir vulnerabilidades de Cross-Site Scripting (XSS).
+ */
+const escapeHtml = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 export const GMPanelModule = {
     activeSession: null,
     unsubscribeInvites: null,
@@ -962,6 +975,47 @@ export const GMPanelModule = {
 
     vttInvitesUnsubscribe: null,
 
+    /**
+     * Inicia a escuta em tempo real dos heróis e jogadores vinculados à sessão ativa.
+     * Executa imediatamente ao abrir o modal, garantindo sincronização instantânea.
+     */
+    startVTTHeroesListener() {
+        if (!this.activeSession?.id) return;
+
+        if (this.vttInvitesUnsubscribe) {
+            this.vttInvitesUnsubscribe();
+            this.vttInvitesUnsubscribe = null;
+        }
+
+        try {
+            const q = query(
+                collection(db, "session_invites"),
+                where("sessionId", "==", this.activeSession.id)
+            );
+
+            this.vttInvitesUnsubscribe = onSnapshot(q, (snapshot) => {
+                const players = snapshot.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(p => p.role !== 'gm' && !p.id.startsWith('self_'));
+
+                this._currentInvites = players;
+                this.renderVTTControlPanel(players);
+
+                // Sincroniza tokens no motor tático caso o jogo já esteja pronto
+                import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                    const playersWithSheets = players.filter(p => p.characterId);
+                    if (playersWithSheets.length > 0 && VTTIntegration.game) {
+                        VTTIntegration.loadPlayers(playersWithSheets);
+                    }
+                });
+            }, (err) => {
+                console.error("[Lyra VTT] Erro no listener de aventureiros do VTT:", err);
+            });
+        } catch (err) {
+            console.error("[Lyra VTT] Falha ao iniciar listener de heróis:", err);
+        }
+    },
+
     openMapModal() {
         const modal = document.getElementById('gm-map-modal');
         const iframe = document.getElementById('gm-vtt-iframe');
@@ -970,16 +1024,19 @@ export const GMPanelModule = {
             modal.classList.remove('hidden');
             iframe.src = '/vtt/app/index.html';
             
-            // Renderiza imediatamente com convites já em cache no painel, se existirem
+            // 1. Renderiza imediatamente com convites já em cache no painel, se existirem
             const cachedInvites = this._currentInvites || [];
             this.renderVTTControlPanel(cachedInvites);
             
-            // Inicializa a integração
+            // 2. Inicia imediatamente a escuta em tempo real do Firestore (sem esperar carregamento do iframe)
+            this.startVTTHeroesListener();
+
+            // 3. Inicializa a integração com o motor GDevelop
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
                 // Passa o ID da sessão ativa para a integração como Mestre
                 VTTIntegration.init(iframe, this.activeSession?.id, { isMaster: true });
                 
-                // Envia dados iniciais da sessão após o carregamento
+                // Envia dados iniciais da sessão após o carregamento da cena
                 VTTIntegration.waitForGame(async (game, scene) => {
                     if (this.activeSession) {
                         // 0. Envia a identidade do jogador (Mestre)
@@ -1010,33 +1067,12 @@ export const GMPanelModule = {
                             });
                         }
                         
-                        // 4. Conecta um Listener em Tempo Real para os participantes da sessão no Painel de Controle
-                        try {
-                            const { collection, query, where, onSnapshot } = await import("firebase/firestore");
-                            
-                            if (this.vttInvitesUnsubscribe) this.vttInvitesUnsubscribe();
-                            
-                            const q = query(
-                                collection(db, "session_invites"),
-                                where("sessionId", "==", this.activeSession.id)
-                            );
-                            
-                            this.vttInvitesUnsubscribe = onSnapshot(q, (snapshot) => {
-                                const players = snapshot.docs
-                                    .map(d => ({ id: d.id, ...d.data() }))
-                                    .filter(p => p.role !== 'gm' && !p.id.startsWith('self_'));
-                                
-                                this._currentInvites = players;
-                                this.renderVTTControlPanel(players);
-
-                                // Invocação automática inicial de aventureiros com ficha
-                                const playersWithSheets = players.filter(p => p.characterId);
-                                if (playersWithSheets.length > 0) {
-                                    VTTIntegration.loadPlayers(playersWithSheets);
-                                }
-                            });
-                        } catch (err) {
-                            console.error("[Lyra VTT] Erro ao carregar participantes em tempo real:", err);
+                        // 4. Invocação dos aventureiros que possuem ficha
+                        if (this._currentInvites && this._currentInvites.length > 0) {
+                            const playersWithSheets = this._currentInvites.filter(p => p.characterId);
+                            if (playersWithSheets.length > 0) {
+                                VTTIntegration.loadPlayers(playersWithSheets);
+                            }
                         }
                     }
                 });
@@ -1079,10 +1115,16 @@ export const GMPanelModule = {
             `;
         } else {
             players.forEach(p => {
-                const labelName = p.characterName || p.nickname || p.displayName || p.email || "Aventureiro(a)";
+                const rawName = p.characterName || p.nickname || p.displayName || p.email || "Aventureiro(a)";
+                const labelName = escapeHtml(rawName);
+                const charName = escapeHtml(p.characterName || '');
+                const nickName = escapeHtml(p.nickname || '');
                 const statusColor = p.status === 'online' ? '#2ecc71' : (p.status === 'accepted' ? '#f1c40f' : '#7f8c8d');
                 const statusLabel = p.status === 'online' ? 'Online' : (p.status === 'accepted' ? 'Aceito' : 'Convidado');
                 const hasSheet = !!p.characterId;
+                const charId = escapeHtml(String(p.characterId || p.id || ''));
+
+                const details = charName ? `• Ficha: ${charName}` : (nickName ? `(${nickName})` : '');
 
                 playersHtml += `
                     <div style="background: rgba(30, 15, 8, 0.55); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
@@ -1090,13 +1132,13 @@ export const GMPanelModule = {
                             <strong style="color: var(--gold); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${labelName}">${labelName}</strong>
                             <span style="font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); display: flex; align-items: center; gap: 4px;">
                                 <span style="width: 6px; height: 6px; border-radius: 50%; background: ${statusColor}; display: inline-block;"></span>
-                                ${statusLabel} ${p.characterName ? `• Ficha: ${p.characterName}` : (p.nickname ? `(${p.nickname})` : '')}
+                                ${statusLabel} ${details}
                             </span>
                         </div>
                         <div style="display: flex; gap: 6px;">
                             <button class="medieval-btn small gold-pulse" style="flex: 1; padding: 5px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;" 
                                     ${hasSheet ? '' : 'disabled title="Aventureiro não vinculou ficha de personagem ainda"'} 
-                                    onclick="GMPanelModule.spawnPlayerToken('${p.characterId || p.id}')">
+                                    onclick="GMPanelModule.spawnPlayerToken('${charId}')">
                                 <i class="fas fa-street-view"></i> Invocar Token
                             </button>
                         </div>
@@ -1513,23 +1555,6 @@ export const GMPanelModule = {
             };
             reader.onerror = reject;
             reader.readAsDataURL(file);
-        });
-    },
-
-    spawnPlayerToken(characterId) {
-        if (!characterId) return;
-
-        import('./vtt-integration.js').then(({ VTTIntegration }) => {
-            // Instancia o token do herói em posição de entrada (x=4, y=4)
-            const playerPayload = [{
-                characterId: characterId,
-                id: characterId,
-                x: 4,
-                y: 4
-            }];
-
-            VTTIntegration.loadPlayers(playerPayload);
-            window.app.showAlert("O herói foi invocado no tabuleiro tático!", "Token Convocado");
         });
     },
 

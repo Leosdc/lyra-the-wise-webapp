@@ -305,10 +305,22 @@
 
                 loadingText.innerText = "Conectando ao Motor Tático...";
 
+                // Timeout de contingência para liberar a interface se necessário
+                let isGameReady = false;
+                const safetyTimeout = setTimeout(() => {
+                    if (!isGameReady && loadingOverlay && loadingOverlay.style.display !== 'none') {
+                        console.warn("[Lyra VTT] Contingência ativada: liberando visual do tabuleiro.");
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 400);
+                    }
+                }, 10000);
+
                 // Inicializa o módulo VTT
                 VTTIntegration.init(iframe, sessionId, { isMaster: isGM });
 
                 VTTIntegration.waitForGame(async (game, scene) => {
+                    isGameReady = true;
+                    clearTimeout(safetyTimeout);
                     loadingText.innerText = "Manifestando Mapa e Aventureiros...";
 
                     // 1. Envia a identidade do jogador

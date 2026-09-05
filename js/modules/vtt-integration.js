@@ -121,7 +121,8 @@ export const VTTIntegration = {
             attempts++;
 
             try {
-                const game = this.iframeEl.contentWindow?.gdjsGame;
+                const win = this.iframeEl.contentWindow;
+                const game = win?.gdjsGame || win?.game;
                 const scene = game?.getSceneStack()?.getCurrentScene();
                 
                 if (game && scene) {

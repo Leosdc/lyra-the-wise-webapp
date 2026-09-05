@@ -12,6 +12,16 @@ import {
 import { COLLECTIONS } from '../data.js';
 import { AccessRequestsModule } from './access-requests.js';
 
+const escapeHtml = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 /**
  * Returns invitation-management methods to be mixed into GMPanelModule.
  */
@@ -171,28 +181,35 @@ export function createInvitesMixin(ctx) {
 
                     if (['accepted', 'online'].includes(invite.status)) onlineCount++;
 
+                    const rawName = invite.characterName || invite.nickname || invite.displayName || invite.email || "Aventureiro(a)";
+                    const safeName = escapeHtml(rawName);
+                    const safeCharName = escapeHtml(invite.characterName || (invite.status === 'invited' ? 'Aguardando Aceite...' : 'Escolhendo Ficha...'));
+                    const safeInviteId = escapeHtml(invite.id);
+                    const safeCharId = escapeHtml(invite.characterId || '');
+                    const safeCancelTarget = escapeHtml(invite.nickname || invite.email || 'Aventureiro');
+
                     const li = document.createElement('li');
                     li.className = `player-item list-item-v2 ${invite.status}`;
                     li.innerHTML = `
                         <div class="player-status ${invite.status}"></div>
                         <div class="player-info">
-                            <span class="player-name">${invite.nickname || invite.displayName || "Aventureiro(a)"}</span>
+                            <span class="player-name">${safeName}</span>
                             <span class="player-sheet ${invite.characterId ? 'ready' : 'pending'}">
-                                ${invite.characterName || (invite.status === 'invited' ? 'Aguardando Aceite...' : 'Escolhendo Ficha...')}
+                                ${safeCharName}
                             </span>
                         </div>
                         <div class="player-actions">
                             ${invite.characterId ? `
                                 <button class="medieval-btn icon-only inspiration-glow-btn ${invite.inspiration ? 'active' : ''}" 
                                         title="${invite.inspiration ? 'Retirar Inspiração' : 'Conceder Inspiração'}" 
-                                        onclick="GMPanelModule.togglePlayerInspiration('${invite.id}', '${invite.characterId}', ${!!invite.inspiration})">
+                                        onclick="GMPanelModule.togglePlayerInspiration('${safeInviteId}', '${safeCharId}', ${!!invite.inspiration})">
                                     <i class="fas fa-star"></i>
                                 </button>
-                                <button class="medieval-btn icon-only gold-glow" title="Visualizar Ficha" onclick="GMPanelModule.viewPlayerSheet('${invite.characterId}')">
+                                <button class="medieval-btn icon-only gold-glow" title="Visualizar Ficha" onclick="GMPanelModule.viewPlayerSheet('${safeCharId}')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             ` : ''}
-                            <button class="medieval-btn icon-only delete-glow" title="Cancelar Convite" onclick="GMPanelModule.cancelInvite('${invite.id}', '${invite.nickname || invite.email}')">
+                            <button class="medieval-btn icon-only delete-glow" title="Cancelar Convite" onclick="GMPanelModule.cancelInvite('${safeInviteId}', '${safeCancelTarget}')">
                                 <i class="fas fa-trash-can"></i>
                             </button>
                         </div>
@@ -208,7 +225,15 @@ export function createInvitesMixin(ctx) {
             const qi = query(collection(db, "session_invites"), where("sessionId", "==", sessionId));
             ctx.unsubscribeInvites = onSnapshot(qi, (snapshot) => {
                 currentInvites = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                const gmEmail = getAuth().currentUser?.email?.toLowerCase();
+                ctx._currentInvites = currentInvites.filter(p => p.role !== 'gm' && !p.id.startsWith('self_') && p.email?.toLowerCase() !== gmEmail);
                 renderUnifiedList();
+
+                // Atualiza a convocação de heróis do modal VTT caso esteja aberto
+                const mapModal = document.getElementById('gm-map-modal');
+                if (mapModal && !mapModal.classList.contains('hidden') && typeof ctx.renderVTTControlPanel === 'function') {
+                    ctx.renderVTTControlPanel(ctx._currentInvites);
+                }
             });
 
             // Access Requests Listener

@@ -210,6 +210,8 @@
     (function() {
         //Initialization
         var game = new gdjs.RuntimeGame(gdjs.projectData, {});
+        window.gdjsGame = game;
+        window.game = game;
 
         //Create a renderer
         game.getRenderer().createStandardCanvas(document.body);
