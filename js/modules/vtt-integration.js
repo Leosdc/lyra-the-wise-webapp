@@ -159,44 +159,55 @@ export const VTTIntegration = {
         check();
     },
 
+    _queue: [],
+    _isProcessingQueue: false,
+
     /**
-     * Injeta um comando estruturado JSON no motor do GDevelop VTT
-     * Usa postMessage como canal principal e variáveis da cena como canal de contingência
+     * Injeta um comando estruturado JSON no motor do GDevelop VTT usando fila sequencial
+     * Garante que cada comando seja processado por um ciclo de frames antes do próximo ser injetado
      */
     sendToVTT(payload) {
         if (!payload || !payload.type) return;
+        this._queue.push(payload);
+        this._processQueue();
+    },
 
-        // 1. Canal Primário: postMessage para o iframe
-        try {
-            if (this.iframeEl?.contentWindow) {
-                this.iframeEl.contentWindow.postMessage(payload, "*");
-            }
-        } catch (err) {
-            console.warn("[Lyra VTT] Falha ao enviar via postMessage:", err);
-        }
+    _processQueue() {
+        if (this._isProcessingQueue || this._queue.length === 0) return;
+        this._isProcessingQueue = true;
 
-        // 2. Canal Direto: Variáveis do RuntimeScene (IncomingMessage e HasNewMessage)
+        const nextPayload = this._queue.shift();
+
         this.waitForGame((game, scene) => {
             try {
-                const jsonStr = JSON.stringify(payload);
-                
-                // Variável index 29 (IncomingMessage): string JSON
+                // 1. Canal Primário: postMessage para o iframe
+                if (this.iframeEl?.contentWindow) {
+                    this.iframeEl.contentWindow.postMessage(nextPayload, "*");
+                }
+
+                // 2. Canal Direto: Variáveis do RuntimeScene (IncomingMessage e HasNewMessage)
+                const jsonStr = JSON.stringify(nextPayload);
                 const varIncoming = scene.getVariables().get("IncomingMessage") || scene.getVariables().getFromIndex(29);
-                if (varIncoming) varIncoming.setString(jsonStr);
-                
-                // Variável index 30 (HasNewMessage): dispara trigger do Event Sheet
                 const varHasNew = scene.getVariables().get("HasNewMessage") || scene.getVariables().getFromIndex(30);
+
+                if (varIncoming) varIncoming.setString(jsonStr);
                 if (varHasNew) varHasNew.setBoolean(true);
-                
-                console.log(`[Lyra VTT] Comando injetado no motor: ${payload.type}`);
+
+                console.log(`[Lyra VTT] Comando processado da fila: ${nextPayload.type}`);
             } catch (err) {
-                console.error("[Lyra VTT] Erro ao injetar variáveis na cena:", err);
+                console.warn("[Lyra VTT] Falha ao despachar comando da fila:", err);
             }
+
+            // Aguarda 160ms para dar tempo do frame do GDevelop consumir a mensagem
+            setTimeout(() => {
+                this._isProcessingQueue = false;
+                this._processQueue();
+            }, 160);
         });
     },
 
     /**
-     * Envia a identidade do jogador (Mestre ou Viajante)
+     * Envia a identidade do jogador (Mestre ou Viajante) e instancia controles
      */
     sendPlayerID(playerId, isMaster = false) {
         const payload = {
@@ -206,6 +217,39 @@ export const VTTIntegration = {
                 IsMaster: isMaster ? "true" : "false"
             }
         };
+
+        // Força imediatamente variáveis globais do motor do jogo
+        this.waitForGame((game, scene) => {
+            try {
+                const gPlayer = game.getVariables().get("PlayerID") || game.getVariables().getFromIndex(3);
+                const gMaster = game.getVariables().get("IsMaster") || game.getVariables().getFromIndex(4);
+                if (gPlayer) gPlayer.setString(String(playerId));
+                if (gMaster) gMaster.setBoolean(isMaster);
+
+                const sPlayer = scene.getVariables().get("PlayerID");
+                const sMaster = scene.getVariables().get("IsMaster");
+                if (sPlayer) sPlayer.setString(String(playerId));
+                if (sMaster) sMaster.setBoolean(isMaster);
+
+                // Se for Mestre, garante a instanciação dos botões do Mestre e Dados
+                if (isMaster) {
+                    const win = this.iframeEl?.contentWindow;
+                    if (win && win.gdjs?.evtTools?.runtimeScene) {
+                        try {
+                            const existingHud = scene.getObjects("Master_Head");
+                            if (!existingHud || existingHud.length === 0) {
+                                win.gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout(scene, "Master_HUD", 0, 0, 0);
+                                win.gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout(scene, "RollDice", 0, 0, 0);
+                                console.log("[Lyra VTT] Master_HUD e RollDice instanciados para o Mestre!");
+                            }
+                        } catch (hudErr) {
+                            console.warn("[Lyra VTT] Falha ao instanciar Master_HUD:", hudErr);
+                        }
+                    }
+                }
+            } catch (e) {}
+        });
+
         this.sendToVTT(payload);
     },
 
@@ -250,9 +294,16 @@ export const VTTIntegration = {
         };
         this.sendToVTT(payload);
 
-        // Injeta também diretamente nas variáveis da cena para resposta imediata
+        // Injeta e aplica a imagem diretamente no objeto Map para troca instantânea do cenário
         this.waitForGame((game, scene) => {
             try {
+                const win = this.iframeEl?.contentWindow;
+                const mapObjects = scene.getObjects("Map");
+                if (win && mapObjects && mapObjects.length > 0 && win.gdjs?.evtsExt__LoadImageFromURL__LoadURLIntoSprite) {
+                    win.gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.func(scene, safeUrl, mapObjects, true, null);
+                    console.log("[Lyra VTT] Cenário do mapa carregado diretamente no objeto Map!");
+                }
+
                 const varUrl = scene.getVariables().get("Map_URL") || scene.getVariables().getFromIndex(4);
                 const varCell = scene.getVariables().get("CellSize") || scene.getVariables().getFromIndex(13);
                 if (varUrl) varUrl.setString(safeUrl);
@@ -364,7 +415,12 @@ export const VTTIntegration = {
                             }];
                             if (varList) varList.fromJSObject(listData);
                             if (varLoadOn) varLoadOn.setBoolean(true);
-                            console.log(`[Lyra VTT] Ficha ${fichaId} (${fichaData.name}) injetada com sucesso no runtime da cena!`);
+
+                            const win = this.iframeEl?.contentWindow;
+                            if (win && win.gdjs?.MapaCode?.eventsList149) {
+                                win.gdjs.MapaCode.eventsList149(scene);
+                            }
+                            console.log(`[Lyra VTT] Ficha ${fichaId} (${fichaData.name}) instanciada com sucesso no runtime da cena!`);
                         }
                     } catch (injErr) {
                         console.warn("[Lyra VTT] Falha na injeção direta de ficha:", injErr);
