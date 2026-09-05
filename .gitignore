@@ -46,6 +46,7 @@ public/assets/systems/dnd5e/implementation_plan.md
 # Scripts de desenvolvimento locais
 auditor.mjs
 docs/auditoria.md
+docs/GUIA_INTEGRACAO_VTT_FIREBASE.md
 
 # Gemini AI Agent Workspace & Tools
 .agents/
