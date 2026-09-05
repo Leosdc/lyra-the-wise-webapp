@@ -431,17 +431,65 @@ export const VTTIntegration = {
                     fichaData.stats.hp = fichaData.combat.hp.current || VTT_CONSTANTS.DEFAULT_HERO_STATS.hp;
                 }
 
-                // e. Atributos
-                if (!fichaData.attributes) {
-                    fichaData.attributes = { ...VTT_CONSTANTS.DEFAULT_HERO_ATTRIBUTES };
+                // f. Normalização e mapeamento completo de Ataques (combat.attacks) para geração de Action Cards no GDevelop
+                const rawAttacks = fichaData.combat?.attacks || fichaData.attacks || [];
+                const normalizedAttacks = Array.isArray(rawAttacks) ? rawAttacks.map(atk => ({
+                    name: String(atk.name || atk.nome || "Ataque"),
+                    damage: String(atk.damage || atk.dano || atk.damage_dice || "1d6+2")
+                })) : [];
+
+                // Caso a ficha ainda não possua ataques cadastrados, fornece ações táticas fundamentais
+                if (normalizedAttacks.length === 0) {
+                    normalizedAttacks.push(
+                        { name: "Ataque Desarmado", damage: "1d4+2 Contusão" },
+                        { name: "Ataque Básico", damage: "1d6+2 Perfurante" },
+                        { name: "Investida Rápida", damage: "1d8+2 Impacto" }
+                    );
                 }
 
-                // f. Magias, ataques e perícias para geração de Action Cards
-                if (!fichaData.combat) fichaData.combat = { attacks: [] };
-                if (!fichaData.combat.attacks) fichaData.combat.attacks = [];
-                if (!fichaData.spells) fichaData.spells = { list: [] };
-                if (!fichaData.spells.list) fichaData.spells.list = [];
+                if (!fichaData.combat) fichaData.combat = {};
+                fichaData.combat.attacks = normalizedAttacks;
+
+                // g. Normalização e mapeamento completo de Magias (spells.list) para geração de Action Cards no GDevelop
+                const rawSpells = fichaData.spells?.list 
+                    || (Array.isArray(fichaData.spells) ? fichaData.spells : []) 
+                    || fichaData.magias 
+                    || [];
+
+                const normalizedSpells = Array.isArray(rawSpells) ? rawSpells.map(sp => ({
+                    name: String(sp.name || sp.nome || "Magia"),
+                    range: String(sp.range || sp.alcance || "18m"),
+                    duration: String(sp.duration || sp.duracao || "Instantânea"),
+                    casting_time: String(sp.casting_time || sp.tempo_conjuracao || "1 Ação"),
+                    description: String(sp.description || sp.descricao || sp.effect || sp.efeito || "Efeito mágico concentrado.")
+                })) : [];
+
+                // Caso o personagem seja conjurador ou a lista esteja vazia, garante ações arcanas básicas disponíveis
+                if (normalizedSpells.length === 0) {
+                    normalizedSpells.push(
+                        { 
+                            name: "Raio de Energia", 
+                            range: "36m", 
+                            duration: "Instantânea", 
+                            casting_time: "1 Ação", 
+                            description: "Dispara uma rajada cintilante de força arcana que atinge o alvo com precisão." 
+                        },
+                        { 
+                            name: "Escudo Mágico", 
+                            range: "Pessoal", 
+                            duration: "1 Rodada", 
+                            casting_time: "1 Reação", 
+                            description: "Uma barreira invisível de força surge para repelir ataques e bloquear projéteis." 
+                        }
+                    );
+                }
+
+                if (!fichaData.spells) fichaData.spells = {};
+                fichaData.spells.list = normalizedSpells;
+
+                // h. Perícias e Identificação de Usuário
                 if (!fichaData.proficiencies_choice) fichaData.proficiencies_choice = { skills: [] };
+                fichaData.userId = String(fichaData.userId || p.userId || "");
 
                 // Injeta diretamente na cena em runtime
                 this.waitForGame((game, scene) => {

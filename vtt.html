@@ -379,7 +379,7 @@
                         console.warn("[Lyra VTT] Falha ao carregar lista de aventureiros:", pErr);
                     }
 
-                    // 5. Restaura estado de AttSession salvo no documento da sessão
+                    // 5. Restaura estado de AttSession salvo no documento da sessão (com sanitização rigorosa de mapa e dados)
                     let savedAttContent = sessionData.AttSession || sessionData.vttVariables || null;
                     if (!savedAttContent && (sessionData.Tile_Matriz || sessionData.Players)) {
                         savedAttContent = {
@@ -397,6 +397,19 @@
 
                     if (savedAttContent) {
                         const restored = VTTIntegration.restoreArraysFromFirestore(savedAttContent);
+
+                        // Protege contra URLs de mapas corrompidas salvas no histórico (ex: "2Q==")
+                        if (restored.Map) {
+                            if (!restored.Map.Img || typeof restored.Map.Img !== 'string' || !restored.Map.Img.startsWith('http')) {
+                                restored.Map.Img = mapUrl;
+                            }
+                        }
+
+                        // Preserva integridade de Players caso o snapshot salvo esteja vazio
+                        if ((!restored.Players || Object.keys(restored.Players).length === 0) && playersList.length > 0) {
+                            delete restored.Players;
+                        }
+
                         console.log("[Lyra VTT] Restaurando AttSession da sessão no motor:", restored);
                         VTTIntegration.sendToVTT({
                             type: "AttSession",
