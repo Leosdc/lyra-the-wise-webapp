@@ -6,6 +6,51 @@
 import { db } from '../auth.js';
 import { doc, getDoc, onSnapshot, updateDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
+/**
+ * Constantes semânticas imutáveis do VTT
+ */
+export const VTT_CONSTANTS = Object.freeze({
+    QUEUE_INTERVAL_MS: 160,
+    WAIT_FOR_GAME_POLL_MS: 150,
+    MAX_GAME_INIT_ATTEMPTS: 150,
+    DEFAULT_CELL_SIZE: 64,
+    DEFAULT_MAP_WIDTH: 1280,
+    DEFAULT_MAP_HEIGHT: 720,
+    DEFAULT_SPAWN_X: 6,
+    DEFAULT_SPAWN_Y: 5,
+    DEFAULT_MAP_PATH: "/assets/maps/default.jpg",
+    DEFAULT_TOKEN_PATH: "/assets/tokens/default_char.png",
+    DEFAULT_HERO_STATS: Object.freeze({
+        ac: 12,
+        hp: 20,
+        speed: 9
+    }),
+    DEFAULT_HERO_ATTRIBUTES: Object.freeze({
+        str: 10,
+        dex: 10,
+        con: 10,
+        int: 10,
+        wis: 10,
+        cha: 10
+    })
+});
+
+/**
+ * Resolve uma URL absoluta segura para assets (evitando dependências de domínios externos hardcoded)
+ * @param {string|null|undefined} pathOrUrl - Caminho relativo ou URL absoluta
+ * @param {string} fallbackPath - Caminho de fallback relativo
+ * @returns {string} URL absoluta iniciada por http/https
+ */
+export function resolveAbsoluteAssetUrl(pathOrUrl, fallbackPath = VTT_CONSTANTS.DEFAULT_TOKEN_PATH) {
+    const raw = (typeof pathOrUrl === 'string' && pathOrUrl.trim()) ? pathOrUrl.trim() : fallbackPath;
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        return raw;
+    }
+    const origin = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : '';
+    const cleanPath = raw.startsWith('/') ? raw : `/${raw}`;
+    return `${origin}${cleanPath}`;
+}
+
 export const VTTIntegration = {
     iframeEl: null,
     gameInstance: null,
@@ -114,7 +159,7 @@ export const VTTIntegration = {
         if (!this.iframeEl || this._isDestroyed) return;
 
         let attempts = 0;
-        const maxAttempts = 150; // ~22.5s limite seguro
+        const maxAttempts = VTT_CONSTANTS.MAX_GAME_INIT_ATTEMPTS;
 
         const check = () => {
             if (this._isDestroyed || !this.iframeEl) return;
@@ -153,7 +198,7 @@ export const VTTIntegration = {
             }
 
             if (attempts < maxAttempts && !this._isDestroyed) {
-                setTimeout(check, 150);
+                setTimeout(check, VTT_CONSTANTS.WAIT_FOR_GAME_POLL_MS);
             }
         };
         check();
@@ -198,11 +243,11 @@ export const VTTIntegration = {
                 console.warn("[Lyra VTT] Falha ao despachar comando da fila:", err);
             }
 
-            // Aguarda 160ms para dar tempo do frame do GDevelop consumir a mensagem
+            // Aguarda o intervalo de frame configurado antes de processar o próximo item da fila
             setTimeout(() => {
                 this._isProcessingQueue = false;
                 this._processQueue();
-            }, 160);
+            }, VTT_CONSTANTS.QUEUE_INTERVAL_MS);
         });
     },
 
@@ -270,25 +315,28 @@ export const VTTIntegration = {
     /**
      * Envia o mapa (URL, tamanho da grade e dimensões) para o VTT
      */
-    loadMap(urlMap, cellSize = 64, customSize = { on: "true", x: "1280", y: "720" }) {
-        let safeUrl = (typeof urlMap === 'string' && urlMap.trim()) ? urlMap.trim() : "/assets/maps/default.jpg";
+    loadMap(urlMap, cellSize = VTT_CONSTANTS.DEFAULT_CELL_SIZE, customSize = { on: "true", x: String(VTT_CONSTANTS.DEFAULT_MAP_WIDTH), y: String(VTT_CONSTANTS.DEFAULT_MAP_HEIGHT) }) {
+        const safeUrl = resolveAbsoluteAssetUrl(urlMap, VTT_CONSTANTS.DEFAULT_MAP_PATH);
+        const resolvedCellSize = Number(cellSize) || VTT_CONSTANTS.DEFAULT_CELL_SIZE;
+        const resolvedWidth = Number(customSize?.x) || VTT_CONSTANTS.DEFAULT_MAP_WIDTH;
+        const resolvedHeight = Number(customSize?.y) || VTT_CONSTANTS.DEFAULT_MAP_HEIGHT;
         
         this._currentMapData = {
             Img: safeUrl,
-            CellSize: Number(cellSize) || 64,
-            x: Number(customSize?.x) || 1280,
-            y: Number(customSize?.y) || 720
+            CellSize: resolvedCellSize,
+            x: resolvedWidth,
+            y: resolvedHeight
         };
 
         const payload = {
             type: "LoadMap",
             content: {
                 urlMap: safeUrl,
-                CellSize: Number(cellSize) || 64,
+                CellSize: resolvedCellSize,
                 CustonSize: {
                     on: String(customSize?.on || "true"),
-                    x: String(customSize?.x || "1280"),
-                    y: String(customSize?.y || "720")
+                    x: String(resolvedWidth),
+                    y: String(resolvedHeight)
                 }
             }
         };
@@ -308,8 +356,8 @@ export const VTTIntegration = {
                 const varCell = scene.getVariables().get("CellSize") || scene.getVariables().getFromIndex(13);
                 if (varUrl) varUrl.setString(safeUrl);
                 if (varCell) {
-                    varCell.getChild("X").setNumber(Number(cellSize) || 64);
-                    varCell.getChild("Y").setNumber(Number(cellSize) || 64);
+                    varCell.getChild("X").setNumber(resolvedCellSize);
+                    varCell.getChild("Y").setNumber(resolvedCellSize);
                 }
             } catch (e) {}
         });
@@ -327,8 +375,8 @@ export const VTTIntegration = {
                 players: validPlayers.map(p => ({
                     fichaId: String(p.fichaId || p.characterId || p.id || ""),
                     position: {
-                        x: Number(p.x !== undefined ? p.x : (p.position?.x ?? 6)),
-                        y: Number(p.y !== undefined ? p.y : (p.position?.y ?? 5))
+                        x: Number(p.x !== undefined ? p.x : (p.position?.x ?? VTT_CONSTANTS.DEFAULT_SPAWN_X)),
+                        y: Number(p.y !== undefined ? p.y : (p.position?.y ?? VTT_CONSTANTS.DEFAULT_SPAWN_Y))
                     }
                 }))
             }
@@ -350,9 +398,9 @@ export const VTTIntegration = {
                 if (!fichaData) {
                     fichaData = {
                         name: p.characterName || p.name || "Aventureiro",
-                        tokenUrl: p.tokenUrl || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png",
-                        stats: { ac: 12, hp: 20, speed: 9 },
-                        attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+                        tokenUrl: resolveAbsoluteAssetUrl(p.tokenUrl, VTT_CONSTANTS.DEFAULT_TOKEN_PATH),
+                        stats: { ...VTT_CONSTANTS.DEFAULT_HERO_STATS },
+                        attributes: { ...VTT_CONSTANTS.DEFAULT_HERO_ATTRIBUTES },
                         combat: { attacks: [] },
                         spells: { list: [] },
                         proficiencies_choice: { skills: [] }
@@ -361,9 +409,10 @@ export const VTTIntegration = {
 
                 // Normalizações cruciais exigidas pelo motor do GDevelop:
                 // a. Imagem de token com URL 'http' válida (para checagem startsWith 'ht' do GDevelop)
-                if (!fichaData.tokenUrl || !fichaData.tokenUrl.startsWith("http")) {
-                    fichaData.tokenUrl = fichaData.avatar || fichaData.portraitUrl || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png";
-                }
+                fichaData.tokenUrl = resolveAbsoluteAssetUrl(
+                    fichaData.tokenUrl || fichaData.avatar || fichaData.portraitUrl || p.tokenUrl, 
+                    VTT_CONSTANTS.DEFAULT_TOKEN_PATH
+                );
 
                 // b. Nome do herói
                 fichaData.name = fichaData.name || fichaData.bio?.name || p.characterName || "Herói";
@@ -371,20 +420,20 @@ export const VTTIntegration = {
                 // c. stats.speed como número para divisão matemática no grid
                 if (!fichaData.stats) fichaData.stats = {};
                 if (typeof fichaData.stats.speed === 'string') {
-                    fichaData.stats.speed = parseFloat(fichaData.stats.speed) || 9;
+                    fichaData.stats.speed = parseFloat(fichaData.stats.speed) || VTT_CONSTANTS.DEFAULT_HERO_STATS.speed;
                 } else if (!fichaData.stats.speed) {
-                    fichaData.stats.speed = 9;
+                    fichaData.stats.speed = VTT_CONSTANTS.DEFAULT_HERO_STATS.speed;
                 }
 
                 // d. CA e HP
-                fichaData.stats.ac = Number(fichaData.stats.ac || fichaData.combat?.ac || 10);
+                fichaData.stats.ac = Number(fichaData.stats.ac || fichaData.combat?.ac || VTT_CONSTANTS.DEFAULT_HERO_STATS.ac);
                 if (!fichaData.stats.hp && fichaData.combat?.hp) {
-                    fichaData.stats.hp = fichaData.combat.hp.current || 20;
+                    fichaData.stats.hp = fichaData.combat.hp.current || VTT_CONSTANTS.DEFAULT_HERO_STATS.hp;
                 }
 
                 // e. Atributos
                 if (!fichaData.attributes) {
-                    fichaData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+                    fichaData.attributes = { ...VTT_CONSTANTS.DEFAULT_HERO_ATTRIBUTES };
                 }
 
                 // f. Magias, ataques e perícias para geração de Action Cards
@@ -409,8 +458,8 @@ export const VTTIntegration = {
                             const listData = [{
                                 fichaId: fichaId,
                                 position: {
-                                    x: Number(p.x !== undefined ? p.x : (p.position?.x ?? 6)),
-                                    y: Number(p.y !== undefined ? p.y : (p.position?.y ?? 5))
+                                    x: Number(p.x !== undefined ? p.x : (p.position?.x ?? VTT_CONSTANTS.DEFAULT_SPAWN_X)),
+                                    y: Number(p.y !== undefined ? p.y : (p.position?.y ?? VTT_CONSTANTS.DEFAULT_SPAWN_Y))
                                 }
                             }];
                             if (varList) varList.fromJSObject(listData);

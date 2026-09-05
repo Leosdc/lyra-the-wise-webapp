@@ -1032,7 +1032,7 @@ export const GMPanelModule = {
             this.startVTTHeroesListener();
 
             // 3. Inicializa a integração com o motor GDevelop
-            import('./vtt-integration.js').then(({ VTTIntegration }) => {
+            import('./vtt-integration.js').then(({ VTTIntegration, VTT_CONSTANTS }) => {
                 // Passa o ID da sessão ativa para a integração como Mestre
                 VTTIntegration.init(iframe, this.activeSession?.id, { isMaster: true });
                 
@@ -1061,9 +1061,8 @@ export const GMPanelModule = {
                                 mapUrl = chapterWithMap.mapUrl;
                             }
                         }
-                        if (!mapUrl) mapUrl = "/assets/maps/default.jpg";
-                        const cellSize = Number(this.activeSession.cellSize) || 64;
-                        VTTIntegration.loadMap(mapUrl, cellSize);
+                        const cellSize = Number(this.activeSession.cellSize) || VTT_CONSTANTS.DEFAULT_CELL_SIZE;
+                        VTTIntegration.loadMap(mapUrl || VTT_CONSTANTS.DEFAULT_MAP_PATH, cellSize);
 
                         // 3. Caso existam variáveis de sessão salvas (vttVariables) no Firebase, restaura o estado
                         if (this.activeSession.vttVariables) {
@@ -1517,15 +1516,15 @@ export const GMPanelModule = {
 
         const invite = this._currentInvites?.find(p => p.characterId === characterId || p.id === characterId);
 
-        import('./vtt-integration.js').then(({ VTTIntegration }) => {
+        import('./vtt-integration.js').then(({ VTTIntegration, VTT_CONSTANTS, resolveAbsoluteAssetUrl }) => {
             // Instancia o token do herói com os dados esperados pelo GDevelop (LoadPlayer)
             const playerPayload = [{
                 fichaId: String(characterId),
                 id: String(characterId),
                 characterName: invite?.characterName || invite?.nickname || "Herói",
-                tokenUrl: invite?.avatar || "https://raw.githubusercontent.com/Leosdc/lyra-the-wise-webapp/dev/public/assets/tokens/default_char.png",
-                x: 6,
-                y: 5
+                tokenUrl: resolveAbsoluteAssetUrl(invite?.avatar, VTT_CONSTANTS.DEFAULT_TOKEN_PATH),
+                x: VTT_CONSTANTS.DEFAULT_SPAWN_X,
+                y: VTT_CONSTANTS.DEFAULT_SPAWN_Y
             }];
 
             VTTIntegration.loadPlayers(playerPayload);

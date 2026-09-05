@@ -236,7 +236,7 @@
         import { db, auth } from './js/auth.js';
         import { onAuthStateChanged } from "firebase/auth";
         import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-        import { VTTIntegration } from './js/modules/vtt-integration.js';
+        import { VTTIntegration, VTT_CONSTANTS } from './js/modules/vtt-integration.js';
 
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get('id');
@@ -341,13 +341,13 @@
                     
                     let mapUrl = (chapterData?.mapUrl && chapterData.mapUrl.trim()) 
                         || (sessionData.mapUrl && sessionData.mapUrl.trim()) 
-                        || "/assets/maps/default.jpg";
+                        || VTT_CONSTANTS.DEFAULT_MAP_PATH;
 
                     if (!mapUrl || !mapUrl.trim()) {
-                        mapUrl = "/assets/maps/default.jpg";
+                        mapUrl = VTT_CONSTANTS.DEFAULT_MAP_PATH;
                     }
 
-                    const cellSize = Number(chapterData?.cellSize || sessionData.cellSize || 64);
+                    const cellSize = Number(chapterData?.cellSize || sessionData.cellSize || VTT_CONSTANTS.DEFAULT_CELL_SIZE);
 
                     if (chapterData?.title) {
                         sessionTitleEl.innerText = `${sessionData.title || "Crônica"} - ${chapterData.title}`;
