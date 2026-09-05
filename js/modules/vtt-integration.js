@@ -470,57 +470,29 @@ export const VTTIntegration = {
                     hit_dice_current: hitDiceVal
                 };
 
-                // f. Normalização e mapeamento completo de Ataques (combat.attacks) para geração de Action Cards no GDevelop
+                // f. Mapeamento de Ataques (combat.attacks) estritamente do Firestore da ficha
                 const rawAttacks = fichaData.combat?.attacks || fichaData.attacks || [];
                 const normalizedAttacks = Array.isArray(rawAttacks) ? rawAttacks.map(atk => ({
-                    name: String(atk.name || atk.nome || "Ataque"),
-                    damage: String(atk.damage || atk.dano || atk.damage_dice || "1d6+2")
-                })) : [];
-
-                // Caso a ficha ainda não possua ataques cadastrados, fornece ações táticas fundamentais
-                if (normalizedAttacks.length === 0) {
-                    normalizedAttacks.push(
-                        { name: "Ataque Desarmado", damage: "1d4+2 Contusão" },
-                        { name: "Ataque Básico", damage: "1d6+2 Perfurante" },
-                        { name: "Investida Rápida", damage: "1d8+2 Impacto" }
-                    );
-                }
+                    name: String(atk.name || atk.nome || ""),
+                    damage: String(atk.damage || atk.dano || atk.damage_dice || "")
+                })).filter(atk => atk.name.trim() !== "") : [];
 
                 if (!fichaData.combat) fichaData.combat = {};
                 fichaData.combat.attacks = normalizedAttacks;
 
-                // g. Normalização e mapeamento completo de Magias (spells.list) para geração de Action Cards no GDevelop
+                // g. Mapeamento de Magias (spells.list) estritamente do Firestore da ficha (se vazio, lista vazia)
                 const rawSpells = fichaData.spells?.list 
                     || (Array.isArray(fichaData.spells) ? fichaData.spells : []) 
                     || fichaData.magias 
                     || [];
 
                 const normalizedSpells = Array.isArray(rawSpells) ? rawSpells.map(sp => ({
-                    name: String(sp.name || sp.nome || "Magia"),
-                    range: String(sp.range || sp.alcance || "18m"),
-                    duration: String(sp.duration || sp.duracao || "Instantânea"),
-                    casting_time: String(sp.casting_time || sp.tempo_conjuracao || "1 Ação"),
-                    description: String(sp.description || sp.descricao || sp.effect || sp.efeito || "Efeito mágico concentrado.")
-                })) : [];
-
-                if (normalizedSpells.length === 0) {
-                    normalizedSpells.push(
-                        { 
-                            name: "Raio de Energia", 
-                            range: "36m", 
-                            duration: "Instantânea", 
-                            casting_time: "1 Ação", 
-                            description: "Dispara uma rajada cintilante de força arcana que atinge o alvo com precisão." 
-                        },
-                        { 
-                            name: "Escudo Mágico", 
-                            range: "Pessoal", 
-                            duration: "1 Rodada", 
-                            casting_time: "1 Reação", 
-                            description: "Uma barreira invisível de força surge para repelir ataques e bloquear projéteis." 
-                        }
-                    );
-                }
+                    name: String(sp.name || sp.nome || ""),
+                    range: String(sp.range || sp.alcance || ""),
+                    duration: String(sp.duration || sp.duracao || ""),
+                    casting_time: String(sp.casting_time || sp.tempo_conjuracao || ""),
+                    description: String(sp.description || sp.descricao || sp.effect || sp.efeito || "")
+                })).filter(sp => sp.name.trim() !== "") : [];
 
                 if (!fichaData.spells) fichaData.spells = {};
                 fichaData.spells.list = normalizedSpells;

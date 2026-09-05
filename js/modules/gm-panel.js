@@ -7,7 +7,7 @@
  *  - gm-invites.js  → Invitation send/cancel, listener, player sheet view
  */
 
-import { db } from '../auth.js';
+import { db, storage } from '../auth.js';
 import { getAuth } from "firebase/auth";
 import {
     collection, addDoc, getDocs, query, where,
