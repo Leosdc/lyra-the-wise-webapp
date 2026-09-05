@@ -17,6 +17,7 @@ export default defineConfig({
             input: {
                 main: 'index.html',
                 sessionStage: 'session-stage.html',
+                vtt: 'vtt.html',
                 audit: 'audit.html',
                 diagnose: 'diagnose.html',
             },

@@ -51,6 +51,7 @@ docs/auditoria.md
 .agents/
 skills-lock.json
 .env.development
+.understand-anything/
 
 # Motores compilados offline e executáveis gigantes (NIST SI-16)
 *.exe

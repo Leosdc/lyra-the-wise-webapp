@@ -307,11 +307,14 @@ export const NavigationModule = {
                         </div>
                     </div>
 
-                    <!-- ADENTRAR ATRIUM button for invited players/guests
+                    <!-- ADENTRAR ATRIUM e ADENTRAR VTT buttons for invited players/guests
                          (Session owners are redirected to GM Panel at line 244-254) -->
-                    <div class="detail-actions" style="margin-top: 2rem; text-align: center;">
+                    <div class="detail-actions" style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                         <button class="medieval-btn gold-pulse" onclick="NavigationModule.enterSession('${session.id}')">
                             <i class="fas fa-door-open"></i> ADENTRAR ATRIUM
+                        </button>
+                        <button class="medieval-btn primary" style="background: linear-gradient(135deg, #2d5a27, #4a8c3f); border-color: #5dba50;" onclick="NavigationModule.enterVTT('${session.id}')">
+                            <i class="fas fa-map-location-dot"></i> ADENTRAR VTT
                         </button>
                     </div>
                 </div>
@@ -566,6 +569,14 @@ export const NavigationModule = {
             localStorage.setItem('lyra_active_chapter', 0);
             window.open(`session-stage.html?id=${sessionId}&chapter=0`, '_blank');
         }
+    },
+
+    enterVTT(sessionId) {
+        if (!sessionId) {
+            console.error("NavigationModule: Session ID missing for VTT.");
+            return;
+        }
+        window.open(`vtt.html?id=${sessionId}&role=player`, '_blank');
     }
 };
 

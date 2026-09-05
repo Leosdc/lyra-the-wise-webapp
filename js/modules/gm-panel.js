@@ -189,8 +189,17 @@ export const GMPanelModule = {
                         <div class="gm-sidebar-content">
                             <ul class="player-list" id="gm-player-list"></ul>
                             <div class="gm-map-section">
-                                <div class="gm-sidebar-header"><h3>MAPA</h3><button class="medieval-btn icon-only" data-action="gm-open-map" title="Configurar Mapa"><i class="fas fa-map"></i></button></div>
-                                <div id="gm-map-container" class="gm-map-container"><div class="map-grid-overlay"></div><div class="map-placeholder"><i class="fas fa-compass fa-spin"></i><p>Em breve: Mapas Táticos</p></div></div>
+                                <div class="gm-sidebar-header">
+                                    <h3>MAPA</h3>
+                                    <div style="display: flex; gap: 4px; align-items: center;">
+                                        <label class="medieval-btn icon-only small" title="Carregar Imagem de Mapa" style="cursor: pointer; margin: 0; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-cloud-arrow-up"></i>
+                                            <input type="file" id="gm-sidebar-map-upload-input" accept="image/*" style="display: none;">
+                                        </label>
+                                        <button class="medieval-btn icon-only small" data-action="gm-open-map" title="Configurar Mapa"><i class="fas fa-map"></i></button>
+                                    </div>
+                                </div>
+                                <div id="gm-map-container" class="gm-map-container" style="position: relative; overflow: hidden; cursor: pointer;" data-action="gm-open-map"><div class="map-grid-overlay"></div><div class="map-placeholder"><i class="fas fa-compass fa-spin"></i><p>Em breve: Mapas Táticos</p></div></div>
                             </div>
                         </div>
                     </aside>
@@ -359,6 +368,43 @@ export const GMPanelModule = {
                     </div>
                 </div>
             </div>
+
+            <!-- Modal de Vinculação de Mapa a Sessões do Sistema -->
+            <div id="gm-vtt-map-link-modal" class="modal-overlay hidden" style="z-index: 10005;">
+                <div class="modal-content medieval-modal" style="max-width: 580px; width: 92vw;">
+                    <button class="close-modal" id="btn-close-map-link-modal"><i class="fas fa-times"></i></button>
+                    <h2 class="modal-title"><i class="fas fa-map-location-dot"></i> Vincular Cenário às Sessões</h2>
+                    <div class="parchment-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.88rem; color: #e0d0b0; margin: 0;">
+                            Defina em quais sessões e capítulos este mapa de combate estará vinculado no sistema:
+                        </p>
+                        
+                        <div id="vtt-map-link-preview-container" style="display: flex; gap: 12px; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.3);">
+                            <img id="vtt-map-link-preview-img" src="" style="width: 110px; height: 75px; object-fit: cover; border-radius: 4px; border: 1px solid var(--gold); background: #000;" alt="Preview">
+                            <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 4px;">
+                                <strong id="vtt-map-link-preview-name" style="color: var(--gold); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">mapa.jpg</strong>
+                                <span id="vtt-map-link-preview-size" style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">Tamanho da imagem</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 6px;">
+                            <span style="font-size: 0.85rem; color: var(--gold); font-weight: 600;"><i class="fas fa-scroll"></i> Sessões da Crônica & Sistema</span>
+                            <button type="button" class="medieval-btn small secondary" id="btn-toggle-select-all-sessions" style="font-size: 0.75rem; padding: 3px 8px; margin: 0;">
+                                <i class="fas fa-check-double"></i> Selecionar Todas
+                            </button>
+                        </div>
+
+                        <div id="vtt-map-sessions-checkboxes-list" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(10,5,3,0.6); border: 1px solid rgba(212,175,55,0.2); border-radius: 4px;">
+                            <!-- Checkboxes renderizadas dinamicamente -->
+                        </div>
+
+                        <div class="modal-actions-centered" style="margin-top: 10px; display: flex; gap: 12px; justify-content: center;">
+                            <button class="medieval-btn secondary" id="btn-cancel-map-link"><i class="fas fa-times"></i> Cancelar</button>
+                            <button class="medieval-btn gold-pulse" id="btn-confirm-map-link"><i class="fas fa-cloud-arrow-up"></i> Salvar e Vincular Imagem</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
@@ -458,13 +504,35 @@ export const GMPanelModule = {
             });
         }
 
-        // Enter VTT Button (Opens VTT map in new tab)
+        // Enter VTT Button (Abre o seletor de sessão/capítulo para adentrar o VTT como Mestre)
         const enterVttBtn = document.getElementById('btn-enter-vtt');
         if (enterVttBtn) {
             enterVttBtn.addEventListener('click', () => {
-                window.open('vtt/app/index.html', '_blank');
+                this.openSessionSelectModal('vtt');
             });
         }
+
+        // Upload de mapa direto da barra lateral do Painel do Mestre
+        const sidebarMapUpload = document.getElementById('gm-sidebar-map-upload-input');
+        if (sidebarMapUpload) {
+            sidebarMapUpload.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                    this.openMapLinkModal(file);
+                    e.target.value = ''; // Permite selecionar o mesmo arquivo novamente
+                }
+            });
+        }
+
+        // Eventos do Modal de Vinculação de Mapa a Sessões
+        document.getElementById('btn-close-map-link-modal')?.addEventListener('click', () => this.closeMapLinkModal());
+        document.getElementById('btn-cancel-map-link')?.addEventListener('click', () => this.closeMapLinkModal());
+        document.getElementById('btn-confirm-map-link')?.addEventListener('click', () => this.confirmMapLink());
+        document.getElementById('btn-toggle-select-all-sessions')?.addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('#vtt-map-sessions-checkboxes-list input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        });
 
         // Custom Select Trigger
         document.getElementById('gm-session-select-trigger')?.addEventListener('click', () => {
@@ -809,6 +877,7 @@ export const GMPanelModule = {
         this.renderSagaData(session);
         this.renderTimeline(session);
         this.showSummary(session.summary);
+        this.updateSidebarMapPreview(session.mapUrl);
     },
 
     showStartOptions() {
@@ -901,18 +970,19 @@ export const GMPanelModule = {
             modal.classList.remove('hidden');
             iframe.src = '/vtt/app/index.html';
             
-            // Renderiza imediatamente a barra lateral de controles (Upload do Mapa, Tamanho da Grade, etc)
-            this.renderVTTControlPanel([]);
+            // Renderiza imediatamente com convites já em cache no painel, se existirem
+            const cachedInvites = this._currentInvites || [];
+            this.renderVTTControlPanel(cachedInvites);
             
             // Inicializa a integração
             import('./vtt-integration.js').then(({ VTTIntegration }) => {
-                // Passa o ID da sessão ativa para a integração
-                VTTIntegration.init(iframe, this.activeSession?.id);
+                // Passa o ID da sessão ativa para a integração como Mestre
+                VTTIntegration.init(iframe, this.activeSession?.id, { isMaster: true });
                 
                 // Envia dados iniciais da sessão após o carregamento
                 VTTIntegration.waitForGame(async (game, scene) => {
                     if (this.activeSession) {
-                        // 0. Envia a identidade do jogador (neste caso, o Mestre) para destravar a inicialização da cena
+                        // 0. Envia a identidade do jogador (Mestre)
                         try {
                             const auth = getAuth();
                             const user = auth.currentUser;
@@ -923,21 +993,24 @@ export const GMPanelModule = {
                             console.error("[Lyra VTT] Erro ao sincronizar a identidade do mestre:", err);
                         }
 
-                        // 1. Carrega o mapa da campanha/sessão
+                        // 1. Envia o ID da sessão com carregamento ativado
+                        VTTIntegration.sendSessionID(this.activeSession.id, "on");
+
+                        // 2. Carrega o mapa da campanha/sessão
                         const mapUrl = this.activeSession.mapUrl || "/assets/maps/default.jpg";
-                        const cellSize = this.activeSession.cellSize || 50;
+                        const cellSize = Number(this.activeSession.cellSize) || 64;
                         VTTIntegration.loadMap(mapUrl, cellSize);
 
-                        // 1.5. Caso existam variáveis de sessão salvas (vttVariables) no Firebase, reinjeta-as para restaurar o estado do VTT
+                        // 3. Caso existam variáveis de sessão salvas (vttVariables) no Firebase, restaura o estado
                         if (this.activeSession.vttVariables) {
-                            console.log("[Lyra VTT] Enviando variáveis salvas no Firebase para restaurar o estado do VTT...");
+                            console.log("[Lyra VTT] Enviando variáveis salvas para restaurar o estado do VTT...");
                             VTTIntegration.sendToVTT({
-                                type: "LoadSession",
+                                type: "AttSession",
                                 content: this.activeSession.vttVariables
                             });
                         }
                         
-                        // 2. Conecta um Listener em Tempo Real para os participantes da sessão no Painel de Controle
+                        // 4. Conecta um Listener em Tempo Real para os participantes da sessão no Painel de Controle
                         try {
                             const { collection, query, where, onSnapshot } = await import("firebase/firestore");
                             
@@ -953,10 +1026,17 @@ export const GMPanelModule = {
                                     .map(d => ({ id: d.id, ...d.data() }))
                                     .filter(p => p.role !== 'gm' && !p.id.startsWith('self_'));
                                 
+                                this._currentInvites = players;
                                 this.renderVTTControlPanel(players);
+
+                                // Invocação automática inicial de aventureiros com ficha
+                                const playersWithSheets = players.filter(p => p.characterId);
+                                if (playersWithSheets.length > 0) {
+                                    VTTIntegration.loadPlayers(playersWithSheets);
+                                }
                             });
                         } catch (err) {
-                            console.error("[Lyra VTT] Erro ao carregar ouvintes de tempo real para participantes:", err);
+                            console.error("[Lyra VTT] Erro ao carregar participantes em tempo real:", err);
                         }
                     }
                 });
@@ -983,14 +1063,14 @@ export const GMPanelModule = {
         }
     },
 
-    renderVTTControlPanel(players) {
+    renderVTTControlPanel(players = []) {
         const sidebar = document.getElementById('gm-vtt-control-sidebar');
         if (!sidebar) return;
 
-        const currentCellSize = this.activeSession?.cellSize || 50;
+        const currentCellSize = this.activeSession?.cellSize || 64;
 
         let playersHtml = "";
-        if (players.length === 0) {
+        if (!players || players.length === 0) {
             playersHtml = `
                 <div style="color: rgba(212, 175, 55, 0.6); text-align: center; font-size: 0.85rem; padding: 20px 0; border: 1px dashed rgba(212, 175, 55, 0.2); border-radius: 4px; background: rgba(0,0,0,0.3);">
                     <i class="fas fa-ghost" style="font-size: 1.6rem; display: block; margin-bottom: 8px; color: rgba(212, 175, 55, 0.4);"></i>
@@ -999,23 +1079,23 @@ export const GMPanelModule = {
             `;
         } else {
             players.forEach(p => {
-                const labelName = p.characterName || p.nickname || p.displayName || p.email;
+                const labelName = p.characterName || p.nickname || p.displayName || p.email || "Aventureiro(a)";
                 const statusColor = p.status === 'online' ? '#2ecc71' : (p.status === 'accepted' ? '#f1c40f' : '#7f8c8d');
                 const statusLabel = p.status === 'online' ? 'Online' : (p.status === 'accepted' ? 'Aceito' : 'Convidado');
                 const hasSheet = !!p.characterId;
 
                 playersHtml += `
-                    <div style="background: rgba(30, 15, 8, 0.45); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.4);">
+                    <div style="background: rgba(30, 15, 8, 0.55); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
                         <div style="display: flex; flex-direction: column; overflow: hidden; gap: 2px;">
                             <strong style="color: var(--gold); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${labelName}">${labelName}</strong>
-                            <span style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.4); display: flex; align-items: center; gap: 4px;">
-                                <span style="width: 5px; height: 5px; border-radius: 50%; background: ${statusColor}; display: inline-block;"></span>
-                                ${statusLabel} ${p.nickname ? `(${p.nickname})` : ''}
+                            <span style="font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); display: flex; align-items: center; gap: 4px;">
+                                <span style="width: 6px; height: 6px; border-radius: 50%; background: ${statusColor}; display: inline-block;"></span>
+                                ${statusLabel} ${p.characterName ? `• Ficha: ${p.characterName}` : (p.nickname ? `(${p.nickname})` : '')}
                             </span>
                         </div>
                         <div style="display: flex; gap: 6px;">
-                            <button class="medieval-btn small gold-pulse" style="flex: 1; padding: 4px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;" 
-                                    ${hasSheet ? '' : 'disabled title="Aventureiro não escolheu ficha de personagem ainda"'} 
+                            <button class="medieval-btn small gold-pulse" style="flex: 1; padding: 5px 8px; font-size: 0.75rem; margin: 0; display: flex; justify-content: center; align-items: center; gap: 4px;" 
+                                    ${hasSheet ? '' : 'disabled title="Aventureiro não vinculou ficha de personagem ainda"'} 
                                     onclick="GMPanelModule.spawnPlayerToken('${p.characterId || p.id}')">
                                 <i class="fas fa-street-view"></i> Invocar Token
                             </button>
@@ -1036,8 +1116,8 @@ export const GMPanelModule = {
                         <i class="fas fa-cloud-arrow-up"></i> Upload do Mapa
                         <input type="file" id="vtt-map-upload-input" accept="image/*" style="display: none;">
                     </label>
-                    <div style="font-size: 0.65rem; color: rgba(212, 175, 55, 0.5); text-align: center;">
-                        * Recomendado imagens de até 500KB
+                    <div style="font-size: 0.65rem; color: rgba(212, 175, 55, 0.6); text-align: center;">
+                        * Abrirá pop-up para vincular às sessões do sistema
                     </div>
                     <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
                         <input type="number" id="vtt-grid-size-input" class="medieval-input small" value="${currentCellSize}" min="20" max="200" style="width: 65px; text-align: center; font-size: 0.8rem; padding: 3px 6px; margin: 0;" title="Tamanho da Grade (px)">
@@ -1046,6 +1126,17 @@ export const GMPanelModule = {
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Seção de Invocação de Ameaça/NPC -->
+            <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 14px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="medieval-subtitle" style="margin: 0 0 4px 0; font-size: 0.95rem; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-dragon"></i> Invocador de Ameaça / NPC
+                </div>
+                <label class="medieval-btn small secondary" style="display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin: 0; padding: 6px 12px; font-size: 0.8rem; width: 100%;">
+                    <i class="fas fa-mask"></i> Upload Token de NPC
+                    <input type="file" id="vtt-npc-upload-input" accept="image/*" style="display: none;">
+                </label>
             </div>
 
             <!-- Seção de Aventureiros -->
@@ -1069,40 +1160,18 @@ export const GMPanelModule = {
         const applyGridBtn = document.getElementById('vtt-apply-grid-btn');
 
         if (fileInput) {
-            fileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                window.app.toggleLoading(true, "Tecendo o novo cenário de combate...");
-                try {
-                    const base64Url = await this.compressImage(file, 1200, 1200, 0.75);
-                    const cellSize = parseInt(gridInput?.value || "50");
-
-                    // 1. Salva no Firestore
-                    await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
-                        mapUrl: base64Url,
-                        cellSize: cellSize,
-                        updatedAt: serverTimestamp()
-                    });
-
-                    // 2. Propaga imediatamente no VTT
-                    import('./vtt-integration.js').then(({ VTTIntegration }) => {
-                        VTTIntegration.loadMap(base64Url, cellSize);
-                    });
-
-                    window.app.showAlert("O novo cenário de combate foi otimizado e manifestado com sucesso!", "Saga Atualizada");
-                } catch (err) {
-                    console.error("[Lyra VTT] Erro ao salvar mapa local no Firestore:", err);
-                    window.app.showAlert("Falha ao registrar novo tabuleiro no éter.");
-                } finally {
-                    window.app.toggleLoading(false);
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                    this.openMapLinkModal(file);
+                    e.target.value = '';
                 }
             });
         }
 
         if (applyGridBtn && gridInput) {
             applyGridBtn.addEventListener('click', async () => {
-                const cellSize = parseInt(gridInput.value || "50");
+                const cellSize = parseInt(gridInput.value || "64");
                 if (isNaN(cellSize) || cellSize < 20 || cellSize > 200) {
                     window.app.showAlert("O tamanho da grade deve ser entre 20 e 200 pixels.", "Aviso");
                     return;
@@ -1115,6 +1184,7 @@ export const GMPanelModule = {
                         cellSize: cellSize,
                         updatedAt: serverTimestamp()
                     });
+                    this.activeSession.cellSize = cellSize;
 
                     import('./vtt-integration.js').then(({ VTTIntegration }) => {
                         VTTIntegration.loadMap(mapUrl, cellSize);
@@ -1133,7 +1203,7 @@ export const GMPanelModule = {
         const npcFileInput = document.getElementById('vtt-npc-upload-input');
         if (npcFileInput) {
             npcFileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
+                const file = e.target.files?.[0];
                 if (!file) return;
 
                 window.app.toggleLoading(true, "Otimizando token da ameaça...");
@@ -1142,6 +1212,7 @@ export const GMPanelModule = {
                     const npcName = file.name.replace(/\.[^/.]+$/, "");
                     import('./vtt-integration.js').then(({ VTTIntegration }) => {
                         VTTIntegration.loadNPCs([{
+                            fichaId: npcName,
                             name: npcName,
                             tokenUrl: base64Url,
                             position: { x: 5, y: 5 }
@@ -1149,13 +1220,262 @@ export const GMPanelModule = {
                     });
                     window.app.showAlert(`Token de "${npcName}" invocado no mapa!`, "Invocação");
                 } catch (err) {
-                    console.error("[Lyra VTT] Erro ao otimizar token de NPC:", err);
-                    window.app.showAlert("Falha ao invocar token da ameaça.");
+                    console.error("[Lyra VTT] Erro ao carregar token NPC:", err);
+                    window.app.showAlert("Falha ao invocar ameaça.");
                 } finally {
                     window.app.toggleLoading(false);
                 }
             });
         }
+    },
+
+    // --- Modal de Vinculação de Mapa a Sessões do Sistema ---
+    _pendingMapFile: null,
+
+    async openMapLinkModal(file) {
+        if (!file) return;
+        this._pendingMapFile = file;
+
+        const modal = document.getElementById('gm-vtt-map-link-modal');
+        const previewImg = document.getElementById('vtt-map-link-preview-img');
+        const previewName = document.getElementById('vtt-map-link-preview-name');
+        const previewSize = document.getElementById('vtt-map-link-preview-size');
+        const listContainer = document.getElementById('vtt-map-sessions-checkboxes-list');
+
+        if (!modal || !listContainer) return;
+
+        // Preview da imagem
+        if (previewName) previewName.innerText = file.name;
+        if (previewSize) previewSize.innerText = `${(file.size / 1024).toFixed(1)} KB`;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (previewImg) previewImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        // Monta a lista de sessões vinculáveis
+        listContainer.innerHTML = '<div style="color: var(--gold); font-size: 0.8rem; text-align: center; padding: 10px;"><i class="fas fa-spinner fa-spin"></i> Localizando sessões do sistema...</div>';
+        modal.classList.remove('hidden');
+
+        try {
+            const sessionsOptions = [];
+
+            // 1. Capítulos da saga ativa (fullTimeline)
+            if (this.activeSession?.fullTimeline && Array.isArray(this.activeSession.fullTimeline)) {
+                this.activeSession.fullTimeline.forEach((ch, idx) => {
+                    sessionsOptions.push({
+                        id: `chapter_${idx}`,
+                        label: `Sessão ${ch.session || (idx + 1)}: ${ch.title || "Capítulo da Saga"}`,
+                        isChapter: true,
+                        chapterIdx: idx,
+                        checked: true
+                    });
+                });
+            }
+
+            // 2. Sessão ativa atual (Saga Root)
+            if (this.activeSession) {
+                sessionsOptions.unshift({
+                    id: this.activeSession.id,
+                    label: `🌟 ${this.activeSession.title || "Sessão Atual"} (Crônica Ativa)`,
+                    isRoot: true,
+                    checked: true
+                });
+            }
+
+            // 3. Outras sessões do mestre no mesmo sistema
+            try {
+                const user = getAuth().currentUser;
+                if (user) {
+                    const { collection, query, where, getDocs } = await import("firebase/firestore");
+                    const q = query(
+                        collection(db, "sessoes"),
+                        where("userId", "==", user.uid)
+                    );
+                    const snap = await getDocs(q);
+                    snap.forEach(d => {
+                        if (d.id !== this.activeSession?.id) {
+                            const data = d.data();
+                            sessionsOptions.push({
+                                id: d.id,
+                                label: `📜 ${data.title || "Sessão Antiga"}`,
+                                isRoot: true,
+                                checked: false
+                            });
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn("[Lyra VTT] Nota: Falha ao carregar outras sessões:", err);
+            }
+
+            // Renderiza as checkboxes
+            let html = "";
+            sessionsOptions.forEach(opt => {
+                html += `
+                    <label style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(30, 15, 8, 0.45); border: 1px solid rgba(212,175,55,0.2); border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #f5e6c8; transition: background 0.2s;">
+                        <input type="checkbox" value="${opt.id}" data-is-chapter="${!!opt.isChapter}" data-chapter-idx="${opt.chapterIdx ?? ''}" ${opt.checked ? 'checked' : ''} style="accent-color: var(--gold); cursor: pointer; width: 16px; height: 16px;">
+                        <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${opt.label}</span>
+                    </label>
+                `;
+            });
+
+            listContainer.innerHTML = html || '<div style="color: #aaa; text-align: center; font-size: 0.8rem;">Nenhuma sessão encontrada.</div>';
+        } catch (err) {
+            console.error("[Lyra VTT] Erro ao popular lista de sessões:", err);
+            listContainer.innerHTML = '<div style="color: #e74c3c; text-align: center; font-size: 0.8rem;">Erro ao carregar sessões.</div>';
+        }
+    },
+
+    closeMapLinkModal() {
+        const modal = document.getElementById('gm-vtt-map-link-modal');
+        if (modal) modal.classList.add('hidden');
+        this._pendingMapFile = null;
+    },
+
+    async confirmMapLink() {
+        if (!this._pendingMapFile) {
+            window.app.showAlert("Nenhum arquivo de mapa foi selecionado.", "Aviso");
+            return;
+        }
+
+        const checkboxes = document.querySelectorAll('#vtt-map-sessions-checkboxes-list input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            window.app.showAlert("Selecione pelo menos uma sessão para vincular a imagem.", "Aviso");
+            return;
+        }
+
+        window.app.toggleLoading(true, "Otimizando imagem e vinculando às sessões no éter...");
+
+        try {
+            const user = getAuth().currentUser;
+            if (!user) throw new Error("Usuário não autenticado.");
+
+            // 1. Otimiza a imagem em Base64 através do Canvas
+            const base64Url = await this.compressImage(this._pendingMapFile, 1280, 1280, 0.8);
+            const cellSize = Number(this.activeSession?.cellSize) || 64;
+
+            // Extrai IDs selecionados
+            const selectedSessionIds = [];
+            const selectedChapterIndices = [];
+
+            checkboxes.forEach(cb => {
+                const val = cb.value;
+                const isChapter = cb.dataset.isChapter === 'true';
+                if (isChapter) {
+                    selectedChapterIndices.push(Number(cb.dataset.chapterIdx));
+                } else {
+                    selectedSessionIds.push(val);
+                }
+            });
+
+            // 2. Salva no Firestore como IMAGEM na coleção 'images'
+            const { collection, addDoc, serverTimestamp, updateDoc, doc } = await import("firebase/firestore");
+            const imageDoc = await addDoc(collection(db, "images"), {
+                name: this._pendingMapFile.name,
+                imageData: base64Url,
+                type: this._pendingMapFile.type || "image/jpeg",
+                userId: user.uid,
+                systemId: this.activeSession?.system || "dnd5e",
+                linkedSessions: selectedSessionIds,
+                linkedChapters: selectedChapterIndices,
+                createdAt: serverTimestamp()
+            });
+
+            console.log(`[Lyra VTT] Imagem salva na coleção 'images' com ID: ${imageDoc.id}`);
+
+            // 3. Salva o link da imagem nos dados de cada sessão selecionada
+            for (const sessId of selectedSessionIds) {
+                try {
+                    await updateDoc(doc(db, COLLECTIONS.SESSIONS, sessId), {
+                        mapUrl: base64Url,
+                        mapImageId: imageDoc.id,
+                        cellSize: cellSize,
+                        updatedAt: serverTimestamp()
+                    });
+                } catch (sessErr) {
+                    console.warn(`[Lyra VTT] Falha ao atualizar sessão ${sessId}:`, sessErr);
+                }
+            }
+
+            // 4. Se capítulos da saga ativa foram selecionados, atualiza no fullTimeline
+            if (this.activeSession?.fullTimeline && selectedChapterIndices.length > 0) {
+                const updatedTimeline = [...this.activeSession.fullTimeline];
+                selectedChapterIndices.forEach(idx => {
+                    if (updatedTimeline[idx]) {
+                        updatedTimeline[idx].mapUrl = base64Url;
+                        updatedTimeline[idx].mapImageId = imageDoc.id;
+                    }
+                });
+                await updateDoc(doc(db, COLLECTIONS.SESSIONS, this.activeSession.id), {
+                    fullTimeline: updatedTimeline,
+                    updatedAt: serverTimestamp()
+                });
+                this.activeSession.fullTimeline = updatedTimeline;
+            }
+
+            // 5. Atualiza estado da sessão ativa na memória
+            if (this.activeSession) {
+                this.activeSession.mapUrl = base64Url;
+                this.activeSession.mapImageId = imageDoc.id;
+            }
+
+            // 6. Atualiza miniatura na barra lateral do painel do mestre
+            this.updateSidebarMapPreview(base64Url);
+
+            // 7. Se o modal do VTT estiver aberto, propaga imediatamente para a cena
+            import('./vtt-integration.js').then(({ VTTIntegration }) => {
+                VTTIntegration.loadMap(base64Url, cellSize);
+            });
+
+            this.closeMapLinkModal();
+            window.app.showAlert("O cenário foi salvo como IMAGEM no Firestore e vinculado com sucesso às sessões selecionadas!", "Mapa Vinculado");
+
+        } catch (err) {
+            console.error("[Lyra VTT] Erro ao salvar imagem e vincular:", err);
+            window.app.showAlert("Falha ao salvar cenário: " + err.message, "Erro");
+        } finally {
+            window.app.toggleLoading(false);
+        }
+    },
+
+    // --- Atualização da Miniatura de Mapa na Barra Lateral do Painel do Mestre ---
+    updateSidebarMapPreview(mapUrl) {
+        const container = document.getElementById('gm-map-container');
+        if (!container) return;
+
+        if (mapUrl && mapUrl !== '/assets/maps/default.jpg') {
+            container.innerHTML = `
+                <div class="map-grid-overlay"></div>
+                <img src="${mapUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="Cenário Tático">
+                <div style="position: absolute; bottom: 6px; right: 6px; background: rgba(12,6,3,0.85); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; color: var(--gold); border: 1px solid rgba(212,175,55,0.4); display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.6);" data-action="gm-open-map">
+                    <i class="fas fa-expand"></i> Abrir VTT
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="map-grid-overlay"></div>
+                <div class="map-placeholder"><i class="fas fa-compass fa-spin"></i><p>Em breve: Mapas Táticos</p></div>
+            `;
+        }
+    },
+
+    spawnPlayerToken(characterId) {
+        if (!characterId) return;
+
+        import('./vtt-integration.js').then(({ VTTIntegration }) => {
+            // Instancia o token do herói com os dados esperados pelo GDevelop (LoadPlayer)
+            const playerPayload = [{
+                fichaId: String(characterId),
+                id: String(characterId),
+                x: 6,
+                y: 5
+            }];
+
+            VTTIntegration.loadPlayers(playerPayload);
+            window.app.showAlert("O herói foi invocado no tabuleiro tático!", "Token Convocado");
+        });
     },
 
     compressImage(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
@@ -1698,9 +2018,13 @@ export const GMPanelModule = {
         if (hiddenValue) hiddenValue.value = "";
 
         if (title) {
-            title.innerHTML = mode === 'enter'
-                ? '<i class="fas fa-scroll"></i> ESCOLHER CAPÍTULO'
-                : '<i class="fas fa-exchange-alt"></i> ALTERNAR CRÔNICA';
+            if (mode === 'vtt') {
+                title.innerHTML = '<i class="fas fa-map-location-dot"></i> ESCOLHER SESSÃO DO VTT';
+            } else if (mode === 'enter') {
+                title.innerHTML = '<i class="fas fa-scroll"></i> ESCOLHER CAPÍTULO';
+            } else {
+                title.innerHTML = '<i class="fas fa-exchange-alt"></i> ALTERNAR CRÔNICA';
+            }
         }
 
         modal.classList.remove('hidden');
@@ -1714,11 +2038,22 @@ export const GMPanelModule = {
         };
 
         const newConfirmBtn = confirmBtn.cloneNode(true);
+        if (mode === 'vtt') {
+            newConfirmBtn.innerHTML = '<i class="fas fa-map-location-dot"></i> ADENTRAR VTT';
+        } else if (mode === 'enter') {
+            newConfirmBtn.innerHTML = '<i class="fas fa-check"></i> CONFIRMAR TRILHA';
+        } else {
+            newConfirmBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> ALTERNAR';
+        }
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
-        // CASE A: Entering Atrium (Chapter Selection from Active Session)
-        if (mode === 'enter' && this.activeSession && this.activeSession.fullTimeline) {
-            if (textDisplay) textDisplay.textContent = "Selecione um capítulo da trilha...";
+        // CASE A: Entering Atrium or VTT (Chapter/Session Selection from Active Chronicle)
+        if ((mode === 'enter' || mode === 'vtt') && this.activeSession && this.activeSession.fullTimeline) {
+            if (textDisplay) {
+                textDisplay.textContent = mode === 'vtt' 
+                    ? "Selecione a sessão para iniciar no VTT..."
+                    : "Selecione um capítulo da trilha...";
+            }
 
             let optionsHtml = '';
             this.activeSession.fullTimeline.forEach((item, index) => {
@@ -1735,15 +2070,15 @@ export const GMPanelModule = {
             newConfirmBtn.addEventListener('click', () => {
                 const selectedIndex = hiddenValue.value;
                 if (selectedIndex !== "") {
-                    this.switchSession(this.activeSession.id, 'enter', selectedIndex);
+                    this.switchSession(this.activeSession.id, mode, selectedIndex);
                 } else {
-                    window.app.showAlert("Selecione um capítulo antes de prosseguir.");
+                    window.app.showAlert("Selecione uma sessão antes de prosseguir.", "Aviso");
                 }
             });
             return;
         }
 
-        // CASE B: Switching Saga (Top-level Session Selection)
+        // CASE B: Switching Saga / Selecting Session (Top-level Session Selection)
         try {
             const user = getAuth().currentUser;
             const systemId = window.app.currentSystem;
@@ -1762,7 +2097,11 @@ export const GMPanelModule = {
                 return;
             }
 
-            if (textDisplay) textDisplay.textContent = "Escolha uma crônica...";
+            if (textDisplay) {
+                textDisplay.textContent = mode === 'vtt'
+                    ? "Escolha a crônica para adentrar o VTT..."
+                    : "Escolha uma crônica...";
+            }
             let optionsHtml = '';
             snapshot.docs.forEach((docSnap, index) => {
                 const data = docSnap.data();
@@ -1783,7 +2122,7 @@ export const GMPanelModule = {
                 if (selectedId) {
                     this.switchSession(selectedId, mode);
                 } else {
-                    window.app.showAlert("Selecione um destino antes de prosseguir.");
+                    window.app.showAlert("Selecione um destino antes de prosseguir.", "Aviso");
                 }
             });
 
@@ -1800,6 +2139,26 @@ export const GMPanelModule = {
 
     async switchSession(sessionId, mode = 'switch', chapterIndex = null) {
         this.closeSessionSelectModal();
+
+        // MODO VTT: Abre o Virtual Tabletop com a sessão e capítulo selecionados
+        if (mode === 'vtt') {
+            let finalIdx = chapterIndex !== null && chapterIndex !== "" ? parseInt(chapterIndex, 10) : 0;
+            if (isNaN(finalIdx)) finalIdx = 0;
+
+            localStorage.setItem('lyra_active_session', sessionId);
+            localStorage.setItem('lyra_active_chapter', finalIdx);
+
+            // Atualiza activeChapterIndex no Firestore se for o dono da sessão
+            try {
+                updateDoc(doc(db, COLLECTIONS.SESSIONS, sessionId), {
+                    activeChapterIndex: finalIdx,
+                    updatedAt: serverTimestamp()
+                }).catch(() => {});
+            } catch(e) {}
+
+            window.open(`vtt.html?id=${sessionId}&chapter=${finalIdx}&role=gm`, '_blank');
+            return;
+        }
 
         if (mode === 'enter') {
             window.app.toggleLoading(true, "Abrindo os portões do Atrium...");

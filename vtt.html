@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyra VTT — Tabuleiro Tático em Produção</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/tokens/lyra.png" type="image/png">
+
+    <!-- Fontes & Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Grenze+Gotisch:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos Base -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050302;
+            font-family: 'Montserrat', sans-serif;
+            color: #f5e6c8;
+        }
+
+        /* Top Bar Temática */
+        #vtt-topbar {
+            height: 48px;
+            background: linear-gradient(180deg, rgba(20, 10, 5, 0.98) 0%, rgba(12, 6, 3, 0.95) 100%);
+            border-bottom: 2px solid var(--gold, #d4af37);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            position: relative;
+        }
+
+        .vtt-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vtt-brand img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--gold, #d4af37);
+        }
+
+        .vtt-title-group {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .vtt-title {
+            font-family: 'Grenze Gotisch', serif;
+            font-size: 1.3rem;
+            color: var(--gold, #d4af37);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 40vw;
+        }
+
+        .vtt-role-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .vtt-role-badge.gm {
+            background: rgba(184, 134, 11, 0.25);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .vtt-role-badge.player {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .vtt-sync-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .vtt-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+            box-shadow: 0 0 8px #2ecc71;
+            animation: pulse-sync 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-sync {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .vtt-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vtt-action-btn {
+            background: rgba(30, 15, 8, 0.7);
+            border: 1px solid var(--gold, #d4af37);
+            color: var(--gold, #d4af37);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .vtt-action-btn:hover {
+            background: var(--gold, #d4af37);
+            color: #1a0f05;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Container do Iframe do Motor */
+        #vtt-frame-wrapper {
+            width: 100%;
+            height: calc(100% - 48px);
+            position: relative;
+            background: #000;
+        }
+
+        #vtt-engine-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Overlay de Carregamento */
+        #vtt-loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 3, 2, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 50;
+            transition: opacity 0.4s ease;
+        }
+
+        .medieval-loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: var(--gold, #d4af37);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #vtt-loading-text {
+            font-family: 'Grenze Gotisch', serif;
+            font-size: 1.4rem;
+            color: var(--gold, #d4af37);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Controle Superior -->
+    <header id="vtt-topbar">
+        <div class="vtt-brand">
+            <img src="/assets/tokens/lyra.png" alt="Lyra">
+            <div class="vtt-title-group">
+                <h1 class="vtt-title" id="vtt-session-title">Conectando ao Tabuleiro...</h1>
+                <span class="vtt-role-badge gm" id="vtt-role-badge">Mestre</span>
+            </div>
+        </div>
+
+        <div class="vtt-sync-status">
+            <div class="vtt-status-dot" id="vtt-sync-dot"></div>
+            <span id="vtt-sync-label">Sincronizado em Tempo Real</span>
+        </div>
+
+        <div class="vtt-actions">
+            <button class="vtt-action-btn" id="btn-vtt-fullscreen" title="Alternar Tela Cheia">
+                <i class="fas fa-expand"></i> Tela Cheia
+            </button>
+            <button class="vtt-action-btn" id="btn-vtt-exit" title="Sair do Tabuleiro">
+                <i class="fas fa-door-open"></i> Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Container do Motor GDevelop VTT -->
+    <main id="vtt-frame-wrapper">
+        <div id="vtt-loading-overlay">
+            <div class="medieval-loader"></div>
+            <p id="vtt-loading-text">Abrindo os Portais do Tabuleiro Tático...</p>
+        </div>
+        <iframe id="vtt-engine-frame" src="/vtt/app/index.html" allow="clipboard-read; clipboard-write"></iframe>
+    </main>
+
+    <!-- Script de Inicialização e Sincronização -->
+    <script type="module">
+        import { db, auth } from './js/auth.js';
+        import { onAuthStateChanged } from "firebase/auth";
+        import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+        import { VTTIntegration } from './js/modules/vtt-integration.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('id');
+        const forcedRole = params.get('role'); // 'gm' ou 'player'
+
+        const iframe = document.getElementById('vtt-engine-frame');
+        const sessionTitleEl = document.getElementById('vtt-session-title');
+        const roleBadgeEl = document.getElementById('vtt-role-badge');
+        const loadingOverlay = document.getElementById('vtt-loading-overlay');
+        const loadingText = document.getElementById('vtt-loading-text');
+
+        if (!sessionId) {
+            alert("ID da Sessão não informado. Retornando ao portal...");
+            window.location.href = '/';
+        }
+
+        // Configuração de Tela Cheia
+        document.getElementById('btn-vtt-fullscreen')?.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.warn(err));
+            } else {
+                document.exitFullscreen().catch(err => console.warn(err));
+            }
+        });
+
+        // Configuração de Saída
+        document.getElementById('btn-vtt-exit')?.addEventListener('click', () => {
+            if (window.opener) {
+                window.close();
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // Inicialização de Autenticação e Dados
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                alert("Você precisa estar autenticado para adentrar o VTT.");
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                loadingText.innerText = "Consultando os Anais da Jornada...";
+                const sessionRef = doc(db, "sessoes", sessionId);
+                const sessionSnap = await getDoc(sessionRef);
+
+                if (!sessionSnap.exists()) {
+                    alert("A sessão informada não foi encontrada no éter.");
+                    window.location.href = '/';
+                    return;
+                }
+
+                const sessionData = sessionSnap.data();
+                const isGM = forcedRole === 'gm' || (sessionData.userId === user.uid);
+
+                // Configura interface
+                sessionTitleEl.innerText = sessionData.title || "Jornada Arcana";
+                if (isGM) {
+                    roleBadgeEl.innerText = "Mestre";
+                    roleBadgeEl.className = "vtt-role-badge gm";
+                } else {
+                    roleBadgeEl.innerText = "Aventureiro";
+                    roleBadgeEl.className = "vtt-role-badge player";
+                }
+
+                loadingText.innerText = "Conectando ao Motor Tático...";
+
+                // Inicializa o módulo VTT
+                VTTIntegration.init(iframe, sessionId, { isMaster: isGM });
+
+                VTTIntegration.waitForGame(async (game, scene) => {
+                    loadingText.innerText = "Manifestando Mapa e Aventureiros...";
+
+                    // 1. Envia a identidade do jogador
+                    VTTIntegration.sendPlayerID(user.uid, isGM);
+
+                    // 2. Envia o ID da sessão para sincronização
+                    VTTIntegration.sendSessionID(sessionId, "on");
+
+                    // 3. Carrega o mapa vinculado à sessão ou capítulo selecionado
+                    const chapterParam = params.get('chapter');
+                    const chapterIdx = (chapterParam !== null && chapterParam !== "") 
+                        ? parseInt(chapterParam, 10) 
+                        : (sessionData.activeChapterIndex !== undefined ? parseInt(sessionData.activeChapterIndex, 10) : 0);
+                    
+                    const chapterData = (sessionData.fullTimeline && sessionData.fullTimeline[chapterIdx]) 
+                        ? sessionData.fullTimeline[chapterIdx] 
+                        : null;
+                    
+                    const mapUrl = chapterData?.mapUrl || sessionData.mapUrl || "/assets/maps/default.jpg";
+                    const cellSize = Number(chapterData?.cellSize || sessionData.cellSize || 64);
+
+                    if (chapterData?.title) {
+                        sessionTitleEl.innerText = `${sessionData.title || "Crônica"} - ${chapterData.title}`;
+                    }
+
+                    VTTIntegration.loadMap(mapUrl, cellSize);
+
+                    // 4. Carrega os aventureiros vinculados à sessão
+                    try {
+                        const q = query(collection(db, "session_invites"), where("sessionId", "==", sessionId));
+                        const invitesSnap = await getDocs(q);
+                        const playersList = [];
+
+                        invitesSnap.forEach(docSnap => {
+                            const p = docSnap.data();
+                            if (p.characterId) {
+                                playersList.push({
+                                    fichaId: p.characterId,
+                                    characterName: p.characterName || p.nickname || "Aventureiro"
+                                });
+                            }
+                        });
+
+                        if (playersList.length > 0) {
+                            console.log(`[Lyra VTT] Invocando ${playersList.length} aventureiros no mapa:`, playersList);
+                            VTTIntegration.loadPlayers(playersList);
+                        }
+                    } catch (pErr) {
+                        console.warn("[Lyra VTT] Falha ao carregar lista de aventureiros:", pErr);
+                    }
+
+                    // 5. Restaura estado de AttSession salvo no documento da sessão
+                    let savedAttContent = sessionData.AttSession || sessionData.vttVariables || null;
+                    if (!savedAttContent && (sessionData.Tile_Matriz || sessionData.Players)) {
+                        savedAttContent = {
+                            Act_Scene_State: sessionData.Act_Scene_State || "LOAD",
+                            Att: sessionData.Att !== undefined ? sessionData.Att : true,
+                            Iniciative: sessionData.Iniciative || {},
+                            Itens: sessionData.Itens || {},
+                            Objects: sessionData.Objects || {},
+                            Players: sessionData.Players || {},
+                            SCENE_STATES: sessionData.SCENE_STATES || {},
+                            Tile_Matriz: sessionData.Tile_Matriz || [],
+                            Time: sessionData.Time || Date.now()
+                        };
+                    }
+
+                    if (savedAttContent) {
+                        const restored = VTTIntegration.restoreArraysFromFirestore(savedAttContent);
+                        console.log("[Lyra VTT] Restaurando AttSession da sessão no motor:", restored);
+                        VTTIntegration.sendToVTT({
+                            type: "AttSession",
+                            content: restored
+                        });
+                    }
+
+                    // Remove tela de carregamento suavemente
+                    setTimeout(() => {
+                        if (loadingOverlay) {
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => loadingOverlay.style.display = 'none', 400);
+                        }
+                    }, 800);
+                });
+
+            } catch (err) {
+                console.error("[Lyra VTT] Erro ao carregar sessão no VTT:", err);
+                alert("Falha ao abrir a sessão no VTT: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
