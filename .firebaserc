@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "lyra-the-wise"
+    "default": "lyra-the-wise",
+    "prod": "lyra-the-wise",
+    "dev": "lyra-the-wise-dev"
   }
 }
