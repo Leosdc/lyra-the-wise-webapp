@@ -351,34 +351,39 @@ export const VTTIntegration = {
                 const win = this.iframeEl?.contentWindow;
                 const mapObjects = scene.getObjects("Map");
                 if (win && mapObjects && mapObjects.length > 0) {
-                    // 1. Carrega a imagem nativa e aplica como textura PixiJS direta
+                    // 1. Carrega e aplica a textura PixiJS diretamente no contexto do iframe
                     try {
-                        const img = new Image();
-                        img.crossOrigin = "anonymous";
-                        img.onload = () => {
-                            try {
-                                const PIXI = win.PIXI;
-                                if (PIXI && PIXI.Texture) {
-                                    const texture = PIXI.Texture.from(img);
-                                    mapObjects.forEach(m => {
-                                        if (m.getRendererObject) {
-                                            m.getRendererObject().texture = texture;
-                                            m.getBehavior("Resizable")?.setSize(resolvedWidth, resolvedHeight);
-                                        }
-                                    });
-                                    console.log("[Lyra VTT] Textura do mapa aplicada com sucesso ao PixiJS!");
-                                }
-                            } catch (pixiErr) {
-                                console.warn("[Lyra VTT] Aviso ao aplicar textura Pixi:", pixiErr);
-                            }
-                        };
-                        img.src = safeUrl;
-                    } catch (imgErr) {}
+                        const PIXI = win.PIXI;
+                        if (PIXI && PIXI.Texture) {
+                            const texture = PIXI.Texture.from(safeUrl);
+                            const applyTextureAndDimensions = () => {
+                                mapObjects.forEach(m => {
+                                    const renderer = m.getRendererObject ? m.getRendererObject() : null;
+                                    if (renderer) {
+                                        renderer.texture = texture;
+                                    }
+                                    if (m.setWidth && m.setHeight) {
+                                        m.setWidth(resolvedWidth);
+                                        m.setHeight(resolvedHeight);
+                                    }
+                                    m.hitBoxesDirty = true;
+                                    m.getBehavior("Resizable")?.setSize(resolvedWidth, resolvedHeight);
+                                });
+                                console.log("[Lyra VTT] Textura do mapa aplicada com sucesso ao PixiJS! Dimensões:", resolvedWidth, resolvedHeight);
+                            };
 
-                    // 2. Aciona o loader nativo do GDevelop para compatibilidade com eventos da engine
-                    if (safeUrl.startsWith("http") && win.gdjs?.evtsExt__LoadImageFromURL__LoadURLIntoSprite) {
-                        win.gdjs.evtsExt__LoadImageFromURL__LoadURLIntoSprite.func(scene, safeUrl, mapObjects, true, null);
-                        console.log("[Lyra VTT] Cenário do mapa carregado diretamente no objeto Map!");
+                            const baseTex = texture.baseTexture;
+                            if (baseTex && (baseTex.valid || baseTex.hasLoaded)) {
+                                applyTextureAndDimensions();
+                            } else if (baseTex) {
+                                baseTex.once('loaded', applyTextureAndDimensions);
+                                baseTex.once('update', applyTextureAndDimensions);
+                            } else {
+                                applyTextureAndDimensions();
+                            }
+                        }
+                    } catch (pixiErr) {
+                        console.warn("[Lyra VTT] Aviso ao aplicar textura Pixi:", pixiErr);
                     }
                 }
 
